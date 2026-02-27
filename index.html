@@ -37,6 +37,12 @@
     </a>
     <a class="nav-link" data-page="reports" onclick="Router.navigate('reports')">Reports</a>
   </nav>
+  <div class="topbar-auth" id="topbar-auth">
+    <button class="btn btn-dark btn-sm" id="btn-connect-tenant" onclick="handleConnectTenant()">
+      <span class="auth-dot" id="auth-dot"></span>
+      Connect Tenant
+    </button>
+  </div>
 </header>
 
 <!-- ═══ APP ═══ -->
@@ -147,13 +153,30 @@
   <div id="modal" class="modal"></div>
 </div>
 
+<!-- ═══ TENANT CONFIG MODAL ═══ -->
+<div id="tenant-modal-overlay" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-header">
+      <h3 id="tenant-modal-title">Connect to Microsoft 365 Tenant</h3>
+      <button class="modal-close" onclick="document.getElementById('tenant-modal-overlay').classList.remove('open')">&times;</button>
+    </div>
+    <div class="modal-body" id="tenant-config-content"></div>
+  </div>
+</div>
+
+<!-- ═══ DEPLOY PROGRESS ═══ -->
+<div id="deploy-progress" class="deploy-progress" style="display:none"></div>
+
 <!-- ═══ TOAST ═══ -->
 <div id="toast" class="toast"></div>
 
 <!-- ═══ SCRIPTS ═══ -->
+<script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
 <script src="js/data.js"></script>
 <script src="js/state.js"></script>
+<script src="js/auth.js"></script>
 <script src="js/router.js"></script>
+<script src="js/deploy.js"></script>
 <script src="js/assessment.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/policies.js"></script>
@@ -171,6 +194,99 @@ function showToast(msg) {
   el.textContent = msg;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── Tenant Connection ──
+function handleConnectTenant() {
+  if (TenantAuth.isAuthenticated()) {
+    showTenantStatusModal();
+  } else {
+    showTenantConfigModal();
+  }
+}
+
+function showTenantConfigModal() {
+  const content = document.getElementById('tenant-config-content');
+  const storedId = TenantAuth.getStoredClientId() || '';
+  const redirectUri = window.location.origin + window.location.pathname;
+  content.innerHTML = `
+    <p style="font-size:.76rem;color:var(--ink2);margin-bottom:16px;line-height:1.6">
+      To deploy policies directly to your tenant, register an Entra ID app as a public SPA client.
+    </p>
+    <div class="section-hdr">App Registration Setup</div>
+    <ol style="font-size:.72rem;color:var(--ink2);margin:0 0 20px 16px;line-height:2">
+      <li>Go to <strong>Entra admin center</strong> &gt; App registrations &gt; New registration</li>
+      <li>Name: <code style="background:var(--surface2);padding:1px 5px;font-size:.68rem">M365 Compliance Framework</code></li>
+      <li>Supported account types: <strong>Accounts in any organizational directory</strong></li>
+      <li>Platform: <strong>Single-page application (SPA)</strong></li>
+      <li>Redirect URI: <code style="background:var(--surface2);padding:1px 5px;font-size:.68rem">${escHtml(redirectUri)}</code></li>
+      <li>Under API permissions, add the delegated permissions shown below, then grant admin consent</li>
+      <li>Copy the <strong>Application (client) ID</strong> and paste below</li>
+    </ol>
+    <div class="section-hdr">Required API Permissions (Delegated)</div>
+    <div style="display:flex;flex-wrap:wrap;gap:4px;margin-bottom:20px">
+      ${TenantAuth.GRAPH_SCOPES.map(s => '<span class="badge badge-blue">' + s + '</span>').join('')}
+    </div>
+    <label style="display:block;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--ink3);margin-bottom:4px">
+      Application (Client) ID
+    </label>
+    <input class="search-input" type="text" id="input-client-id"
+      placeholder="00000000-0000-0000-0000-000000000000"
+      value="${escHtml(storedId)}"
+      style="margin-bottom:16px">
+    <button class="btn btn-primary" onclick="connectWithClientId()" style="width:100%;padding:10px">
+      Sign in to Microsoft 365
+    </button>`;
+  document.getElementById('tenant-modal-overlay').classList.add('open');
+}
+
+function showTenantStatusModal() {
+  const content = document.getElementById('tenant-config-content');
+  const acct = TenantAuth.getAccount();
+  content.innerHTML = `
+    <div style="text-align:center;padding:20px 0">
+      <div class="auth-dot connected" style="width:24px;height:24px;margin:0 auto 12px"></div>
+      <h4 style="margin-bottom:4px">${escHtml(acct.name)}</h4>
+      <p style="font-size:.72rem;color:var(--ink3)">${escHtml(acct.email)}</p>
+      <p style="font-size:.62rem;color:var(--ink4);margin-top:4px;font-family:'IBM Plex Mono',monospace">Tenant: ${escHtml(acct.tenantId)}</p>
+      <div style="display:flex;gap:8px;justify-content:center;margin-top:20px">
+        <button class="btn btn-sm" onclick="disconnectTenant()">Disconnect</button>
+        <button class="btn btn-sm" onclick="document.getElementById('tenant-modal-overlay').classList.remove('open')">Close</button>
+      </div>
+    </div>`;
+  document.getElementById('tenant-modal-overlay').classList.add('open');
+}
+
+async function connectWithClientId() {
+  const clientId = document.getElementById('input-client-id').value.trim();
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clientId)) {
+    showToast('Please enter a valid Client ID (GUID format)');
+    return;
+  }
+  TenantAuth.setStoredClientId(clientId);
+  AppState.set('authClientId', clientId);
+  const redirectUri = window.location.origin + window.location.pathname;
+  await TenantAuth.init(clientId, redirectUri);
+  document.getElementById('tenant-modal-overlay').classList.remove('open');
+  await TenantAuth.login();
+}
+
+async function disconnectTenant() {
+  document.getElementById('tenant-modal-overlay').classList.remove('open');
+  DeployEngine.clearDeploymentStatus();
+  await TenantAuth.logout();
+  updateAuthUI();
+}
+
+function updateAuthUI() {
+  const btn = document.getElementById('btn-connect-tenant');
+  if (!btn) return;
+  if (TenantAuth.isAuthenticated()) {
+    const acct = TenantAuth.getAccount();
+    btn.innerHTML = '<span class="auth-dot connected"></span>' + escHtml(acct.name || 'Connected');
+  } else {
+    btn.innerHTML = '<span class="auth-dot"></span>Connect Tenant';
+  }
 }
 
 // ── Bootstrap ──
@@ -211,6 +327,39 @@ async function bootstrap() {
 
     // Start router
     Router.init();
+
+    // Initialize MSAL if client ID is stored
+    const storedClientId = TenantAuth.getStoredClientId();
+    if (storedClientId) {
+      const redirectUri = window.location.origin + window.location.pathname;
+      await TenantAuth.init(storedClientId, redirectUri);
+      await TenantAuth.handleRedirectPromise();
+      updateAuthUI();
+    }
+
+    // Listen for auth state changes to update UI
+    AppState.on('authIsConnected', () => {
+      updateAuthUI();
+      if (AppState.get('currentPage') === 'policies') Policies.render();
+    });
+
+    // Listen for deployment progress
+    AppState.on('deploymentProgress', (progress) => {
+      const el = document.getElementById('deploy-progress');
+      if (!el) return;
+      if (!progress) { el.style.display = 'none'; return; }
+      el.style.display = 'block';
+      const pct = Math.round((progress.completed / progress.total) * 100);
+      el.innerHTML = `
+        <div class="deploy-progress-title">Deploying Policies</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+        <div class="deploy-progress-stats">
+          <span>${progress.completed}/${progress.total}</span>
+          <span class="stat-success">${progress.succeeded} ok</span>
+          <span class="stat-failed">${progress.failed} fail</span>
+          <span class="stat-exists">${progress.exists} exist</span>
+        </div>`;
+    });
 
   } catch (err) {
     console.error('Bootstrap failed:', err);

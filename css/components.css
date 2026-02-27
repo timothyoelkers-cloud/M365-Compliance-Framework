@@ -668,3 +668,138 @@
   50% { opacity: .6; }
 }
 .loading { animation: pulse 1.5s var(--ease) infinite; }
+
+/* ── AUTH STATUS (topbar) ────────────── */
+.topbar-auth {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 12px;
+  margin-left: auto;
+  border-left: 1px solid var(--dark-border, rgba(255,255,255,.08));
+}
+.topbar-auth .btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+  font-size: .68rem;
+}
+.auth-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  display: inline-block;
+  flex-shrink: 0;
+  transition: background .3s var(--ease), box-shadow .3s var(--ease);
+}
+.auth-dot.connected {
+  background: #16a34a;
+  box-shadow: 0 0 6px rgba(22,163,74,.5);
+}
+
+/* ── DEPLOY BUTTONS ──────────────────── */
+.btn-deploy {
+  background: var(--blue);
+  color: #fff !important;
+  border-color: var(--blue);
+}
+.btn-deploy:hover {
+  background: #1e40af;
+  border-color: #1e40af;
+}
+.btn-script {
+  background: #7c3aed;
+  color: #fff !important;
+  border-color: #7c3aed;
+}
+.btn-script:hover {
+  background: #6d28d9;
+  border-color: #6d28d9;
+}
+.btn-deployed {
+  background: rgba(22,163,74,.1);
+  color: #16a34a !important;
+  border-color: rgba(22,163,74,.2);
+  cursor: default;
+}
+.btn-failed {
+  background: rgba(220,38,38,.1);
+  color: #dc2626 !important;
+  border-color: rgba(220,38,38,.2);
+}
+.btn-exists {
+  background: rgba(217,119,6,.1);
+  color: #d97706 !important;
+  border-color: rgba(217,119,6,.2);
+  cursor: default;
+}
+
+/* ── DEPLOYMENT STATUS INLINE ────────── */
+.deploy-status {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .56rem;
+  padding: 1px 6px;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  vertical-align: middle;
+  margin-left: 6px;
+}
+.deploy-status-success { color: #16a34a; background: rgba(22,163,74,.08); }
+.deploy-status-failed { color: #dc2626; background: rgba(220,38,38,.08); }
+.deploy-status-exists { color: #d97706; background: rgba(217,119,6,.08); }
+.deploy-status-deploying { color: var(--blue); animation: pulse 1.5s var(--ease) infinite; }
+
+/* ── DEPLOY PROGRESS PANEL ───────────── */
+.deploy-progress {
+  position: fixed;
+  bottom: 60px; right: 20px;
+  background: #0d1117;
+  border: 1px solid rgba(255,255,255,.1);
+  padding: 16px 20px;
+  min-width: 280px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  z-index: 290;
+  color: #e6edf3;
+  font-size: .76rem;
+  border-radius: 4px;
+}
+.deploy-progress-title {
+  font-weight: 700;
+  margin-bottom: 8px;
+  font-size: .66rem;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+  color: rgba(255,255,255,.7);
+}
+.deploy-progress .progress-track {
+  height: 4px;
+  background: rgba(255,255,255,.1);
+  border-radius: 2px;
+  margin: 8px 0;
+  overflow: hidden;
+}
+.deploy-progress .progress-fill {
+  height: 100%;
+  background: var(--blue);
+  transition: width .3s var(--ease);
+  border-radius: 2px;
+}
+.deploy-progress-stats {
+  display: flex;
+  gap: 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .62rem;
+  color: rgba(255,255,255,.5);
+}
+.deploy-progress-stats .stat-success { color: #16a34a; }
+.deploy-progress-stats .stat-failed { color: #dc2626; }
+.deploy-progress-stats .stat-exists { color: #d97706; }
+
+/* ── RESPONSIVE AUTH ─────────────────── */
+@media (max-width: 768px) {
+  .topbar-auth { padding: 0 8px; }
+  .topbar-auth .btn { font-size: .6rem; padding: 3px 8px; }
+}
