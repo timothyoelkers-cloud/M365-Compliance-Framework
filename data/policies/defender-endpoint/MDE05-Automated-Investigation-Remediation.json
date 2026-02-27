@@ -1,47 +1,123 @@
 {
-  "id": "MDE05",
-  "file": "MDE05-Automated-Investigation-Remediation.json",
-  "type": "defender-endpoint",
-  "displayName": "MDE05 | Automated-Investigation-Remediation",
-  "description": "Configures Automated Investigation and Remediation (AIR) to Full Automation. MDE automatically investigates alerts and remediates threats without manual analyst approval. Requires MDE P2.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule",
-    "ISO 22301:2019"
-  ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "Requires Microsoft Defender for Endpoint Plan 2",
-  "requiredLicence": "Microsoft Defender for Endpoint P2 or Microsoft 365 E5",
-  "version": "1.0",
-  "path": "policies/defender-endpoint/MDE05-Automated-Investigation-Remediation.json"
+  "_metadata": {
+    "id": "MDE05",
+    "title": "Automated Investigation and Remediation (AIR)",
+    "description": "Configures Automated Investigation and Remediation to Full Automation level. MDE will automatically investigate alerts and remediate confirmed threats without requiring analyst approval, reducing mean-time-to-respond (MTTR).",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2", "DORA", "ISO 27001:2022", "ISO 22301:2019",
+      "NIST SP 800-53 Rev.5", "UK NCSC CAF v3.2", "SOC 2",
+      "FedRAMP Moderate", "HITRUST CSF v11", "BSI IT-Grundschutz",
+      "ASD Essential Eight", "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark", "NIST CSF 2.0",
+      "CMMC v2.0", "NERC-CIP", "PCI DSS v4.0", "HIPAA",
+      "CJIS v6", "TSA Security Directive"
+    ],
+    "cisChecks": ["5.1.4.1", "5.1.4.2"],
+    "mitreMappings": ["T1059", "T1547", "T1053", "T1036", "T1055"],
+    "requiredLicences": [
+      "Microsoft Defender for Endpoint P2",
+      "Microsoft 365 E5 or Microsoft 365 E5 Security"
+    ],
+    "requiredRoles": ["Security Administrator", "Security Operator"],
+    "deploymentOrder": 5,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Devices must be onboarded to Microsoft Defender for Endpoint (MDE01-MDE03)",
+      "MDE P2 licence is required for Automated Investigation and Remediation",
+      "Cloud-delivered protection must be enabled",
+      "Review and understand the automation levels before deploying Full Automation",
+      "Consider starting with Semi - require approval for core folders before moving to Full"
+    ],
+    "automationLevels": {
+      "fullAutomation": "All remediation actions run automatically without analyst approval (recommended for mature SOCs)",
+      "semiRequireApprovalForCoreFolders": "Auto-remediate except for files in core OS/user folders which require approval",
+      "semiRequireApprovalForNonTempFolders": "Auto-remediate temp folder items; all others require approval",
+      "semiRequireApprovalForAllFolders": "All remediation actions require analyst approval",
+      "noAutomatedResponse": "Investigation runs but no automated remediation (not recommended)"
+    },
+    "deploymentSteps": [
+      "1. Navigate to security.microsoft.com > Settings > Endpoints > Advanced features",
+      "2. Ensure Automated Investigation is toggled ON",
+      "3. Navigate to Settings > Endpoints > Device groups",
+      "4. Set the automation level per device group using the API or portal",
+      "5. Monitor the Action Center for automated remediations"
+    ],
+    "rollbackProcedure": "Change the automation level to 'Semi - require approval for all folders' via the portal or API."
+  },
+  "deviceGroupAutomationSettings": {
+    "graphApiEndpoint": "https://api.securitycenter.microsoft.com/api/machinegroups",
+    "method": "PATCH",
+    "deviceGroups": [
+      {
+        "name": "Standard Workstations",
+        "description": "All standard Windows workstations - full automation",
+        "automationLevel": "fullAutomation",
+        "matchRules": [
+          {
+            "type": "tag",
+            "operator": "contains",
+            "value": "Workstation"
+          }
+        ]
+      },
+      {
+        "name": "Servers - Production",
+        "description": "Production servers - semi automation requiring approval for core folders",
+        "automationLevel": "semiRequireApprovalForCoreFolders",
+        "matchRules": [
+          {
+            "type": "tag",
+            "operator": "contains",
+            "value": "Server-Prod"
+          }
+        ]
+      },
+      {
+        "name": "High-Value Assets",
+        "description": "Domain controllers, CA servers, financial systems - manual approval required",
+        "automationLevel": "semiRequireApprovalForAllFolders",
+        "matchRules": [
+          {
+            "type": "tag",
+            "operator": "contains",
+            "value": "HVA"
+          }
+        ]
+      }
+    ]
+  },
+  "advancedFeatures": {
+    "graphApiEndpoint": "https://api.securitycenter.microsoft.com/api/preferences",
+    "settings": {
+      "automatedInvestigation": true,
+      "autoResolveRemediatedAlerts": true,
+      "allowOrBlockFile": true,
+      "liveResponse": true,
+      "liveResponseForServers": true,
+      "liveResponseUnsignedScriptExecution": false
+    }
+  },
+  "intuneIntegration": {
+    "graphApiEndpoint": "https://graph.microsoft.com/beta/deviceManagement/advancedThreatProtection",
+    "advancedThreatProtectionSettings": {
+      "automatedInvestigation": {
+        "enabled": true,
+        "automationLevel": "fullAutomation"
+      },
+      "autoResolveRemediatedAlerts": true
+    }
+  },
+  "monitoringConfig": {
+    "actionCenterReview": {
+      "frequency": "daily",
+      "reviewUrl": "https://security.microsoft.com/action-center",
+      "alertOnPendingActions": true,
+      "pendingActionThresholdHours": 4
+    }
+  }
 }

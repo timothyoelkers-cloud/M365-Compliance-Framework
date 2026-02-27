@@ -1,44 +1,169 @@
 {
-  "id": "MDE11",
-  "file": "MDE11-Deception-Technology-Enable.json",
-  "type": "defender-endpoint",
-  "displayName": "MDE11 | Deception-Technology-Enable",
-  "description": "Enables MDE Deception (Honeypot) technology. Deploys fake credentials, decoy files, and lure components to detect adversary lateral movement. Generates high-fidelity alerts on compromise.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule"
+  "_metadata": {
+    "id": "MDE11",
+    "title": "Enable MDE Deception Technology",
+    "description": "Enables Microsoft Defender for Endpoint deception capabilities including honeytoken accounts, decoy files, and lure components. Detects adversary lateral movement and credential theft with high-fidelity alerts.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "CJIS v6",
+      "TSA Security Directive",
+      "CIRCIA (US)",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "mitreMappings": [
+      "T1078",
+      "T1003",
+      "T1021",
+      "T1552",
+      "T1550",
+      "T1558"
+    ],
+    "requiredLicences": [
+      "Microsoft Defender for Endpoint P2",
+      "Microsoft 365 E5 or Microsoft 365 E5 Security"
+    ],
+    "requiredRoles": [
+      "Security Administrator"
+    ],
+    "deploymentOrder": 11,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Devices must be onboarded to MDE (MDE01 deployed)",
+      "MDE P2 licence required for deception capabilities",
+      "Active Directory must be connected for honeytoken account deception",
+      "Requires domain-joined devices for full deception lure deployment",
+      "At least one device per network segment for effective coverage"
+    ],
+    "deceptionTypes": {
+      "honeytokenAccounts": "Fake user accounts planted in Active Directory that generate high-fidelity alerts when authentication is attempted",
+      "decoyFiles": "Fake documents and files placed on endpoints that generate alerts when accessed",
+      "lureComponents": "Fake cached credentials, browser history entries, and RDP connections that attract lateral movement"
+    },
+    "deploymentSteps": [
+      "1. Navigate to security.microsoft.com > Settings > Endpoints > Advanced features",
+      "2. Enable the Deception capability toggle",
+      "3. Configure deception rules in Settings > Endpoints > Deception",
+      "4. Create honeytoken accounts in Active Directory or via the deception settings",
+      "5. Configure lure types and deployment scope",
+      "6. Deploy lures to target device groups",
+      "7. Monitor deception alerts in the Incidents queue"
+    ],
+    "rollbackProcedure": "Disable the Deception toggle in MDE advanced features. Remove honeytoken accounts from AD. Lures will be automatically cleaned up from endpoints."
+  },
+  "deceptionSettings": {
+    "portalUrl": "https://security.microsoft.com/deception",
+    "featureToggle": {
+      "path": "Settings > Endpoints > Advanced features > Deception",
+      "enabled": true
+    }
+  },
+  "deceptionRules": [
+    {
+      "ruleName": "MDE11 - Honeytoken Account Deception",
+      "description": "Deploy honeytoken accounts that generate alerts on any authentication attempt",
+      "ruleType": "honeytokenAccount",
+      "isEnabled": true,
+      "honeytokenAccounts": [
+        {
+          "displayName": "Service Account - Legacy Backup",
+          "samAccountName": "svc-backup-legacy",
+          "description": "Backup service account (decommissioned)",
+          "_note": "Create this account in AD with a strong random password. Account should be disabled but appear legitimate."
+        },
+        {
+          "displayName": "Admin - IT Support",
+          "samAccountName": "adm-itsupport",
+          "description": "IT admin account",
+          "_note": "Honeytoken admin account. Any authentication attempt triggers a high-severity alert."
+        }
+      ],
+      "alertSeverity": "high",
+      "alertTitle": "Honeytoken account authentication attempt detected"
+    },
+    {
+      "ruleName": "MDE11 - Decoy File Deception",
+      "description": "Deploy decoy documents that generate alerts when opened or accessed",
+      "ruleType": "decoyFile",
+      "isEnabled": true,
+      "decoyFiles": [
+        {
+          "fileName": "Passwords-Master-List.xlsx",
+          "fileType": "xlsx",
+          "placementPath": "C:\\Users\\Public\\Documents",
+          "description": "Decoy password file that attracts credential seekers"
+        },
+        {
+          "fileName": "VPN-Config-Backup.docx",
+          "fileType": "docx",
+          "placementPath": "C:\\Users\\Public\\Documents",
+          "description": "Decoy VPN configuration file"
+        },
+        {
+          "fileName": "AWS-Keys-Production.txt",
+          "fileType": "txt",
+          "placementPath": "C:\\Users\\Public\\Documents",
+          "description": "Decoy cloud credential file"
+        }
+      ],
+      "targetDeviceGroups": [],
+      "alertSeverity": "high"
+    },
+    {
+      "ruleName": "MDE11 - Lure Components",
+      "description": "Deploy lure components (cached credentials, browser history, RDP shortcuts) to attract lateral movement",
+      "ruleType": "lureComponent",
+      "isEnabled": true,
+      "lureTypes": [
+        {
+          "type": "cachedCredentials",
+          "enabled": true,
+          "description": "Plant fake cached domain credentials on endpoints"
+        },
+        {
+          "type": "browserHistory",
+          "enabled": true,
+          "description": "Plant fake browser history entries pointing to honeytoken resources"
+        },
+        {
+          "type": "rdpConnections",
+          "enabled": true,
+          "description": "Plant fake RDP connection history entries"
+        },
+        {
+          "type": "networkShares",
+          "enabled": true,
+          "description": "Plant fake mapped network drive entries"
+        }
+      ],
+      "targetDeviceGroups": [],
+      "deploymentScope": "allOnboardedDevices",
+      "alertSeverity": "high"
+    }
   ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Requires Microsoft Defender for Endpoint Plan 2",
-  "requiredLicence": "Microsoft Defender for Endpoint P2 or Microsoft 365 E5",
-  "version": "1.0",
-  "path": "policies/defender-endpoint/MDE11-Deception-Technology-Enable.json"
+  "monitoringConfig": {
+    "advancedHuntingQuery": "AlertInfo | where Title has 'deception' or Title has 'honeytoken' or Title has 'lure' | join kind=inner AlertEvidence on AlertId | project Timestamp, AlertId, Title, Severity, DeviceName, AccountName, RemoteIP | sort by Timestamp desc",
+    "incidentCorrelation": true,
+    "_note": "Deception alerts are high-fidelity and should always be investigated as priority incidents"
+  }
 }

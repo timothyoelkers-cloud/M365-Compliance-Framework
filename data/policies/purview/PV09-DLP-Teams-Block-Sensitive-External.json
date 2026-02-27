@@ -1,48 +1,172 @@
 {
-  "id": "PV09",
-  "file": "PV09-DLP-Teams-Block-Sensitive-External.json",
-  "type": "purview",
-  "displayName": "PV09 | DLP-Teams-Block-Sensitive-External",
-  "description": "DLP policy scoped to Microsoft Teams. Blocks sensitive data (credit cards, SSNs, NI numbers) in Teams chat/channel messages to external users.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "UK NCSC Cyber Essentials v3.2",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "CRI Profile v2.0",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)"
-  ],
-  "cisChecks": [
-    "4.2",
-    "9.1.5"
-  ],
-  "importMethod": "powershell-security-compliance",
-  "importScript": "scripts/Import-PurviewPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "Microsoft Purview (M365 E3, E5, or Purview add-on)",
-  "version": "1.0",
-  "path": "policies/purview/PV09-DLP-Teams-Block-Sensitive-External.json"
+  "_metadata": {
+    "id": "PV09",
+    "title": "DLP - Teams Block Sensitive Data to External Participants",
+    "description": "DLP policy scoped exclusively to Microsoft Teams that detects and blocks credit card numbers, Social Security numbers, UK National Insurance numbers, and passport numbers from being shared in Teams chat and channel messages with external participants.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "4.2",
+      "9.1.5"
+    ],
+    "mitreMappings": [
+      "T1048",
+      "T1567.002",
+      "T1530"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E3 (basic DLP for Teams)",
+      "Microsoft 365 E5 or E5 Compliance (advanced DLP features)"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Teams Administrator"
+    ],
+    "deploymentOrder": 9,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Teams DLP requires at minimum M365 E3 licensing",
+      "External access and guest access must be configured in Teams admin center",
+      "Deploy in TestWithNotifications mode initially"
+    ],
+    "teamsSpecificBehaviour": [
+      "DLP in Teams blocks the message from being delivered to external participants",
+      "The sender receives a policy tip explaining why the message was blocked",
+      "Internal recipients in the same conversation can still see the message",
+      "Applies to 1:1 chats, group chats, and channel messages",
+      "File attachments shared in Teams are covered by SharePoint/OneDrive DLP policies"
+    ],
+    "deploymentSteps": [
+      "1. Create the DLP policy scoped to Teams only",
+      "2. Create the detection rule for sensitive data types",
+      "3. Test in simulation mode for 1 week",
+      "4. Verify policy tips appear correctly in Teams client",
+      "5. Switch to enforcement mode"
+    ],
+    "rollbackProcedure": "Set-DlpCompliancePolicy -Identity 'PV09-DLP-Teams-BlockSensitive-External' -Mode Disable"
+  },
+  "powershellCommands": {
+    "createPolicy": {
+      "cmdlet": "New-DlpCompliancePolicy",
+      "parameters": {
+        "Name": "PV09-DLP-Teams-BlockSensitive-External",
+        "Comment": "Blocks sensitive data (credit cards, SSNs, NI numbers, passport numbers) in Teams chat and channel messages to external participants.",
+        "TeamsLocation": [
+          "All"
+        ],
+        "ExchangeLocation": [],
+        "SharePointLocation": [],
+        "OneDriveLocation": [],
+        "Mode": "TestWithNotifications",
+        "Priority": 8
+      }
+    },
+    "createRule": {
+      "cmdlet": "New-DlpComplianceRule",
+      "parameters": {
+        "Name": "PV09-Rule-Teams-BlockSensitive-External",
+        "Policy": "PV09-DLP-Teams-BlockSensitive-External",
+        "ContentContainsSensitiveInformation": [
+          {
+            "name": "Credit Card Number",
+            "id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085",
+            "minCount": 1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.S. Social Security Number (SSN)",
+            "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+            "minCount": 1,
+            "minConfidence": 85,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.K. National Insurance Number (NINO)",
+            "id": "16c07343-c26f-49d2-a987-3daf717e94cc",
+            "minCount": 1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.S. / U.K. Passport Number",
+            "id": "178ec42a-18b4-47cc-85c7-d62c92fd67f8",
+            "minCount": 1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "EU Passport Number",
+            "id": "2c8a1953-6bf7-4f1e-8a8f-39b6919e4ec0",
+            "minCount": 1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.K. National Health Service Number",
+            "id": "eb44f8b2-4d1b-42b5-9b63-3b5be9fcab01",
+            "minCount": 1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          }
+        ],
+        "AccessScope": "NotInOrganization",
+        "BlockAccess": true,
+        "BlockAccessScope": "ExternalUsers",
+        "NotifyUser": [
+          "LastModifier"
+        ],
+        "NotifyUserType": "NotifyAll",
+        "NotifyPolicyTipCustomText": "Your Teams message contains sensitive information (credit card, national ID, or passport numbers) that cannot be shared with external participants. Please remove the sensitive data and try again.",
+        "GenerateAlert": "SiteAdmin",
+        "GenerateIncidentReport": [],
+        "IncidentReportContent": [
+          "Title",
+          "DocumentAuthor",
+          "DocumentLastModifier",
+          "Service",
+          "MatchedItem",
+          "RulesMatched",
+          "Severity"
+        ],
+        "ReportSeverityLevel": "Medium"
+      }
+    }
+  },
+  "policySettings": {
+    "mode": "TestWithNotifications",
+    "priority": 8,
+    "workloads": {
+      "exchangeOnline": false,
+      "sharePointOnline": false,
+      "oneDriveForBusiness": false,
+      "microsoftTeams": true
+    },
+    "_note": "This policy is intentionally scoped to Teams only. Other workloads are covered by PV01-PV08."
+  },
+  "overrideSettings": {
+    "allowOverride": false,
+    "requireBusinessJustification": false,
+    "_note": "No override for sensitive data in Teams messages to external users."
+  }
 }

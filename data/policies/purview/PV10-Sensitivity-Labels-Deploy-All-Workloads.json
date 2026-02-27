@@ -1,51 +1,317 @@
 {
-  "id": "PV10",
-  "file": "PV10-Sensitivity-Labels-Deploy-All-Workloads.json",
-  "type": "purview",
-  "displayName": "PV10 | Sensitivity-Labels-Deploy-All-Workloads",
-  "description": "Deploys Purview sensitivity labels across Exchange, SharePoint, OneDrive, Teams. Auto-labelling for known sensitive content. Labels drive encryption and DLP enforcement.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "CRI Profile v2.0",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "ISO 22301:2019"
-  ],
-  "cisChecks": [
-    "9.1.7",
-    "9.1.10",
-    "9.1.11"
-  ],
-  "importMethod": "powershell-security-compliance",
-  "importScript": "scripts/Import-PurviewPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "Microsoft Purview Information Protection (M365 E5 or AIP add-on)",
-  "version": "1.0",
-  "path": "policies/purview/PV10-Sensitivity-Labels-Deploy-All-Workloads.json"
+  "_metadata": {
+    "id": "PV10",
+    "title": "Sensitivity Labels - Deploy Across All Workloads",
+    "description": "Deploys a four-tier sensitivity label taxonomy (Public, Internal, Confidential, Highly Confidential) with encryption for Confidential and above, watermarking for Highly Confidential, and auto-labelling rules for known sensitive content patterns.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "ISO 27701:2019",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "ASD Essential Eight",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "9.1.7",
+      "9.1.10",
+      "9.1.11"
+    ],
+    "mitreMappings": [
+      "T1048",
+      "T1567",
+      "T1041",
+      "T1530"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Information Protection",
+      "Azure Information Protection P2 (for auto-labelling)"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Security Administrator"
+    ],
+    "deploymentOrder": 10,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Azure Information Protection unified labelling must be activated",
+      "Microsoft 365 Apps must support sensitivity labels (Microsoft 365 Apps for Enterprise)",
+      "For container labels (Teams/Groups/Sites), enable the Azure AD settings",
+      "Plan label taxonomy with stakeholders before deployment"
+    ],
+    "deploymentSteps": [
+      "1. Create labels in order (parent labels first, then sub-labels)",
+      "2. Create the label policy and publish to all users",
+      "3. Configure auto-labelling policies for service-side labelling",
+      "4. Enable mandatory labelling after a 4-week adoption period",
+      "5. Configure default label for new documents",
+      "6. Deploy to containers (Teams, Groups, SharePoint sites)"
+    ],
+    "rollbackProcedure": "Set label policy to draft or remove label assignments. Note: removing encryption from already-encrypted files requires Rights Management super user permissions."
+  },
+  "powershellCommands": {
+    "createLabels": [
+      {
+        "cmdlet": "New-Label",
+        "parameters": {
+          "Name": "Public",
+          "DisplayName": "Public",
+          "Comment": "Information approved for unrestricted distribution. No confidentiality requirements.",
+          "Tooltip": "Use for information that can be freely shared with anyone, including external parties and the general public.",
+          "Priority": 0,
+          "Settings": {
+            "color": "#00AA00"
+          },
+          "LabelActions": {
+            "headerEnabled": true,
+            "headerText": "Classification: PUBLIC",
+            "headerFontSize": 8,
+            "headerColor": "#00AA00",
+            "headerAlignment": "Right",
+            "footerEnabled": true,
+            "footerText": " - Public",
+            "footerFontSize": 8,
+            "footerColor": "#00AA00",
+            "footerAlignment": "Center"
+          }
+        }
+      },
+      {
+        "cmdlet": "New-Label",
+        "parameters": {
+          "Name": "Internal",
+          "DisplayName": "Internal",
+          "Comment": "Information intended only for internal use within the organisation. Not for external distribution without approval.",
+          "Tooltip": "Use for internal business information that should not be shared outside the organisation without prior approval.",
+          "Priority": 1,
+          "Settings": {
+            "color": "#0078D4"
+          },
+          "LabelActions": {
+            "headerEnabled": true,
+            "headerText": "Classification: INTERNAL",
+            "headerFontSize": 8,
+            "headerColor": "#0078D4",
+            "headerAlignment": "Right",
+            "footerEnabled": true,
+            "footerText": " - Internal Use Only",
+            "footerFontSize": 8,
+            "footerColor": "#0078D4",
+            "footerAlignment": "Center"
+          }
+        }
+      },
+      {
+        "cmdlet": "New-Label",
+        "parameters": {
+          "Name": "Confidential",
+          "DisplayName": "Confidential",
+          "Comment": "Sensitive business information requiring protection. Encrypted at rest and in transit. Access restricted to authorised internal users.",
+          "Tooltip": "Use for sensitive information such as financial reports, HR data, customer PII, or business strategies. Content will be encrypted.",
+          "Priority": 2,
+          "Settings": {
+            "color": "#FF8C00"
+          },
+          "EncryptionEnabled": true,
+          "EncryptionProtectionType": "Template",
+          "EncryptionRightsDefinitions": [
+            {
+              "identity": "",
+              "rights": [
+                "VIEW",
+                "EDIT",
+                "PRINT",
+                "COPY",
+                "EXPORT",
+                "FORWARD",
+                "REPLY",
+                "REPLYALL",
+                "EXTRACT"
+              ]
+            }
+          ],
+          "EncryptionDoNotForward": false,
+          "EncryptionOfflineAccessDays": 30,
+          "EncryptionContentExpiredOnDateInDaysOrNever": "Never",
+          "LabelActions": {
+            "headerEnabled": true,
+            "headerText": "Classification: CONFIDENTIAL",
+            "headerFontSize": 8,
+            "headerColor": "#FF8C00",
+            "headerAlignment": "Right",
+            "footerEnabled": true,
+            "footerText": " - Confidential - Do Not Distribute Externally",
+            "footerFontSize": 8,
+            "footerColor": "#FF8C00",
+            "footerAlignment": "Center"
+          }
+        }
+      },
+      {
+        "cmdlet": "New-Label",
+        "parameters": {
+          "Name": "HighlyConfidential",
+          "DisplayName": "Highly Confidential",
+          "Comment": "Extremely sensitive information with the highest protection. Encrypted with restricted access. Watermarked. Requires explicit authorisation for any sharing.",
+          "Tooltip": "Use for the most sensitive information: board papers, M&A documents, security credentials, legal privilege, or regulated data (HIPAA/PCI). Content will be encrypted and watermarked.",
+          "Priority": 3,
+          "Settings": {
+            "color": "#CC0000"
+          },
+          "EncryptionEnabled": true,
+          "EncryptionProtectionType": "Template",
+          "EncryptionRightsDefinitions": [
+            {
+              "identity": "@",
+              "rights": [
+                "VIEW",
+                "EDIT"
+              ]
+            },
+            {
+              "identity": "@",
+              "rights": [
+                "VIEW",
+                "EDIT",
+                "PRINT",
+                "EXPORT"
+              ]
+            }
+          ],
+          "EncryptionDoNotForward": true,
+          "EncryptionOfflineAccessDays": 7,
+          "EncryptionContentExpiredOnDateInDaysOrNever": "Never",
+          "LabelActions": {
+            "headerEnabled": true,
+            "headerText": "Classification: HIGHLY CONFIDENTIAL",
+            "headerFontSize": 10,
+            "headerColor": "#CC0000",
+            "headerAlignment": "Right",
+            "footerEnabled": true,
+            "footerText": " - HIGHLY CONFIDENTIAL - Authorised Recipients Only",
+            "footerFontSize": 10,
+            "footerColor": "#CC0000",
+            "footerAlignment": "Center",
+            "watermarkEnabled": true,
+            "watermarkText": "HIGHLY CONFIDENTIAL - ",
+            "watermarkFontSize": 48,
+            "watermarkColor": "#CC0000",
+            "watermarkLayout": "Diagonal"
+          }
+        }
+      }
+    ],
+    "createLabelPolicy": {
+      "cmdlet": "New-LabelPolicy",
+      "parameters": {
+        "Name": "PV10-SensitivityLabelPolicy-AllUsers",
+        "Comment": "Publishes sensitivity labels to all users across all M365 workloads. Default label set to Internal. Mandatory labelling enabled.",
+        "Labels": [
+          "Public",
+          "Internal",
+          "Confidential",
+          "HighlyConfidential"
+        ],
+        "ExchangeLocation": [
+          "All"
+        ],
+        "ModernGroupLocation": [
+          "All"
+        ],
+        "Settings": {
+          "requireDowngradeJustification": true,
+          "mandatoryLabelEnabled": true,
+          "defaultLabelId": "",
+          "_defaultLabelNote": "Default label for new documents is Internal. Users must explicitly select a different label.",
+          "outlookDefaultLabel": "",
+          "powerbilabelenabled": true,
+          "teamworkLabelEnabled": true,
+          "sitesAndGroupsLabelEnabled": true
+        }
+      }
+    },
+    "createAutoLabellingPolicies": [
+      {
+        "cmdlet": "New-AutoSensitivityLabelPolicy",
+        "parameters": {
+          "Name": "PV10-AutoLabel-CreditCard-Confidential",
+          "Comment": "Auto-apply Confidential label to documents containing credit card numbers",
+          "ApplySensitivityLabel": "Confidential",
+          "ExchangeLocation": [
+            "All"
+          ],
+          "SharePointLocation": [
+            "All"
+          ],
+          "OneDriveLocation": [
+            "All"
+          ],
+          "Mode": "TestWithNotifications"
+        }
+      },
+      {
+        "cmdlet": "New-AutoSensitivityLabelRule",
+        "parameters": {
+          "Name": "PV10-AutoLabel-CreditCard-Rule",
+          "Policy": "PV10-AutoLabel-CreditCard-Confidential",
+          "ContentContainsSensitiveInformation": [
+            {
+              "name": "Credit Card Number",
+              "id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085",
+              "minCount": 1,
+              "minConfidence": 85
+            }
+          ]
+        }
+      },
+      {
+        "cmdlet": "New-AutoSensitivityLabelPolicy",
+        "parameters": {
+          "Name": "PV10-AutoLabel-HealthData-HighlyConfidential",
+          "Comment": "Auto-apply Highly Confidential label to documents containing PHI/health data",
+          "ApplySensitivityLabel": "HighlyConfidential",
+          "ExchangeLocation": [
+            "All"
+          ],
+          "SharePointLocation": [
+            "All"
+          ],
+          "OneDriveLocation": [
+            "All"
+          ],
+          "Mode": "TestWithNotifications"
+        }
+      }
+    ]
+  },
+  "policySettings": {
+    "mandatoryLabelling": true,
+    "defaultLabel": "Internal",
+    "requireJustificationOnDowngrade": true,
+    "workloads": {
+      "officeApps": true,
+      "exchangeOnline": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true,
+      "microsoftTeams": true,
+      "powerBI": true,
+      "microsoftFabric": true
+    }
+  }
 }

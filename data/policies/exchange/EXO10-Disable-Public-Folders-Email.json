@@ -1,32 +1,56 @@
 {
-  "id": "EXO10",
-  "file": "EXO10-Disable-Public-Folders-Email.json",
-  "type": "exchange",
-  "displayName": "EXO10 | Disable-Public-Folders-Email",
-  "description": "Disables mail-enabled public folders. They bypass DLP, audit logging, and access controls. Script removes mail-enabled property from existing public folders.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "CMMC v2.0",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "UK CS&R Bill 2025"
+  "_metadata": {
+    "id": "EXO10",
+    "title": "Disable Public Folder Email Addresses",
+    "description": "Disables mail-enabled public folders in Exchange Online. Mail-enabled public folders can receive email from external senders but bypass DLP policies, message trace, and audit logging. This policy removes email addresses from existing mail-enabled public folders and disables mail functionality.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "6.5.2"
+    ],
+    "severity": "Medium",
+    "category": "Exchange Online",
+    "deploymentOrder": 10,
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "Mail-enabled public folders are a legacy feature. Email sent to public folders bypasses DLP, transport rules, and retention policies. It is difficult to audit who accessed the content. The audit step identifies all mail-enabled public folders. The remediation step disables mail on each one. IMPORTANT: Coordinate with business owners before disabling, as some organizations use mail-enabled public folders for shared mailbox functionality. Migrate to shared mailboxes or Microsoft 365 Groups instead."
+  },
+  "steps": [
+    {
+      "cmdlet": "Get-MailPublicFolder",
+      "parameters": {
+        "ResultSize": "Unlimited"
+      },
+      "_notes": "AUDIT STEP: Lists all mail-enabled public folders. Review the output with business stakeholders before proceeding with remediation. PowerShell: Get-MailPublicFolder -ResultSize Unlimited | Select-Object Name, DisplayName, PrimarySmtpAddress, EmailAddresses"
+    },
+    {
+      "cmdlet": "Disable-MailPublicFolder",
+      "parameters": {
+        "Identity": "",
+        "Confirm": false
+      },
+      "_notes": "REMEDIATION STEP: Run for each mail-enabled public folder identified in the audit step. This removes the email functionality but preserves the public folder content. PowerShell loop: Get-MailPublicFolder -ResultSize Unlimited | ForEach-Object { Disable-MailPublicFolder -Identity $_.Identity -Confirm:$false }"
+    }
   ],
-  "cisChecks": [
-    "6.5.2"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-ExchangePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/exchange/EXO10-Disable-Public-Folders-Email.json"
+  "automationScript": "Get-MailPublicFolder -ResultSize Unlimited | ForEach-Object { Write-Host \"Disabling mail on: $($_.DisplayName)\"; Disable-MailPublicFolder -Identity $_.Identity -Confirm:$false }",
+  "postDeployment": [
+    "Get-MailPublicFolder -ResultSize Unlimited (should return empty if all were disabled)",
+    "Verify public folder content is still accessible (only email functionality is removed)",
+    "If business units require shared email functionality, migrate to shared mailboxes or Microsoft 365 Groups",
+    "Document all disabled mail-enabled public folders for audit trail",
+    "Schedule quarterly audit: Get-MailPublicFolder -ResultSize Unlimited | Select-Object Name, PrimarySmtpAddress"
+  ]
 }

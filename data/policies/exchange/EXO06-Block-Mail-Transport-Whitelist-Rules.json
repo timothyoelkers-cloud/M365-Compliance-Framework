@@ -1,48 +1,66 @@
 {
-  "id": "EXO06",
-  "file": "EXO06-Block-Mail-Transport-Whitelist-Rules.json",
-  "type": "exchange",
-  "displayName": "EXO06 | Block-Mail-Transport-Whitelist-Rules",
-  "description": "Removes transport rules that whitelist sender domains/IPs from filtering. Whitelisted domains bypass all email security scanning.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "NIST CSF 1.1",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NYDFS 23 NYCRR 500",
-    "MITRE ATT&CK",
-    "CSA CCM v4",
-    "CRI Profile v2.0",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "GSMA FS.31",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule",
-    "HITRUST CSF v11",
-    "ISO 22301:2019"
+  "_metadata": {
+    "id": "EXO06",
+    "title": "Block and Audit Mail Transport Whitelist Rules",
+    "description": "Audits and removes transport rules that set SCL to -1 (whitelist), which bypasses all spam filtering for matched senders. These rules are a common attack surface as they allow phishing and malware to bypass all email security scanning for whitelisted domains.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK T1562.001"
+    ],
+    "cisChecks": [
+      "2.1.14",
+      "6.1.3"
+    ],
+    "severity": "High",
+    "category": "Exchange Online",
+    "deploymentOrder": 6,
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "Transport rules with SetSCL -1 bypass ALL spam filtering for matched messages. This is extremely dangerous as it allows phishing and malware from whitelisted senders. The audit step lists all such rules. The remediation step disables and optionally removes them. IMPORTANT: Review the audit output with stakeholders before removing rules, as some may have been intentionally created for business partners. Find alternatives such as Safe Sender lists (less dangerous) or Exchange Online connectors with proper TLS validation."
+  },
+  "steps": [
+    {
+      "cmdlet": "Get-TransportRule",
+      "parameters": {},
+      "_notes": "AUDIT STEP: Run this first to identify all transport rules with SCL=-1. PowerShell: Get-TransportRule | Where-Object {$_.SetSCL -eq -1} | Select-Object Name, State, SetSCL, FromAddressContainsWords, SenderDomainIs, Priority | Format-Table -AutoSize",
+      "auditScript": "Get-TransportRule | Where-Object {$_.SetSCL -eq -1} | Select-Object Name, State, SetSCL, FromAddressContainsWords, SenderDomainIs, Priority"
+    },
+    {
+      "cmdlet": "Disable-TransportRule",
+      "parameters": {
+        "Identity": "",
+        "Confirm": false
+      },
+      "_notes": "REMEDIATION STEP 1: Disable each identified whitelist rule. Run for each rule found in the audit step. Disabling (rather than removing) allows for rollback."
+    },
+    {
+      "cmdlet": "Remove-TransportRule",
+      "parameters": {
+        "Identity": "",
+        "Confirm": false
+      },
+      "_notes": "REMEDIATION STEP 2 (OPTIONAL): After confirming no business impact from disabling, permanently remove the rule. Only execute after a monitoring period with the rule disabled."
+    }
   ],
-  "cisChecks": [
-    "2.1.14",
-    "6.1.3"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-ExchangePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/exchange/EXO06-Block-Mail-Transport-Whitelist-Rules.json"
+  "postDeployment": [
+    "Get-TransportRule | Where-Object {$_.SetSCL -eq -1} | Select-Object Name, State (should return empty)",
+    "Document all removed/disabled rules and the business justification for their original creation",
+    "For legitimate business partner needs, replace SCL=-1 rules with: (a) Exchange Online connectors with TLS certificate validation, or (b) scoped Safe Sender entries",
+    "Schedule quarterly audits: Get-TransportRule | Where-Object {$_.SetSCL -eq -1} to detect new whitelist rule creation",
+    "Consider implementing an alert rule in the Security & Compliance Center for transport rule creation events"
+  ]
 }

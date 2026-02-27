@@ -1,37 +1,51 @@
 {
-  "id": "DEF08",
-  "file": "DEF08-Common-Attachment-Filter.json",
-  "type": "defender",
-  "displayName": "DEF08 | Common-Attachment-Filter",
-  "description": "Enables the Common Attachment Types Filter. Blocks 70+ malicious file types (.exe, .js, .vbs, .cmd, .ps1, .reg, .hta, and more). Zero configuration needed.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "IASME Cyber Assurance",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22"
-  ],
-  "cisChecks": [
-    "2.1.1"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-DefenderPolicies.ps1",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "Exchange Online Protection (included with M365)",
-  "version": "1.0",
-  "path": "policies/defender/DEF08-Common-Attachment-Filter.json"
+  "_metadata": {
+    "id": "DEF08",
+    "title": "Common Attachment Types Filter - Default Policy",
+    "description": "Updates the default malware filter policy to enable the common attachment types filter. Blocks 50+ dangerous file extensions at the transport layer. Uses the default policy so all recipients are covered without needing a rule.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "MITRE ATT&CK T1204.002",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "UK NCSC Cyber Essentials v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["2.1.1"],
+    "severity": "High",
+    "category": "Defender for Office 365",
+    "deploymentOrder": 8,
+    "requiredLicence": "Exchange Online Protection (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "This modifies the built-in Default malware filter policy using Set-MalwareFilterPolicy. The Default policy applies to all recipients automatically. No rule is needed. The FileTypes list below is comprehensive and covers executable, script, archive, disk image, and macro-enabled Office formats. Review the list against business requirements; some organizations may need to allow specific types (e.g., .iso for IT, .apk for mobile development)."
+  },
+  "cmdlet": "Set-MalwareFilterPolicy",
+  "parameters": {
+    "Identity": "Default",
+    "EnableFileFilter": true,
+    "FileTypes": [
+      "ace", "apk", "app", "appx", "ani", "arj", "bat", "cab", "cmd", "com",
+      "deb", "dex", "dll", "docm", "elf", "exe", "hta", "img", "iso", "jar",
+      "jnlp", "kext", "lha", "lib", "library", "lnk", "lzh", "macho", "msc",
+      "msi", "msix", "msp", "mst", "pif", "ppa", "ppam", "reg", "rev", "scf",
+      "scr", "sh", "sys", "vb", "vbe", "vbs", "vxd", "wsc", "wsf", "wsh",
+      "xll", "xz"
+    ]
+  },
+  "postDeployment": [
+    "Get-MalwareFilterPolicy -Identity Default | Select-Object -ExpandProperty FileTypes",
+    "Test by sending an email with a .exe or .bat attachment to verify it is rejected",
+    "Review FileTypes list against business requirements and add or remove extensions as needed",
+    "Common legitimate exceptions to consider: .iso (IT teams), .apk (mobile dev), .dll (software dev)"
+  ]
 }

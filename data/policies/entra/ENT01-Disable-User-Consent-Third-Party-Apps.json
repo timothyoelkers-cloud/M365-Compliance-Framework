@@ -1,47 +1,121 @@
 {
-  "id": "ENT01",
-  "file": "ENT01-Disable-User-Consent-Third-Party-Apps.json",
-  "type": "entra",
-  "displayName": "ENT01 | Disable-User-Consent-Third-Party-Apps",
-  "description": "Disables user consent to third-party OAuth apps accessing corporate data. Requires admin approval for all app permissions. Prevents OAuth phishing attacks.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "NIST CSF 1.1",
-    "UK NCSC Cyber Essentials v3.2",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "CISA CPG",
-    "CRI Profile v2.0",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "HPH CPGs",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "SEC Cyber Rule",
-    "UK NCSC CAF v3.1"
+  "_metadata": {
+    "id": "ENT01",
+    "title": "Disable User Consent to Third-Party Apps",
+    "description": "Disables the ability for users to consent to third-party OAuth applications accessing corporate data. Removes the legacy default user consent policy, requiring admin approval for all application permission grants. Prevents OAuth phishing and illicit consent grant attacks.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "ASD Essential Eight",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "5.1.2.1",
+      "5.1.5.1"
+    ],
+    "mitreMappings": [
+      "T1550.001",
+      "T1528",
+      "T1098.003"
+    ],
+    "requiredLicences": [
+      "Microsoft Entra ID Free (included with any M365 plan)"
+    ],
+    "requiredRoles": [
+      "Global Administrator",
+      "Privileged Role Administrator"
+    ],
+    "deploymentOrder": 1,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-EntraSettings.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Global Administrator or Privileged Role Administrator role required",
+      "Review existing user-consented applications before disabling consent",
+      "Deploy ENT02 (Admin Consent Workflow) simultaneously to provide a governed request process",
+      "Communicate change to users before deployment"
+    ],
+    "deploymentSteps": [
+      "1. Audit existing user-consented applications via Entra admin center > Enterprise applications",
+      "2. Deploy ENT02 (Admin Consent Workflow) first to provide a request mechanism",
+      "3. Apply the Graph API PATCH to remove user consent permissions",
+      "4. Verify the change via Graph API GET",
+      "5. Monitor the admin consent request queue for incoming requests"
+    ],
+    "rollbackProcedure": "PATCH /policies/authorizationPolicy with permissionGrantPoliciesAssigned including 'ManagePermissionGrantsForSelf.microsoft-user-default-legacy'"
+  },
+  "graphApiCalls": [
+    {
+      "stepOrder": 1,
+      "description": "Remove all user consent permission grant policies - disable user consent to third-party apps",
+      "method": "PATCH",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy/authorizationPolicy",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer "
+      },
+      "body": {
+        "defaultUserRolePermissions": {
+          "permissionGrantPoliciesAssigned": []
+        }
+      },
+      "_explanation": "Setting permissionGrantPoliciesAssigned to an empty array removes 'ManagePermissionGrantsForSelf.microsoft-user-default-legacy' which is the default user consent policy. Users will no longer be able to consent to any application permissions."
+    },
+    {
+      "stepOrder": 2,
+      "description": "Verify the user consent policy has been removed",
+      "method": "GET",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy/authorizationPolicy",
+      "expectedResponse": {
+        "defaultUserRolePermissions": {
+          "permissionGrantPoliciesAssigned": []
+        }
+      }
+    }
   ],
-  "cisChecks": [
-    "5.1.2.1",
-    "5.1.5.1"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-EntraSettings.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/entra/ENT01-Disable-User-Consent-Third-Party-Apps.json"
+  "powershellAlternative": {
+    "module": "Microsoft.Graph",
+    "commands": [
+      {
+        "description": "Connect to Microsoft Graph with required permissions",
+        "command": "Connect-MgGraph -Scopes 'Policy.ReadWrite.Authorization'"
+      },
+      {
+        "description": "Update the authorization policy to remove user consent",
+        "command": "Update-MgPolicyAuthorizationPolicy -DefaultUserRolePermissions @{ PermissionGrantPoliciesAssigned = @() }"
+      },
+      {
+        "description": "Verify the change",
+        "command": "(Get-MgPolicyAuthorizationPolicy).DefaultUserRolePermissions.PermissionGrantPoliciesAssigned"
+      }
+    ]
+  },
+  "entraPortalPath": {
+    "navigation": "Entra admin center > Identity > Applications > Enterprise applications > Consent and permissions > User consent settings",
+    "setting": "Do not allow user consent",
+    "_note": "This is the portal equivalent of the Graph API call"
+  },
+  "auditExistingConsents": {
+    "_description": "Before disabling user consent, review existing consented applications",
+    "graphApiQuery": {
+      "method": "GET",
+      "endpoint": "https://graph.microsoft.com/v1.0/oauth2PermissionGrants?$filter=consentType eq 'Principal'",
+      "_explanation": "Lists all user-level consent grants. Review these before disabling consent to identify applications that may need admin consent."
+    },
+    "powershellCommand": "Get-MgOAuth2PermissionGrant -Filter \"consentType eq 'Principal'\" -All | Select-Object ClientId, ConsentType, Scope, PrincipalId"
+  }
 }

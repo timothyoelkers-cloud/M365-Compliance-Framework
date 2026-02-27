@@ -1,56 +1,199 @@
 {
-  "id": "PV05",
-  "file": "PV05-DLP-Insider-Risk-Bulk-Download-Detection.json",
-  "type": "purview",
-  "displayName": "PV05 | DLP-Insider-Risk-Bulk-Download-Detection",
-  "description": "Detects unusual bulk file download/access (>50 files). Triggers insider data theft indicators. Works with Purview Insider Risk Management.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "NIST CSF 2.0",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC CAF v3.1",
-    "UK NCSC Cyber Essentials v3.2",
-    "ASD Essential Eight",
-    "MITRE ATT&CK",
-    "CISA CPG",
-    "CSA CCM v4",
-    "COBIT 19",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "GSMA FS.31",
-    "HPH CPGs",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule",
-    "ISO 22301:2019"
-  ],
-  "cisChecks": [
-    "9.1.4"
-  ],
-  "importMethod": "powershell-security-compliance",
-  "importScript": "scripts/Import-PurviewPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "Microsoft Purview E5 or Insider Risk Management add-on",
-  "version": "1.0",
-  "path": "policies/purview/PV05-DLP-Insider-Risk-Bulk-Download-Detection.json"
+  "_metadata": {
+    "id": "PV05",
+    "title": "DLP - Insider Risk Bulk Download Detection",
+    "description": "DLP policy that detects unusual bulk file download and access activity exceeding 50 files, indicative of insider data theft or exfiltration. Integrates with Purview Insider Risk Management for correlated risk scoring.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "PCI DSS v4.0",
+      "NYDFS 23 NYCRR 500",
+      "CMMC v2.0",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "9.1.4"
+    ],
+    "mitreMappings": [
+      "T1119",
+      "T1530",
+      "T1039",
+      "T1048",
+      "T1567"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Insider Risk Management add-on"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Insider Risk Management Admin"
+    ],
+    "deploymentOrder": 5,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Microsoft 365 E5 or Insider Risk Management add-on required",
+      "Audit logging must be enabled (PV11)",
+      "Insider Risk Management must be configured for full integration",
+      "HR connector recommended for departing employee correlation"
+    ],
+    "deploymentSteps": [
+      "1. Ensure audit logging is enabled and retained for 12 months (PV11)",
+      "2. Create the DLP policy scoped to SharePoint and OneDrive",
+      "3. Create detection rules for bulk download thresholds",
+      "4. Configure alert notifications for security team",
+      "5. Integrate with Insider Risk Management policy (PV12)"
+    ],
+    "rollbackProcedure": "Set-DlpCompliancePolicy -Identity 'PV05-DLP-InsiderRisk-BulkDownload' -Mode Disable"
+  },
+  "powershellCommands": {
+    "createPolicy": {
+      "cmdlet": "New-DlpCompliancePolicy",
+      "parameters": {
+        "Name": "PV05-DLP-InsiderRisk-BulkDownload",
+        "Comment": "Detects unusual bulk file download and access patterns indicative of insider data theft. Scoped to SharePoint and OneDrive.",
+        "SharePointLocation": [
+          "All"
+        ],
+        "OneDriveLocation": [
+          "All"
+        ],
+        "Mode": "Enable",
+        "Priority": 4
+      }
+    },
+    "createRuleBulkDownload": {
+      "cmdlet": "New-DlpComplianceRule",
+      "parameters": {
+        "Name": "PV05-Rule-BulkDownload-Alert",
+        "Policy": "PV05-DLP-InsiderRisk-BulkDownload",
+        "Comment": "Alert on bulk file downloads exceeding 50 files in a single session",
+        "ContentContainsSensitiveInformation": [
+          {
+            "name": "All Full Names",
+            "id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085",
+            "minCount": 50,
+            "minConfidence": 65,
+            "maxConfidence": 100,
+            "_note": "High-count threshold to detect bulk data patterns"
+          }
+        ],
+        "AccessScope": "InOrganization",
+        "BlockAccess": false,
+        "GenerateAlert": "SiteAdmin",
+        "AlertProperties": {
+          "AggregationType": "AggregateByActivity",
+          "Threshold": 50,
+          "TimeWindow": 1440
+        },
+        "NotifyUser": [
+          "SiteAdmin"
+        ],
+        "GenerateIncidentReport": [],
+        "IncidentReportContent": [
+          "Title",
+          "DocumentAuthor",
+          "DocumentLastModifier",
+          "Service",
+          "MatchedItem",
+          "RulesMatched",
+          "Severity"
+        ],
+        "ReportSeverityLevel": "High"
+      }
+    },
+    "createRuleUnusualVolume": {
+      "cmdlet": "New-DlpComplianceRule",
+      "parameters": {
+        "Name": "PV05-Rule-UnusualVolume-External-Block",
+        "Policy": "PV05-DLP-InsiderRisk-BulkDownload",
+        "Comment": "Block external sharing when bulk file access is detected alongside external sharing attempts",
+        "AccessScope": "NotInOrganization",
+        "BlockAccess": true,
+        "BlockAccessScope": "ExternalUsers",
+        "ContentContainsSensitiveInformation": [
+          {
+            "name": "Credit Card Number",
+            "id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085",
+            "minCount": 5,
+            "minConfidence": 75
+          },
+          {
+            "name": "U.S. Social Security Number (SSN)",
+            "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+            "minCount": 5,
+            "minConfidence": 85
+          }
+        ],
+        "NotifyUser": [
+          "SiteAdmin",
+          "LastModifier"
+        ],
+        "NotifyPolicyTipCustomText": "Unusual bulk file activity detected. External sharing has been blocked pending security review. Contact the security team if this is a legitimate business need.",
+        "GenerateIncidentReport": [],
+        "IncidentReportContent": [
+          "Title",
+          "DocumentAuthor",
+          "DocumentLastModifier",
+          "Service",
+          "MatchedItem",
+          "RulesMatched",
+          "Severity"
+        ],
+        "ReportSeverityLevel": "High"
+      }
+    }
+  },
+  "activityAlertConfig": {
+    "_description": "Complementary activity alert for bulk download detection via the Security & Compliance activity alerts",
+    "cmdlet": "New-ActivityAlert",
+    "parameters": {
+      "Name": "PV05-ActivityAlert-BulkDownload",
+      "Description": "Alert on user downloading more than 50 files from SharePoint/OneDrive within 60 minutes",
+      "Operation": [
+        "FileDownloaded",
+        "FileSyncDownloadedFull"
+      ],
+      "Condition": {
+        "aggregationType": "ByUser",
+        "threshold": 50,
+        "timeWindow": 60
+      },
+      "NotifyUser": [],
+      "Severity": "High",
+      "Type": "Custom",
+      "Enabled": true
+    }
+  },
+  "policySettings": {
+    "mode": "Enable",
+    "priority": 4,
+    "workloads": {
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true,
+      "exchangeOnline": false,
+      "microsoftTeams": false
+    }
+  },
+  "insiderRiskIntegration": {
+    "_description": "This DLP policy feeds into Insider Risk Management as a triggering event and risk indicator",
+    "triggerType": "DlpPolicyMatch",
+    "riskScoreContribution": "high",
+    "correlatedPolicies": [
+      "PV12-Insider-Risk-Management-Policy"
+    ]
+  }
 }

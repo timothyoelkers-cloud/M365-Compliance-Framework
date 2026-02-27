@@ -1,44 +1,64 @@
 {
-  "id": "CA01",
-  "file": "CA01-Block-Legacy-Authentication.json",
-  "type": "conditional-access",
-  "displayName": "CA01 | Block-Legacy-Authentication",
-  "description": "Blocks all legacy authentication protocols (SMTP AUTH, IMAP, POP3, MAPI, Exchange ActiveSync basic auth). Legacy auth bypasses MFA. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "NIST CSF 2.0",
-    "NIST CSF 1.1",
-    "ASD Essential Eight",
-    "MITRE ATT&CK",
-    "CISA CPG",
-    "Microsoft Cloud Security Benchmark",
-    "EU Cyber Resilience Act"
-  ],
-  "cisChecks": [
-    "5.2.2.3",
-    "6.5.1"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA01-Block-Legacy-Authentication.json"
+  "displayName": "CA01 | Block Legacy Authentication",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "exchangeActiveSync",
+      "other"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "block"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA01",
+    "description": "Blocks all legacy authentication protocols including Exchange ActiveSync, SMTP AUTH, POP3, IMAP, and older Office clients that do not support modern authentication. Legacy auth cannot enforce MFA and is the primary vector for password-spray and credential-stuffing attacks.",
+    "cisControls": [
+      "CIS 5.2.2.3 - Ensure legacy authentication is not allowed",
+      "CIS 6.5.1 - Ensure modern authentication for Exchange Online is enabled"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "IA-2",
+        "IA-5",
+        "AC-17(2)"
+      ],
+      "CIS-Microsoft-365": [
+        "5.2.2.3",
+        "6.5.1"
+      ],
+      "ISO-27001-2022": [
+        "A.8.5 - Secure authentication"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078 - Valid Accounts",
+        "T1110 - Brute Force"
+      ],
+      "NIS2": [
+        "Article 21(2)(j) - Multi-factor authentication"
+      ],
+      "Essential-Eight": [
+        "Restrict administrative privileges"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "deploymentNotes": "Deploy in report-only first. Monitor sign-in logs under Entra > Monitoring > Sign-in logs, filter by Client App = 'Exchange ActiveSync' and 'Other clients' to identify remaining legacy auth usage before enforcing. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

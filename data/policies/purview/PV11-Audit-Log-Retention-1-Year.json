@@ -1,51 +1,150 @@
 {
-  "id": "PV11",
-  "file": "PV11-Audit-Log-Retention-1-Year.json",
-  "type": "purview",
-  "displayName": "PV11 | Audit-Log-Retention-1-Year",
-  "description": "Configures Purview audit log retention to 12 months. Extends beyond 90-day default to meet SOC 2, PCI DSS, HIPAA, NIS2 incident investigation requirements.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "CRI Profile v2.0",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule",
-    "ISO 22301:2019"
-  ],
-  "cisChecks": [
-    "9.1.1",
-    "9.1.9"
-  ],
-  "importMethod": "powershell-security-compliance",
-  "importScript": "scripts/Import-PurviewPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "Microsoft 365 E5 or Microsoft Purview Audit (Premium)",
-  "version": "1.0",
-  "path": "policies/purview/PV11-Audit-Log-Retention-1-Year.json"
+  "_metadata": {
+    "id": "PV11",
+    "title": "Unified Audit Log Retention - 1 Year",
+    "description": "Configures Microsoft Purview unified audit log retention to 12 months (TwelveMonths) for all record types and all users, extending beyond the default 180-day retention. Required for regulatory compliance and incident investigation timelines.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "TSA Security Directive",
+      "CIRCIA (US)",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "9.1.1",
+      "9.1.9"
+    ],
+    "mitreMappings": [],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance (for 1-year retention)",
+      "Microsoft Purview Audit (Premium) add-on",
+      "Office 365 E5 (alternative)"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Organization Management"
+    ],
+    "deploymentOrder": 11,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "E5 Compliance or Audit Premium licence required for retention beyond 180 days",
+      "Audit logging must be enabled (verify: Get-AdminAuditLogConfig | Select UnifiedAuditLogIngestionEnabled)",
+      "With E5, retention up to 10 years is available for specific record types"
+    ],
+    "retentionLimits": {
+      "e3Default": "180 days (Standard Audit)",
+      "e5OneYear": "365 days (Audit Premium - 1 year)",
+      "e5TenYears": "3650 days (Audit Premium - 10 year retention add-on)"
+    },
+    "deploymentSteps": [
+      "1. Connect to Security & Compliance PowerShell",
+      "2. Verify audit logging is enabled",
+      "3. Create the 1-year retention policy for all record types",
+      "4. Create additional high-priority retention policies for security-critical events",
+      "5. Verify policy creation and confirm retention period"
+    ],
+    "rollbackProcedure": "Remove-UnifiedAuditLogRetentionPolicy -Identity 'PV11-AuditRetention-1Year-AllRecords'. Note: audit records already stored will be retained until their original expiry."
+  },
+  "powershellCommands": {
+    "verifyAuditEnabled": {
+      "cmdlet": "Get-AdminAuditLogConfig",
+      "parameters": {},
+      "expectedResult": "UnifiedAuditLogIngestionEnabled: True",
+      "enableIfDisabled": {
+        "cmdlet": "Set-AdminAuditLogConfig",
+        "parameters": {
+          "UnifiedAuditLogIngestionEnabled": true
+        }
+      }
+    },
+    "createRetentionPolicyAllRecords": {
+      "cmdlet": "New-UnifiedAuditLogRetentionPolicy",
+      "parameters": {
+        "Name": "PV11-AuditRetention-1Year-AllRecords",
+        "Description": "Retain all unified audit log records for 12 months. Applies to all users and all record types. Required for regulatory compliance (NIS2, PCI DSS, HIPAA, SOC 2).",
+        "RetentionDuration": "TwelveMonths",
+        "RecordTypes": [],
+        "Operations": [],
+        "UserIds": [],
+        "Priority": 1,
+        "_recordTypesNote": "Empty array = all record types. Specific record types can be targeted for longer retention."
+      }
+    },
+    "createRetentionPolicySecurityCritical": {
+      "cmdlet": "New-UnifiedAuditLogRetentionPolicy",
+      "parameters": {
+        "Name": "PV11-AuditRetention-1Year-SecurityCritical",
+        "Description": "Extended retention for security-critical audit events including admin operations, authentication events, and data access.",
+        "RetentionDuration": "TwelveMonths",
+        "RecordTypes": [
+          "AzureActiveDirectory",
+          "AzureActiveDirectoryAccountLogon",
+          "AzureActiveDirectoryStsLogon",
+          "ExchangeAdmin",
+          "SharePointSharingOperation",
+          "DLP",
+          "SecurityComplianceAlerts",
+          "ThreatIntelligence",
+          "SecurityComplianceInsights",
+          "MipAutoLabelSharePointItem",
+          "MipAutoLabelExchangeItem"
+        ],
+        "Operations": [],
+        "UserIds": [],
+        "Priority": 2
+      }
+    },
+    "createRetentionPolicyPrivilegedAccounts": {
+      "cmdlet": "New-UnifiedAuditLogRetentionPolicy",
+      "parameters": {
+        "Name": "PV11-AuditRetention-1Year-PrivilegedAccounts",
+        "Description": "Extended retention for all audit events from privileged admin accounts.",
+        "RetentionDuration": "TwelveMonths",
+        "RecordTypes": [],
+        "Operations": [],
+        "UserIds": [],
+        "Priority": 3
+      }
+    },
+    "verifyPolicies": {
+      "cmdlet": "Get-UnifiedAuditLogRetentionPolicy",
+      "parameters": {},
+      "expectedOutput": "Lists all created retention policies with their retention durations and priorities"
+    }
+  },
+  "policySettings": {
+    "retentionDuration": "TwelveMonths",
+    "scope": "allRecordTypes",
+    "allUsers": true,
+    "priority": 1
+  },
+  "complianceMappings": {
+    "pciDss": "PCI DSS v4.0 Req 10.7: Retain audit logs for at least 12 months",
+    "hipaa": "HIPAA 164.312(b): Audit controls with sufficient retention for investigations",
+    "soc2": "SOC 2 CC7.2: Monitoring and detection of anomalies with adequate log retention",
+    "nis2": "NIS2 Article 21: Incident handling and reporting with evidence preservation",
+    "gdpr": "GDPR Article 5(2): Accountability principle - demonstrate compliance",
+    "nist": "NIST SP 800-53 AU-11: Audit Record Retention"
+  }
 }

@@ -1,47 +1,69 @@
 {
-  "id": "CA10",
-  "file": "CA10-Require-Managed-Device-MFA-Registration.json",
-  "type": "conditional-access",
-  "displayName": "CA10 | Require-Managed-Device-MFA-Registration",
-  "description": "Requires managed/compliant device for MFA method registration/updates. Prevents rogue MFA device registration. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "HPH CPGs",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "SEC Cyber Rule",
-    "Microsoft Cloud Security Benchmark",
-    "MITRE ATT&CK",
-    "CISA CPG"
-  ],
-  "cisChecks": [
-    "1.3.6",
-    "5.2.2.10",
-    "5.2.2.11"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "Microsoft Intune enrolment must be configured first",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA10-Require-Managed-Device-MFA-Registration.json"
+  "displayName": "CA10 | Require Managed Device for Security Info Registration",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeUserActions": [
+        "urn:user:registersecurityinfo"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "compliantDevice"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA10",
+    "description": "Requires a managed, Intune-compliant device for users registering or modifying their security information (MFA methods, SSPR, passwordless credentials). This prevents attackers who have compromised a password from registering their own MFA device on an unmanaged endpoint, which is a critical step in account takeover attacks.",
+    "targetUserAction": "urn:user:registersecurityinfo",
+    "cisControls": [
+      "CIS 1.3.6 - Ensure Conditional Access policies are configured to prevent security information registration from outside the corporate network",
+      "CIS 5.2.2.10 - Ensure that MFA is required to register or join devices",
+      "CIS 5.2.2.11 - Ensure Conditional Access policies cover all user actions for security info registration"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "IA-2(1)",
+        "IA-5(2)",
+        "IA-12"
+      ],
+      "CIS-Microsoft-365": [
+        "1.3.6",
+        "5.2.2.10",
+        "5.2.2.11"
+      ],
+      "ISO-27001-2022": [
+        "A.5.17 - Authentication information",
+        "A.8.5 - Secure authentication"
+      ],
+      "MITRE-ATT&CK": [
+        "T1098.005 - Device Registration",
+        "T1556 - Modify Authentication Process"
+      ],
+      "NIS2": [
+        "Article 21(2)(j) - Multi-factor authentication"
+      ],
+      "Essential-Eight": [
+        "Multi-factor authentication"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2",
+      "Microsoft Intune"
+    ],
+    "deploymentNotes": "This policy targets the user action 'Register security information' rather than a cloud application. Ensure Intune device compliance policies and device enrollment are configured before enforcing. For initial MFA registration bootstrapping, consider using Temporary Access Pass (TAP) on compliant devices. Deploy in report-only first. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

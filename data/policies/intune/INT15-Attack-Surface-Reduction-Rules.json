@@ -1,50 +1,133 @@
 {
-  "id": "INT15",
-  "file": "INT15-Attack-Surface-Reduction-Rules.json",
-  "type": "intune",
-  "displayName": "INT15 | Attack-Surface-Reduction-Rules",
-  "description": "Deploys all 16 Attack Surface Reduction rules in Block mode via Intune. Blocks Office macros spawning child processes, credential theft, ransomware patterns, LSASS access.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "DORA",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)"
+  "@odata.type": "#microsoft.graph.windows10CustomConfiguration",
+  "displayName": "INT15 - Attack Surface Reduction Rules (All 16 in Block Mode)",
+  "description": "Deploys all 16 ASR rules in Block mode via OMA-URI. Blocks Office macro abuse, credential theft from LSASS, untrusted USB processes, executable email content, obfuscated scripts, and more.",
+  "version": 1,
+  "omaSettings": [
+    {
+      "@odata.type": "#microsoft.graph.omaSettingString",
+      "displayName": "ASR - Block Office apps from creating child processes",
+      "description": "GUID: D4F940AB-401B-4EFC-AADC-AD5F3C50688A. Value: 1 = Block.",
+      "omaUri": "./Vendor/MSFT/Policy/Config/Defender/AttackSurfaceReductionRules",
+      "value": "D4F940AB-401B-4EFC-AADC-AD5F3C50688A=1|3B576869-A4EC-4529-8536-B80A7769E899=1|75668C1F-73B5-4CF0-BB93-3ECF5CB7CC84=1|5BEB7EFE-FD9A-4556-801D-275E5FFC04CC=1|D3E037E1-3EB8-44C8-A917-57927947596D=1|BE9BA2D9-53EA-4CDC-84E5-9B1EEEE46550=1|92E97FA1-2EDF-4476-BDD6-9DD0B4DDDC7B=1|01443614-CD74-433A-B99E-2ECDC07BFC25=1|26190899-1602-49E8-8B27-EB1D0A1CE869=1|9E6C4E1F-7D60-472F-BA1A-A39EF669E4B2=1|B2B3F03D-6A65-4F7B-A9C7-1C7EF74A9BA4=1|7674BA52-37EB-4A4F-A9A1-F0F9A1619A2C=1|E6DB77E5-3DF2-4CF1-B95A-636979351E5B=1|D1E49AAC-8F56-4280-B9BA-993A6D77406C=1|33DDEDF1-C6E0-47CB-833E-DE6133960387=1|C1DB55AB-C21A-4637-BB3F-A12568109D35=1"
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingString",
+      "displayName": "ASR - Actions for all rules",
+      "description": "Sets all ASR rule actions to Block (1).",
+      "omaUri": "./Vendor/MSFT/Policy/Config/Defender/AttackSurfaceReductionOnlyExclusions",
+      "value": ""
+    }
   ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2"
+  "_asrRuleReference": {
+    "description": "Complete mapping of all 16 ASR rule GUIDs to descriptions. All set to Block (1). Other valid values: 0=Off, 2=Audit, 6=Warn.",
+    "rules": [
+      {
+        "guid": "D4F940AB-401B-4EFC-AADC-AD5F3C50688A",
+        "name": "Block Office applications from creating child processes",
+        "action": 1
+      },
+      {
+        "guid": "3B576869-A4EC-4529-8536-B80A7769E899",
+        "name": "Block Office applications from creating executable content",
+        "action": 1
+      },
+      {
+        "guid": "75668C1F-73B5-4CF0-BB93-3ECF5CB7CC84",
+        "name": "Block Office applications from injecting code into other processes",
+        "action": 1
+      },
+      {
+        "guid": "5BEB7EFE-FD9A-4556-801D-275E5FFC04CC",
+        "name": "Block execution of potentially obfuscated scripts",
+        "action": 1
+      },
+      {
+        "guid": "D3E037E1-3EB8-44C8-A917-57927947596D",
+        "name": "Block JavaScript or VBScript from launching downloaded executable content",
+        "action": 1
+      },
+      {
+        "guid": "BE9BA2D9-53EA-4CDC-84E5-9B1EEEE46550",
+        "name": "Block executable content from email client and webmail",
+        "action": 1
+      },
+      {
+        "guid": "92E97FA1-2EDF-4476-BDD6-9DD0B4DDDC7B",
+        "name": "Block Win32 API calls from Office macros",
+        "action": 1
+      },
+      {
+        "guid": "01443614-CD74-433A-B99E-2ECDC07BFC25",
+        "name": "Block executable files from running unless they meet a prevalence, age, or trusted list criterion",
+        "action": 1
+      },
+      {
+        "guid": "26190899-1602-49E8-8B27-EB1D0A1CE869",
+        "name": "Block Office communication application from creating child processes",
+        "action": 1
+      },
+      {
+        "guid": "9E6C4E1F-7D60-472F-BA1A-A39EF669E4B2",
+        "name": "Block credential stealing from the Windows local security authority subsystem (lsass.exe)",
+        "action": 1
+      },
+      {
+        "guid": "B2B3F03D-6A65-4F7B-A9C7-1C7EF74A9BA4",
+        "name": "Block untrusted and unsigned processes that run from USB",
+        "action": 1
+      },
+      {
+        "guid": "7674BA52-37EB-4A4F-A9A1-F0F9A1619A2C",
+        "name": "Block Adobe Reader from creating child processes",
+        "action": 1
+      },
+      {
+        "guid": "E6DB77E5-3DF2-4CF1-B95A-636979351E5B",
+        "name": "Block persistence through WMI event subscription",
+        "action": 1
+      },
+      {
+        "guid": "D1E49AAC-8F56-4280-B9BA-993A6D77406C",
+        "name": "Block process creations originating from PSExec and WMI commands",
+        "action": 1
+      },
+      {
+        "guid": "33DDEDF1-C6E0-47CB-833E-DE6133960387",
+        "name": "Block rebooting machine in Safe Mode",
+        "action": 1
+      },
+      {
+        "guid": "C1DB55AB-C21A-4637-BB3F-A12568109D35",
+        "name": "Use advanced protection against ransomware",
+        "action": 1
+      }
+    ]
+  },
+  "roleScopeTagIds": [
+    "0"
   ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-IntunePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Intune licence required. Test in Audit mode first for 2-4 weeks before Block mode.",
-  "requiredLicence": "Microsoft Defender for Endpoint Plan 1 or above",
-  "version": "1.0",
-  "path": "policies/intune/INT15-Attack-Surface-Reduction-Rules.json"
+  "_metadata": {
+    "policyId": "INT15",
+    "description": "Deploys all 16 Attack Surface Reduction (ASR) rules in Block mode via OMA-URI custom configuration. Rules prevent Office macro child process creation, executable content creation, code injection, obfuscated script execution, credential theft from LSASS, untrusted USB processes, email executable content, WMI persistence, PSExec/WMI process creation, and advanced ransomware protection. IMPORTANT: Deploy in Audit mode (value=2) for 2-4 weeks before switching to Block mode (value=1) in production.",
+    "graphEndpoint": "POST /deviceManagement/deviceConfigurations",
+    "platform": "Windows 10/11",
+    "prerequisite": "Microsoft Defender for Endpoint Plan 1 or above. Test in Audit mode for 2-4 weeks before enabling Block mode.",
+    "frameworks": [
+      "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
+      "NIST SP 800-53 Rev 5 - SI-3, SI-4, SI-7",
+      "NIST SP 800-171 Rev 2 - 3.14.2, 3.14.6",
+      "ISO 27001:2022 A.8.7, A.8.8",
+      "Essential Eight - Application Control (Maturity Level 2)",
+      "Essential Eight - Configure Microsoft Office Macro Settings (Maturity Level 2)",
+      "MITRE ATT&CK - T1059 (Command and Scripting Interpreter), T1566 (Phishing), T1003 (OS Credential Dumping), T1091 (Replication Through Removable Media)"
+    ],
+    "cisChecks": [
+      "CIS 18.9.47.5.1.1 - Ensure ASR rules are configured",
+      "CIS 18.9.47.5.1.2 - Ensure ASR rule: Block Office applications from creating child processes is Enabled",
+      "CIS 18.9.47.5.1.3 - Ensure ASR rule: Block credential stealing from LSASS is Enabled"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  }
 }

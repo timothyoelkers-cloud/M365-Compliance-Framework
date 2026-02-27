@@ -1,52 +1,80 @@
 {
-  "id": "INT10",
-  "file": "INT10-Device-Enrollment-Restrictions.json",
-  "type": "intune",
-  "displayName": "INT10 | Device-Enrollment-Restrictions",
-  "description": "Restricts Intune enrollment: block personal devices (corporate-only), limit personal iOS/Android, require Entra ID registration, block unsupported platforms (Linux, Windows Home).",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "DORA",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "GSMA FS.31",
-    "Cybersecure Canada",
-    "EU Cyber Resilience Act",
-    "ISO 22301:2019"
+  "@odata.type": "#microsoft.graph.deviceEnrollmentPlatformRestrictionsConfiguration",
+  "displayName": "INT10 - Device Enrollment Restrictions - Corporate Only",
+  "description": "Restricts Intune enrollment to corporate-owned devices only. Blocks personal enrollment, blocks Linux platform, limits per-user device count to 5.",
+  "version": 1,
+  "platformRestrictions": {
+    "androidRestriction": {
+      "platformBlocked": false,
+      "personalDeviceEnrollmentBlocked": true,
+      "osMinimumVersion": "13.0",
+      "osMaximumVersion": null
+    },
+    "androidForWorkRestriction": {
+      "platformBlocked": false,
+      "personalDeviceEnrollmentBlocked": true,
+      "osMinimumVersion": "13.0",
+      "osMaximumVersion": null
+    },
+    "iosRestriction": {
+      "platformBlocked": false,
+      "personalDeviceEnrollmentBlocked": true,
+      "osMinimumVersion": "16.0",
+      "osMaximumVersion": null
+    },
+    "macOSRestriction": {
+      "platformBlocked": false,
+      "personalDeviceEnrollmentBlocked": true,
+      "osMinimumVersion": "14.0",
+      "osMaximumVersion": null
+    },
+    "windowsRestriction": {
+      "platformBlocked": false,
+      "personalDeviceEnrollmentBlocked": true,
+      "osMinimumVersion": "10.0.19045",
+      "osMaximumVersion": null
+    },
+    "windowsMobileRestriction": {
+      "platformBlocked": true,
+      "personalDeviceEnrollmentBlocked": true,
+      "osMinimumVersion": null,
+      "osMaximumVersion": null
+    },
+    "linuxRestriction": {
+      "platformBlocked": true,
+      "personalDeviceEnrollmentBlocked": true,
+      "osMinimumVersion": null,
+      "osMaximumVersion": null
+    }
+  },
+  "deviceEnrollmentConfigurationType": "platformRestrictions",
+  "roleScopeTagIds": [
+    "0"
   ],
-  "cisChecks": [
-    "5.1.3.1",
-    "5.1.4.1",
-    "5.1.4.3"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-IntunePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Intune licence required",
-  "requiredLicence": "Microsoft Intune / Microsoft 365 Business Premium or above",
-  "version": "1.0",
-  "path": "policies/intune/INT10-Device-Enrollment-Restrictions.json"
+  "_deviceLimitConfiguration": {
+    "@odata.type": "#microsoft.graph.deviceEnrollmentLimitConfiguration",
+    "displayName": "INT10 - Device Enrollment Limit - 5 per User",
+    "description": "Limits each user to a maximum of 5 enrolled devices.",
+    "limit": 5
+  },
+  "_metadata": {
+    "policyId": "INT10",
+    "description": "Device enrollment restrictions blocking personal device enrollment (corporate-only), blocking Linux and Windows Mobile platforms, enforcing minimum OS versions per platform, and limiting each user to 5 enrolled devices. The _deviceLimitConfiguration section should be posted separately to /deviceManagement/deviceEnrollmentConfigurations.",
+    "graphEndpoint": "POST /deviceManagement/deviceEnrollmentConfigurations",
+    "platform": "Cross-platform",
+    "frameworks": [
+      "CIS Microsoft 365 Foundations Benchmark v3.1",
+      "NIST SP 800-53 Rev 5 - AC-19, CM-8",
+      "ISO 27001:2022 A.8.1",
+      "Essential Eight - Restrict Administrative Privileges",
+      "Microsoft Cloud Security Benchmark - AM-1, AM-2"
+    ],
+    "cisChecks": [
+      "CIS 5.1.3.1 - Ensure device enrollment is restricted to corporate devices",
+      "CIS 5.1.4.1 - Ensure minimum OS version is enforced at enrollment",
+      "CIS 5.1.4.3 - Ensure per-user device limit is configured"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  }
 }

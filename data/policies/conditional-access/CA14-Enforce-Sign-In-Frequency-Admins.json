@@ -1,42 +1,105 @@
 {
-  "id": "CA14",
-  "file": "CA14-Enforce-Sign-In-Frequency-Admins.json",
-  "type": "conditional-access",
-  "displayName": "CA14 | Enforce-Sign-In-Frequency-Admins",
-  "description": "Sets sign-in frequency to Every Sign-In for all admin roles. More restrictive than CA13, targeting privileged accounts.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "NIST CSF 1.1",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "TSA Security Directive"
-  ],
-  "cisChecks": [
-    "1.3.8",
-    "5.2.2.4"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA14-Enforce-Sign-In-Frequency-Admins.json"
+  "displayName": "CA14 | Enforce Sign-In Frequency Every Time for Admins",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [],
+      "excludeUsers": [],
+      "includeRoles": [
+        "62e90394-69f5-4237-9190-012177145e10",
+        "e8611ab8-c189-46e8-94e1-60213ab1f814",
+        "29232cdf-9323-42fd-ade2-1d097af3e4de",
+        "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+        "fe930be7-5e62-47db-91af-98c3a49a38b1",
+        "b0f54661-2d74-4c50-afa3-1ec803f12efe",
+        "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9",
+        "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+        "c4e39bd9-1100-46d3-8c65-fb160da0071f",
+        "7be44c8a-adaf-4e2a-84d6-ab2649e08a13",
+        "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3",
+        "158c047a-c907-4556-b7ef-446551a6b5f7"
+      ],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "mfa"
+    ]
+  },
+  "sessionControls": {
+    "signInFrequency": {
+      "frequencyInterval": "everyTime",
+      "isEnabled": true
+    },
+    "persistentBrowser": {
+      "mode": "never",
+      "isEnabled": true
+    }
+  },
+  "_metadata": {
+    "policyNumber": "CA14",
+    "description": "Enforces 'every time' sign-in frequency for all privileged administrator roles. This is the most restrictive session control, requiring fresh authentication for every single session. Combined with persistent browser mode 'never', this ensures no admin session tokens persist and every admin action requires fresh, verified authentication.",
+    "adminRoleTemplateIds": {
+      "62e90394-69f5-4237-9190-012177145e10": "Global Administrator",
+      "e8611ab8-c189-46e8-94e1-60213ab1f814": "Security Administrator",
+      "29232cdf-9323-42fd-ade2-1d097af3e4de": "Exchange Administrator",
+      "f28a1f50-f6e7-4571-818b-6a12f2af6b6c": "SharePoint Administrator",
+      "fe930be7-5e62-47db-91af-98c3a49a38b1": "User Administrator",
+      "b0f54661-2d74-4c50-afa3-1ec803f12efe": "Billing Administrator",
+      "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9": "Conditional Access Administrator",
+      "729827e3-9c14-49f7-bb1b-9608f156bbb8": "Helpdesk Administrator",
+      "c4e39bd9-1100-46d3-8c65-fb160da0071f": "Authentication Administrator",
+      "7be44c8a-adaf-4e2a-84d6-ab2649e08a13": "Privileged Authentication Administrator",
+      "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3": "Application Administrator",
+      "158c047a-c907-4556-b7ef-446551a6b5f7": "Cloud Application Administrator"
+    },
+    "cisControls": [
+      "CIS 1.3.8 - Ensure sign-in frequency is enabled and browser sessions are not persistent for administrative users",
+      "CIS 5.2.2.4 - Ensure Sign-in frequency is set and browser sessions are not persistent"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "AC-11",
+        "AC-12",
+        "AC-6(5)",
+        "SC-10"
+      ],
+      "CIS-Microsoft-365": [
+        "1.3.8",
+        "5.2.2.4"
+      ],
+      "ISO-27001-2022": [
+        "A.8.2 - Privileged access rights",
+        "A.8.5 - Secure authentication"
+      ],
+      "MITRE-ATT&CK": [
+        "T1539 - Steal Web Session Cookie",
+        "T1550.001 - Application Access Token",
+        "T1078.004 - Cloud Accounts"
+      ],
+      "NIS2": [
+        "Article 21(2)(i) - Access control policies",
+        "Article 21(2)(j) - Multi-factor authentication"
+      ],
+      "Essential-Eight": [
+        "Restrict administrative privileges",
+        "Multi-factor authentication"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "deploymentNotes": "The 'everyTime' frequency interval is the most restrictive option and requires admins to authenticate freshly for every session. This is more restrictive than CA13 and targets only admin roles. Deploy in report-only first to measure admin authentication volume. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

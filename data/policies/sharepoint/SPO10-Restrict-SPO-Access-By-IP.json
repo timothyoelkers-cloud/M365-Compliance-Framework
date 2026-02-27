@@ -1,37 +1,49 @@
 {
-  "id": "SPO10",
-  "file": "SPO10-Restrict-SPO-Access-By-IP.json",
-  "type": "sharepoint",
-  "displayName": "SPO10 | Restrict-SPO-Access-By-IP",
-  "description": "Configures SharePoint Online IP access control. Restricts or reports access from outside corporate IP ranges. Add your IP ranges to script parameters.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "CMMC v2.0",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "HITRUST CSF v11",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "NERC-CIP",
-    "TSA Security Directive",
-    "NYDFS 23 NYCRR 500"
-  ],
-  "cisChecks": [
-    "7.2.11"
-  ],
-  "importMethod": "powershell-spo",
-  "importScript": "scripts/Import-SharePointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/sharepoint/SPO10-Restrict-SPO-Access-By-IP.json"
+  "_metadata": {
+    "id": "SPO10",
+    "title": "Restrict SharePoint Online Access by IP Range",
+    "description": "Configures IP-based access restrictions for SharePoint Online. Only allows access from specified corporate IP ranges (e.g., office egress IPs, VPN endpoints). All access from non-listed IP addresses is blocked.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "NERC-CIP",
+      "TSA Security Directive",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.11"
+    ],
+    "severity": "High",
+    "category": "SharePoint Online",
+    "deploymentOrder": 10,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "CAUTION: IP-based restrictions can lock out users working remotely unless VPN egress IPs are included. Before enabling IPAddressEnforcement, ensure ALL corporate egress IP addresses, VPN endpoints, and any required third-party service IPs are listed in IPAddressAllowList. Consider using Entra ID Conditional Access with Named Locations as a more flexible alternative. IPAddressAllowList supports IPv4 CIDR notation (e.g., 203.0.113.0/24). Test thoroughly with IPAddressEnforcement: false first (logging only) before setting to true."
+  },
+  "cmdlet": "Set-SPOTenant",
+  "parameters": {
+    "IPAddressAllowList": "",
+    "IPAddressEnforcement": true,
+    "IPAddressWACTokenLifetime": 15
+  },
+  "postDeployment": [
+    "Get-SPOTenant | Select-Object IPAddressAllowList, IPAddressEnforcement, IPAddressWACTokenLifetime",
+    "Replace  with actual CIDR ranges, e.g., '203.0.113.0/24,198.51.100.0/24'",
+    "IMPORTANT: Test with IPAddressEnforcement: $false first to verify your IP list is complete",
+    "Include all: office egress IPs, VPN concentrator public IPs, remote office IPs, any third-party service IPs that need SPO access",
+    "IPAddressWACTokenLifetime: 15 means Office Online sessions expire after 15 minutes when accessed from allowed IPs",
+    "If remote workers without VPN need access, consider Entra ID Conditional Access with Named Locations instead of SPO IP restrictions",
+    "Monitor access failures after enabling enforcement to identify missing IP ranges"
+  ]
 }

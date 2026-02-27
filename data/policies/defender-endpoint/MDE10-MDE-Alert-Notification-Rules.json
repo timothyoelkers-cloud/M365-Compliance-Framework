@@ -1,49 +1,202 @@
 {
-  "id": "MDE10",
-  "file": "MDE10-MDE-Alert-Notification-Rules.json",
-  "type": "defender-endpoint",
-  "displayName": "MDE10 | MDE-Alert-Notification-Rules",
-  "description": "Configures MDE email alert notifications for High and Medium severity alerts to the security team. Ensures SOC/security team receives immediate notification of endpoint incidents.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "ISO 22301:2019",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule"
-  ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Defender for Endpoint Plan 1 or Plan 2. Edit MDE10 JSON to replace REPLACE-WITH-SOC-EMAIL.",
-  "requiredLicence": "Microsoft Defender for Endpoint P1/P2 or Microsoft 365 E5",
-  "version": "1.0",
-  "path": "policies/defender-endpoint/MDE10-MDE-Alert-Notification-Rules.json"
+  "_metadata": {
+    "id": "MDE10",
+    "title": "MDE Alert Notification Rules",
+    "description": "Configures email alert notification rules to ensure the security operations team is notified immediately when High and Medium severity alerts are generated in Microsoft Defender for Endpoint.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "ISO 22301:2019",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "CJIS v6",
+      "TSA Security Directive",
+      "CIRCIA (US)",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "mitreMappings": [],
+    "requiredLicences": [
+      "Microsoft Defender for Endpoint P1 or P2",
+      "Microsoft 365 E5 or Microsoft 365 E5 Security"
+    ],
+    "requiredRoles": [
+      "Security Administrator"
+    ],
+    "deploymentOrder": 10,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "MDE must be provisioned and devices onboarded",
+      "Replace  with your SOC/security team distribution list",
+      "Replace  with your security manager email",
+      "Ensure email addresses are valid Exchange Online or external SMTP addresses",
+      "Consider creating a dedicated distribution group for MDE notifications"
+    ],
+    "deploymentSteps": [
+      "1. Replace all placeholder email addresses in the notification rules",
+      "2. Create the notification rules via the MDE portal or API",
+      "3. Send a test notification to verify delivery",
+      "4. Ensure email delivery is not blocked by spam filters or transport rules",
+      "5. Integrate with SIEM/SOAR via the MDE Streaming API for production alerting"
+    ],
+    "rollbackProcedure": "Delete or disable the notification rules via the MDE portal or API."
+  },
+  "notificationRules": {
+    "apiEndpoint": "https://api.securitycenter.microsoft.com/api/alertNotificationRules",
+    "rules": [
+      {
+        "ruleName": "MDE10 - Critical and High Severity Alert Notifications",
+        "description": "Notify the security team immediately for all Critical and High severity MDE alerts",
+        "isEnabled": true,
+        "severity": [
+          "critical",
+          "high"
+        ],
+        "alertTypes": [
+          "newAlert"
+        ],
+        "notificationTargets": [
+          {
+            "type": "email",
+            "emailAddress": "",
+            "description": "Security Operations Team distribution list"
+          },
+          {
+            "type": "email",
+            "emailAddress": "",
+            "description": "Security Manager / CISO"
+          }
+        ],
+        "includeOrganizationName": true,
+        "includeDeviceInfo": true,
+        "includeAlertDetails": true,
+        "deviceGroupIds": [],
+        "_deviceGroupNote": "Empty array = all device groups. Specify group IDs to scope to specific groups."
+      },
+      {
+        "ruleName": "MDE10 - Medium Severity Alert Notifications",
+        "description": "Notify the security team for Medium severity alerts during business hours review",
+        "isEnabled": true,
+        "severity": [
+          "medium"
+        ],
+        "alertTypes": [
+          "newAlert"
+        ],
+        "notificationTargets": [
+          {
+            "type": "email",
+            "emailAddress": "",
+            "description": "Security Operations Team distribution list"
+          }
+        ],
+        "includeOrganizationName": true,
+        "includeDeviceInfo": true,
+        "includeAlertDetails": true,
+        "deviceGroupIds": []
+      },
+      {
+        "ruleName": "MDE10 - Alert Resolution Notifications",
+        "description": "Notify when alerts are resolved for tracking and compliance",
+        "isEnabled": true,
+        "severity": [
+          "critical",
+          "high",
+          "medium"
+        ],
+        "alertTypes": [
+          "alertResolved"
+        ],
+        "notificationTargets": [
+          {
+            "type": "email",
+            "emailAddress": "",
+            "description": "Security Operations Team distribution list"
+          }
+        ],
+        "includeOrganizationName": true,
+        "includeDeviceInfo": true,
+        "includeAlertDetails": true,
+        "deviceGroupIds": []
+      }
+    ]
+  },
+  "emailNotificationSettings": {
+    "portalPath": "security.microsoft.com > Settings > Endpoints > Email notifications > Alerts",
+    "generalSettings": {
+      "includeOrganizationName": true,
+      "includeTenantId": false,
+      "includeDeviceName": true,
+      "includeDeviceGroup": true,
+      "includeAlertSeverity": true,
+      "includeAlertCategory": true,
+      "includeAlertDescription": true,
+      "includeInvestigationStatus": true
+    }
+  },
+  "vulnerabilityNotificationSettings": {
+    "_description": "Separate notification channel for Vulnerability Management events",
+    "portalPath": "security.microsoft.com > Settings > Endpoints > Email notifications > Vulnerabilities",
+    "rules": [
+      {
+        "ruleName": "MDE10 - New Critical Vulnerability Notifications",
+        "isEnabled": true,
+        "notificationEvents": [
+          "newExploit",
+          "newVulnerability"
+        ],
+        "minimumSeverity": "critical",
+        "notificationTargets": [
+          {
+            "type": "email",
+            "emailAddress": ""
+          },
+          {
+            "type": "email",
+            "emailAddress": ""
+          }
+        ]
+      }
+    ]
+  },
+  "siemIntegration": {
+    "_description": "For production environments, also configure streaming API to SIEM",
+    "streamingApiEndpoint": "https://api.securitycenter.microsoft.com/api/streamingconnection",
+    "supportedTargets": [
+      {
+        "type": "azureEventHubs",
+        "eventHubNamespace": "",
+        "eventHubName": "",
+        "eventTypes": [
+          "AlertCreated",
+          "AlertUpdated",
+          "AlertResolved"
+        ]
+      },
+      {
+        "type": "azureStorage",
+        "storageAccountName": "",
+        "containerName": "mde-alerts"
+      }
+    ]
+  }
 }

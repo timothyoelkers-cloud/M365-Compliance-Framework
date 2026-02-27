@@ -1,46 +1,125 @@
 {
-  "id": "INT12",
-  "file": "INT12-Microsoft-Edge-Security-Baseline.json",
-  "type": "intune",
-  "displayName": "INT12 | Microsoft-Edge-Security-Baseline",
-  "description": "Deploys Microsoft Edge security baseline via Intune: SmartScreen, tracking prevention, password manager restrictions, extension control, pop-up blocker, HTTPS-First mode.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "UK NCSC Cyber Essentials v3.2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "EU Cyber Resilience Act",
-    "ISO 22301:2019"
+  "@odata.type": "#microsoft.graph.windows10GeneralConfiguration",
+  "displayName": "INT12 - Microsoft Edge Security Baseline",
+  "description": "Edge browser security settings: SmartScreen enabled, strict tracking prevention, password manager and monitor enabled, block potentially unwanted apps, block malicious downloads.",
+  "version": 1,
+  "edgeSearchEngine": null,
+  "edgeHomepageUrls": [],
+  "edgeBlockAccessToAboutFlags": true,
+  "edgeBlockAddressBarDropdown": false,
+  "edgeBlockAutofill": false,
+  "edgeBlockCompatibilityList": false,
+  "edgeBlockDeveloperTools": false,
+  "edgeBlockExtensions": false,
+  "edgeBlockInPrivateBrowsing": false,
+  "edgeBlockJavaScript": false,
+  "edgeBlockLiveTileDataCollection": true,
+  "edgeBlockPasswordManager": false,
+  "edgeBlockPopups": true,
+  "edgeBlockSearchSuggestions": false,
+  "edgeBlockSendingDoNotTrackHeader": false,
+  "edgeBlockSendingIntranetTrafficToInternetExplorer": true,
+  "edgeClearBrowsingDataOnExit": false,
+  "edgeCookiePolicy": "blockThirdParty",
+  "edgeDisableFirstRunPage": true,
+  "edgeFavoritesBarVisibility": "notConfigured",
+  "edgeOpensWith": "startPage",
+  "edgePreventCertificateErrorOverride": true,
+  "edgeRequireSmartScreen": true,
+  "edgeSendIntranetTrafficToInternetExplorer": false,
+  "edgeSyncFavoritesWithInternetExplorer": false,
+  "edgeTelemetryForMicrosoft365Analytics": "notConfigured",
+  "smartScreenBlockPromptOverride": true,
+  "smartScreenBlockPromptOverrideForFiles": true,
+  "smartScreenEnableAppInstallControl": true,
+  "webRtcBlockLocalhostIpAddress": true,
+  "defenderSmartScreenPromptOverrideEnabled": false,
+  "defenderSmartScreenBlockDownloadOverride": true,
+  "roleScopeTagIds": [
+    "0"
   ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-IntunePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Intune licence required",
-  "requiredLicence": "Microsoft Intune / Microsoft 365 Business Premium or above",
-  "version": "1.0",
-  "path": "policies/intune/INT12-Microsoft-Edge-Security-Baseline.json"
+  "_edgeOmaSettings": {
+    "description": "Additional Edge policies via OMA-URI for settings not available in the windows10GeneralConfiguration type.",
+    "settings": [
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Edge - Tracking Prevention Level",
+        "description": "TrackingPrevention: 3 = Strict tracking prevention.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/Edge~Policy~microsoft_edge/TrackingPrevention",
+        "value": 3
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Edge - SmartScreen Enabled",
+        "description": "SmartScreenEnabled: 1 = Enabled.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/Edge~Policy~microsoft_edge/SmartScreenEnabled",
+        "value": 1
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Edge - SmartScreen for PUA",
+        "description": "SmartScreenPuaEnabled: 1 = Enabled - block potentially unwanted apps.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/Edge~Policy~microsoft_edge/SmartScreenPuaEnabled",
+        "value": 1
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Edge - Password Manager Enabled",
+        "description": "PasswordManagerEnabled: 1 = Enabled.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/Edge~Policy~microsoft_edge/PasswordManagerEnabled",
+        "value": 1
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Edge - Password Monitor Enabled",
+        "description": "PasswordMonitorAllowed: 1 = Enabled - alerts users if passwords are found in data breach.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/Edge~Policy~microsoft_edge/PasswordMonitorAllowed",
+        "value": 1
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Edge - Block Dangerous Downloads",
+        "description": "PreventSmartScreenPromptOverrideForFiles: 1 = Enabled.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/Edge~Policy~microsoft_edge/PreventSmartScreenPromptOverrideForFiles",
+        "value": 1
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Edge - Enhanced Security Mode",
+        "description": "EnhanceSecurityMode: 2 = Strict mode.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/Edge~Policy~microsoft_edge/EnhanceSecurityMode",
+        "value": 2
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Edge - Typosquatting Checker",
+        "description": "TyposquattingCheckerEnabled: 1 = Enabled.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/Edge~Policy~microsoft_edge/TyposquattingCheckerEnabled",
+        "value": 1
+      }
+    ]
+  },
+  "_metadata": {
+    "policyId": "INT12",
+    "description": "Microsoft Edge security baseline enforcing SmartScreen protection, strict tracking prevention, password manager and breach monitor, PUA blocking, blocking malicious downloads, preventing certificate error overrides, third-party cookie blocking, and enhanced security mode. The _edgeOmaSettings section contains supplementary OMA-URI policies for a custom configuration profile.",
+    "graphEndpoint": "POST /deviceManagement/deviceConfigurations",
+    "platform": "Windows 10/11",
+    "frameworks": [
+      "CIS Microsoft Edge Benchmark v2.0",
+      "NIST SP 800-53 Rev 5 - SC-18, SI-3, SI-8",
+      "ISO 27001:2022 A.8.23",
+      "Essential Eight - Application Control",
+      "Microsoft Cloud Security Benchmark - NS-8"
+    ],
+    "cisChecks": [
+      "CIS 1.1 - Ensure SmartScreen is enabled for Microsoft Edge",
+      "CIS 1.2 - Ensure SmartScreen prompt override is blocked",
+      "CIS 1.3 - Ensure tracking prevention is set to Strict",
+      "CIS 1.4 - Ensure potentially unwanted app blocking is enabled",
+      "CIS 1.5 - Ensure password manager is enabled",
+      "CIS 1.6 - Ensure password monitor is enabled"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  }
 }

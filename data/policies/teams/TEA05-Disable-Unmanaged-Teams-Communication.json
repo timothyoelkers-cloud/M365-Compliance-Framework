@@ -1,33 +1,41 @@
 {
-  "id": "TEA05",
-  "file": "TEA05-Disable-Unmanaged-Teams-Communication.json",
-  "type": "teams",
-  "displayName": "TEA05 | Disable-Unmanaged-Teams-Communication",
-  "description": "Blocks communication with external Teams users using unmanaged/personal Teams accounts. All external Teams federation uses managed organisational accounts.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "HITRUST CSF v11",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22"
-  ],
-  "cisChecks": [
-    "8.2.4"
-  ],
-  "importMethod": "powershell-teams",
-  "importScript": "scripts/Import-TeamsPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/teams/TEA05-Disable-Unmanaged-Teams-Communication.json"
+  "_metadata": {
+    "id": "TEA05",
+    "title": "Disable Unmanaged (Personal) Teams Communication",
+    "description": "Blocks communication with external users on unmanaged (personal/free) Teams accounts. Prevents both outbound and inbound communication with Teams consumer accounts. Only managed organizational Teams accounts can communicate with your users.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["8.2.4"],
+    "severity": "Medium",
+    "category": "Microsoft Teams",
+    "deploymentOrder": 5,
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "Teams consumer accounts (personal/free Teams) are not managed by any organization and have no IT governance. Allowing communication with these accounts creates a phishing and social engineering risk as the identity cannot be verified. AllowTeamsConsumer: false blocks outbound communication to personal Teams accounts. AllowTeamsConsumerInbound: false blocks inbound messages from personal Teams accounts. This does NOT affect communication with other Microsoft 365 tenants (that is controlled by federation settings in TEA06)."
+  },
+  "cmdlet": "Set-CsTeamsClientConfiguration",
+  "parameters": {
+    "Identity": "Global",
+    "AllowTeamsConsumer": false,
+    "AllowTeamsConsumerInbound": false
+  },
+  "postDeployment": [
+    "Get-CsTeamsClientConfiguration | Select-Object AllowTeamsConsumer, AllowTeamsConsumerInbound",
+    "Verify users cannot search for or communicate with personal Teams accounts",
+    "Verify inbound messages from personal Teams accounts are blocked",
+    "This setting is separate from federation (TEA06) which controls communication with other M365 tenants",
+    "If specific users need to communicate with personal Teams accounts, this setting is tenant-wide and cannot be scoped per-user"
+  ]
 }

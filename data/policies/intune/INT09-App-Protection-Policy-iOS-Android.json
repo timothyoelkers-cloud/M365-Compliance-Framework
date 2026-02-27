@@ -1,55 +1,149 @@
 {
-  "id": "INT09",
-  "file": "INT09-App-Protection-Policy-iOS-Android.json",
-  "type": "intune",
-  "displayName": "INT09 | App-Protection-Policy-iOS-Android",
-  "description": "MAM policy for iOS/Android: prevent copy/paste to unmanaged apps, block screenshots, PIN for app access, remote wipe of managed app data, min OS version requirement.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "DORA",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "GSMA FS.31",
-    "HPH CPGs",
-    "Cybersecure Canada",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "ISO 22301:2019"
+  "@odata.type": "#microsoft.graph.iosManagedAppProtection",
+  "displayName": "INT09 - App Protection Policy (MAM) - iOS/Android",
+  "description": "Mobile Application Management policy: prevents cut/copy/paste to unmanaged apps, blocks save to personal storage, requires 6-digit numeric PIN, blocks screenshots, enforces minimum OS, wipes after 90 days offline.",
+  "version": 1,
+  "periodOfflineBeforeAccessCheck": "PT12H",
+  "periodOnlineBeforeAccessCheck": "PT30M",
+  "allowedInboundDataTransferSources": "managedApps",
+  "allowedOutboundDataTransferDestinations": "managedApps",
+  "organizationalCredentialsRequired": false,
+  "allowedOutboundClipboardSharingLevel": "managedAppsWithPasteIn",
+  "dataBackupBlocked": true,
+  "deviceComplianceRequired": false,
+  "managedBrowserToOpenLinksRequired": false,
+  "saveAsBlocked": true,
+  "periodOfflineBeforeWipeIsEnforced": "P90D",
+  "pinRequired": true,
+  "maximumPinRetries": 5,
+  "simplePinBlocked": true,
+  "minimumPinLength": 6,
+  "pinCharacterSet": "numeric",
+  "periodBeforePinReset": "P0D",
+  "allowedDataStorageLocations": [
+    "oneDriveForBusiness",
+    "sharePoint"
   ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2",
-    "5.1.4.3"
+  "contactSyncBlocked": false,
+  "printBlocked": true,
+  "fingerprintBlocked": false,
+  "disableAppPinIfDevicePinIsSet": false,
+  "minimumRequiredOsVersion": "16.0",
+  "minimumWarningOsVersion": "16.0",
+  "minimumRequiredAppVersion": null,
+  "minimumWarningAppVersion": null,
+  "managedBrowser": "microsoftEdge",
+  "minimumRequiredSdkVersion": null,
+  "screenCaptureBlocked": true,
+  "encryptAppData": true,
+  "disableAppEncryptionIfDeviceEncryptionIsEnabled": false,
+  "appDataEncryptionType": "whenDeviceLocked",
+  "faceIdBlocked": false,
+  "customBrowserProtocol": null,
+  "apps": [
+    {
+      "mobileAppIdentifier": {
+        "@odata.type": "#microsoft.graph.iosMobileAppIdentifier",
+        "bundleId": "com.microsoft.Office.Outlook"
+      }
+    },
+    {
+      "mobileAppIdentifier": {
+        "@odata.type": "#microsoft.graph.iosMobileAppIdentifier",
+        "bundleId": "com.microsoft.Office.Word"
+      }
+    },
+    {
+      "mobileAppIdentifier": {
+        "@odata.type": "#microsoft.graph.iosMobileAppIdentifier",
+        "bundleId": "com.microsoft.Office.Excel"
+      }
+    },
+    {
+      "mobileAppIdentifier": {
+        "@odata.type": "#microsoft.graph.iosMobileAppIdentifier",
+        "bundleId": "com.microsoft.Office.Powerpoint"
+      }
+    },
+    {
+      "mobileAppIdentifier": {
+        "@odata.type": "#microsoft.graph.iosMobileAppIdentifier",
+        "bundleId": "com.microsoft.onenote"
+      }
+    },
+    {
+      "mobileAppIdentifier": {
+        "@odata.type": "#microsoft.graph.iosMobileAppIdentifier",
+        "bundleId": "com.microsoft.msapps"
+      }
+    },
+    {
+      "mobileAppIdentifier": {
+        "@odata.type": "#microsoft.graph.iosMobileAppIdentifier",
+        "bundleId": "com.microsoft.skype.teams"
+      }
+    },
+    {
+      "mobileAppIdentifier": {
+        "@odata.type": "#microsoft.graph.iosMobileAppIdentifier",
+        "bundleId": "com.microsoft.sharepoint"
+      }
+    },
+    {
+      "mobileAppIdentifier": {
+        "@odata.type": "#microsoft.graph.iosMobileAppIdentifier",
+        "bundleId": "com.microsoft.msedge"
+      }
+    }
   ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-IntunePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Intune licence required",
-  "requiredLicence": "Microsoft Intune / Microsoft 365 Business Premium or above",
-  "version": "1.0",
-  "path": "policies/intune/INT09-App-Protection-Policy-iOS-Android.json"
+  "_androidPolicy": {
+    "@odata.type": "#microsoft.graph.androidManagedAppProtection",
+    "displayName": "INT09 - App Protection Policy (MAM) - Android",
+    "description": "Android counterpart: same MAM protections applied to Android Enterprise managed apps.",
+    "allowedInboundDataTransferSources": "managedApps",
+    "allowedOutboundDataTransferDestinations": "managedApps",
+    "allowedOutboundClipboardSharingLevel": "managedAppsWithPasteIn",
+    "dataBackupBlocked": true,
+    "saveAsBlocked": true,
+    "pinRequired": true,
+    "simplePinBlocked": true,
+    "minimumPinLength": 6,
+    "pinCharacterSet": "numeric",
+    "periodOfflineBeforeWipeIsEnforced": "P90D",
+    "periodOfflineBeforeAccessCheck": "PT12H",
+    "screenCaptureBlocked": true,
+    "encryptAppData": true,
+    "minimumRequiredOsVersion": "13.0",
+    "minimumWarningOsVersion": "13.0",
+    "allowedDataStorageLocations": [
+      "oneDriveForBusiness",
+      "sharePoint"
+    ],
+    "printBlocked": true,
+    "fingerprintBlocked": false,
+    "disableAppPinIfDevicePinIsSet": false
+  },
+  "_metadata": {
+    "policyId": "INT09",
+    "description": "Mobile Application Management (MAM) policy for iOS and Android. Prevents data leakage via cut/copy/paste to unmanaged apps, blocks save to personal storage, requires 6-digit numeric PIN, blocks screenshots, enforces minimum OS (iOS 16.0 / Android 13.0), and wipes managed app data after 90 days offline. The _androidPolicy section provides the equivalent Android configuration for POST /deviceAppManagement/androidManagedAppProtections.",
+    "graphEndpoint": "POST /deviceAppManagement/iosManagedAppProtections",
+    "graphEndpointAndroid": "POST /deviceAppManagement/androidManagedAppProtections",
+    "platform": "iOS/iPadOS and Android",
+    "frameworks": [
+      "CIS Microsoft 365 Foundations Benchmark v3.1",
+      "NIST SP 800-53 Rev 5 - AC-19, MP-7, SC-28",
+      "NIST SP 800-171 Rev 2 - 3.1.18, 3.1.19",
+      "ISO 27001:2022 A.8.10",
+      "Essential Eight - Restrict Administrative Privileges",
+      "HIPAA - 164.312(d)"
+    ],
+    "cisChecks": [
+      "CIS 2.6.1 - Ensure mobile device management is configured",
+      "CIS 2.6.2 - Ensure app protection policies prevent data leakage",
+      "CIS 2.6.3 - Ensure PIN is required for mobile app access",
+      "CIS 2.6.4 - Ensure minimum OS version is enforced"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  }
 }

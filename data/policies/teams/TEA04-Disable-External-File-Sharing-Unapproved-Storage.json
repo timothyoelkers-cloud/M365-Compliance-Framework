@@ -1,33 +1,44 @@
 {
-  "id": "TEA04",
-  "file": "TEA04-Disable-External-File-Sharing-Unapproved-Storage.json",
-  "type": "teams",
-  "displayName": "TEA04 | Disable-External-File-Sharing-Unapproved-Storage",
-  "description": "Restricts Teams external file sharing to SharePoint/OneDrive only. Blocks Google Drive, Dropbox, Box integrations.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "HITRUST CSF v11",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22"
-  ],
-  "cisChecks": [
-    "8.2.3"
-  ],
-  "importMethod": "powershell-teams",
-  "importScript": "scripts/Import-TeamsPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/teams/TEA04-Disable-External-File-Sharing-Unapproved-Storage.json"
+  "_metadata": {
+    "id": "TEA04",
+    "title": "Disable External File Sharing via Unapproved Cloud Storage",
+    "description": "Disables all third-party cloud storage provider integrations in Microsoft Teams. Blocks Dropbox, Box, Google Drive, ShareFile, and Egnyte. File sharing in Teams is restricted to SharePoint Online and OneDrive for Business only, ensuring all files remain within managed Microsoft 365 storage.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["8.2.3"],
+    "severity": "Medium",
+    "category": "Microsoft Teams",
+    "deploymentOrder": 4,
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "Third-party cloud storage integrations allow users to share files from external providers within Teams. This bypasses DLP policies, retention policies, and audit logging that apply to SharePoint/OneDrive. Disabling these providers ensures all files shared in Teams are stored in managed Microsoft 365 storage where governance controls apply. This does not prevent users from sharing links to external cloud storage via chat messages."
+  },
+  "cmdlet": "Set-CsTeamsClientConfiguration",
+  "parameters": {
+    "Identity": "Global",
+    "AllowDropBox": false,
+    "AllowBox": false,
+    "AllowGoogleDrive": false,
+    "AllowShareFile": false,
+    "AllowEgnyte": false
+  },
+  "postDeployment": [
+    "Get-CsTeamsClientConfiguration | Select-Object AllowDropBox, AllowBox, AllowGoogleDrive, AllowShareFile, AllowEgnyte",
+    "Verify that third-party storage options no longer appear in the Teams file picker",
+    "Communicate to users that file sharing in Teams is now restricted to SharePoint/OneDrive",
+    "If specific teams need third-party storage (e.g., partnerships), note that this is a tenant-wide setting and cannot be scoped to specific users",
+    "Users can still paste links to external storage in chat; consider DLP policies to detect and block external storage URLs if needed"
+  ]
 }

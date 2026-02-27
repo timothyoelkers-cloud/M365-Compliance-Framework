@@ -1,49 +1,133 @@
 {
-  "id": "ENT06",
-  "file": "ENT06-Disable-Guest-Invite-Non-Admins.json",
-  "type": "entra",
-  "displayName": "ENT06 | Disable-Guest-Invite-Non-Admins",
-  "description": "Restricts guest invitation to admin roles only. Regular users cannot invite external guests without IT oversight.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "NIST CSF 1.1",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC CAF v3.1",
-    "UK NCSC Cyber Essentials v3.2",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "CSA CCM v4",
-    "CRI Profile v2.0",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "GSMA FS.31",
-    "HPH CPGs",
-    "EU Cyber Resilience Act"
+  "_metadata": {
+    "id": "ENT06",
+    "title": "Restrict Guest Invitations to Admins and Guest Inviters",
+    "description": "Restricts the ability to invite external guest users to Entra ID to administrators and users in the Guest Inviter role only. Prevents regular users and existing guests from inviting additional external users without IT oversight.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "5.1.6.2",
+      "5.1.6.3"
+    ],
+    "mitreMappings": [
+      "T1078.004",
+      "T1136.003",
+      "T1098"
+    ],
+    "requiredLicences": [
+      "Microsoft Entra ID Free (included with any M365 plan)"
+    ],
+    "requiredRoles": [
+      "Global Administrator",
+      "External Identity Provider Administrator"
+    ],
+    "deploymentOrder": 6,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-EntraSettings.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Review current guest invitation patterns before restricting",
+      "Identify business users who legitimately need to invite guests and assign them Guest Inviter role",
+      "Establish a guest invitation request process for regular users",
+      "Consider impact on Teams external sharing and SharePoint guest access"
+    ],
+    "guestInvitationLevels": {
+      "none": "No one can invite guests (most restrictive)",
+      "adminsAndGuestInviters": "Only admins and users in Guest Inviter role can invite (recommended)",
+      "adminsGuestInvitersAndAllMembers": "All members can invite guests",
+      "everyone": "Anyone including guests can invite guests (least restrictive - default)"
+    },
+    "deploymentSteps": [
+      "1. Audit current guest users and invitation patterns",
+      "2. Assign Guest Inviter role to users who need invitation capabilities",
+      "3. Apply the Graph API PATCH to restrict invitations",
+      "4. Verify the change and test that restricted users cannot invite",
+      "5. Communicate the new guest invitation process"
+    ],
+    "rollbackProcedure": "PATCH /policies/authorizationPolicy with allowInvitesFrom: 'adminsGuestInvitersAndAllMembers' or 'everyone'"
+  },
+  "graphApiCalls": [
+    {
+      "stepOrder": 1,
+      "description": "Restrict guest invitations to admins and Guest Inviter role members only",
+      "method": "PATCH",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy/authorizationPolicy",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer "
+      },
+      "body": {
+        "allowInvitesFrom": "adminsAndGuestInviters"
+      },
+      "_explanation": "Setting allowInvitesFrom to 'adminsAndGuestInviters' means only users with Global Administrator, User Administrator, or Guest Inviter roles can invite external guests. Regular users and existing guests cannot send invitations."
+    },
+    {
+      "stepOrder": 2,
+      "description": "Verify the guest invitation restriction",
+      "method": "GET",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy/authorizationPolicy",
+      "expectedResponse": {
+        "allowInvitesFrom": "adminsAndGuestInviters"
+      }
+    }
   ],
-  "cisChecks": [
-    "5.1.6.2",
-    "5.1.6.3"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-EntraSettings.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/entra/ENT06-Disable-Guest-Invite-Non-Admins.json"
+  "powershellAlternative": {
+    "module": "Microsoft.Graph",
+    "commands": [
+      {
+        "description": "Connect to Microsoft Graph",
+        "command": "Connect-MgGraph -Scopes 'Policy.ReadWrite.Authorization'"
+      },
+      {
+        "description": "Restrict guest invitations",
+        "command": "Update-MgPolicyAuthorizationPolicy -AllowInvitesFrom 'adminsAndGuestInviters'"
+      },
+      {
+        "description": "Verify the change",
+        "command": "(Get-MgPolicyAuthorizationPolicy).AllowInvitesFrom"
+      },
+      {
+        "description": "Assign Guest Inviter role to specific users",
+        "command": "New-MgRoleManagementDirectoryRoleAssignment -PrincipalId '' -RoleDefinitionId '95e79109-95c0-4d8e-aee3-d01accf2d47b' -DirectoryScopeId '/'"
+      }
+    ]
+  },
+  "entraPortalPath": {
+    "navigation": "Entra admin center > Identity > External Identities > External collaboration settings",
+    "settings": {
+      "guestInviteSettings": "Only users assigned to specific admin roles can invite guest users",
+      "_options": [
+        "Anyone in the organization can invite guest users including guests and non-admins (most inclusive)",
+        "Member users and users assigned to specific admin roles can invite guest users including guests with member permissions",
+        "Only users assigned to specific admin roles can invite guest users (recommended)",
+        "No one in the organization can invite guest users including admins (most restrictive)"
+      ]
+    }
+  },
+  "guestInviterRoleId": {
+    "roleId": "95e79109-95c0-4d8e-aee3-d01accf2d47b",
+    "roleName": "Guest Inviter",
+    "_note": "Assign this role to specific users who need to invite external guests"
+  }
 }

@@ -1,45 +1,227 @@
 {
-  "id": "MDE12",
-  "file": "MDE12-Threat-Intelligence-Integration.json",
-  "type": "defender-endpoint",
-  "displayName": "MDE12 | Threat-Intelligence-Integration",
-  "description": "Configures MDE custom Indicators of Compromise (IoCs): block/alert on specific file hashes, IP addresses, URLs, and certificates. Enables TAXII/STIX threat intel feed ingestion.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule",
-    "ISO 22301:2019"
-  ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Requires Microsoft Defender for Endpoint Plan 2",
-  "requiredLicence": "Microsoft Defender for Endpoint P2 or Microsoft 365 E5",
-  "version": "1.0",
-  "path": "policies/defender-endpoint/MDE12-Threat-Intelligence-Integration.json"
+  "_metadata": {
+    "id": "MDE12",
+    "title": "Threat Intelligence Integration - Custom Indicators",
+    "description": "Configures custom Indicators of Compromise (IoCs) in Microsoft Defender for Endpoint to block, alert, or allow specific file hashes, IP addresses, URLs, and certificates. Provides a template for custom threat intelligence integration via the MDE tiIndicators API.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "CJIS v6",
+      "TSA Security Directive",
+      "CIRCIA (US)",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "mitreMappings": [
+      "T1071",
+      "T1204",
+      "T1566",
+      "T1189",
+      "T1568",
+      "T1105"
+    ],
+    "requiredLicences": [
+      "Microsoft Defender for Endpoint P2",
+      "Microsoft 365 E5 or Microsoft 365 E5 Security",
+      "Microsoft Defender Threat Intelligence (optional, for premium TI feeds)"
+    ],
+    "requiredRoles": [
+      "Security Administrator",
+      "TI Analyst"
+    ],
+    "deploymentOrder": 12,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Devices must be onboarded to MDE (MDE01 deployed)",
+      "MDE P2 licence required for custom indicators",
+      "Custom indicators for URLs/domains require Network Protection enabled (MDE07)",
+      "Microsoft Graph API permissions required: ThreatIndicators.ReadWrite.OwnedBy",
+      "For TAXII feeds, Microsoft Sentinel integration is recommended"
+    ],
+    "indicatorLimits": {
+      "fileHashIndicators": 15000,
+      "ipIndicators": 15000,
+      "urlDomainIndicators": 15000,
+      "certificateIndicators": 500
+    },
+    "deploymentSteps": [
+      "1. Register an Azure AD app with ThreatIndicators.ReadWrite.OwnedBy permission",
+      "2. Use the tiIndicators API to submit custom indicators",
+      "3. For manual indicators, use the MDE portal > Settings > Endpoints > Indicators",
+      "4. For automated feeds, integrate via Microsoft Graph Security API or Sentinel TAXII connector",
+      "5. Monitor indicator matches in Advanced Hunting"
+    ],
+    "rollbackProcedure": "Delete individual indicators via the API or portal. Use the bulk delete API endpoint for mass removal."
+  },
+  "customIndicatorTemplates": {
+    "apiEndpoint": "https://api.securitycenter.microsoft.com/api/indicators",
+    "graphApiEndpoint": "https://graph.microsoft.com/beta/security/tiIndicators",
+    "fileHashIndicator": {
+      "@odata.type": "#microsoft.graph.tiIndicator",
+      "action": "block",
+      "description": "Blocked file hash - known malware sample",
+      "expirationDateTime": "2027-02-27T00:00:00Z",
+      "indicatorProvider": "Custom Threat Intelligence",
+      "fileHashType": "sha256",
+      "fileHashValue": "",
+      "severity": "high",
+      "generateAlert": true,
+      "recommendedActions": "Quarantine the file. Investigate the device for additional compromise indicators. Run full AV scan.",
+      "title": "Custom IoC - Malicious File Hash",
+      "tags": [
+        "custom-ioc",
+        "malware"
+      ],
+      "rbacGroupNames": [],
+      "_note": "Leave rbacGroupNames empty to apply to all device groups"
+    },
+    "ipAddressIndicator": {
+      "@odata.type": "#microsoft.graph.tiIndicator",
+      "action": "block",
+      "description": "Blocked IP address - known C2 infrastructure",
+      "expirationDateTime": "2027-02-27T00:00:00Z",
+      "indicatorProvider": "Custom Threat Intelligence",
+      "networkDestinationIPv4": "",
+      "severity": "high",
+      "generateAlert": true,
+      "recommendedActions": "Investigate the device for C2 communication. Check for data exfiltration. Isolate if confirmed compromised.",
+      "title": "Custom IoC - C2 IP Address",
+      "tags": [
+        "custom-ioc",
+        "c2-infrastructure"
+      ],
+      "rbacGroupNames": []
+    },
+    "urlIndicator": {
+      "@odata.type": "#microsoft.graph.tiIndicator",
+      "action": "block",
+      "description": "Blocked URL - known phishing or malware delivery URL",
+      "expirationDateTime": "2027-02-27T00:00:00Z",
+      "indicatorProvider": "Custom Threat Intelligence",
+      "url": "",
+      "severity": "high",
+      "generateAlert": true,
+      "recommendedActions": "Check browser history for URL access. Scan device for downloaded payloads. Reset user credentials if phishing confirmed.",
+      "title": "Custom IoC - Malicious URL",
+      "tags": [
+        "custom-ioc",
+        "phishing"
+      ],
+      "rbacGroupNames": [],
+      "_prerequisite": "Network Protection (MDE07) must be enabled for URL indicators to work"
+    },
+    "domainIndicator": {
+      "@odata.type": "#microsoft.graph.tiIndicator",
+      "action": "alert",
+      "description": "Alert-only domain indicator - suspicious domain for monitoring",
+      "expirationDateTime": "2027-02-27T00:00:00Z",
+      "indicatorProvider": "Custom Threat Intelligence",
+      "domainName": "",
+      "severity": "medium",
+      "generateAlert": true,
+      "recommendedActions": "Review the connection context. Determine if the domain access is business-justified.",
+      "title": "Custom IoC - Suspicious Domain",
+      "tags": [
+        "custom-ioc",
+        "monitoring"
+      ],
+      "rbacGroupNames": []
+    },
+    "certificateIndicator": {
+      "@odata.type": "#microsoft.graph.tiIndicator",
+      "action": "blockAndRemediate",
+      "description": "Block files signed with known malicious certificate",
+      "expirationDateTime": "2027-02-27T00:00:00Z",
+      "indicatorProvider": "Custom Threat Intelligence",
+      "certificateThumbprint": "",
+      "certificateIssuerName": "",
+      "certificateSubjectName": "",
+      "severity": "high",
+      "generateAlert": true,
+      "recommendedActions": "Block all files signed with this certificate. Investigate for supply chain compromise.",
+      "title": "Custom IoC - Malicious Code Signing Certificate",
+      "tags": [
+        "custom-ioc",
+        "supply-chain"
+      ],
+      "rbacGroupNames": []
+    },
+    "allowListIndicator": {
+      "@odata.type": "#microsoft.graph.tiIndicator",
+      "action": "allowed",
+      "description": "Allow-listed file hash - false positive exclusion for known safe file",
+      "expirationDateTime": "2027-02-27T00:00:00Z",
+      "indicatorProvider": "Internal Security Team",
+      "fileHashType": "sha256",
+      "fileHashValue": "",
+      "severity": "informational",
+      "generateAlert": false,
+      "title": "Allow List - Known Safe Application",
+      "tags": [
+        "allow-list",
+        "false-positive-exclusion"
+      ],
+      "rbacGroupNames": []
+    }
+  },
+  "bulkImportTemplate": {
+    "_description": "CSV format for bulk indicator import via the MDE portal",
+    "csvHeaders": "IndicatorType,IndicatorValue,ExpirationTime,Action,Severity,Title,Description,RecommendedActions,RbacGroups,Category,MitreTechniques,GenerateAlert",
+    "exampleRows": [
+      "FileSha256,,2027-02-27T00:00:00Z,Block,High,Malware Sample,Known malicious file,Quarantine and investigate,,Malware,T1204,TRUE",
+      "IpAddress,,2027-02-27T00:00:00Z,Block,High,C2 Infrastructure,Known command-and-control IP,Isolate device,,CommandAndControl,T1071,TRUE",
+      "Url,,2027-02-27T00:00:00Z,Block,High,Phishing URL,Known phishing page,Reset credentials,,Phishing,T1566.002,TRUE",
+      "DomainName,,2027-02-27T00:00:00Z,Alert,Medium,Suspicious Domain,Monitoring suspicious domain,Review connections,,SuspiciousActivity,,TRUE"
+    ]
+  },
+  "automatedFeedIntegration": {
+    "microsoftSentinelTaxii": {
+      "_description": "Integrate TAXII/STIX threat intelligence feeds via Microsoft Sentinel for automatic indicator submission to MDE",
+      "connectorType": "ThreatIntelligenceTaxii",
+      "configuration": {
+        "taxiiServer": "",
+        "collectionId": "",
+        "username": "",
+        "password": "",
+        "pollingFrequency": "hourly",
+        "lookbackPeriod": "24h"
+      }
+    },
+    "graphSecurityApi": {
+      "_description": "Submit indicators programmatically via Microsoft Graph Security API",
+      "endpoint": "https://graph.microsoft.com/beta/security/tiIndicators",
+      "requiredPermissions": [
+        "ThreatIndicators.ReadWrite.OwnedBy"
+      ],
+      "authentication": {
+        "type": "clientCredentials",
+        "tenantId": "",
+        "clientId": "",
+        "clientSecret": ""
+      }
+    }
+  },
+  "advancedHuntingQueries": {
+    "indicatorMatches": "DeviceEvents | where ActionType == 'IndicatorFileBlocked' or ActionType == 'IndicatorIpBlocked' or ActionType == 'IndicatorUrlBlocked' | project Timestamp, DeviceName, ActionType, FileName, RemoteUrl, RemoteIP, SHA256 | sort by Timestamp desc | take 100",
+    "indicatorStats": "DeviceEvents | where ActionType startswith 'Indicator' | summarize MatchCount=count() by ActionType, bin(Timestamp, 1d) | sort by Timestamp desc"
+  }
 }

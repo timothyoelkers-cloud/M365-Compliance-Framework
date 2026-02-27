@@ -1,55 +1,274 @@
 {
-  "id": "PV12",
-  "file": "PV12-Insider-Risk-Management-Policy.json",
-  "type": "purview",
-  "displayName": "PV12 | Insider-Risk-Management-Policy",
-  "description": "Purview Insider Risk Management policy: detects departing employee data downloads, access from unusual locations, bulk file deletion, large attachments to personal email.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC CAF v3.1",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "ASD Essential Eight",
-    "MITRE ATT&CK",
-    "CSA CCM v4",
-    "CRI Profile v2.0",
-    "COBIT 19",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "GSMA FS.31",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule",
-    "ISO 22301:2019"
+  "_metadata": {
+    "id": "PV12",
+    "title": "Insider Risk Management Policy",
+    "description": "Configures Microsoft Purview Insider Risk Management policies for detecting departing employee data theft, general data leaks, and security policy violations. Uses HR connector signals, DLP policy matches, and behavioural indicators to identify insider threats.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "NYDFS 23 NYCRR 500",
+      "ASD Essential Eight",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "9.1.4"
+    ],
+    "mitreMappings": [
+      "T1048",
+      "T1567",
+      "T1530",
+      "T1119",
+      "T1039",
+      "T1052",
+      "T1041"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Insider Risk Management add-on",
+      "Microsoft 365 E5 Insider Risk Management"
+    ],
+    "requiredRoles": [
+      "Insider Risk Management Admin",
+      "Compliance Administrator"
+    ],
+    "deploymentOrder": 12,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Microsoft 365 E5 or Insider Risk Management add-on licence required",
+      "Audit logging must be enabled and retained (PV11)",
+      "HR connector configured for departing employee signals (recommended)",
+      "Microsoft Defender for Endpoint integration enabled for device indicators",
+      "DLP policies deployed (PV01-PV09) for DLP match triggering events",
+      "Privacy settings configured to anonymise user names during investigation"
+    ],
+    "privacyConsiderations": [
+      "Enable pseudonymised (anonymised) usernames in Insider Risk settings",
+      "Configure role-based access for investigators",
+      "Ensure legal/HR review of monitoring scope before deployment",
+      "Document lawful basis for monitoring under GDPR Article 6",
+      "Conduct Data Protection Impact Assessment (DPIA) if required"
+    ],
+    "deploymentSteps": [
+      "1. Configure Insider Risk Management settings (privacy, indicators, detection thresholds)",
+      "2. Set up HR connector for resignation/termination signals",
+      "3. Enable Defender for Endpoint integration for device-level indicators",
+      "4. Create the Departing Employee Data Theft policy",
+      "5. Create the General Data Leaks policy",
+      "6. Create the Security Policy Violations policy",
+      "7. Assign investigator roles to the Insider Risk team",
+      "8. Monitor alerts and triage cases"
+    ],
+    "rollbackProcedure": "Disable individual policies via the Insider Risk Management portal. Policies can be paused without deletion."
+  },
+  "insiderRiskSettings": {
+    "portalUrl": "https://compliance.microsoft.com/insiderriskmanagement",
+    "globalSettings": {
+      "privacySettings": {
+        "showAnonymizedVersionsOfUsernames": true,
+        "_note": "Anonymise user identities until an investigation is formally opened"
+      },
+      "policyIndicators": {
+        "officeIndicators": {
+          "fileDownloadFromSharePoint": true,
+          "fileDownloadFromOneDrive": true,
+          "fileUploadToPersonalCloud": true,
+          "emailSentExternalRecipients": true,
+          "emailWithAttachmentsToExternalDomains": true,
+          "sharingLinkCreated": true,
+          "fileCopiedToRemovableMedia": true,
+          "filePrintActivity": true,
+          "fileCopiedToClipboard": true,
+          "fileCopiedToNetworkShare": true
+        },
+        "deviceIndicators": {
+          "_note": "Requires MDE integration (MDE01-MDE03)",
+          "fileMovedToUSBDrive": true,
+          "fileCopiedToUSBDrive": true,
+          "filePrintedOnNetworkPrinter": true,
+          "fileCopiedToCloudSyncFolder": true,
+          "browsingToExfiltrationSite": true,
+          "usbDeviceConnected": true
+        },
+        "securityPolicyViolationIndicators": {
+          "malwareThreatDetection": true,
+          "dlpPolicyMatch": true,
+          "disabledSecurityControls": true,
+          "bypassedSecurityControls": true
+        }
+      },
+      "detectionThresholds": {
+        "useDefaultThresholds": false,
+        "customThresholds": {
+          "fileDownloadThreshold": {
+            "dailyLimit": 50,
+            "description": "Alert when user downloads more than 50 files in a day"
+          },
+          "emailVolumeThreshold": {
+            "dailyExternalEmails": 25,
+            "description": "Alert when user sends more than 25 emails to external recipients in a day"
+          },
+          "sharingThreshold": {
+            "dailySharingLinks": 20,
+            "description": "Alert when user creates more than 20 sharing links in a day"
+          }
+        }
+      },
+      "intelligentDetections": {
+        "excludedDomains": [
+          ".com",
+          ".com"
+        ],
+        "excludedFileTypes": [
+          ".log",
+          ".tmp"
+        ],
+        "unusualActivityDetection": true,
+        "cumulativeExfiltrationDetection": true
+      }
+    }
+  },
+  "policies": [
+    {
+      "policyName": "PV12-DepartingEmployee-DataTheft",
+      "displayName": "PV12 - Departing Employee Data Theft Detection",
+      "template": "DepartingEmployeeDataTheft",
+      "description": "Detects potential data theft by employees who have submitted resignation or are scheduled for termination. Triggered by HR connector resignation signal.",
+      "isEnabled": true,
+      "triggeringEvents": [
+        {
+          "type": "hrConnector",
+          "event": "resignation",
+          "description": "HR connector signals resignation or termination date"
+        },
+        {
+          "type": "hrConnector",
+          "event": "lastDayOfWork",
+          "description": "HR connector signals last working day"
+        }
+      ],
+      "activationWindow": {
+        "daysBeforeTrigger": 90,
+        "daysAfterTrigger": 30,
+        "_description": "Monitor activity 90 days before resignation date and 30 days after departure"
+      },
+      "indicators": [
+        "fileDownloadFromSharePoint",
+        "fileDownloadFromOneDrive",
+        "emailSentExternalRecipients",
+        "emailWithAttachmentsToExternalDomains",
+        "fileCopiedToRemovableMedia",
+        "fileCopiedToCloudSyncFolder",
+        "sharingLinkCreated",
+        "filePrintActivity"
+      ],
+      "userScope": {
+        "type": "allUsers",
+        "_note": "Triggered only when HR connector provides resignation signal"
+      },
+      "alertSeverity": {
+        "low": "1-3 risk indicators",
+        "medium": "4-6 risk indicators",
+        "high": "7+ risk indicators or cumulative exfiltration detected"
+      }
+    },
+    {
+      "policyName": "PV12-GeneralDataLeaks",
+      "displayName": "PV12 - General Data Leaks Detection",
+      "template": "DataLeaks",
+      "description": "Detects potential data leaks through unusual sharing, downloading, or exfiltration patterns. Triggered by DLP policy matches.",
+      "isEnabled": true,
+      "triggeringEvents": [
+        {
+          "type": "dlpPolicyMatch",
+          "policies": [
+            "PV01-DLP-Block-CreditCard-External",
+            "PV02-DLP-Block-PII-UKEU-External",
+            "PV03-DLP-Block-PHI-HIPAA",
+            "PV04-DLP-Block-FinancialData-PCI",
+            "PV06-DLP-Block-SourceCode-Credentials",
+            "PV07-DLP-Block-Password-Sharing"
+          ],
+          "severity": [
+            "High",
+            "Medium"
+          ]
+        }
+      ],
+      "indicators": [
+        "fileDownloadFromSharePoint",
+        "fileDownloadFromOneDrive",
+        "emailSentExternalRecipients",
+        "fileCopiedToRemovableMedia",
+        "fileUploadToPersonalCloud",
+        "sharingLinkCreated",
+        "fileCopiedToNetworkShare",
+        "browsingToExfiltrationSite"
+      ],
+      "userScope": {
+        "type": "allUsers"
+      }
+    },
+    {
+      "policyName": "PV12-SecurityPolicyViolations",
+      "displayName": "PV12 - Security Policy Violations",
+      "template": "SecurityPolicyViolations",
+      "description": "Detects users who violate security policies including disabling security controls, browsing blocked sites, or triggering malware detections.",
+      "isEnabled": true,
+      "triggeringEvents": [
+        {
+          "type": "securityViolation",
+          "events": [
+            "dlpPolicyMatch",
+            "malwareDetection",
+            "securityControlDisabled"
+          ]
+        }
+      ],
+      "indicators": [
+        "malwareThreatDetection",
+        "disabledSecurityControls",
+        "bypassedSecurityControls",
+        "dlpPolicyMatch",
+        "browsingToExfiltrationSite"
+      ],
+      "userScope": {
+        "type": "allUsers"
+      }
+    }
   ],
-  "cisChecks": [
-    "9.1.4"
-  ],
-  "importMethod": "powershell-security-compliance",
-  "importScript": "scripts/Import-PurviewPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "Microsoft Purview E5 or Insider Risk Management add-on",
-  "version": "1.0",
-  "path": "policies/purview/PV12-Insider-Risk-Management-Policy.json"
+  "hrConnectorConfig": {
+    "_description": "HR connector configuration for employee lifecycle event signals",
+    "connectorType": "HRConnector",
+    "dataSource": {
+      "type": "csvUpload",
+      "fields": [
+        "EmailAddress",
+        "ResignationDate",
+        "LastWorkingDay",
+        "PerformanceImprovementPlanStartDate",
+        "PerformanceImprovementPlanEndDate",
+        "TerminationDate"
+      ],
+      "uploadFrequency": "daily",
+      "_note": "CSV file must be uploaded daily via the HR connector in the Compliance portal or via API"
+    }
+  }
 }

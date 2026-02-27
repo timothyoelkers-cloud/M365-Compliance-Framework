@@ -1,51 +1,75 @@
 {
-  "id": "EXO01",
-  "file": "EXO01-DKIM-Enable-All-Domains.json",
-  "type": "exchange",
-  "displayName": "EXO01 | DKIM-Enable-All-Domains",
-  "description": "Enables DKIM signing for all Exchange Online domains. Script outputs CNAME records for DNS. Part of DMARC/DKIM/SPF email authentication trilogy.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "NIST CSF 1.1",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "MITRE ATT&CK",
-    "CSA CCM v4",
-    "CRI Profile v2.0",
-    "COBIT 19",
-    "CJIS v6",
-    "GSMA FS.31",
-    "HPH CPGs",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule",
-    "HITRUST CSF v11",
-    "ISO 22301:2019",
-    "NZ ISM v3.8"
+  "_metadata": {
+    "id": "EXO01",
+    "title": "DKIM - Enable for All Domains",
+    "description": "Enables DomainKeys Identified Mail (DKIM) signing for all accepted domains in Exchange Online. Creates DKIM signing configurations and enables them. DKIM cryptographically signs outbound email to prove domain authenticity and detect message tampering.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.8",
+      "6.2.2"
+    ],
+    "severity": "High",
+    "category": "Exchange Online",
+    "deploymentOrder": 1,
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "PREREQUISITE: Before enabling DKIM, you must create two CNAME records in DNS for each domain. The CNAME names are selector1._domainkey.<domain> and selector2._domainkey.<domain>, pointing to selector1-<domain-dashes>._domainkey.<tenant>.onmicrosoft.com and selector2-<domain-dashes>._domainkey.<tenant>.onmicrosoft.com respectively. DKIM signing will fail to enable if DNS records are not yet propagated. Allow 24-48 hours for DNS propagation before running Set-DkimSigningConfig -Enabled $true."
+  },
+  "steps": [
+    {
+      "cmdlet": "New-DkimSigningConfig",
+      "parameters": {
+        "DomainName": "",
+        "KeySize": 2048,
+        "Enabled": true
+      },
+      "_notes": "Run this for each accepted domain. If the signing config already exists, skip to Set-DkimSigningConfig."
+    },
+    {
+      "cmdlet": "Set-DkimSigningConfig",
+      "parameters": {
+        "Identity": "",
+        "Enabled": true
+      },
+      "_notes": "Use this to enable DKIM on domains that already have a signing config but are not yet enabled."
+    }
   ],
-  "cisChecks": [
-    "2.1.8",
-    "6.2.2"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-ExchangePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/exchange/EXO01-DKIM-Enable-All-Domains.json"
+  "dnsRecords": {
+    "_notes": "Create these CNAME records in your DNS provider BEFORE enabling DKIM",
+    "record1": {
+      "type": "CNAME",
+      "name": "selector1._domainkey.",
+      "value": "selector1-._domainkey..onmicrosoft.com",
+      "ttl": 3600
+    },
+    "record2": {
+      "type": "CNAME",
+      "name": "selector2._domainkey.",
+      "value": "selector2-._domainkey..onmicrosoft.com",
+      "ttl": 3600
+    }
+  },
+  "postDeployment": [
+    "Get-DkimSigningConfig | Format-List Domain, Enabled, Status, Selector1CNAME, Selector2CNAME",
+    "For each domain, verify DNS CNAME records are published: nslookup -type=CNAME selector1._domainkey.",
+    "Send a test email to an external address and verify DKIM-Signature header is present",
+    "Use https://mxtoolbox.com/dkim.aspx to validate DKIM records externally",
+    "If New-DkimSigningConfig fails with 'CNAME record does not exist', verify DNS propagation and retry after 24 hours"
+  ]
 }

@@ -1,34 +1,74 @@
 {
-  "id": "CA11",
-  "file": "CA11-Block-Guest-Access-All-Apps.json",
-  "type": "conditional-access",
-  "displayName": "CA11 | Block-Guest-Access-All-Apps",
-  "description": "Blocks all external guest/B2B user access to M365 apps. Use as restrictive baseline with specific app exceptions. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "UK NCSC CAF v3.2",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025"
-  ],
-  "cisChecks": [
-    "5.1.6.2",
-    "5.1.6.3",
-    "5.1.2.3"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA11-Block-Guest-Access-All-Apps.json"
+  "displayName": "CA11 | Block All Guest and External User Access",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeGuestsOrExternalUsers": {
+        "guestOrExternalUserTypes": "b2bCollaborationGuest,b2bDirectConnectUser,otherExternalUser",
+        "externalTenants": {
+          "membershipKind": "all"
+        }
+      },
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "block"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA11",
+    "description": "Blocks all access for guest and external users including B2B collaboration guests, B2B direct connect users, and other external users from all tenants. This is the most restrictive guest policy and should be used as a baseline when external collaboration is not required or when specific app-level exceptions via CA12 are preferred.",
+    "guestUserTypes": {
+      "b2bCollaborationGuest": "Users invited via Azure AD B2B collaboration (guest accounts in your directory)",
+      "b2bDirectConnectUser": "Users from other organisations accessing resources via B2B direct connect (Teams shared channels)",
+      "otherExternalUser": "Users that do not fall into B2B collaboration or direct connect categories"
+    },
+    "cisControls": [
+      "CIS 5.1.6.2 - Ensure that only organizationally managed/approved public groups exist",
+      "CIS 5.1.6.3 - Ensure guest access to a Teams or SharePoint channel is restricted",
+      "CIS 5.1.2.3 - Ensure guest user access is restricted"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "AC-2(7)",
+        "AC-17",
+        "IA-8"
+      ],
+      "CIS-Microsoft-365": [
+        "5.1.6.2",
+        "5.1.6.3",
+        "5.1.2.3"
+      ],
+      "ISO-27001-2022": [
+        "A.5.19 - Information security in supplier relationships",
+        "A.8.3 - Information access restriction"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078 - Valid Accounts",
+        "T1199 - Trusted Relationship"
+      ],
+      "NIS2": [
+        "Article 21(2)(d) - Supply chain security"
+      ],
+      "GDPR": [
+        "Article 28 - Processor"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "deploymentNotes": "This is a restrictive policy that blocks ALL guest and external user access. Use CA12 instead if you need to allow guest access with MFA. You can also add excludeApplications to allow guests to specific applications. Deploy in report-only first and monitor guest sign-in logs to avoid disrupting legitimate B2B collaboration. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

@@ -1,50 +1,97 @@
 {
-  "id": "CA03",
-  "file": "CA03-Require-Phishing-Resistant-MFA-Admins.json",
-  "type": "conditional-access",
-  "displayName": "CA03 | Require-Phishing-Resistant-MFA-Admins",
-  "description": "Requires FIDO2 / Windows Hello phishing-resistant MFA for all privileged admin roles. Protects against AiTM attacks. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "NERC-CIP",
-    "TSA Security Directive",
-    "CJIS v6",
-    "GSMA FS.31",
-    "HPH CPGs",
-    "Microsoft Cloud Security Benchmark",
-    "ASD Essential Eight",
-    "MITRE ATT&CK",
-    "EU Cyber Resilience Act"
-  ],
-  "cisChecks": [
-    "1.3.1",
-    "1.3.2",
-    "5.2.2.2",
-    "5.3.1"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA03-Require-Phishing-Resistant-MFA-Admins.json"
+  "displayName": "CA03 | Require Phishing-Resistant MFA for Admins",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [],
+      "excludeUsers": [],
+      "includeRoles": [
+        "62e90394-69f5-4237-9190-012177145e10",
+        "e8611ab8-c189-46e8-94e1-60213ab1f814",
+        "29232cdf-9323-42fd-ade2-1d097af3e4de",
+        "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+        "fe930be7-5e62-47db-91af-98c3a49a38b1",
+        "b0f54661-2d74-4c50-afa3-1ec803f12efe",
+        "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9",
+        "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+        "c4e39bd9-1100-46d3-8c65-fb160da0071f",
+        "7be44c8a-adaf-4e2a-84d6-ab2649e08a13",
+        "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3",
+        "158c047a-c907-4556-b7ef-446551a6b5f7"
+      ],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "authenticationStrength": {
+      "id": "00000000-0000-0000-0000-000000000004"
+    }
+  },
+  "_metadata": {
+    "policyNumber": "CA03",
+    "description": "Requires phishing-resistant MFA (FIDO2 security keys, Windows Hello for Business, or X.509 certificate-based authentication) for all privileged administrator roles. Standard MFA methods like SMS, voice call, or Authenticator app push notifications are insufficient for admin accounts due to real-time phishing (AiTM) attacks and MFA fatigue exploitation.",
+    "adminRoleTemplateIds": {
+      "62e90394-69f5-4237-9190-012177145e10": "Global Administrator",
+      "e8611ab8-c189-46e8-94e1-60213ab1f814": "Security Administrator",
+      "29232cdf-9323-42fd-ade2-1d097af3e4de": "Exchange Administrator",
+      "f28a1f50-f6e7-4571-818b-6a12f2af6b6c": "SharePoint Administrator",
+      "fe930be7-5e62-47db-91af-98c3a49a38b1": "User Administrator",
+      "b0f54661-2d74-4c50-afa3-1ec803f12efe": "Billing Administrator",
+      "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9": "Conditional Access Administrator",
+      "729827e3-9c14-49f7-bb1b-9608f156bbb8": "Helpdesk Administrator",
+      "c4e39bd9-1100-46d3-8c65-fb160da0071f": "Authentication Administrator",
+      "7be44c8a-adaf-4e2a-84d6-ab2649e08a13": "Privileged Authentication Administrator",
+      "9b895d92-2cd3-44c7-9d02-a6ac2d5ea5c3": "Application Administrator",
+      "158c047a-c907-4556-b7ef-446551a6b5f7": "Cloud Application Administrator"
+    },
+    "cisControls": [
+      "CIS 1.3.1 - Ensure MFA is required for all users in all cloud apps",
+      "CIS 1.3.2 - Ensure phishing-resistant MFA strength is required for Administrators",
+      "CIS 5.2.2.2 - Ensure MFA is enabled for all users in administrative roles",
+      "CIS 5.3.1 - Ensure the Microsoft Authenticator app is configured to protect against MFA fatigue"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "IA-2(1)",
+        "IA-2(6)",
+        "IA-2(12)"
+      ],
+      "CIS-Microsoft-365": [
+        "1.3.1",
+        "1.3.2",
+        "5.2.2.2",
+        "5.3.1"
+      ],
+      "ISO-27001-2022": [
+        "A.8.2 - Privileged access rights",
+        "A.8.5 - Secure authentication"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078.004 - Cloud Accounts",
+        "T1556 - Modify Authentication Process",
+        "T1621 - Multi-Factor Authentication Request Generation"
+      ],
+      "NIS2": [
+        "Article 21(2)(i) - Human resources security, access control policies and asset management"
+      ],
+      "Essential-Eight": [
+        "Multi-factor authentication"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "authenticationStrengthNotes": "The ID 00000000-0000-0000-0000-000000000004 is the built-in 'Phishing-resistant MFA' authentication strength policy. Accepted methods: FIDO2 security key, Windows Hello for Business, X.509 certificate-based authentication (CBA).",
+    "deploymentNotes": "Ensure all admin accounts have enrolled a FIDO2 security key or Windows Hello for Business credential before enforcing. Deploy in report-only first and verify admin sign-in success in sign-in logs. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

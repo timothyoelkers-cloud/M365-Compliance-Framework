@@ -1,47 +1,69 @@
 {
-  "id": "CA04",
-  "file": "CA04-Block-High-Risk-Sign-Ins.json",
-  "type": "conditional-access",
-  "displayName": "CA04 | Block-High-Risk-Sign-Ins",
-  "description": "Blocks sign-ins classified as high-risk by Entra ID Protection. Requires Entra ID P2. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "HITRUST CSF v11",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "NERC-CIP",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "NIST CSF 2.0",
-    "MITRE ATT&CK",
-    "ISO 27701:2019"
-  ],
-  "cisChecks": [
-    "1.2.2",
-    "5.2.2.5"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "Requires Microsoft Entra ID P2 or Microsoft 365 E5 licence",
-  "requiredLicence": "Entra ID P2 / Microsoft 365 E5",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA04-Block-High-Risk-Sign-Ins.json"
+  "displayName": "CA04 | Block High-Risk Sign-Ins",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ],
+    "signInRiskLevels": [
+      "high"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "block"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA04",
+    "description": "Blocks sign-in attempts that Microsoft Entra ID Identity Protection classifies as high risk in real time. High-risk detections include sign-ins from anonymous IP addresses, malware-linked IP addresses, impossible travel, token anomalies, and password spray patterns.",
+    "cisControls": [
+      "CIS 1.2.2 - Ensure that a user risk policy is configured to block high-risk users",
+      "CIS 5.2.2.5 - Ensure Sign-in risk policy is configured to require MFA for medium and high sign-in risk"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "SI-4",
+        "AC-7",
+        "IA-5(13)",
+        "RA-5"
+      ],
+      "CIS-Microsoft-365": [
+        "1.2.2",
+        "5.2.2.5"
+      ],
+      "ISO-27001-2022": [
+        "A.8.16 - Monitoring activities"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078 - Valid Accounts",
+        "T1110 - Brute Force",
+        "T1090 - Proxy"
+      ],
+      "NIS2": [
+        "Article 21(2)(b) - Incident handling"
+      ],
+      "Essential-Eight": [
+        "Multi-factor authentication"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P2 or Microsoft 365 E5"
+    ],
+    "deploymentNotes": "Requires Entra ID P2 licensing for Identity Protection real-time risk detection. Deploy in report-only first and monitor the Risky sign-ins report (Entra > Protection > Identity Protection > Risky sign-ins) for false positives before enforcing. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

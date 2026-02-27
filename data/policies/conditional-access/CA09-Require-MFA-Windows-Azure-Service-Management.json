@@ -1,49 +1,71 @@
 {
-  "id": "CA09",
-  "file": "CA09-Require-MFA-Windows-Azure-Service-Management.json",
-  "type": "conditional-access",
-  "displayName": "CA09 | Require-MFA-Windows-Azure-Service-Management",
-  "description": "Requires MFA for Windows Azure Service Management API access. Complements CA08. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "NIST CSF 2.0",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "COBIT 19",
-    "GSMA FS.31",
-    "Cybersecure Canada",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule",
-    "ISO 22301:2019"
-  ],
-  "cisChecks": [
-    "1.3.5"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA09-Require-MFA-Windows-Azure-Service-Management.json"
+  "displayName": "CA09 | Require MFA for Windows Azure Service Management API",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "797f4846-ba00-4fd7-ba43-dac1f8f63013"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "mfa"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA09",
+    "description": "Requires MFA for Windows Azure Service Management API access. This complements CA08 by explicitly targeting the Service Management API layer used by Azure classic deployment model operations, REST API calls, and programmatic Azure resource management. Both CA08 and CA09 use the same service principal ID as Microsoft consolidated the Azure Management endpoints.",
+    "targetApplication": {
+      "appId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+      "displayName": "Windows Azure Service Management API",
+      "scope": "Azure Service Management API, Azure classic deployment model, Azure REST API management operations"
+    },
+    "cisControls": [
+      "CIS 1.3.5 - Ensure MFA is required for Azure management"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "IA-2(1)",
+        "AC-6(5)",
+        "AC-17(2)",
+        "SC-8"
+      ],
+      "CIS-Microsoft-365": [
+        "1.3.5"
+      ],
+      "ISO-27001-2022": [
+        "A.8.2 - Privileged access rights",
+        "A.8.9 - Configuration management"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078.004 - Cloud Accounts",
+        "T1580 - Cloud Infrastructure Discovery",
+        "T1098 - Account Manipulation"
+      ],
+      "NIS2": [
+        "Article 21(2)(i) - Access control policies"
+      ],
+      "Essential-Eight": [
+        "Restrict administrative privileges",
+        "Multi-factor authentication"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "deploymentNotes": "The application ID 797f4846-ba00-4fd7-ba43-dac1f8f63013 covers both Microsoft Azure Management and Windows Azure Service Management API as Microsoft consolidated these endpoints. This policy complements CA08 and provides defence-in-depth. Deploy in report-only first. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

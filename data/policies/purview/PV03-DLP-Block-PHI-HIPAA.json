@@ -1,45 +1,242 @@
 {
-  "id": "PV03",
-  "file": "PV03-DLP-Block-PHI-HIPAA.json",
-  "type": "purview",
-  "displayName": "PV03 | DLP-Block-PHI-HIPAA",
-  "description": "Blocks Protected Health Information under HIPAA: ICD codes, DEA drug codes, US SSNs, Medicare/Medicaid numbers, medical terminology+DOB combinations. Simulation mode first.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "HIPAA",
-    "PCI DSS v4.0",
-    "CRI Profile v2.0",
-    "HPH CPGs",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "CMMC v2.0",
-    "TSA Security Directive",
-    "CJIS v6",
-    "EU Cyber Resilience Act",
-    "ISO 22301:2019"
-  ],
-  "cisChecks": [
-    "9.1.1",
-    "9.1.2",
-    "9.1.3"
-  ],
-  "importMethod": "powershell-security-compliance",
-  "importScript": "scripts/Import-PurviewPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "Microsoft Purview (M365 E3, E5, or Purview add-on)",
-  "version": "1.0",
-  "path": "policies/purview/PV03-DLP-Block-PHI-HIPAA.json"
+  "_metadata": {
+    "id": "PV03",
+    "title": "DLP - Block Protected Health Information (HIPAA)",
+    "description": "Data Loss Prevention policy based on the HIPAA U.S. template that detects and blocks Protected Health Information (PHI) including SSNs, DEA numbers, ICD-9/10 codes, health insurance information, and Medicare beneficiary identifiers from external sharing. Includes a business justification override for low-volume matches.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "HIPAA",
+      "HITRUST CSF v11",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "NYDFS 23 NYCRR 500",
+      "CRI Profile v2.0",
+      "HPH CPGs",
+      "CJIS v6",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "9.1.1",
+      "9.1.2",
+      "9.1.3"
+    ],
+    "mitreMappings": [
+      "T1048",
+      "T1567",
+      "T1041"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Data Loss Prevention add-on"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Security Administrator"
+    ],
+    "deploymentOrder": 3,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "HIPAA Business Associate Agreement (BAA) must be signed with Microsoft",
+      "Organisation must have HIPAA compliance obligations",
+      "Deploy in TestWithNotifications mode initially"
+    ],
+    "deploymentSteps": [
+      "1. Connect to Security & Compliance PowerShell",
+      "2. Create the DLP policy scoped to all workloads",
+      "3. Create high-volume PHI rule (10+ instances) with strict block",
+      "4. Create low-volume PHI rule (1-9 instances) with override option",
+      "5. Validate in simulation mode for 2 weeks",
+      "6. Switch to enforcement mode"
+    ],
+    "rollbackProcedure": "Set-DlpCompliancePolicy -Identity 'PV03-DLP-Block-PHI-HIPAA' -Mode Disable"
+  },
+  "powershellCommands": {
+    "createPolicy": {
+      "cmdlet": "New-DlpCompliancePolicy",
+      "parameters": {
+        "Name": "PV03-DLP-Block-PHI-HIPAA",
+        "Comment": "HIPAA compliance DLP policy. Blocks PHI from external sharing across all M365 workloads. Based on U.S. HIPAA template.",
+        "ExchangeLocation": [
+          "All"
+        ],
+        "SharePointLocation": [
+          "All"
+        ],
+        "OneDriveLocation": [
+          "All"
+        ],
+        "TeamsLocation": [
+          "All"
+        ],
+        "Mode": "TestWithNotifications",
+        "Priority": 2
+      }
+    },
+    "createRuleHighVolume": {
+      "cmdlet": "New-DlpComplianceRule",
+      "parameters": {
+        "Name": "PV03-Rule-HighVolume-PHI-Block",
+        "Policy": "PV03-DLP-Block-PHI-HIPAA",
+        "Comment": "High volume PHI detection (10+ instances) - strict block, no override",
+        "ContentContainsSensitiveInformation": [
+          {
+            "name": "U.S. Social Security Number (SSN)",
+            "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+            "minCount": 10,
+            "minConfidence": 85,
+            "maxConfidence": 100
+          },
+          {
+            "name": "Drug Enforcement Agency (DEA) Number",
+            "id": "d5b30b42-ecba-40c1-af3a-d6b9e5b79c97",
+            "minCount": 10,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "International Classification of Diseases (ICD-9-CM)",
+            "id": "fa0f9141-0d09-4c29-bca5-0037e6f5fc4b",
+            "minCount": 10,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "International Classification of Diseases (ICD-10-CM)",
+            "id": "3356946c-6bb7-449b-b253-6ffa419c0ce7",
+            "minCount": 10,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.S. Medicare Beneficiary Identifier (MBI)",
+            "id": "1d607691-c165-4f41-8c5c-7f3d4a28c897",
+            "minCount": 10,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.S. Health Insurance Claim Number (HICN)",
+            "id": "f6dba3ed-dc3c-4c3e-8bd5-0db5e1f0e8db",
+            "minCount": 10,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          }
+        ],
+        "AccessScope": "NotInOrganization",
+        "BlockAccess": true,
+        "BlockAccessScope": "All",
+        "NotifyUser": [
+          "SiteAdmin",
+          "LastModifier"
+        ],
+        "NotifyPolicyTipCustomText": "This content contains a large volume of Protected Health Information (PHI) subject to HIPAA. External sharing is strictly prohibited.",
+        "GenerateIncidentReport": [],
+        "IncidentReportContent": [
+          "Title",
+          "DocumentAuthor",
+          "DocumentLastModifier",
+          "Service",
+          "MatchedItem",
+          "RulesMatched",
+          "Severity"
+        ],
+        "ReportSeverityLevel": "High"
+      }
+    },
+    "createRuleLowVolume": {
+      "cmdlet": "New-DlpComplianceRule",
+      "parameters": {
+        "Name": "PV03-Rule-LowVolume-PHI-BlockWithOverride",
+        "Policy": "PV03-DLP-Block-PHI-HIPAA",
+        "Comment": "Low volume PHI detection (1-9 instances) - block with business justification override",
+        "ContentContainsSensitiveInformation": [
+          {
+            "name": "U.S. Social Security Number (SSN)",
+            "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+            "minCount": 1,
+            "maxCount": 9,
+            "minConfidence": 85,
+            "maxConfidence": 100
+          },
+          {
+            "name": "Drug Enforcement Agency (DEA) Number",
+            "id": "d5b30b42-ecba-40c1-af3a-d6b9e5b79c97",
+            "minCount": 1,
+            "maxCount": 9,
+            "minConfidence": 75
+          },
+          {
+            "name": "International Classification of Diseases (ICD-10-CM)",
+            "id": "3356946c-6bb7-449b-b253-6ffa419c0ce7",
+            "minCount": 1,
+            "maxCount": 9,
+            "minConfidence": 75
+          },
+          {
+            "name": "U.S. Medicare Beneficiary Identifier (MBI)",
+            "id": "1d607691-c165-4f41-8c5c-7f3d4a28c897",
+            "minCount": 1,
+            "maxCount": 9,
+            "minConfidence": 75
+          },
+          {
+            "name": "U.S. Health Insurance Claim Number (HICN)",
+            "id": "f6dba3ed-dc3c-4c3e-8bd5-0db5e1f0e8db",
+            "minCount": 1,
+            "maxCount": 9,
+            "minConfidence": 75
+          }
+        ],
+        "AccessScope": "NotInOrganization",
+        "BlockAccess": true,
+        "BlockAccessScope": "ExternalUsers",
+        "NotifyUser": [
+          "SiteAdmin",
+          "LastModifier"
+        ],
+        "NotifyPolicyTipCustomText": "This content contains Protected Health Information (PHI) subject to HIPAA. You may override with a business justification if sharing is required for treatment, payment, or healthcare operations.",
+        "NotifyOverride": "WithJustification",
+        "GenerateIncidentReport": [],
+        "IncidentReportContent": [
+          "Title",
+          "DocumentAuthor",
+          "DocumentLastModifier",
+          "Service",
+          "MatchedItem",
+          "RulesMatched",
+          "Severity"
+        ],
+        "ReportSeverityLevel": "Medium"
+      }
+    }
+  },
+  "policySettings": {
+    "mode": "TestWithNotifications",
+    "priority": 2,
+    "policyTemplate": "U.S. Health Insurance Act (HIPAA)",
+    "workloads": {
+      "exchangeOnline": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true,
+      "microsoftTeams": true
+    }
+  },
+  "overrideSettings": {
+    "highVolumeRule": {
+      "allowOverride": false,
+      "_note": "No override for bulk PHI exposure (10+ matches)"
+    },
+    "lowVolumeRule": {
+      "allowOverride": true,
+      "requireBusinessJustification": true,
+      "_note": "Override with mandatory business justification for 1-9 PHI matches"
+    }
+  }
 }

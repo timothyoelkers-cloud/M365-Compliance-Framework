@@ -1,31 +1,75 @@
 {
-  "id": "CA12",
-  "file": "CA12-Require-MFA-Guest-External-Users.json",
-  "type": "conditional-access",
-  "displayName": "CA12 | Require-MFA-Guest-External-Users",
-  "description": "Requires MFA for all external guest/B2B users. Alternative to CA11 where some guest access is required. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "HITRUST CSF v11",
-    "UK NCSC CAF v3.2",
-    "UK CS&R Bill 2025",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22"
-  ],
-  "cisChecks": [
-    "5.1.6.2",
-    "5.1.6.3"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA12-Require-MFA-Guest-External-Users.json"
+  "displayName": "CA12 | Require MFA for Guest and External Users",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeGuestsOrExternalUsers": {
+        "guestOrExternalUserTypes": "b2bCollaborationGuest,b2bCollaborationMember,b2bDirectConnectUser,otherExternalUser,serviceProvider",
+        "externalTenants": {
+          "membershipKind": "all"
+        }
+      },
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "mfa"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA12",
+    "description": "Requires multi-factor authentication for all guest and external user types when accessing any cloud application. This is the recommended alternative to CA11 when external B2B collaboration is needed but must be secured. Covers B2B collaboration guests, B2B collaboration members, B2B direct connect users, other external users, and service provider users.",
+    "guestUserTypes": {
+      "b2bCollaborationGuest": "Users invited via Azure AD B2B collaboration with guest role",
+      "b2bCollaborationMember": "Users invited via Azure AD B2B collaboration with member role",
+      "b2bDirectConnectUser": "Users from other organisations via B2B direct connect (Teams shared channels)",
+      "otherExternalUser": "Users not classified under B2B collaboration or direct connect",
+      "serviceProvider": "Users from Cloud Service Provider (CSP) partner organisations"
+    },
+    "cisControls": [
+      "CIS 5.1.6.2 - Ensure that only organizationally managed/approved public groups exist",
+      "CIS 5.1.6.3 - Ensure guest access to a Teams or SharePoint channel is restricted"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "IA-2(1)",
+        "IA-8(1)",
+        "AC-17"
+      ],
+      "CIS-Microsoft-365": [
+        "5.1.6.2",
+        "5.1.6.3"
+      ],
+      "ISO-27001-2022": [
+        "A.5.19 - Information security in supplier relationships",
+        "A.8.5 - Secure authentication"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078 - Valid Accounts",
+        "T1199 - Trusted Relationship"
+      ],
+      "NIS2": [
+        "Article 21(2)(d) - Supply chain security",
+        "Article 21(2)(j) - Multi-factor authentication"
+      ],
+      "GDPR": [
+        "Article 28 - Processor"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "deploymentNotes": "This policy is the recommended alternative to CA11 when B2B collaboration is required. Guest users will be prompted to complete MFA using their home tenant credentials or register MFA in your resource tenant. Ensure cross-tenant access settings are configured appropriately. Deploy in report-only first. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

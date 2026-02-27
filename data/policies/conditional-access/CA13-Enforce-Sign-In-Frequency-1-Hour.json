@@ -1,44 +1,77 @@
 {
-  "id": "CA13",
-  "file": "CA13-Enforce-Sign-In-Frequency-1-Hour.json",
-  "type": "conditional-access",
-  "displayName": "CA13 | Enforce-Sign-In-Frequency-1-Hour",
-  "description": "Sets sign-in frequency to 1 hour and disables persistent browser sessions for all users. Limits session token theft window. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "NIST CSF 1.1",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)"
-  ],
-  "cisChecks": [
-    "1.3.8",
-    "5.2.2.4"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA13-Enforce-Sign-In-Frequency-1-Hour.json"
+  "displayName": "CA13 | Enforce Sign-In Frequency 1 Hour",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "mfa"
+    ]
+  },
+  "sessionControls": {
+    "signInFrequency": {
+      "value": 1,
+      "type": "hours",
+      "isEnabled": true
+    },
+    "persistentBrowser": {
+      "mode": "never",
+      "isEnabled": true
+    }
+  },
+  "_metadata": {
+    "policyNumber": "CA13",
+    "description": "Enforces a 1-hour sign-in frequency for all users across all cloud applications and disables persistent browser sessions. This limits the window of opportunity for session token theft and replay attacks by forcing re-authentication every hour. Persistent browser sessions are set to 'never' to prevent 'keep me signed in' tokens from persisting.",
+    "cisControls": [
+      "CIS 1.3.8 - Ensure sign-in frequency is enabled and browser sessions are not persistent for administrative users",
+      "CIS 5.2.2.4 - Ensure Sign-in frequency is set and browser sessions are not persistent"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "AC-11",
+        "AC-12",
+        "SC-10",
+        "SC-23"
+      ],
+      "CIS-Microsoft-365": [
+        "1.3.8",
+        "5.2.2.4"
+      ],
+      "ISO-27001-2022": [
+        "A.8.5 - Secure authentication",
+        "A.8.11 - Data masking"
+      ],
+      "MITRE-ATT&CK": [
+        "T1539 - Steal Web Session Cookie",
+        "T1550.001 - Application Access Token"
+      ],
+      "NIS2": [
+        "Article 21(2)(j) - Multi-factor authentication"
+      ],
+      "Essential-Eight": [
+        "Multi-factor authentication"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "deploymentNotes": "This policy significantly impacts user experience as users must re-authenticate every hour. Consider applying this only to sensitive applications or using CA14 for admin-only frequency. The persistentBrowser mode 'never' ensures browser sessions are not preserved across browser closures. Deploy in report-only first and gather user feedback. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

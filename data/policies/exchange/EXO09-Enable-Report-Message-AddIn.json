@@ -1,33 +1,76 @@
 {
-  "id": "EXO09",
-  "file": "EXO09-Enable-Report-Message-AddIn.json",
-  "type": "exchange",
-  "displayName": "EXO09 | Enable-Report-Message-AddIn",
-  "description": "Deploys Report Message and Report Phishing add-ins org-wide. Users can report suspicious emails to Microsoft and security team mailbox.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025"
+  "_metadata": {
+    "id": "EXO09",
+    "title": "Enable Report Message Add-In",
+    "description": "Deploys the Microsoft Report Message and Report Phishing add-ins organization-wide for all users. Enables users to report suspicious, phishing, and junk emails directly from Outlook. Reported messages are submitted to Microsoft for analysis and optionally to a security team mailbox.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "6.2.3"
+    ],
+    "severity": "Medium",
+    "category": "Exchange Online",
+    "deploymentOrder": 9,
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "The Report Message add-in provides both 'Report Phishing' and 'Report Junk' buttons in Outlook. The Report Phishing add-in provides only the phishing report button. Deploy both for maximum user flexibility. UserOverridable: false prevents users from removing the add-in. DefaultStateForUser: Enabled activates the add-in for all users without requiring individual installation. Also configure the user submission policy to route reported messages to your security team."
+  },
+  "steps": [
+    {
+      "cmdlet": "New-App",
+      "parameters": {
+        "OrganizationApp": true,
+        "DefaultStateForUser": "Enabled",
+        "ProvidedTo": "Everyone",
+        "UserOverridable": false,
+        "Url": "https://appsource.microsoft.com/en-us/product/office/WA104381180"
+      },
+      "_notes": "Deploys the Report Message add-in (WA104381180) from the Microsoft AppSource marketplace. This add-in adds 'Report Junk', 'Report Phishing', and 'Report Not Junk' buttons to Outlook."
+    },
+    {
+      "cmdlet": "New-App",
+      "parameters": {
+        "OrganizationApp": true,
+        "DefaultStateForUser": "Enabled",
+        "ProvidedTo": "Everyone",
+        "UserOverridable": false,
+        "Url": "https://appsource.microsoft.com/en-us/product/office/WA200002469"
+      },
+      "_notes": "Deploys the Report Phishing add-in (WA200002469) for a streamlined phishing-only report button."
+    },
+    {
+      "cmdlet": "New-ReportSubmissionPolicy",
+      "parameters": {
+        "ReportJunkToCustomizedAddress": true,
+        "ReportNotJunkToCustomizedAddress": true,
+        "ReportPhishToCustomizedAddress": true,
+        "ReportJunkAddresses": [],
+        "ReportNotJunkAddresses": [],
+        "ReportPhishAddresses": [],
+        "ReportChatMessageEnabled": false,
+        "ReportChatMessageToCustomizedAddressEnabled": false
+      },
+      "_notes": "Routes user-reported messages to the security team mailbox in addition to Microsoft. Replace  with your SOC or phishing response mailbox."
+    }
   ],
-  "cisChecks": [
-    "6.2.3"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-ExchangePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/exchange/EXO09-Enable-Report-Message-AddIn.json"
+  "postDeployment": [
+    "Get-App -OrganizationApp | Where-Object {$_.DisplayName -like '*Report*'} | Select-Object DisplayName, Enabled, DefaultStateForUser",
+    "Get-ReportSubmissionPolicy | Format-List",
+    "Verify the Report Message button appears in Outlook Web Access and Outlook desktop for test users",
+    "Replace  with the actual security operations mailbox address",
+    "Train users on when and how to use the Report Message and Report Phishing buttons",
+    "Marketplace URLs - Report Message: https://appsource.microsoft.com/en-us/product/office/WA104381180 | Report Phishing: https://appsource.microsoft.com/en-us/product/office/WA200002469"
+  ]
 }

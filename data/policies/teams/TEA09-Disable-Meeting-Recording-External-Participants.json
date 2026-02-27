@@ -1,33 +1,46 @@
 {
-  "id": "TEA09",
-  "file": "TEA09-Disable-Meeting-Recording-External-Participants.json",
-  "type": "teams",
-  "displayName": "TEA09 | Disable-Meeting-Recording-External-Participants",
-  "description": "External participants cannot initiate meeting recordings. Only internal organisers/co-organisers can record.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "HITRUST CSF v11",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22"
-  ],
-  "cisChecks": [
-    "8.5.5"
-  ],
-  "importMethod": "powershell-teams",
-  "importScript": "scripts/Import-TeamsPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/teams/TEA09-Disable-Meeting-Recording-External-Participants.json"
+  "_metadata": {
+    "id": "TEA09",
+    "title": "Restrict Meeting Recording - Internal Organizers Only",
+    "description": "Configures Teams meeting recording so that only internal meeting organizers and co-organizers can initiate recordings. Cloud recording is enabled for internal use but restricted to prevent external participants from recording meetings. Recording storage remains within the organization's OneDrive/SharePoint.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["8.5.5"],
+    "severity": "Medium",
+    "category": "Microsoft Teams",
+    "deploymentOrder": 9,
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "AllowCloudRecording: true enables recording for internal organizers. AllowRecordingStorageOutsideRegion: false ensures recordings are stored within the organization's data residency region. RecordingStorageMode: OneDriveForBusiness stores recordings in the organizer's OneDrive. External participants (guests, federated users) do not have recording permissions when these settings are applied. The recording button is only available to the meeting organizer and co-organizers."
+  },
+  "cmdlet": "Set-CsTeamsMeetingPolicy",
+  "parameters": {
+    "Identity": "Global",
+    "AllowCloudRecording": true,
+    "AllowRecordingStorageOutsideRegion": false,
+    "RecordingStorageMode": "OneDriveForBusiness",
+    "AllowMeetingRegistration": true,
+    "AllowCartCaptionsAndTranscriptions": true,
+    "AllowTranscription": true
+  },
+  "postDeployment": [
+    "Get-CsTeamsMeetingPolicy -Identity Global | Select-Object AllowCloudRecording, AllowRecordingStorageOutsideRegion, RecordingStorageMode",
+    "Verify internal organizers can start recordings in meetings",
+    "Verify external/guest participants do not see the recording button",
+    "Recordings are stored in the organizer's OneDrive > Recordings folder",
+    "Review data residency requirements: AllowRecordingStorageOutsideRegion: false ensures recordings stay in-region",
+    "If recording must be fully disabled for all users, set AllowCloudRecording: false"
+  ]
 }

@@ -1,47 +1,81 @@
 {
-  "id": "CA07",
-  "file": "CA07-Block-Non-Approved-Countries.json",
-  "type": "conditional-access",
-  "displayName": "CA07 | Block-Non-Approved-Countries",
-  "description": "Blocks authentication from countries outside approved Named Location. Create Named Location 'Approved Countries' in Entra first. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "NIST CSF 2.0",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "NERC-CIP",
-    "MITRE ATT&CK",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "ISO 27701:2019"
-  ],
-  "cisChecks": [
-    "1.3.9"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "Create Named Location 'Approved Countries' in Entra > Protection > Named Locations first",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA07-Block-Non-Approved-Countries.json"
+  "displayName": "CA07 | Block Sign-Ins from Non-Approved Countries",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ],
+    "locations": {
+      "includeLocations": [
+        "All"
+      ],
+      "excludeLocations": [
+        "AllTrusted"
+      ]
+    }
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "block"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA07",
+    "description": "Blocks all sign-in attempts originating from countries not included in the approved Named Location. This is a geo-fencing control that significantly reduces the attack surface by preventing authentication from regions where the organisation has no legitimate users or operations.",
+    "prerequisiteSteps": [
+      "1. Navigate to Entra admin centre > Protection > Conditional Access > Named locations",
+      "2. Click '+ Countries location'",
+      "3. Name it 'AllowedCountries' (or your preferred name)",
+      "4. Select the countries where your organisation operates",
+      "5. Mark as 'trusted location' if appropriate",
+      "6. Save and copy the resulting Location ID",
+      "7. Replace AllTrusted in this policy with that ID"
+    ],
+    "cisControls": [
+      "CIS 1.3.9 - Ensure that a Conditional Access policy is configured to block access from anonymous or threat-intelligence flagged IP addresses"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "AC-2(11)",
+        "SC-7",
+        "SI-4"
+      ],
+      "CIS-Microsoft-365": [
+        "1.3.9"
+      ],
+      "ISO-27001-2022": [
+        "A.8.20 - Networks security",
+        "A.8.22 - Segregation of networks"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078 - Valid Accounts",
+        "T1090 - Proxy",
+        "T1090.003 - Multi-hop Proxy"
+      ],
+      "NIS2": [
+        "Article 21(2)(b) - Incident handling"
+      ],
+      "Essential-Eight": [
+        "Multi-factor authentication"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "deploymentNotes": "IMPORTANT: You MUST create the Named Location in Entra admin centre BEFORE importing this policy, then replace AllTrusted with the actual GUID. If you import with the placeholder the API call will fail. Deploy in report-only first and monitor for legitimate users travelling or using VPN endpoints in blocked countries. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

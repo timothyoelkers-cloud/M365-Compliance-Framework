@@ -1,49 +1,159 @@
 {
-  "id": "MDE07",
-  "file": "MDE07-Network-Protection-Block.json",
-  "type": "defender-endpoint",
-  "displayName": "MDE07 | Network-Protection-Block",
-  "description": "Enables Network Protection in Block mode via Intune. Blocks outbound connections to known malicious IPs/domains via SmartScreen at the OS level. Applies to all processes.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)"
-  ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Defender for Endpoint Plan 1 or Plan 2. Deploy in Audit mode first.",
-  "requiredLicence": "Microsoft Defender for Endpoint P1/P2 or Microsoft 365 E5",
-  "version": "1.0",
-  "path": "policies/defender-endpoint/MDE07-Network-Protection-Block.json"
+  "_metadata": {
+    "id": "MDE07",
+    "title": "Network Protection in Block Mode",
+    "description": "Enables Network Protection in Block mode to prevent outbound connections to known malicious or dangerous domains and IP addresses. Uses SmartScreen intelligence at the network stack level, applying to all processes, not just browsers.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "mitreMappings": [
+      "T1071",
+      "T1566",
+      "T1189",
+      "T1204.001",
+      "T1568"
+    ],
+    "requiredLicences": [
+      "Microsoft Defender for Endpoint P1 or P2",
+      "Microsoft 365 E5 or Microsoft 365 E3 + E5 Security add-on"
+    ],
+    "requiredRoles": [
+      "Intune Administrator",
+      "Security Administrator"
+    ],
+    "deploymentOrder": 7,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Devices must be onboarded to MDE (MDE01 deployed)",
+      "Microsoft Defender Antivirus must be the active AV or running in passive mode",
+      "Cloud-delivered protection must be enabled for real-time URL/IP reputation checks",
+      "Recommended: Deploy in Audit mode (value 2) for 2 weeks before switching to Block (value 1)",
+      "Network Protection works on Windows 10 v1709+, Windows 11, macOS, and Linux"
+    ],
+    "deploymentSteps": [
+      "1. Deploy in Audit mode first: Set EnableNetworkProtection = 2",
+      "2. Monitor audit events in security.microsoft.com > Advanced Hunting for 2 weeks",
+      "3. Review blocked URLs/IPs and create any necessary allow-list custom indicators",
+      "4. Switch to Block mode: Set EnableNetworkProtection = 1",
+      "5. Monitor the Network Protection report in the MDE portal"
+    ],
+    "rollbackProcedure": "Set EnableNetworkProtection to 0 (Disabled) via Intune OMA-URI, PowerShell, or GPO. Takes effect immediately."
+  },
+  "intuneOmaUriPolicy": {
+    "@odata.type": "#microsoft.graph.windows10CustomConfiguration",
+    "displayName": "MDE07 - Network Protection Block Mode",
+    "description": "Enables Network Protection in Block mode via Intune OMA-URI custom policy",
+    "omaSettings": [
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Enable Network Protection",
+        "description": "0=Disabled, 1=Enabled (Block), 2=Audit mode",
+        "omaUri": "./Vendor/MSFT/Policy/Config/Defender/EnableNetworkProtection",
+        "value": 1
+      }
+    ]
+  },
+  "intuneEndpointSecurityPolicy": {
+    "@odata.type": "#microsoft.graph.deviceManagementConfigurationPolicy",
+    "name": "MDE07 - Network Protection - Block Mode",
+    "description": "Enable Network Protection in Block mode to prevent connections to malicious destinations",
+    "platforms": "windows10",
+    "technologies": "mdm,microsoftSense",
+    "templateReference": {
+      "templateId": "46ddfc50-d10f-4a96-9c12-b210e585b44f_1",
+      "templateFamily": "endpointSecurityAttackSurfaceReduction",
+      "templateDisplayName": "Attack surface reduction rules"
+    },
+    "settings": [
+      {
+        "settingInstance": {
+          "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+          "settingDefinitionId": "device_vendor_msft_policy_config_defender_enablenetworkprotection",
+          "choiceSettingValue": {
+            "value": "device_vendor_msft_policy_config_defender_enablenetworkprotection_1",
+            "children": [],
+            "_valueDescription": "1 = Block mode"
+          }
+        }
+      }
+    ]
+  },
+  "powershellDeployment": {
+    "enableBlockMode": {
+      "command": "Set-MpPreference -EnableNetworkProtection Enabled",
+      "description": "Enable Network Protection in Block mode via PowerShell"
+    },
+    "enableAuditMode": {
+      "command": "Set-MpPreference -EnableNetworkProtection AuditMode",
+      "description": "Enable Network Protection in Audit mode for initial testing"
+    },
+    "disable": {
+      "command": "Set-MpPreference -EnableNetworkProtection Disabled",
+      "description": "Disable Network Protection (rollback)"
+    },
+    "verify": {
+      "command": "Get-MpPreference | Select-Object -Property EnableNetworkProtection",
+      "expectedResult": "EnableNetworkProtection: 1"
+    },
+    "remediationScript": {
+      "displayName": "MDE07 - Network Protection Compliance Check",
+      "detectionScript": "$np = (Get-MpPreference).EnableNetworkProtection; if ($np -eq 1) { Write-Output 'Compliant'; exit 0 } else { Write-Output \"Non-compliant: value=$np\"; exit 1 }",
+      "remediationScript": "Set-MpPreference -EnableNetworkProtection Enabled; Write-Output 'Network Protection set to Block mode'; exit 0",
+      "runAs": "system",
+      "scheduleFrequency": "daily"
+    }
+  },
+  "groupPolicyAlternative": {
+    "path": "Computer Configuration > Administrative Templates > Windows Components > Microsoft Defender Antivirus > Microsoft Defender Exploit Guard > Network Protection",
+    "setting": "Prevent users and apps from accessing dangerous websites",
+    "value": "Enabled (Block)"
+  },
+  "advancedHuntingQuery": {
+    "_description": "KQL query to monitor Network Protection audit and block events",
+    "query": "DeviceEvents | where ActionType in ('ExploitGuardNetworkProtectionAudited', 'ExploitGuardNetworkProtectionBlocked') | summarize count() by ActionType, RemoteUrl, DeviceName | sort by count_ desc | take 100"
+  },
+  "assignments": {
+    "include": [
+      {
+        "@odata.type": "#microsoft.graph.groupAssignmentTarget",
+        "groupId": "",
+        "groupDisplayName": "All Managed Windows Devices"
+      }
+    ],
+    "exclude": [
+      {
+        "@odata.type": "#microsoft.graph.exclusionGroupAssignmentTarget",
+        "groupId": "",
+        "groupDisplayName": "Network Testing Lab Devices"
+      }
+    ]
+  }
 }

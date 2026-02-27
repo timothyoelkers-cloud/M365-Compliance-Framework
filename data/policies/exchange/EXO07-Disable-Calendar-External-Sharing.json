@@ -1,33 +1,55 @@
 {
-  "id": "EXO07",
-  "file": "EXO07-Disable-Calendar-External-Sharing.json",
-  "type": "exchange",
-  "displayName": "EXO07 | Disable-Calendar-External-Sharing",
-  "description": "Restricts Exchange Online calendar sharing — prevents detailed availability/appointment data from being shared with external users.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025"
+  "_metadata": {
+    "id": "EXO07",
+    "title": "Disable Calendar External Sharing",
+    "description": "Restricts Exchange Online calendar sharing to prevent detailed availability and appointment data from being shared with external or anonymous users. Limits the default sharing policy to free/busy time only (no subject or location details). Also restricts public folder connections.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["6.2.1"],
+    "severity": "Medium",
+    "category": "Exchange Online",
+    "deploymentOrder": 7,
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "Calendar sharing can leak sensitive information about meetings, attendees, subjects, and locations to external parties. The default sharing policy controls what level of detail is shared. CalendarSharingFreeBusySimple shares only free/busy availability without subjects or details. For maximum restriction, set Enabled: false on the sharing policy to disable all external calendar sharing."
+  },
+  "steps": [
+    {
+      "cmdlet": "Set-SharingPolicy",
+      "parameters": {
+        "Identity": "Default Sharing Policy",
+        "Domains": [
+          "Anonymous:CalendarSharingFreeBusySimple"
+        ],
+        "Enabled": true
+      },
+      "_notes": "Restricts the default sharing policy to free/busy simple (availability only, no details). To fully disable external sharing, set Enabled: false instead."
+    },
+    {
+      "cmdlet": "Set-OrganizationConfig",
+      "parameters": {
+        "PublicFoldersEnabled": "None"
+      },
+      "_notes": "Disables public folder access to prevent calendar information leakage through public folder sharing."
+    }
   ],
-  "cisChecks": [
-    "6.2.1"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-ExchangePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/exchange/EXO07-Disable-Calendar-External-Sharing.json"
+  "postDeployment": [
+    "Get-SharingPolicy -Identity 'Default Sharing Policy' | Format-List",
+    "Get-OrganizationConfig | Select-Object PublicFoldersEnabled",
+    "Verify external users can only see free/busy availability (no appointment subjects or locations)",
+    "If specific departments need detailed calendar sharing (e.g., with partners), create a scoped sharing policy for those users only",
+    "Review existing organization relationships: Get-OrganizationRelationship | Format-List"
+  ]
 }

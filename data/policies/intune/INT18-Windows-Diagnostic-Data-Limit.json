@@ -1,35 +1,99 @@
 {
-  "id": "INT18",
-  "file": "INT18-Windows-Diagnostic-Data-Limit.json",
-  "type": "intune",
-  "displayName": "INT18 | Windows-Diagnostic-Data-Limit",
-  "description": "Configures Windows diagnostic data to Security level (minimum). Disables telemetry beyond required security data. Required for GDPR-compliant Windows 11 deployments.",
-  "frameworks": [
-    "GDPR (EU) 2016/679",
-    "ISO 27701:2019",
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "HITRUST CSF v11",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CJIS v6",
-    "EU Cyber Resilience Act"
+  "@odata.type": "#microsoft.graph.windows10GeneralConfiguration",
+  "displayName": "INT18 - Windows Diagnostic Data - Required/Security Level",
+  "description": "Restricts Windows diagnostic data collection to the Required (Security) level. Disables optional telemetry. Supports GDPR and data minimisation compliance.",
+  "version": 1,
+  "diagnosticsDataSubmissionMode": "basic",
+  "edgeTelemetryForMicrosoft365Analytics": "notConfigured",
+  "inkWorkspaceAccess": "disabled",
+  "inkWorkspaceAccessState": "blocked",
+  "inkWorkspaceBlockSuggestedApps": true,
+  "searchBlockDiacritics": false,
+  "searchDisableAutoLanguageDetection": false,
+  "searchDisableIndexerBackoff": false,
+  "searchDisableIndexingEncryptedItems": false,
+  "searchDisableIndexingRemovableDriveItems": true,
+  "searchEnableRemoteQueries": false,
+  "experienceBlockDeviceDiscovery": false,
+  "experienceBlockErrorDialogWhenNoSIM": false,
+  "experienceBlockTaskSwitcher": false,
+  "experienceDoNotSyncBrowserSettings": "blocked",
+  "privacyBlockActivityFeed": true,
+  "privacyBlockPublishUserActivities": true,
+  "privacyBlockInputPersonalization": true,
+  "startBlockUnpinningAppsFromTaskbar": false,
+  "settingsBlockSettingsApp": false,
+  "settingsBlockSystemPage": false,
+  "settingsBlockPrivacyPage": false,
+  "roleScopeTagIds": [
+    "0"
   ],
-  "cisChecks": [
-    "5.1.4.1"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-IntunePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Intune licence required",
-  "requiredLicence": "Microsoft Intune / Microsoft 365 Business Premium or above",
-  "version": "1.0",
-  "path": "policies/intune/INT18-Windows-Diagnostic-Data-Limit.json"
+  "_supplementaryOmaUri": {
+    "description": "Additional diagnostic data restrictions via OMA-URI for comprehensive telemetry control.",
+    "settings": [
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Allow Telemetry - Required Only",
+        "description": "AllowTelemetry: 1 = Required/Basic diagnostic data only. For Enterprise, use 0 for Security level.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/System/AllowTelemetry",
+        "value": 1
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Limit Enhanced Diagnostic Data",
+        "description": "LimitEnhancedDiagnosticDataWindowsAnalytics: 1 = Limit to minimum required.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/System/LimitEnhancedDiagnosticDataWindowsAnalytics",
+        "value": 1
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Disable Diagnostic Data Opt-In Settings UI",
+        "description": "ConfigureTelemetryOptInSettingsUx: 1 = Disable the Settings UI for telemetry opt-in.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/System/ConfigureTelemetryOptInSettingsUx",
+        "value": 1
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Disable Diagnostic Data Viewer",
+        "description": "DisableDiagnosticDataViewer: 1 = Disable.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/System/DisableDiagnosticDataViewer",
+        "value": 1
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Disable One Settings Downloads",
+        "description": "DisableOneSettingsDownloads: 1 = Prevents dynamic configuration data downloads.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/System/DisableOneSettingsDownloads",
+        "value": 1
+      },
+      {
+        "@odata.type": "#microsoft.graph.omaSettingInteger",
+        "displayName": "Allow Commercial Data Pipeline",
+        "description": "AllowCommercialDataPipeline: 1 = Enable Windows diagnostic data processor configuration for EU compliance.",
+        "omaUri": "./Device/Vendor/MSFT/Policy/Config/System/AllowCommercialDataPipeline",
+        "value": 1
+      }
+    ]
+  },
+  "_metadata": {
+    "policyId": "INT18",
+    "description": "Restricts Windows diagnostic data to the Required/Basic level (Security level for Enterprise SKUs). Disables optional telemetry, activity feed publishing, input personalisation, and browser settings sync. Supplementary OMA-URI settings limit enhanced diagnostics, disable telemetry opt-in UI, and enable the EU data boundary commercial data pipeline for GDPR compliance.",
+    "graphEndpoint": "POST /deviceManagement/deviceConfigurations",
+    "platform": "Windows 10/11",
+    "frameworks": [
+      "GDPR (EU) 2016/679 - Article 5(1)(c) Data Minimisation",
+      "NIST SP 800-53 Rev 5 - SI-12",
+      "ISO 27001:2022 A.5.33, A.8.11",
+      "ISO 27701:2019 - 7.4.1",
+      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
+      "BSI IT-Grundschutz - APP.1.1.A18"
+    ],
+    "cisChecks": [
+      "CIS 18.9.17.1 - Ensure Allow Telemetry is set to Required or Security",
+      "CIS 18.9.17.2 - Ensure diagnostic data is not sent beyond required level",
+      "CIS 18.9.17.3 - Ensure telemetry opt-in UI is disabled"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  }
 }

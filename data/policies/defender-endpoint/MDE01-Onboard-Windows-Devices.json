@@ -1,53 +1,156 @@
 {
-  "id": "MDE01",
-  "file": "MDE01-Onboard-Windows-Devices.json",
-  "type": "defender-endpoint",
-  "displayName": "MDE01 | Onboard-Windows-Devices",
-  "description": "Onboards all Windows 10/11 devices to Microsoft Defender for Endpoint via Intune. Deploys MDE sensor and configures Sense service. Prerequisite for all other MDE policies.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "HPH CPGs",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule",
-    "ISO 22301:2019"
-  ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Defender for Endpoint Plan 1 or Plan 2 licence required",
-  "requiredLicence": "Microsoft Defender for Endpoint P1/P2 or Microsoft 365 E5",
-  "version": "1.0",
-  "path": "policies/defender-endpoint/MDE01-Onboard-Windows-Devices.json"
+  "_metadata": {
+    "id": "MDE01",
+    "title": "Onboard Windows Devices to Defender for Endpoint",
+    "description": "Intune EDR onboarding configuration that enables automatic onboarding of Windows devices to Microsoft Defender for Endpoint via the Intune connector. Configures sample sharing and telemetry reporting frequency.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "CJIS v6",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "mitreMappings": [
+      "T1059",
+      "T1204",
+      "T1547",
+      "T1053"
+    ],
+    "requiredLicences": [
+      "Microsoft Defender for Endpoint P1 or P2",
+      "Microsoft 365 E5 or Microsoft 365 E5 Security"
+    ],
+    "requiredRoles": [
+      "Intune Administrator",
+      "Security Administrator"
+    ],
+    "deploymentOrder": 1,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Microsoft Defender for Endpoint service must be provisioned at security.microsoft.com",
+      "Intune connector to MDE must be established via MEM admin center > Endpoint Security > Microsoft Defender for Endpoint",
+      "Windows devices must be enrolled in Intune MDM",
+      "Minimum OS: Windows 10 version 1709 or later, or Windows 11",
+      "Network connectivity to *.securitycenter.windows.com and *.blob.core.windows.net"
+    ],
+    "deploymentSteps": [
+      "1. Enable the MDE connector in Intune admin center under Endpoint Security",
+      "2. Deploy this configuration profile to the target device group",
+      "3. Allow up to 24 hours for onboarding to propagate to all targeted devices",
+      "4. Verify onboarding status in security.microsoft.com > Assets > Devices"
+    ],
+    "rollbackProcedure": "Remove the configuration profile assignment from the device group. Devices will offboard after 7 days. For immediate offboarding, use the offboarding script from the MDE portal."
+  },
+  "intuneProfile": {
+    "@odata.type": "#microsoft.graph.windowsDefenderAdvancedThreatProtectionConfiguration",
+    "displayName": "MDE01 - Onboard Windows Devices to Defender for Endpoint",
+    "description": "Enables automatic onboarding of Windows devices to Microsoft Defender for Endpoint via the Intune EDR connector.",
+    "roleScopeTagIds": [
+      "0"
+    ],
+    "advancedThreatProtectionAutoPopulateOnboardingBlob": true,
+    "advancedThreatProtectionOnboardingBlob": null,
+    "advancedThreatProtectionOnboardingFilename": null,
+    "allowSampleSharing": true,
+    "enableExpeditedTelemetryReporting": false
+  },
+  "endpointSecurityPolicy": {
+    "@odata.type": "#microsoft.graph.deviceManagementConfigurationPolicy",
+    "name": "MDE01 - EDR Onboarding - Windows",
+    "description": "Endpoint Detection and Response onboarding configuration for Windows 10/11 devices",
+    "platforms": "windows10",
+    "technologies": "mdm,microsoftSense",
+    "templateReference": {
+      "templateId": "0385b795-0f2f-44ac-8602-9f65bf6adede_1",
+      "templateFamily": "endpointSecurityEndpointDetectionAndResponse",
+      "templateDisplayName": "Endpoint detection and response",
+      "templateDisplayVersion": "Version 2"
+    },
+    "settings": [
+      {
+        "settingInstance": {
+          "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+          "settingDefinitionId": "device_vendor_msft_windowsadvancedthreatprotection_configurationtype",
+          "choiceSettingValue": {
+            "value": "device_vendor_msft_windowsadvancedthreatprotection_configurationtype_autofromconnector",
+            "children": []
+          }
+        }
+      },
+      {
+        "settingInstance": {
+          "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+          "settingDefinitionId": "device_vendor_msft_windowsadvancedthreatprotection_configuration_samplesharing",
+          "choiceSettingValue": {
+            "value": "device_vendor_msft_windowsadvancedthreatprotection_configuration_samplesharing_all",
+            "children": []
+          }
+        }
+      },
+      {
+        "settingInstance": {
+          "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+          "settingDefinitionId": "device_vendor_msft_windowsadvancedthreatprotection_configuration_telemetryreportingfrequency",
+          "choiceSettingValue": {
+            "value": "device_vendor_msft_windowsadvancedthreatprotection_configuration_telemetryreportingfrequency_normal",
+            "children": []
+          }
+        }
+      }
+    ]
+  },
+  "connectorSettings": {
+    "graphApiEndpoint": "https://graph.microsoft.com/beta/deviceManagement/advancedThreatProtection",
+    "microsoftDefenderForEndpointConnector": {
+      "autoOnboardConnectorEnabled": true,
+      "allowSampleSharing": true,
+      "sampleSharingScope": "all",
+      "telemetryReportingFrequency": "normal",
+      "blockUnsupportedOSVersions": true
+    },
+    "complianceIntegration": {
+      "androidEnabled": false,
+      "iosEnabled": false,
+      "windowsEnabled": true,
+      "macEnabled": false
+    }
+  },
+  "assignments": {
+    "include": [
+      {
+        "@odata.type": "#microsoft.graph.groupAssignmentTarget",
+        "groupId": "",
+        "groupDisplayName": "All Managed Windows Devices"
+      }
+    ],
+    "exclude": [
+      {
+        "@odata.type": "#microsoft.graph.exclusionGroupAssignmentTarget",
+        "groupId": "",
+        "groupDisplayName": "MDE Onboarding Exclusions"
+      }
+    ]
+  }
 }

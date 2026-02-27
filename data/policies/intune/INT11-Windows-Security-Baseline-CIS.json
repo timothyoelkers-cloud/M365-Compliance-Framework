@@ -1,51 +1,155 @@
 {
-  "id": "INT11",
-  "file": "INT11-Windows-Security-Baseline-CIS.json",
-  "type": "intune",
-  "displayName": "INT11 | Windows-Security-Baseline-CIS",
-  "description": "Applies CIS Windows 11 Level 1 security baseline via Intune. 200+ security settings: SMB signing, LLMNR disable, NTLM restrictions, Windows Firewall all profiles, screen lock 5min.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "DORA",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "ISO 22301:2019"
+  "@odata.type": "#microsoft.graph.windows10CustomConfiguration",
+  "displayName": "INT11 - Windows Security Baseline (CIS-Aligned)",
+  "description": "Windows security baseline aligned with CIS benchmarks: SMB signing required, NTLM restricted, LM hash storage disabled, audit logon events, credential caching limited to 1, screen lock after 15 minutes inactivity.",
+  "version": 1,
+  "omaSettings": [
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Require SMB Signing (Server)",
+      "description": "Microsoft network server: Digitally sign communications (always). 1 = Enabled.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/LocalPoliciesSecurityOptions/MicrosoftNetworkServer_DigitallySignCommunicationsAlways",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Require SMB Signing (Client)",
+      "description": "Microsoft network client: Digitally sign communications (always). 1 = Enabled.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/LocalPoliciesSecurityOptions/MicrosoftNetworkClient_DigitallySignCommunicationsAlways",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Restrict NTLM - Network Security LAN Manager Authentication Level",
+      "description": "Network security: LAN Manager authentication level. 5 = Send NTLMv2 response only. Refuse LM & NTLM.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/LocalPoliciesSecurityOptions/NetworkSecurity_LANManagerAuthenticationLevel",
+      "value": 5
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Disable LM Hash Storage",
+      "description": "Network security: Do not store LAN Manager hash value on next password change. 1 = Enabled.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/LocalPoliciesSecurityOptions/NetworkSecurity_DoNotStoreLANManagerHashValueOnNextPasswordChange",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Audit Logon Events - Success and Failure",
+      "description": "Audit logon events. 3 = Success and Failure.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/Audit/AccountLogon_AuditCredentialValidation",
+      "value": 3
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Audit Logon - Success and Failure",
+      "description": "Audit logon. 3 = Success and Failure.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/Audit/AccountLogonLogoff_AuditLogon",
+      "value": 3
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Audit Logoff - Success",
+      "description": "Audit logoff. 1 = Success.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/Audit/AccountLogonLogoff_AuditLogoff",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Audit Account Lockout - Failure",
+      "description": "Audit account lockout. 2 = Failure.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/Audit/AccountLogonLogoff_AuditAccountLockout",
+      "value": 2
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Audit Special Logon - Success",
+      "description": "Audit special logon. 1 = Success.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/Audit/AccountLogonLogoff_AuditSpecialLogon",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Interactive Logon - Cached Logons Count",
+      "description": "Limit cached logon credentials to 1.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/LocalPoliciesSecurityOptions/InteractiveLogon_NumberOfPreviousLogonsToCache",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Screen Lock Timeout (seconds)",
+      "description": "Machine inactivity limit - 900 seconds (15 minutes).",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/LocalPoliciesSecurityOptions/InteractiveLogon_MachineInactivityLimit",
+      "value": 900
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Disable Anonymous SID/Name Translation",
+      "description": "Network access: Allow anonymous SID/Name translation. 0 = Disabled.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/LocalPoliciesSecurityOptions/NetworkAccess_AllowAnonymousSIDNameTranslation",
+      "value": 0
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Restrict Anonymous Access to Named Pipes and Shares",
+      "description": "Network access: Restrict anonymous access to Named Pipes and Shares. 1 = Enabled.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/LocalPoliciesSecurityOptions/NetworkAccess_RestrictAnonymousAccessToNamedPipesAndShares",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Disable Remote Desktop Services NTLM",
+      "description": "Require NLA for Remote Desktop. 1 = Enabled.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/RemoteDesktopServices/RequireSecureRPCCommunication",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Prevent LLMNR",
+      "description": "Turn off multicast name resolution (LLMNR). 0 = Disabled (turns off LLMNR).",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/ADMX_DnsClient/Turn_Off_Multicast",
+      "value": 0
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "User Account Control - Admin Approval Mode",
+      "description": "UAC: Admin Approval Mode for the Built-in Administrator account. 1 = Enabled.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/LocalPoliciesSecurityOptions/UserAccountControl_UseAdminApprovalMode",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "UAC - Behavior of Elevation Prompt for Admins",
+      "description": "UAC: Behavior of the elevation prompt for administrators. 2 = Prompt for consent on the secure desktop.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/LocalPoliciesSecurityOptions/UserAccountControl_BehaviorOfTheElevationPromptForAdministrators",
+      "value": 2
+    }
   ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2",
-    "5.1.4.3"
+  "roleScopeTagIds": [
+    "0"
   ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-IntunePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Intune licence required",
-  "requiredLicence": "Microsoft Intune / Microsoft 365 Business Premium or above",
-  "version": "1.0",
-  "path": "policies/intune/INT11-Windows-Security-Baseline-CIS.json"
+  "_metadata": {
+    "policyId": "INT11",
+    "description": "Windows security baseline aligned with CIS Level 1 benchmarks deployed via OMA-URI custom configuration. Enforces SMB signing on client and server, restricts NTLM to NTLMv2 only, disables LM hash storage, enables comprehensive audit policies for logon events, limits cached credentials to 1, locks screen after 15 minutes inactivity, restricts anonymous access, and enforces UAC admin approval mode.",
+    "graphEndpoint": "POST /deviceManagement/deviceConfigurations",
+    "platform": "Windows 10/11",
+    "frameworks": [
+      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0 - Level 1",
+      "NIST SP 800-53 Rev 5 - AC-3, AU-2, AU-3, IA-2, SC-8",
+      "NIST SP 800-171 Rev 2 - 3.1.1, 3.3.1, 3.5.1",
+      "ISO 27001:2022 A.8.3, A.8.15",
+      "Essential Eight - Restrict Administrative Privileges",
+      "MITRE ATT&CK - T1557 (Man-in-the-Middle), T1003 (OS Credential Dumping)"
+    ],
+    "cisChecks": [
+      "CIS 2.3.8.1 - Ensure Microsoft network client: Digitally sign communications (always) is Enabled",
+      "CIS 2.3.8.2 - Ensure Microsoft network server: Digitally sign communications (always) is Enabled",
+      "CIS 2.3.11.7 - Ensure LAN Manager authentication level is Send NTLMv2 response only",
+      "CIS 2.3.11.5 - Ensure Do not store LAN Manager hash value on next password change is Enabled",
+      "CIS 9.1.8 - Ensure audit logon events is configured",
+      "CIS 2.3.7.4 - Ensure number of previous logons to cache is 1",
+      "CIS 2.3.7.3 - Ensure machine inactivity limit is 900 seconds"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  }
 }

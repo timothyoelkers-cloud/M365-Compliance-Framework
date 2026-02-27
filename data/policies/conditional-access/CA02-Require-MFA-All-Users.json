@@ -1,49 +1,69 @@
 {
-  "id": "CA02",
-  "file": "CA02-Require-MFA-All-Users.json",
-  "type": "conditional-access",
-  "displayName": "CA02 | Require-MFA-All-Users",
-  "description": "Requires MFA for all users on all cloud apps. Single most impactful control. Excludes emergency access accounts only. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "NIST CSF 2.0",
-    "NIST CSF 1.1",
-    "ISO 27701:2019",
-    "HITRUST CSF v11",
-    "ASD Essential Eight",
-    "MITRE ATT&CK",
-    "CISA CPG",
-    "HPH CPGs",
-    "Microsoft Cloud Security Benchmark",
-    "EU Cyber Resilience Act",
-    "Cybersecure Canada"
-  ],
-  "cisChecks": [
-    "1.3.1",
-    "5.2.2.2",
-    "5.3.1"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA02-Require-MFA-All-Users.json"
+  "displayName": "CA02 | Require MFA for All Users",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "mfa"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA02",
+    "description": "Requires multi-factor authentication for all users across all cloud applications. This is the foundational MFA policy and the single most effective control against identity compromise, blocking over 99.9% of account compromise attacks.",
+    "cisControls": [
+      "CIS 1.3.1 - Ensure MFA is required for all users in all cloud apps",
+      "CIS 5.2.2.2 - Ensure multifactor authentication is enabled for all users in administrative roles",
+      "CIS 5.3.1 - Ensure the Microsoft Authenticator app is configured to protect against MFA fatigue"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "IA-2(1)",
+        "IA-2(2)",
+        "IA-2(6)"
+      ],
+      "CIS-Microsoft-365": [
+        "1.3.1",
+        "5.2.2.2",
+        "5.3.1"
+      ],
+      "ISO-27001-2022": [
+        "A.8.5 - Secure authentication"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078 - Valid Accounts",
+        "T1556 - Modify Authentication Process"
+      ],
+      "NIS2": [
+        "Article 21(2)(j) - Multi-factor authentication"
+      ],
+      "Essential-Eight": [
+        "Multi-factor authentication"
+      ],
+      "SOC-2": [
+        "CC6.1 - Logical and physical access controls"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "deploymentNotes": "Deploy in report-only first. Ensure all users have registered at least one MFA method via https://aka.ms/mfasetup before enforcing. Review the Authentication methods activity report in Entra admin centre. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

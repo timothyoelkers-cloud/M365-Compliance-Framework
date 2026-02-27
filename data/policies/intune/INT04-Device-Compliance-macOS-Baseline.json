@@ -1,50 +1,65 @@
 {
-  "id": "INT04",
-  "file": "INT04-Device-Compliance-macOS-Baseline.json",
-  "type": "intune",
-  "displayName": "INT04 | Device-Compliance-macOS-Baseline",
-  "description": "macOS compliance: min OS version, FileVault encryption, Gatekeeper enabled, SIP enabled, screen lock with password, firewall enabled.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "DORA",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "Cybersecure Canada",
-    "EU Cyber Resilience Act",
-    "ISO 22301:2019"
+  "@odata.type": "#microsoft.graph.macOSCompliancePolicy",
+  "displayName": "INT04 - macOS Device Compliance Baseline",
+  "description": "Enforces baseline compliance for macOS devices: minimum OS 14.0, FileVault encryption required, Gatekeeper enabled, System Integrity Protection enabled, passcode required (min 6), firewall enabled.",
+  "version": 1,
+  "passwordRequired": true,
+  "passwordBlockSimple": true,
+  "passwordExpirationDays": null,
+  "passwordMinimumLength": 6,
+  "passwordMinutesOfInactivityBeforeLock": 15,
+  "passwordPreviousPasswordBlockCount": 5,
+  "passwordMinimumCharacterSetCount": 1,
+  "passwordRequiredType": "alphanumeric",
+  "osMinimumVersion": "14.0",
+  "osMaximumVersion": null,
+  "osMinimumBuildVersion": null,
+  "osMaximumBuildVersion": null,
+  "systemIntegrityProtectionEnabled": true,
+  "deviceThreatProtectionEnabled": false,
+  "deviceThreatProtectionRequiredSecurityLevel": "unavailable",
+  "storageRequireEncryption": true,
+  "gatekeeperAllowedAppSource": "macAppStoreAndIdentifiedDevelopers",
+  "firewallEnabled": true,
+  "firewallBlockAllIncoming": false,
+  "firewallEnableStealthMode": false,
+  "scheduledActionsForRule": [
+    {
+      "ruleName": "PasswordRequired",
+      "scheduledActionConfigurations": [
+        {
+          "actionType": "block",
+          "gracePeriodHours": 72,
+          "notificationTemplateId": "",
+          "notificationMessageCCList": []
+        }
+      ]
+    }
   ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2",
-    "5.1.4.3"
+  "roleScopeTagIds": [
+    "0"
   ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-IntunePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Intune licence required",
-  "requiredLicence": "Microsoft Intune / Microsoft 365 Business Premium or above",
-  "version": "1.0",
-  "path": "policies/intune/INT04-Device-Compliance-macOS-Baseline.json"
+  "_metadata": {
+    "policyId": "INT04",
+    "description": "macOS compliance baseline requiring minimum OS 14.0 (Sonoma), FileVault disk encryption, Gatekeeper app source restriction, System Integrity Protection, alphanumeric passcode (min 6), and firewall enabled.",
+    "graphEndpoint": "POST /deviceManagement/deviceCompliancePolicies",
+    "platform": "macOS",
+    "frameworks": [
+      "CIS Apple macOS Benchmark v3.0",
+      "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28, SI-7",
+      "ISO 27001:2022 A.8.1",
+      "Essential Eight - Patch Operating Systems",
+      "Microsoft Cloud Security Benchmark - DP-4, ES-1"
+    ],
+    "cisChecks": [
+      "CIS 2.5.1.1 - Ensure FileVault is enabled",
+      "CIS 2.6.1.1 - Ensure Gatekeeper is enabled",
+      "CIS 2.6.1.2 - Ensure System Integrity Protection is enabled",
+      "CIS 2.6.4 - Ensure Firewall is enabled",
+      "CIS 5.2.1 - Ensure password is required to wake from sleep or screen saver",
+      "CIS 5.2.3 - Ensure complex password is required"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  }
 }

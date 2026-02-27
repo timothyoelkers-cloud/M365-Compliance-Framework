@@ -1,42 +1,83 @@
 {
-  "id": "CA16",
-  "file": "CA16-Block-Unregistered-Non-Compliant-Devices.json",
-  "type": "conditional-access",
-  "displayName": "CA16 | Block-Unregistered-Non-Compliant-Devices",
-  "description": "Blocks access from devices not registered in Entra ID or not Intune-compliant. Complements CA06. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "Microsoft Cloud Security Benchmark",
-    "MITRE ATT&CK"
-  ],
-  "cisChecks": [
-    "1.3.7",
-    "5.1.3.1",
-    "5.2.2.9"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "Microsoft Intune enrolment and device compliance policies must be configured first",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA16-Block-Unregistered-Non-Compliant-Devices.json"
+  "displayName": "CA16 | Block Access from Unregistered or Non-Compliant Devices",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ],
+    "devices": {
+      "deviceFilter": {
+        "mode": "include",
+        "rule": "device.isCompliant -ne True -or device.trustType -ne \"AzureAD\" -and device.trustType -ne \"ServerAD\" -and device.trustType -ne \"Workplace\""
+      }
+    }
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "block"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA16",
+    "description": "Blocks access from devices that are not registered with Entra ID or are not marked as Intune-compliant. Uses a device filter rule to explicitly identify non-compliant and unregistered devices. This is a more aggressive version of CA06 that uses device filters for granular device state evaluation.",
+    "deviceFilterRule": "device.isCompliant -ne True -or device.trustType -ne 'AzureAD' -and device.trustType -ne 'ServerAD' -and device.trustType -ne 'Workplace'",
+    "deviceFilterExplanation": {
+      "device.isCompliant -ne True": "Matches devices not marked as compliant in Intune",
+      "device.trustType -ne AzureAD": "Matches devices not Azure AD Joined",
+      "device.trustType -ne ServerAD": "Matches devices not Hybrid Azure AD Joined",
+      "device.trustType -ne Workplace": "Matches devices not Azure AD Registered (Workplace Join)"
+    },
+    "cisControls": [
+      "CIS 1.3.7 - Ensure Conditional Access policies require compliant or hybrid joined devices",
+      "CIS 5.1.3.1 - Ensure that device code flow is restricted",
+      "CIS 5.2.2.9 - Ensure access is restricted to compliant devices"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "AC-19",
+        "CM-8",
+        "IA-3",
+        "SC-43"
+      ],
+      "CIS-Microsoft-365": [
+        "1.3.7",
+        "5.1.3.1",
+        "5.2.2.9"
+      ],
+      "ISO-27001-2022": [
+        "A.8.1 - User endpoint devices",
+        "A.8.9 - Configuration management"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078 - Valid Accounts",
+        "T1199 - Trusted Relationship",
+        "T1098.005 - Device Registration"
+      ],
+      "NIS2": [
+        "Article 21(2)(d) - Supply chain security"
+      ],
+      "Essential-Eight": [
+        "Application control"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2",
+      "Microsoft Intune"
+    ],
+    "deploymentNotes": "This policy uses device filters which are more granular than the built-in grant controls in CA06. Ensure all corporate devices are enrolled and compliant in Intune before enforcing. The device filter expression blocks devices that fail compliance OR are not of a recognised trust type. Deploy in report-only first and carefully monitor for false positives on newly enrolled devices. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

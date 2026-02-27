@@ -1,44 +1,53 @@
 {
-  "id": "SPO04",
-  "file": "SPO04-Block-Download-Unmanaged-Devices.json",
-  "type": "sharepoint",
-  "displayName": "SPO04 | Block-Download-Unmanaged-Devices",
-  "description": "Blocks file downloads from SharePoint/OneDrive on unmanaged devices. Browser view-only access permitted. Prevents data leaving on personal devices.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "DORA",
-    "NIST CSF 2.0",
-    "CMMC v2.0",
-    "ISO 27701:2019",
-    "UK NCSC CAF v3.1",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "EU Cyber Resilience Act"
-  ],
-  "cisChecks": [
-    "7.2.2",
-    "7.2.10"
-  ],
-  "importMethod": "powershell-spo",
-  "importScript": "scripts/Import-SharePointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/sharepoint/SPO04-Block-Download-Unmanaged-Devices.json"
+  "_metadata": {
+    "id": "SPO04",
+    "title": "Block Download on Unmanaged Devices",
+    "description": "Configures SharePoint Online to allow limited (browser-only, view-only) access from unmanaged devices while blocking downloads, print, and sync. Prevents corporate data from being saved to personal or unmanaged devices. Full enforcement requires a complementary Conditional Access policy.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["7.2.2", "7.2.10"],
+    "severity": "High",
+    "category": "SharePoint Online",
+    "deploymentOrder": 4,
+    "requiredLicence": "Microsoft Entra ID P1 (for Conditional Access) + SharePoint Online",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "IMPORTANT: Set-SPOTenant -ConditionalAccessPolicy AllowLimitedAccess enables the SharePoint-side enforcement, but full protection requires an Entra ID Conditional Access policy targeting SharePoint Online and OneDrive with a 'Use app enforced restrictions' session control. Without the CA policy, the SPO setting alone may not fully enforce device-based restrictions. Managed devices are those that are Entra ID joined, hybrid joined, or Intune compliant."
+  },
+  "cmdlet": "Set-SPOTenant",
+  "parameters": {
+    "ConditionalAccessPolicy": "AllowLimitedAccess",
+    "AllowDownloadingNonWebViewableFiles": false
+  },
+  "conditionalAccessRequirement": {
+    "_notes": "A Conditional Access policy must also be created in Entra ID to fully enforce this control",
+    "targetApps": ["Office 365 SharePoint Online"],
+    "sessionControl": "Use app enforced restrictions",
+    "conditions": {
+      "deviceState": "All devices except compliant and hybrid Azure AD joined"
+    },
+    "grantControls": "Block or require compliant device"
+  },
+  "postDeployment": [
+    "Get-SPOTenant | Select-Object ConditionalAccessPolicy, AllowDownloadingNonWebViewableFiles",
+    "Create a Conditional Access policy in Entra ID: Target SharePoint Online > Session > Use app enforced restrictions",
+    "Test from an unmanaged device: user should be able to view files in browser but not download, print, or sync",
+    "Test from a managed device: full access should be available",
+    "Note: Some file types (e.g., .pdf) may still be viewable in browser even with download blocked"
+  ]
 }

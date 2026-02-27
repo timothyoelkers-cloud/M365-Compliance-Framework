@@ -1,58 +1,67 @@
 {
-  "id": "EXO04",
-  "file": "EXO04-Disable-Basic-Authentication.json",
-  "type": "exchange",
-  "displayName": "EXO04 | Disable-Basic-Authentication",
-  "description": "Disables basic auth for all Exchange protocols: POP3, IMAP, SMTP, EWS, MAPI, RPC/HTTP. Verify modern auth is working first.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "NIST CSF 2.0",
-    "NIST CSF 1.1",
-    "NIST SP 800-171 Rev.3",
-    "NIST SP 800-171 Rev.2",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "CJIS v6",
-    "GSMA FS.31",
-    "HPH CPGs",
-    "TSA Security Directive",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "CISA CPG",
-    "CSA CCM v4",
-    "CRI Profile v2.0",
-    "COBIT 19",
-    "Microsoft Cloud Security Benchmark",
-    "HITRUST CSF v11",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "ISO 22301:2019"
+  "_metadata": {
+    "id": "EXO04",
+    "title": "Disable Basic Authentication",
+    "description": "Creates an authentication policy that disables basic authentication for all Exchange Online protocols (POP3, IMAP, SMTP, MAPI, ActiveSync, EWS, Autodiscover, Offline Address Book, RPC, PowerShell) and assigns it as the organization default. Basic auth transmits credentials in clear text and cannot enforce MFA.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK T1078"
+    ],
+    "cisChecks": ["6.5.1", "6.1.2"],
+    "severity": "Critical",
+    "category": "Exchange Online",
+    "deploymentOrder": 4,
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "PREREQUISITE: Ensure Modern Authentication (EXO05) is enabled and all clients support OAuth 2.0 BEFORE disabling basic auth. Audit basic auth usage first: Search the Azure AD sign-in logs for clientApp = 'Other clients' or protocol-specific entries. Microsoft has deprecated basic auth for most protocols. AllowBasicAuthSmtp may need to remain true temporarily for legacy devices (multifunction printers, LOB apps) but should be disabled as soon as possible."
+  },
+  "steps": [
+    {
+      "cmdlet": "New-AuthenticationPolicy",
+      "parameters": {
+        "Name": "Block Basic Auth - All Protocols",
+        "AllowBasicAuthActiveSync": false,
+        "AllowBasicAuthAutodiscover": false,
+        "AllowBasicAuthImap": false,
+        "AllowBasicAuthMapi": false,
+        "AllowBasicAuthOfflineAddressBook": false,
+        "AllowBasicAuthPop": false,
+        "AllowBasicAuthPowershell": false,
+        "AllowBasicAuthRpc": false,
+        "AllowBasicAuthSmtp": false,
+        "AllowBasicAuthWebServices": false
+      }
+    },
+    {
+      "cmdlet": "Set-OrganizationConfig",
+      "parameters": {
+        "DefaultAuthenticationPolicy": "Block Basic Auth - All Protocols"
+      },
+      "_notes": "Sets the new policy as the organization-wide default. All users without a per-user authentication policy override will be governed by this policy."
+    }
   ],
-  "cisChecks": [
-    "6.5.1",
-    "6.1.2"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-ExchangePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/exchange/EXO04-Disable-Basic-Authentication.json"
+  "postDeployment": [
+    "Get-AuthenticationPolicy -Identity 'Block Basic Auth - All Protocols' | Format-List",
+    "Get-OrganizationConfig | Select-Object DefaultAuthenticationPolicy",
+    "Audit basic auth usage before enforcement: Search-UnifiedAuditLog -Operations UserLoggedIn -ResultSize 5000 | Where-Object {$_.AuditData -like '*Basic*'}",
+    "If legacy SMTP devices need basic auth temporarily: Set-CASMailbox -Identity <service-account> -SmtpClientAuthenticationDisabled $false",
+    "Monitor Azure AD sign-in logs for basic auth failures after deployment to identify remaining legacy clients"
+  ]
 }

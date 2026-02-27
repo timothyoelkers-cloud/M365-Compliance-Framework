@@ -1,46 +1,233 @@
 {
-  "id": "MDE03",
-  "file": "MDE03-Onboard-iOS-Android-Devices.json",
-  "type": "defender-endpoint",
-  "displayName": "MDE03 | Onboard-iOS-Android-Devices",
-  "description": "Deploys MDE for iOS and Android via Intune App Config and App Protection policies. Mobile threat defence: phishing protection, malicious app detection, network protection.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "DORA",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "UK NCSC Cyber Essentials v3.2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "HPH CPGs",
-    "EU Cyber Resilience Act"
-  ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2",
-    "5.1.4.3"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Defender for Endpoint Plan 1 or Plan 2 licence. Intune-enrolled mobile devices.",
-  "requiredLicence": "Microsoft Defender for Endpoint P1/P2 or Microsoft 365 E5",
-  "version": "1.0",
-  "path": "policies/defender-endpoint/MDE03-Onboard-iOS-Android-Devices.json"
+  "_metadata": {
+    "id": "MDE03",
+    "title": "Onboard iOS and Android Devices to Defender for Endpoint",
+    "description": "Intune App Configuration policy for Microsoft Defender for Endpoint on iOS and Android. Enables web protection, VPN-based network protection, anti-phishing, and jailbreak/root detection for mobile devices.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "DORA",
+      "CMMC v2.0",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2",
+      "5.1.4.3"
+    ],
+    "mitreMappings": [
+      "T1660",
+      "T1437",
+      "T1461",
+      "T1417"
+    ],
+    "requiredLicences": [
+      "Microsoft Defender for Endpoint P1 or P2",
+      "Microsoft 365 E5 or Microsoft 365 E5 Security",
+      "Microsoft Intune Plan 1"
+    ],
+    "requiredRoles": [
+      "Intune Administrator",
+      "Security Administrator"
+    ],
+    "deploymentOrder": 3,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "iOS devices must be enrolled in Intune (supervised or unsupervised)",
+      "Android devices must be enrolled in Intune (device admin, work profile, or fully managed)",
+      "Microsoft Defender app must be deployed as a required app via Intune",
+      "For iOS: Minimum iOS 15.0; VPN profile auto-created by MDE",
+      "For Android: Minimum Android 8.0; Google Play Services required",
+      "MDE connector must be enabled in Intune for iOS and Android compliance"
+    ],
+    "deploymentSteps": [
+      "1. Enable the iOS and Android toggles in Intune > Endpoint Security > Microsoft Defender for Endpoint connector",
+      "2. Deploy the Microsoft Defender app as a required app to mobile device groups",
+      "3. Deploy this App Configuration policy to the same groups",
+      "4. For iOS supervised devices, deploy the VPN profile for web protection",
+      "5. Configure compliance policies to require MDE threat level assessment"
+    ],
+    "rollbackProcedure": "Remove the App Configuration policy assignment and uninstall the Defender app. Disable the MDE connector toggles for mobile platforms."
+  },
+  "androidAppConfigPolicy": {
+    "@odata.type": "#microsoft.graph.androidManagedAppProtection",
+    "displayName": "MDE03 - Defender for Endpoint - Android Configuration",
+    "description": "App Configuration policy for Microsoft Defender for Endpoint on Android devices",
+    "targetedManagedAppGroupType": "allAndroidManagedApps",
+    "packageId": "com.microsoft.scmx",
+    "appConfigurationSettings": [
+      {
+        "key": "vpn",
+        "valueType": "integer",
+        "value": "1",
+        "_description": "Enable VPN-based network protection (1=enabled, 0=disabled)"
+      },
+      {
+        "key": "antiphishing",
+        "valueType": "integer",
+        "value": "1",
+        "_description": "Enable anti-phishing protection (1=enabled, 0=disabled)"
+      },
+      {
+        "key": "web_protection",
+        "valueType": "integer",
+        "value": "1",
+        "_description": "Enable web protection (1=enabled, 0=disabled)"
+      },
+      {
+        "key": "DefenderNetworkProtectionEnable",
+        "valueType": "integer",
+        "value": "1",
+        "_description": "Enable network protection (1=block, 2=audit, 0=disabled)"
+      },
+      {
+        "key": "DefenderOpenNetworkDetection",
+        "valueType": "integer",
+        "value": "1",
+        "_description": "Detect open/unsecured Wi-Fi networks"
+      },
+      {
+        "key": "DefenderEndUserTrustFlowEnable",
+        "valueType": "integer",
+        "value": "0",
+        "_description": "Disable end-user trust flow for certificate warnings"
+      },
+      {
+        "key": "DefenderMalwareScanEnabled",
+        "valueType": "integer",
+        "value": "1",
+        "_description": "Enable malware scanning on Android"
+      },
+      {
+        "key": "DefenderDeviceTag",
+        "valueType": "string",
+        "value": "",
+        "_description": "MDE device tag for grouping"
+      }
+    ]
+  },
+  "iosAppConfigPolicy": {
+    "@odata.type": "#microsoft.graph.iosManagedAppProtection",
+    "displayName": "MDE03 - Defender for Endpoint - iOS Configuration",
+    "description": "App Configuration policy for Microsoft Defender for Endpoint on iOS devices",
+    "targetedManagedAppGroupType": "allIOSManagedApps",
+    "bundleId": "com.microsoft.scmx",
+    "appConfigurationSettings": [
+      {
+        "key": "WebProtection",
+        "valueType": "string",
+        "value": "true",
+        "_description": "Enable web protection via local VPN"
+      },
+      {
+        "key": "VPNEnabled",
+        "valueType": "string",
+        "value": "true",
+        "_description": "Enable VPN tunnel for web filtering"
+      },
+      {
+        "key": "AntiPhishing",
+        "valueType": "string",
+        "value": "true",
+        "_description": "Enable anti-phishing URL detection"
+      },
+      {
+        "key": "NetworkProtection",
+        "valueType": "string",
+        "value": "true",
+        "_description": "Enable network protection"
+      },
+      {
+        "key": "DefenderOpenNetworkDetection",
+        "valueType": "string",
+        "value": "1",
+        "_description": "Detect unsecured Wi-Fi connections"
+      },
+      {
+        "key": "JailbreakDetection",
+        "valueType": "string",
+        "value": "true",
+        "_description": "Detect jailbroken iOS devices"
+      },
+      {
+        "key": "DeviceTag",
+        "valueType": "string",
+        "value": "",
+        "_description": "MDE device tag for grouping"
+      }
+    ]
+  },
+  "iosSupervisedVpnProfile": {
+    "@odata.type": "#microsoft.graph.iosVpnConfiguration",
+    "displayName": "MDE03 - Defender Web Protection VPN - iOS Supervised",
+    "description": "Per-app VPN profile for MDE web protection on supervised iOS devices",
+    "connectionType": "customVpn",
+    "connectionName": "Microsoft Defender",
+    "server": {
+      "address": "127.0.0.1",
+      "description": "MDE Local Tunnel"
+    },
+    "customData": [
+      {
+        "key": "tunnelType",
+        "value": "splitTunnel"
+      }
+    ],
+    "identifier": "com.microsoft.scmx",
+    "enablePerApp": true,
+    "safariDomains": [],
+    "onDemandRules": [
+      {
+        "action": "connect",
+        "domainAction": "neverConnect",
+        "domains": []
+      }
+    ]
+  },
+  "compliancePolicyIntegration": {
+    "androidComplianceRule": {
+      "deviceThreatProtectionEnabled": true,
+      "deviceThreatProtectionRequiredSecurityLevel": "secured",
+      "advancedThreatProtectionRequiredSecurityLevel": "clear"
+    },
+    "iosComplianceRule": {
+      "deviceThreatProtectionEnabled": true,
+      "deviceThreatProtectionRequiredSecurityLevel": "secured",
+      "advancedThreatProtectionRequiredSecurityLevel": "clear"
+    }
+  },
+  "assignments": {
+    "include": [
+      {
+        "@odata.type": "#microsoft.graph.groupAssignmentTarget",
+        "groupId": "",
+        "groupDisplayName": "All Managed Mobile Devices (iOS and Android)"
+      }
+    ],
+    "exclude": [
+      {
+        "@odata.type": "#microsoft.graph.exclusionGroupAssignmentTarget",
+        "groupId": "",
+        "groupDisplayName": "Shared/Kiosk Mobile Devices"
+      }
+    ]
+  }
 }

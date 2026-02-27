@@ -1,33 +1,47 @@
 {
-  "id": "SPO07",
-  "file": "SPO07-Restrict-External-Sharing-Org-Accounts.json",
-  "type": "sharepoint",
-  "displayName": "SPO07 | Restrict-External-Sharing-Org-Accounts",
-  "description": "SharePoint external sharing restricted to organisational accounts only (no personal Microsoft accounts).",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "HITRUST CSF v11",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22"
+  "_metadata": {
+    "id": "SPO07",
+    "title": "Restrict External Sharing - Organization Accounts Only",
+    "description": "Restricts SharePoint Online external sharing to authenticated external users with organizational accounts only (no anonymous links, no personal Microsoft accounts). Requires the invited email address to match the accepting account, preventing invitation forwarding.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["7.2.9"],
+    "severity": "Medium",
+    "category": "SharePoint Online",
+    "deploymentOrder": 7,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "ExternalUserSharingOnly allows new external invitations but blocks anonymous (Anyone) links. RequireAcceptingAccountMatchInvitedAccount ensures the person accepting the invitation is the same person who was invited (prevents forwarded invitations from being accepted by unintended recipients). This is an alternative to SPO01 when the business needs to invite new external users but wants to prevent anonymous access and invitation forwarding."
+  },
+  "steps": [
+    {
+      "cmdlet": "Set-SPOTenant",
+      "parameters": {
+        "SharingCapability": "ExternalUserSharingOnly",
+        "RequireAcceptingAccountMatchInvitedAccount": true
+      },
+      "_notes": "ExternalUserSharingOnly allows new and existing external users but blocks anonymous links. RequireAcceptingAccountMatchInvitedAccount prevents invitation forwarding."
+    }
   ],
-  "cisChecks": [
-    "7.2.9"
-  ],
-  "importMethod": "powershell-spo",
-  "importScript": "scripts/Import-SharePointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/sharepoint/SPO07-Restrict-External-Sharing-Org-Accounts.json"
+  "postDeployment": [
+    "Get-SPOTenant | Select-Object SharingCapability, RequireAcceptingAccountMatchInvitedAccount",
+    "Verify users can share with external organizational accounts but cannot create anonymous links",
+    "Test invitation forwarding prevention: share a file with user A, forward the invitation to user B, confirm B cannot accept it",
+    "Note: This is LESS restrictive than SPO01 (ExistingExternalUserSharingOnly) as it allows new invitations",
+    "Consider combining with SPO06 (Entra ID B2B) to ensure all external users are governed by Conditional Access"
+  ]
 }

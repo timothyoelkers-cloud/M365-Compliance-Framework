@@ -1,49 +1,145 @@
 {
-  "id": "MDE09",
-  "file": "MDE09-Tamper-Protection-Enable.json",
-  "type": "defender-endpoint",
-  "displayName": "MDE09 | Tamper-Protection-Enable",
-  "description": "Enables Tamper Protection on all MDE-enrolled devices via security settings management. Prevents attackers or malware from disabling Defender AV, EDR, or changing protection settings.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)"
-  ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Defender for Endpoint Plan 1 or Plan 2",
-  "requiredLicence": "Microsoft Defender for Endpoint P1/P2 or Microsoft 365 E5",
-  "version": "1.0",
-  "path": "policies/defender-endpoint/MDE09-Tamper-Protection-Enable.json"
+  "_metadata": {
+    "id": "MDE09",
+    "title": "Enable Tamper Protection",
+    "description": "Enables Tamper Protection to prevent users, local admins, and malware from disabling Microsoft Defender Antivirus, real-time protection, cloud-delivered protection, and other security settings. Managed centrally via Intune and cannot be overridden locally.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2", "DORA", "ISO 27001:2022", "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2", "SOC 2", "GDPR (EU) 2016/679",
+      "FedRAMP Moderate", "HITRUST CSF v11", "BSI IT-Grundschutz",
+      "ASD Essential Eight", "NZ ISM v3.8", "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark", "NIST CSF 2.0",
+      "CMMC v2.0", "PCI DSS v4.0", "HIPAA", "CJIS v6"
+    ],
+    "cisChecks": ["5.1.4.1", "5.1.4.2"],
+    "mitreMappings": ["T1562.001", "T1562.004", "T1112", "T1543"],
+    "requiredLicences": [
+      "Microsoft Defender for Endpoint P1 or P2",
+      "Microsoft 365 E5 or Microsoft 365 E3 + E5 Security add-on"
+    ],
+    "requiredRoles": ["Security Administrator", "Intune Administrator"],
+    "deploymentOrder": 9,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Devices must be onboarded to MDE (MDE01 deployed)",
+      "Microsoft Defender Antivirus must be the active AV or in passive mode",
+      "Devices must be Intune-enrolled for cloud-managed Tamper Protection",
+      "Windows 10 version 1903+ or Windows 11 required",
+      "Windows Server 2019+ required for server Tamper Protection"
+    ],
+    "protectedSettings": [
+      "Real-time protection cannot be disabled",
+      "Cloud-delivered protection cannot be disabled",
+      "IOAV (IOfficeAntiVirus) scanning stays enabled",
+      "Behaviour monitoring cannot be turned off",
+      "Security intelligence updates cannot be removed",
+      "Defender service cannot be stopped or disabled",
+      "Defender exclusions cannot be modified locally"
+    ],
+    "deploymentSteps": [
+      "1. Deploy the Intune endpoint security Antivirus profile with Tamper Protection enabled",
+      "2. For tenant-wide enablement, use the MDE portal advanced settings",
+      "3. Verify status via PowerShell: Get-MpComputerStatus | Select IsTamperProtected",
+      "4. Monitor tamper attempts in security.microsoft.com > Advanced Hunting"
+    ],
+    "rollbackProcedure": "Set Tamper Protection to 'Not configured' in Intune to allow local control, or disable tenant-wide in MDE portal > Settings > Endpoints > Advanced features. Note: Disabling Tamper Protection is not recommended."
+  },
+  "intuneEndpointSecurityPolicy": {
+    "@odata.type": "#microsoft.graph.deviceManagementConfigurationPolicy",
+    "name": "MDE09 - Tamper Protection - Enable",
+    "description": "Enable Tamper Protection to prevent modification or disabling of Microsoft Defender security settings",
+    "platforms": "windows10",
+    "technologies": "mdm,microsoftSense",
+    "templateReference": {
+      "templateId": "d02f2162-fcac-48db-9b7b-b0a3f160d100_1",
+      "templateFamily": "endpointSecurityAntivirus",
+      "templateDisplayName": "Windows Security experience",
+      "templateDisplayVersion": "Version 1"
+    },
+    "settings": [
+      {
+        "settingInstance": {
+          "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+          "settingDefinitionId": "device_vendor_msft_policy_config_defender_tamperprotection",
+          "choiceSettingValue": {
+            "value": "device_vendor_msft_policy_config_defender_tamperprotection_enable",
+            "children": [],
+            "_valueDescription": "Enable Tamper Protection - prevents local modification of Defender settings"
+          }
+        }
+      },
+      {
+        "settingInstance": {
+          "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+          "settingDefinitionId": "device_vendor_msft_policy_config_windowsdefendersecuritycenter_disabletamperprotection",
+          "choiceSettingValue": {
+            "value": "device_vendor_msft_policy_config_windowsdefendersecuritycenter_disabletamperprotection_0",
+            "children": [],
+            "_valueDescription": "0 = Do not allow users to toggle Tamper Protection in the Security Center UI"
+          }
+        }
+      }
+    ]
+  },
+  "intuneAntivirusProfile": {
+    "@odata.type": "#microsoft.graph.deviceManagementConfigurationPolicy",
+    "name": "MDE09 - Antivirus with Tamper Protection",
+    "description": "Microsoft Defender Antivirus policy with Tamper Protection enforced",
+    "platforms": "windows10",
+    "technologies": "mdm,microsoftSense",
+    "templateReference": {
+      "templateId": "804339ad-1553-4478-a742-138fb5807418_1",
+      "templateFamily": "endpointSecurityAntivirus",
+      "templateDisplayName": "Microsoft Defender Antivirus"
+    },
+    "settings": [
+      {
+        "settingDefinitionId": "device_vendor_msft_policy_config_defender_tamperprotection",
+        "value": "enable"
+      },
+      {
+        "settingDefinitionId": "device_vendor_msft_policy_config_defender_allowrealtimemonitoring",
+        "value": "allowed"
+      },
+      {
+        "settingDefinitionId": "device_vendor_msft_policy_config_defender_allowcloudprotection",
+        "value": "allowed"
+      },
+      {
+        "settingDefinitionId": "device_vendor_msft_policy_config_defender_allowbehaviormonitoring",
+        "value": "allowed"
+      }
+    ]
+  },
+  "tenantWideSettings": {
+    "portalPath": "security.microsoft.com > Settings > Endpoints > Advanced features",
+    "setting": "Tamper Protection",
+    "value": "On",
+    "_note": "Tenant-wide setting applies to all onboarded devices. Intune policy provides per-group granularity."
+  },
+  "verificationCommands": {
+    "powershell": {
+      "checkStatus": "Get-MpComputerStatus | Select-Object -Property IsTamperProtected, RealTimeProtectionEnabled, AntivirusEnabled",
+      "expectedResult": {
+        "IsTamperProtected": true,
+        "RealTimeProtectionEnabled": true,
+        "AntivirusEnabled": true
+      }
+    },
+    "advancedHuntingQuery": "DeviceEvents | where ActionType == 'TamperingAttempt' | project Timestamp, DeviceName, InitiatingProcessFileName, InitiatingProcessCommandLine, ActionType | sort by Timestamp desc | take 50"
+  },
+  "assignments": {
+    "include": [
+      {
+        "@odata.type": "#microsoft.graph.allDevicesAssignmentTarget",
+        "groupDisplayName": "All Devices (tenant-wide)"
+      }
+    ],
+    "exclude": []
+  }
 }

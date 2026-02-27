@@ -1,51 +1,137 @@
 {
-  "id": "ENT05",
-  "file": "ENT05-Restrict-User-Device-Registration.json",
-  "type": "entra",
-  "displayName": "ENT05 | Restrict-User-Device-Registration",
-  "description": "Restricts Entra ID device registration to admins only (or a managed group). Prevents users silently registering personal devices for device-based CA tokens.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "NIST CSF 1.1",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC CAF v3.1",
-    "UK NCSC Cyber Essentials v3.2",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "CISA CPG",
-    "CSA CCM v4",
-    "CRI Profile v2.0",
-    "COBIT 19",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "GSMA FS.31",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "ISO 22301:2019"
+  "_metadata": {
+    "id": "ENT05",
+    "title": "Restrict User Device Registration",
+    "description": "Restricts Azure AD / Entra ID device registration to a managed group or admins only, preventing users from silently registering personal devices and obtaining device-based Conditional Access tokens. Sets a device quota of 5 per user.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "5.1.3.1"
+    ],
+    "mitreMappings": [
+      "T1078",
+      "T1098",
+      "T1136"
+    ],
+    "requiredLicences": [
+      "Microsoft Entra ID Free (included with any M365 plan)"
+    ],
+    "requiredRoles": [
+      "Global Administrator",
+      "Cloud Device Administrator"
+    ],
+    "deploymentOrder": 5,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-EntraSettings.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Create a security group for users/groups permitted to register devices",
+      "Identify the device registration policy requirements for your Intune/MDM enrolment flows",
+      "Ensure IT helpdesk and device provisioning teams are in the allowed group",
+      "Autopilot and Intune enrolment may require device registration permissions"
+    ],
+    "deploymentSteps": [
+      "1. Create a security group for allowed device registrars (e.g., 'Device Registration Allowed Users')",
+      "2. Apply the Graph API PATCH to restrict device registration",
+      "3. Set the device quota per user",
+      "4. Verify that regular users cannot register devices",
+      "5. Test that Intune enrolment and Autopilot still function correctly"
+    ],
+    "rollbackProcedure": "PATCH /policies/deviceRegistrationPolicy to restore allowedUsers to all users or increase the user device quota."
+  },
+  "graphApiCalls": [
+    {
+      "stepOrder": 1,
+      "description": "Restrict Azure AD device registration to specific group",
+      "method": "PATCH",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/deviceRegistrationPolicy",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer "
+      },
+      "body": {
+        "userDeviceQuota": 5,
+        "azureADRegistration": {
+          "isAdminConfigurable": true,
+          "allowedToRegister": {
+            "@odata.type": "#microsoft.graph.enumeratedDeviceRegistrationMembership",
+            "users": [],
+            "groups": []
+          }
+        },
+        "azureADJoin": {
+          "isAdminConfigurable": true,
+          "allowedToJoin": {
+            "@odata.type": "#microsoft.graph.enumeratedDeviceRegistrationMembership",
+            "users": [],
+            "groups": []
+          }
+        },
+        "localAdminPassword": {
+          "isEnabled": true
+        }
+      },
+      "_explanation": "Restricts both Azure AD registration and Azure AD join to members of the specified security group. Sets a maximum of 5 devices per user. Enables Windows LAPS integration."
+    },
+    {
+      "stepOrder": 2,
+      "description": "Verify device registration policy",
+      "method": "GET",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/deviceRegistrationPolicy",
+      "expectedResponse": {
+        "userDeviceQuota": 5,
+        "azureADRegistration": {
+          "isAdminConfigurable": true
+        }
+      }
+    }
   ],
-  "cisChecks": [
-    "5.1.3.1"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-EntraSettings.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/entra/ENT05-Restrict-User-Device-Registration.json"
+  "powershellAlternative": {
+    "module": "Microsoft.Graph",
+    "commands": [
+      {
+        "description": "Connect to Microsoft Graph",
+        "command": "Connect-MgGraph -Scopes 'Policy.ReadWrite.DeviceConfiguration'"
+      },
+      {
+        "description": "Get current device registration policy",
+        "command": "Get-MgPolicyDeviceRegistrationPolicy | ConvertTo-Json -Depth 5"
+      },
+      {
+        "description": "Update device registration policy",
+        "command": "Update-MgPolicyDeviceRegistrationPolicy -UserDeviceQuota 5 -AzureAdRegistration @{IsAdminConfigurable=$true; AllowedToRegister=@{Groups=@('')}}"
+      }
+    ]
+  },
+  "entraPortalPath": {
+    "navigation": "Entra admin center > Identity > Devices > Device settings",
+    "settings": {
+      "usersCanJoinDevicesToAzureAd": "Selected (group)",
+      "selectedGroup": "",
+      "usersCanRegisterDevices": "Selected (group)",
+      "maximumNumberOfDevicesPerUser": 5,
+      "requireMultiFactorAuthToRegisterOrJoinDevices": true
+    }
+  }
 }

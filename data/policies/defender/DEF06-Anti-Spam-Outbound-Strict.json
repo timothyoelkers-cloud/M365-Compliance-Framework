@@ -1,31 +1,63 @@
 {
-  "id": "DEF06",
-  "file": "DEF06-Anti-Spam-Outbound-Strict.json",
-  "type": "defender",
-  "displayName": "DEF06 | Anti-Spam-Outbound-Strict",
-  "description": "Strict outbound spam filtering. Per-user hourly limits (500/hr). Blocks and alerts on users exceeding limits (indicates account compromise). Deploys in audit mode.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "Microsoft Cloud Security Benchmark"
+  "_metadata": {
+    "id": "DEF06",
+    "title": "Anti-Spam Outbound - Strict",
+    "description": "Strict outbound spam filtering policy. Limits external recipients to 500/hour and internal to 1000/hour. Blocks users who exceed thresholds (indicates account compromise). Disables automatic external forwarding. Notifies security team of outbound spam detections.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.15",
+      "2.1.2"
+    ],
+    "severity": "High",
+    "category": "Defender for Office 365",
+    "deploymentOrder": 6,
+    "requiredLicence": "Exchange Online Protection (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "Outbound spam limits protect your tenant IP reputation and prevent compromised accounts from being used for spam campaigns. ActionWhenThresholdReached: BlockUser is the strictest setting and requires admin intervention to unblock. AutoForwardingMode: Off prevents data exfiltration via auto-forwarding rules. NotifyOutboundSpamRecipients should be set to the security operations mailbox."
+  },
+  "steps": [
+    {
+      "cmdlet": "New-HostedOutboundSpamFilterPolicy",
+      "parameters": {
+        "Name": "Strict Outbound Anti-Spam Policy",
+        "RecipientLimitExternalPerHour": 500,
+        "RecipientLimitInternalPerHour": 1000,
+        "RecipientLimitPerDay": 1000,
+        "ActionWhenThresholdReached": "BlockUser",
+        "AutoForwardingMode": "Off",
+        "NotifyOutboundSpam": true,
+        "NotifyOutboundSpamRecipients": "",
+        "BccSuspiciousOutboundMail": true,
+        "BccSuspiciousOutboundAdditionalRecipients": ""
+      }
+    },
+    {
+      "cmdlet": "New-HostedOutboundSpamFilterRule",
+      "parameters": {
+        "Name": "Strict Outbound Anti-Spam Rule - All Senders",
+        "HostedOutboundSpamFilterPolicy": "Strict Outbound Anti-Spam Policy",
+        "SenderDomainIs": [],
+        "Enabled": true,
+        "Priority": 0
+      }
+    }
   ],
-  "cisChecks": [
-    "2.1.15",
-    "2.1.2"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-DefenderPolicies.ps1",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "Exchange Online Protection (included with M365)",
-  "version": "1.0",
-  "path": "policies/defender/DEF06-Anti-Spam-Outbound-Strict.json"
+  "postDeployment": [
+    "Get-HostedOutboundSpamFilterPolicy -Identity 'Strict Outbound Anti-Spam Policy' | Format-List",
+    "Get-HostedOutboundSpamFilterRule -Identity 'Strict Outbound Anti-Spam Rule - All Senders' | Format-List",
+    "Replace  with the actual security operations mailbox",
+    "Communicate to helpdesk: blocked users will need admin unblock via Remove-BlockedConnector or the Security & Compliance portal",
+    "Monitor for legitimate high-volume senders (e.g., marketing, automated systems) and create exceptions if necessary"
+  ]
 }

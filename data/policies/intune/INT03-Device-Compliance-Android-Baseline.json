@@ -1,53 +1,68 @@
 {
-  "id": "INT03",
-  "file": "INT03-Device-Compliance-Android-Baseline.json",
-  "type": "intune",
-  "displayName": "INT03 | Device-Compliance-Android-Baseline",
-  "description": "Android Enterprise compliance: min OS version, no root access, screen lock, encryption, Samsung Knox / Android for Work attestation, Defender integration.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "DORA",
-    "NIST CSF 2.0",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "GSMA FS.31",
-    "Cybersecure Canada",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "ISO 22301:2019"
+  "@odata.type": "#microsoft.graph.androidWorkProfileCompliancePolicy",
+  "displayName": "INT03 - Android Enterprise Device Compliance Baseline",
+  "description": "Enforces baseline compliance for Android Enterprise work profile devices: minimum OS 13.0, no root, numeric complex password (min 6), storage encryption, Google Play Services required, SafetyNet basic attestation.",
+  "version": 1,
+  "passwordRequired": true,
+  "passwordMinimumLength": 6,
+  "passwordRequiredType": "numericComplex",
+  "passwordMinutesOfInactivityBeforeLock": 5,
+  "passwordExpirationDays": null,
+  "passwordPreviousPasswordBlockCount": 5,
+  "passwordSignInFailureCountBeforeFactoryReset": 10,
+  "securityPreventInstallAppsFromUnknownSources": true,
+  "securityDisableUsbDebugging": true,
+  "securityRequireVerifyApps": true,
+  "deviceThreatProtectionEnabled": false,
+  "deviceThreatProtectionRequiredSecurityLevel": "unavailable",
+  "advancedThreatProtectionRequiredSecurityLevel": "unavailable",
+  "securityBlockJailbrokenDevices": true,
+  "osMinimumVersion": "13.0",
+  "osMaximumVersion": null,
+  "minAndroidSecurityPatchLevel": null,
+  "storageRequireEncryption": true,
+  "securityRequireSafetyNetAttestationBasicIntegrity": true,
+  "securityRequireSafetyNetAttestationCertifiedDevice": false,
+  "securityRequireGooglePlayServices": true,
+  "securityRequireUpToDateSecurityProviders": true,
+  "securityRequireCompanyPortalAppIntegrity": true,
+  "scheduledActionsForRule": [
+    {
+      "ruleName": "PasswordRequired",
+      "scheduledActionConfigurations": [
+        {
+          "actionType": "block",
+          "gracePeriodHours": 72,
+          "notificationTemplateId": "",
+          "notificationMessageCCList": []
+        }
+      ]
+    }
   ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2",
-    "5.1.4.3"
+  "roleScopeTagIds": [
+    "0"
   ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-IntunePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Intune licence required",
-  "requiredLicence": "Microsoft Intune / Microsoft 365 Business Premium or above",
-  "version": "1.0",
-  "path": "policies/intune/INT03-Device-Compliance-Android-Baseline.json"
+  "_metadata": {
+    "policyId": "INT03",
+    "description": "Android Enterprise work profile compliance baseline requiring minimum OS 13.0, root detection, numeric complex password (min 6 digits), storage encryption, Google Play Services, and SafetyNet basic integrity attestation.",
+    "graphEndpoint": "POST /deviceManagement/deviceCompliancePolicies",
+    "platform": "Android Enterprise (Work Profile)",
+    "frameworks": [
+      "CIS Google Android Benchmark v1.3",
+      "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28",
+      "ISO 27001:2022 A.8.1",
+      "Essential Eight - Patch Operating Systems",
+      "Microsoft Cloud Security Benchmark - DP-4"
+    ],
+    "cisChecks": [
+      "CIS 1.1 - Ensure device encryption is enabled",
+      "CIS 1.2 - Ensure screen lock is enabled",
+      "CIS 1.3 - Ensure minimum password length is 6",
+      "CIS 1.4 - Ensure root detection is enabled",
+      "CIS 2.1 - Ensure Google Play Protect is enabled",
+      "CIS 2.2 - Ensure SafetyNet attestation is required"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  }
 }

@@ -1,43 +1,44 @@
 {
-  "id": "EXO08",
-  "file": "EXO08-Configure-Connection-Filter-Clear-Safelist.json",
-  "type": "exchange",
-  "displayName": "EXO08 | Configure-Connection-Filter-Clear-Safelist",
-  "description": "Ensures connection filter IP allow list is empty and safe sender list does not bypass spam filtering. Audits and removes insecure bypasses.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "NIST CSF 1.1",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "FFIEC-CAT",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "Cybersecure Canada"
-  ],
-  "cisChecks": [
-    "2.1.14",
-    "6.5.4",
-    "6.5.5"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-ExchangePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/exchange/EXO08-Configure-Connection-Filter-Clear-Safelist.json"
+  "_metadata": {
+    "id": "EXO08",
+    "title": "Configure Connection Filter - Clear Safe List",
+    "description": "Clears the IP Allow List in the connection filter policy and disables the Safe List. IP allow lists bypass all spam filtering for messages from listed IPs, creating a significant security gap. The Safe List is a Microsoft-maintained list of trusted third-party sources that also bypasses filtering.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "FFIEC-CAT",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["2.1.14", "6.5.4", "6.5.5"],
+    "severity": "High",
+    "category": "Exchange Online",
+    "deploymentOrder": 8,
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "The connection filter IP Allow List bypasses ALL spam filtering for messages from listed IP addresses. This is dangerous because if a listed IP is compromised, all malicious email from that IP will bypass security scanning. The EnableSafeList option uses a Microsoft-maintained list of trusted third-party senders that also bypasses filtering. CIS recommends disabling both. If you have a legitimate third-party email service that needs IP allow-listing, consider using an Exchange Online connector with TLS certificate validation instead."
+  },
+  "cmdlet": "Set-HostedConnectionFilterPolicy",
+  "parameters": {
+    "Identity": "Default",
+    "IPAllowList": [],
+    "IPBlockList": [],
+    "EnableSafeList": false
+  },
+  "postDeployment": [
+    "Get-HostedConnectionFilterPolicy -Identity Default | Select-Object IPAllowList, IPBlockList, EnableSafeList",
+    "Document any IPs that were in the allow list before clearing (for audit trail)",
+    "If third-party email relay is required, configure an inbound connector with TLS certificate validation instead of IP allow-listing",
+    "Monitor for delivery issues from previously-allowed IPs after clearing the list",
+    "IPBlockList is also cleared to ensure it is explicitly managed; add known malicious IPs if needed"
+  ]
 }

@@ -1,46 +1,94 @@
 {
-  "id": "DEF01",
-  "file": "DEF01-Anti-Phishing-Strict.json",
-  "type": "defender",
-  "displayName": "DEF01 | Anti-Phishing-Strict",
-  "description": "Strict anti-phishing: all impersonation protection, mailbox intelligence, spoof protection, aggressive UCL thresholds. Quarantines high-confidence phish. Deploys in audit mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "HITRUST CSF v11",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "HPH CPGs",
-    "NIST CSF 1.1",
-    "ASD Essential Eight",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "EU Cyber Resilience Act",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "NZ ISM v3.8",
-    "TSA Security Directive",
-    "CIRCIA (US)"
+  "_metadata": {
+    "id": "DEF01",
+    "title": "Anti-Phishing Policy - Strict",
+    "description": "Deploys a strict anti-phishing policy with aggressive thresholds, mailbox intelligence, spoof intelligence, organization domain protection, and targeted user protection. All impersonation detections are routed to quarantine.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "MITRE ATT&CK T1566",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.1",
+      "2.1.2",
+      "2.1.3",
+      "2.1.4",
+      "2.1.7"
+    ],
+    "severity": "High",
+    "category": "Defender for Office 365",
+    "deploymentOrder": 1,
+    "requiredLicence": "Microsoft Defender for Office 365 Plan 1 or Plan 2",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "Requires Defender for Office 365 P1/P2. Deploy the policy first (step 1), then assign to recipients via the rule (step 2). TargetedUsersToProtect must be populated with high-value targets (C-suite, finance, HR) before deployment. Review quarantine for false positives during the first 7 days."
+  },
+  "steps": [
+    {
+      "cmdlet": "New-AntiPhishPolicy",
+      "parameters": {
+        "Name": "Strict Anti-Phish Policy",
+        "Enabled": true,
+        "PhishThresholdLevel": 3,
+        "EnableMailboxIntelligence": true,
+        "EnableMailboxIntelligenceProtection": true,
+        "MailboxIntelligenceProtectionAction": "Quarantine",
+        "MailboxIntelligenceQuarantineTag": "DefaultFullAccessPolicy",
+        "EnableSpoofIntelligence": true,
+        "SpoofQuarantineTag": "DefaultFullAccessPolicy",
+        "AuthenticationFailAction": "Quarantine",
+        "EnableOrganizationDomainsProtection": true,
+        "EnableTargetedDomainsProtection": false,
+        "EnableTargetedUserProtection": true,
+        "TargetedUsersToProtect": [
+          ";",
+          ";",
+          ";"
+        ],
+        "TargetedUserProtectionAction": "Quarantine",
+        "TargetedUserQuarantineTag": "DefaultFullAccessPolicy",
+        "TargetedDomainProtectionAction": "Quarantine",
+        "TargetedDomainQuarantineTag": "DefaultFullAccessPolicy",
+        "EnableFirstContactSafetyTips": true,
+        "EnableSimilarUsersSafetyTips": true,
+        "EnableSimilarDomainsSafetyTips": true,
+        "EnableUnusualCharactersSafetyTips": true,
+        "EnableUnauthenticatedSender": true,
+        "EnableViaTag": true,
+        "HonorDmarcPolicy": true,
+        "DmarcQuarantineAction": "Quarantine",
+        "DmarcRejectAction": "Reject",
+        "ImpersonationProtectionState": "Automatic"
+      }
+    },
+    {
+      "cmdlet": "New-AntiPhishRule",
+      "parameters": {
+        "Name": "Strict Anti-Phish Rule - All Recipients",
+        "AntiPhishPolicy": "Strict Anti-Phish Policy",
+        "RecipientDomainIs": [],
+        "Enabled": true,
+        "Priority": 0
+      }
+    }
   ],
-  "cisChecks": [
-    "2.1.7"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-DefenderPolicies.ps1",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "Microsoft Defender for Office 365 Plan 1 or Plan 2",
-  "version": "1.0",
-  "path": "policies/defender/DEF01-Anti-Phishing-Strict.json"
+  "postDeployment": [
+    "Get-AntiPhishPolicy -Identity 'Strict Anti-Phish Policy' | Format-List",
+    "Get-AntiPhishRule -Identity 'Strict Anti-Phish Rule - All Recipients' | Format-List",
+    "Populate TargetedUsersToProtect with actual C-suite and high-value user entries before enforcement",
+    "Monitor quarantine for false positives during first 7 days of deployment"
+  ]
 }

@@ -1,43 +1,72 @@
 {
-  "id": "CA06",
-  "file": "CA06-Require-Compliant-Device.json",
-  "type": "conditional-access",
-  "displayName": "CA06 | Require-Compliant-Device",
-  "description": "Requires Intune-compliant or Entra hybrid-joined devices. Deploy AFTER configuring Intune compliance policies. Imports in Report-Only mode.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "Microsoft Cloud Security Benchmark",
-    "MITRE ATT&CK"
-  ],
-  "cisChecks": [
-    "1.3.7",
-    "5.1.4.1",
-    "5.2.2.9",
-    "5.2.2.12"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "Microsoft Intune enrolment and device compliance policies must be configured first",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA06-Require-Compliant-Device.json"
+  "displayName": "CA06 | Require Compliant or Hybrid Azure AD Joined Device",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "compliantDevice",
+      "domainJoinedDevice"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA06",
+    "description": "Requires that the device accessing cloud resources is either marked as Intune-compliant or is Hybrid Azure AD Joined. This prevents access from unmanaged personal devices, kiosks, and attacker-controlled endpoints, ensuring only corporate-managed endpoints that meet compliance policies can access organisational data.",
+    "cisControls": [
+      "CIS 1.3.7 - Ensure Conditional Access policies require compliant or hybrid joined devices",
+      "CIS 5.1.4.1 - Ensure devices joining or registering to Entra ID require MFA",
+      "CIS 5.2.2.9 - Ensure access is restricted to compliant devices",
+      "CIS 5.2.2.12 - Ensure a Conditional Access policy is in place to require devices to be marked as compliant"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "AC-19",
+        "CM-8",
+        "IA-3",
+        "SC-43"
+      ],
+      "CIS-Microsoft-365": [
+        "1.3.7",
+        "5.1.4.1",
+        "5.2.2.9",
+        "5.2.2.12"
+      ],
+      "ISO-27001-2022": [
+        "A.8.1 - User endpoint devices"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078 - Valid Accounts",
+        "T1199 - Trusted Relationship"
+      ],
+      "NIS2": [
+        "Article 21(2)(d) - Supply chain security"
+      ],
+      "Essential-Eight": [
+        "Application control",
+        "Configure Microsoft Office macro settings"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2",
+      "Microsoft Intune"
+    ],
+    "deploymentNotes": "Ensure Intune device compliance policies are configured and devices are enrolled BEFORE enforcing this policy. The OR operator means EITHER a compliant device OR a Hybrid Azure AD Joined device will satisfy the grant. Deploy in report-only first and monitor for users accessing from unmanaged devices. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }

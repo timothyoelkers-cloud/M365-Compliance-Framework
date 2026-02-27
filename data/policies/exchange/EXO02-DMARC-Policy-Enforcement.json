@@ -1,43 +1,80 @@
 {
-  "id": "EXO02",
-  "file": "EXO02-DMARC-Policy-Enforcement.json",
-  "type": "exchange",
-  "displayName": "EXO02 | DMARC-Policy-Enforcement",
-  "description": "Configures DMARC DNS record (start p=none, progress to p=quarantine then p=reject). Script generates the TXT record string to add to DNS. Prevents domain spoofing.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "NZ ISM v3.8",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "Cybersecure Canada",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule",
-    "HITRUST CSF v11",
-    "UK NCSC Cyber Essentials v3.2"
+  "_metadata": {
+    "id": "EXO02",
+    "title": "DMARC Policy Enforcement",
+    "description": "Configures Domain-based Message Authentication, Reporting, and Conformance (DMARC) via DNS TXT records. DMARC builds on SPF and DKIM to prevent domain spoofing. Includes a staged rollout plan from monitoring (p=none) through quarantine to full reject enforcement.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "UK NCSC Cyber Essentials v3.2",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.10"
+    ],
+    "severity": "High",
+    "category": "Exchange Online",
+    "deploymentOrder": 2,
+    "requiredLicence": "None (DNS configuration only)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "DMARC is a DNS record, not a PowerShell setting. SPF and DKIM MUST be correctly configured before enforcing DMARC. Follow the staged rollout: start with p=none to monitor, then p=quarantine, then p=reject. The rua address receives aggregate reports; the ruf address receives forensic (failure) reports. adkim=s and aspf=s enforce strict alignment. Use a DMARC reporting tool (e.g., Valimail, dmarcian, Agari) to analyze reports before moving to enforcement."
+  },
+  "deploymentType": "dns-record",
+  "stagedRollout": [
+    {
+      "stage": 1,
+      "name": "Monitor Only",
+      "duration": "2-4 weeks minimum",
+      "dnsRecord": {
+        "type": "TXT",
+        "name": "_dmarc.",
+        "value": "v=DMARC1; p=none; rua=mailto:; ruf=mailto:; fo=1; adkim=r; aspf=r; pct=100; ri=86400",
+        "ttl": 3600
+      },
+      "_notes": "p=none only monitors and reports without taking action. Use this phase to identify all legitimate sending sources and fix SPF/DKIM alignment issues. adkim=r and aspf=r use relaxed alignment during monitoring."
+    },
+    {
+      "stage": 2,
+      "name": "Quarantine (Partial Enforcement)",
+      "duration": "2-4 weeks",
+      "dnsRecord": {
+        "type": "TXT",
+        "name": "_dmarc.",
+        "value": "v=DMARC1; p=quarantine; rua=mailto:; ruf=mailto:; fo=1; adkim=s; aspf=s; pct=25; ri=86400",
+        "ttl": 3600
+      },
+      "_notes": "p=quarantine with pct=25 quarantines 25% of failing messages. Gradually increase pct to 50, 75, then 100 over subsequent weeks. Switch to strict alignment (adkim=s, aspf=s)."
+    },
+    {
+      "stage": 3,
+      "name": "Full Reject Enforcement",
+      "duration": "Permanent",
+      "dnsRecord": {
+        "type": "TXT",
+        "name": "_dmarc.",
+        "value": "v=DMARC1; p=reject; rua=mailto:; ruf=mailto:; fo=1; adkim=s; aspf=s; pct=100; ri=86400",
+        "ttl": 3600
+      },
+      "_notes": "p=reject instructs receiving servers to reject messages that fail DMARC. This is the target state for full domain spoofing protection. Only deploy after confirming all legitimate sources pass DMARC alignment."
+    }
   ],
-  "cisChecks": [
-    "2.1.10"
-  ],
-  "importMethod": "dns-record",
-  "importScript": "scripts/Import-ExchangePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/exchange/EXO02-DMARC-Policy-Enforcement.json"
+  "postDeployment": [
+    "Verify DNS record: nslookup -type=TXT _dmarc.",
+    "Use https://mxtoolbox.com/dmarc.aspx to validate the DMARC record",
+    "Subscribe to a DMARC reporting service to analyze aggregate (rua) reports",
+    "Review reports for 2-4 weeks before advancing to the next enforcement stage",
+    "Ensure all third-party senders (marketing platforms, CRM, etc.) are included in SPF and have DKIM configured"
+  ]
 }

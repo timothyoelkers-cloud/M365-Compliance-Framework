@@ -1,48 +1,88 @@
 {
-  "id": "INT17",
-  "file": "INT17-Removable-Storage-Control.json",
-  "type": "intune",
-  "displayName": "INT17 | Removable-Storage-Control",
-  "description": "Blocks or restricts USB removable storage access via Intune Device Control. Prevents USB data exfiltration. Allows IT-approved storage devices only. Audit mode logs all attempts.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "NYDFS 23 NYCRR 500",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)"
+  "@odata.type": "#microsoft.graph.windows10CustomConfiguration",
+  "displayName": "INT17 - Removable Storage Device Control Policy",
+  "description": "Blocks USB removable storage read and write access. Allows specific approved USB vendor IDs via exception list. Prevents data exfiltration via removable media.",
+  "version": 1,
+  "omaSettings": [
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Removable Disk - Deny Read Access",
+      "description": "RemovableDiskDenyReadAccess: 1 = Block read access to removable storage.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/Storage/RemovableDiskDenyReadAccess",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "Removable Disk - Deny Write Access",
+      "description": "RemovableDiskDenyWriteAccess: 1 = Block write access to removable storage.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/Storage/RemovableDiskDenyWriteAccess",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "WPD Devices - Deny Read Access",
+      "description": "Blocks read access to Windows Portable Devices (MTP/PTP). 1 = Block.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/Storage/WPDDevicesDenyReadAccessPerDevice",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "WPD Devices - Deny Write Access",
+      "description": "Blocks write access to Windows Portable Devices (MTP/PTP). 1 = Block.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/Storage/WPDDevicesDenyWriteAccessPerDevice",
+      "value": 1
+    },
+    {
+      "@odata.type": "#microsoft.graph.omaSettingInteger",
+      "displayName": "All Removable Storage - Deny All Access",
+      "description": "AllRemovableStorageClasses_DenyAll_Access: 1 = Block all removable storage classes.",
+      "omaUri": "./Device/Vendor/MSFT/Policy/Config/Storage/AllRemovableStorageClasses_DenyAll_Access",
+      "value": 1
+    }
   ],
-  "cisChecks": [
-    "5.1.4.1"
+  "_approvedDeviceExceptions": {
+    "description": "To allow specific approved USB devices, create a Defender for Endpoint Device Control policy with approved vendor/product IDs. Replace placeholder VIDs/PIDs below with your organisation's approved device identifiers.",
+    "approvedDevices": [
+      {
+        "vendorId": "0781",
+        "productId": "",
+        "friendlyName": "PLACEHOLDER - SanDisk (replace with your approved VID)",
+        "serialNumber": ""
+      },
+      {
+        "vendorId": "0951",
+        "productId": "",
+        "friendlyName": "PLACEHOLDER - Kingston Technology (replace with your approved VID)",
+        "serialNumber": ""
+      }
+    ],
+    "defenderDeviceControlPolicy": {
+      "description": "Use Microsoft Defender for Endpoint Device Control for granular allow/deny rules by VID/PID.",
+      "endpoint": "POST /deviceManagement/intents with templateId for Device Control"
+    }
+  },
+  "roleScopeTagIds": [
+    "0"
   ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-IntunePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Intune licence required",
-  "requiredLicence": "Microsoft Defender for Endpoint Plan 1 or above",
-  "version": "1.0",
-  "path": "policies/intune/INT17-Removable-Storage-Control.json"
+  "_metadata": {
+    "policyId": "INT17",
+    "description": "Blocks all USB removable storage read/write access and Windows Portable Device (MTP/PTP) access via OMA-URI storage policies. Prevents data exfiltration through USB drives, external hard disks, and portable media devices. The _approvedDeviceExceptions section provides placeholder vendor IDs for organisations that need to allow specific approved USB devices via Defender for Endpoint Device Control.",
+    "graphEndpoint": "POST /deviceManagement/deviceConfigurations",
+    "platform": "Windows 10/11",
+    "frameworks": [
+      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
+      "NIST SP 800-53 Rev 5 - MP-7, SC-41",
+      "NIST SP 800-171 Rev 2 - 3.8.7",
+      "ISO 27001:2022 A.7.10, A.8.12",
+      "Essential Eight - Restrict Administrative Privileges",
+      "PCI DSS v4.0 - Req 12.3.10",
+      "MITRE ATT&CK - T1052 (Exfiltration Over Physical Medium), T1091 (Replication Through Removable Media)"
+    ],
+    "cisChecks": [
+      "CIS 18.8.37.1 - Ensure removable storage access is restricted",
+      "CIS 18.8.37.2 - Ensure WPD device access is restricted"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  }
 }

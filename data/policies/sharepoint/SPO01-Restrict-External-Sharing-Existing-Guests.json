@@ -1,55 +1,61 @@
 {
-  "id": "SPO01",
-  "file": "SPO01-Restrict-External-Sharing-Existing-Guests.json",
-  "type": "sharepoint",
-  "displayName": "SPO01 | Restrict-External-Sharing-Existing-Guests",
-  "description": "Restricts SharePoint/OneDrive external sharing to existing authenticated guests only. No anonymous links, no new external users.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "DORA",
-    "NIST CSF 1.1",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC CAF v3.1",
-    "UK NCSC Cyber Essentials v3.2",
-    "ASD Essential Eight",
-    "MITRE ATT&CK",
-    "CISA CPG",
-    "CSA CCM v4",
-    "CRI Profile v2.0",
-    "COBIT 19",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "GSMA FS.31",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "ISO 22301:2019"
+  "_metadata": {
+    "id": "SPO01",
+    "title": "Restrict External Sharing - Existing Guests Only",
+    "description": "Restricts SharePoint Online and OneDrive for Business external sharing to existing authenticated guest users only. No anonymous links permitted, no new external invitations. Only users already in the directory as guest accounts can access shared content.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.3",
+      "7.2.5",
+      "7.2.7",
+      "7.3.2"
+    ],
+    "severity": "High",
+    "category": "SharePoint Online",
+    "deploymentOrder": 1,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "ExistingExternalUserSharingOnly means only guests already present in your Entra ID directory can access shared content. New external users must be invited through Entra ID B2B first. This is more restrictive than ExternalUserSharingOnly (which allows new invitations) but less restrictive than Disabled (no external sharing). OneDrive sharing level cannot be more permissive than the tenant-level SharePoint setting."
+  },
+  "steps": [
+    {
+      "cmdlet": "Set-SPOTenant",
+      "parameters": {
+        "SharingCapability": "ExistingExternalUserSharingOnly"
+      },
+      "_notes": "Sets the tenant-wide SharePoint sharing level. Options: Disabled, ExistingExternalUserSharingOnly, ExternalUserSharingOnly, ExternalUserAndGuestSharing. This sets ExistingExternalUserSharingOnly which only permits sharing with guests already in your directory."
+    },
+    {
+      "cmdlet": "Set-SPOSite",
+      "parameters": {
+        "Identity": "https://-my.sharepoint.com",
+        "SharingCapability": "ExistingExternalUserSharingOnly"
+      },
+      "_notes": "Sets the OneDrive for Business site collection to the same restriction. The OneDrive sharing level cannot exceed the tenant-level setting."
+    }
   ],
-  "cisChecks": [
-    "7.2.3",
-    "7.2.5",
-    "7.2.7",
-    "7.3.2"
-  ],
-  "importMethod": "powershell-spo",
-  "importScript": "scripts/Import-SharePointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/sharepoint/SPO01-Restrict-External-Sharing-Existing-Guests.json"
+  "postDeployment": [
+    "Get-SPOTenant | Select-Object SharingCapability",
+    "Get-SPOSite -Identity 'https://-my.sharepoint.com' | Select-Object SharingCapability",
+    "Audit existing external sharing: Get-SPOSite -IncludePersonalSite $true -Limit All | Where-Object {$_.SharingCapability -ne 'Disabled'} | Select-Object Url, SharingCapability",
+    "Communicate to users that new external sharing invitations are no longer possible without first adding the guest via Entra ID",
+    "Review existing guest accounts: Get-AzureADUser -Filter \"userType eq 'Guest'\" | Select-Object DisplayName, Mail, CreatedDateTime"
+  ]
 }

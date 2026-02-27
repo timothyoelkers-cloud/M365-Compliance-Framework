@@ -1,45 +1,260 @@
 {
-  "id": "MDE08",
-  "file": "MDE08-Web-Content-Filtering.json",
-  "type": "defender-endpoint",
-  "displayName": "MDE08 | Web-Content-Filtering",
-  "description": "Configures MDE Web Content Filtering to block Adult Content, Gambling, Malware sites, Hacking tools, and Phishing sites. No additional proxy required — uses SmartScreen at OS level.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "UK NCSC Cyber Essentials v3.2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act"
-  ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Requires Microsoft Defender for Endpoint Plan 1 or Plan 2",
-  "requiredLicence": "Microsoft Defender for Endpoint P1/P2 or Microsoft 365 E5",
-  "version": "1.0",
-  "path": "policies/defender-endpoint/MDE08-Web-Content-Filtering.json"
+  "_metadata": {
+    "id": "MDE08",
+    "title": "Web Content Filtering",
+    "description": "Configures MDE Web Content Filtering to block access to web categories including Adult content, Gambling, Hacking tools, Malware hosting, Phishing, and Violence. Uses SmartScreen at the OS level so no proxy or agent is required.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CMMC v2.0",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "mitreMappings": [
+      "T1189",
+      "T1566.002",
+      "T1204.001",
+      "T1071.001"
+    ],
+    "requiredLicences": [
+      "Microsoft Defender for Endpoint P1 or P2",
+      "Microsoft 365 E5 or Microsoft 365 E5 Security"
+    ],
+    "requiredRoles": [
+      "Security Administrator"
+    ],
+    "deploymentOrder": 8,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Devices must be onboarded to MDE (MDE01 deployed)",
+      "Network Protection must be enabled in Block or Audit mode (MDE07)",
+      "SmartScreen must be enabled for web content filtering to work",
+      "Web Content Filtering works with Microsoft Edge, Chrome (via Network Protection), and other browsers",
+      "Requires Windows 10 v1709+, Windows 11, macOS 11+, or Linux"
+    ],
+    "deploymentSteps": [
+      "1. Ensure Network Protection (MDE07) is deployed and active",
+      "2. Deploy this web content filtering policy via the MDE portal API",
+      "3. Assign the policy to the target device groups",
+      "4. Monitor blocked categories in security.microsoft.com > Reports > Web protection",
+      "5. Review and refine blocked categories based on business need"
+    ],
+    "rollbackProcedure": "Delete the web content filtering policy via the MDE portal or API. Alternatively, change blocked categories to audit-only."
+  },
+  "webContentFilteringPolicy": {
+    "apiEndpoint": "https://api.securitycenter.microsoft.com/api/webContentFilteringPolicies",
+    "method": "POST",
+    "policy": {
+      "policyName": "MDE08 - Corporate Web Content Filtering",
+      "description": "Block high-risk and inappropriate web content categories across all managed endpoints",
+      "isEnabled": true,
+      "mode": "block",
+      "blockedCategories": [
+        {
+          "categoryGroup": "Adult content",
+          "categories": [
+            {
+              "id": "adultContent",
+              "name": "Adult Content",
+              "action": "block"
+            },
+            {
+              "id": "cults",
+              "name": "Cults",
+              "action": "block"
+            },
+            {
+              "id": "nudity",
+              "name": "Nudity",
+              "action": "block"
+            },
+            {
+              "id": "pornographySexuallyExplicit",
+              "name": "Pornography / Sexually Explicit",
+              "action": "block"
+            },
+            {
+              "id": "sexEducation",
+              "name": "Sex Education",
+              "action": "audit"
+            }
+          ]
+        },
+        {
+          "categoryGroup": "High bandwidth",
+          "categories": [
+            {
+              "id": "peerToPeer",
+              "name": "Peer-to-Peer",
+              "action": "block"
+            },
+            {
+              "id": "streamingMediaEntertainment",
+              "name": "Streaming Media & Entertainment",
+              "action": "audit"
+            }
+          ]
+        },
+        {
+          "categoryGroup": "Legal liability",
+          "categories": [
+            {
+              "id": "childAbuseImages",
+              "name": "Child Abuse Images",
+              "action": "block"
+            },
+            {
+              "id": "gambling",
+              "name": "Gambling",
+              "action": "block"
+            },
+            {
+              "id": "hateAndIntolerance",
+              "name": "Hate & Intolerance",
+              "action": "block"
+            },
+            {
+              "id": "illegalDrug",
+              "name": "Illegal Drug",
+              "action": "block"
+            },
+            {
+              "id": "illegalSoftware",
+              "name": "Illegal Software",
+              "action": "block"
+            },
+            {
+              "id": "violence",
+              "name": "Violence",
+              "action": "block"
+            },
+            {
+              "id": "weapons",
+              "name": "Weapons",
+              "action": "block"
+            }
+          ]
+        },
+        {
+          "categoryGroup": "Security",
+          "categories": [
+            {
+              "id": "hacking",
+              "name": "Hacking",
+              "action": "block"
+            },
+            {
+              "id": "malware",
+              "name": "Malware",
+              "action": "block"
+            },
+            {
+              "id": "phishing",
+              "name": "Phishing",
+              "action": "block"
+            },
+            {
+              "id": "spamUrls",
+              "name": "Spam URLs",
+              "action": "block"
+            },
+            {
+              "id": "commandAndControl",
+              "name": "Command and Control",
+              "action": "block"
+            },
+            {
+              "id": "compromised",
+              "name": "Compromised",
+              "action": "block"
+            }
+          ]
+        }
+      ],
+      "auditCategories": [
+        {
+          "categoryGroup": "Productivity loss",
+          "categories": [
+            {
+              "id": "chat",
+              "name": "Chat",
+              "action": "audit"
+            },
+            {
+              "id": "gaming",
+              "name": "Gaming",
+              "action": "audit"
+            },
+            {
+              "id": "socialNetworking",
+              "name": "Social Networking",
+              "action": "audit"
+            },
+            {
+              "id": "webBasedEmail",
+              "name": "Web-based Email (personal)",
+              "action": "audit"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "scopeAndAssignment": {
+    "assignedDeviceGroups": [
+      {
+        "groupName": "All Managed Windows Devices",
+        "groupId": ""
+      },
+      {
+        "groupName": "All Managed macOS Devices",
+        "groupId": ""
+      }
+    ],
+    "excludedDeviceGroups": [
+      {
+        "groupName": "Security Research Team",
+        "groupId": "",
+        "_reason": "Security researchers require access to hacking/malware categories for threat analysis"
+      }
+    ]
+  },
+  "customIndicatorExceptions": {
+    "_description": "URLs that should be allowed despite being in a blocked category",
+    "allowedUrls": [
+      {
+        "url": "",
+        "title": "Business Exception",
+        "description": "Approved exception for business use",
+        "action": "allowed",
+        "severity": "informational"
+      }
+    ]
+  },
+  "advancedHuntingQuery": {
+    "_description": "KQL query to monitor web content filtering blocks and audits",
+    "query": "DeviceEvents | where ActionType in ('SmartScreenUrlWarning', 'ExploitGuardNetworkProtectionBlocked') | extend ParsedFields = parse_json(AdditionalFields) | project Timestamp, DeviceName, RemoteUrl, ActionType, ParsedFields.ResponseCategory | summarize BlockCount=count() by tostring(ParsedFields_ResponseCategory), bin(Timestamp, 1d) | sort by BlockCount desc"
+  }
 }

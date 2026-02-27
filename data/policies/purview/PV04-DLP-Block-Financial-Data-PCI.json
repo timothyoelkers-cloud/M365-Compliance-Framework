@@ -1,47 +1,185 @@
 {
-  "id": "PV04",
-  "file": "PV04-DLP-Block-Financial-Data-PCI.json",
-  "type": "purview",
-  "displayName": "PV04 | DLP-Block-Financial-Data-PCI",
-  "description": "Detects and blocks financial account numbers, bank routing numbers, SWIFT/BIC codes, IBAN numbers being shared externally. Satisfies PCI DSS Req.4.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "ISO 27701:2019",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "UK NCSC CAF v3.2",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "EU Cyber Resilience Act",
-    "CMMC v2.0",
-    "NYDFS 23 NYCRR 500",
-    "FFIEC-CAT",
-    "NERC-CIP",
-    "CJIS v6",
-    "CSA CCM v4",
-    "COBIT 19",
-    "MITRE ATT&CK",
-    "ISO 22301:2019"
-  ],
-  "cisChecks": [
-    "9.1.2",
-    "9.1.3"
-  ],
-  "importMethod": "powershell-security-compliance",
-  "importScript": "scripts/Import-PurviewPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "Microsoft Purview (M365 E3, E5, or Purview add-on)",
-  "version": "1.0",
-  "path": "policies/purview/PV04-DLP-Block-Financial-Data-PCI.json"
+  "_metadata": {
+    "id": "PV04",
+    "title": "DLP - Block Financial Data (PCI DSS)",
+    "description": "Data Loss Prevention policy that detects and blocks financial account data including credit card numbers, bank account numbers (US, UK, EU), IBAN, SWIFT/BIC codes, and routing numbers from being shared externally. Satisfies PCI DSS Requirement 3 and 4.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "PCI DSS v4.0",
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "NERC-CIP",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "mitreMappings": [
+      "T1048",
+      "T1567",
+      "T1041"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E3 (basic DLP)",
+      "Microsoft 365 E5 or E5 Compliance (advanced DLP)"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Security Administrator"
+    ],
+    "deploymentOrder": 4,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "PCI DSS scope assessment must be completed to identify cardholder data flows",
+      "Deploy in TestWithNotifications mode initially"
+    ],
+    "deploymentSteps": [
+      "1. Connect to Security & Compliance PowerShell",
+      "2. Create the DLP policy",
+      "3. Create the financial data detection rule",
+      "4. Test in simulation mode for 2 weeks",
+      "5. Review and approve false positive exceptions",
+      "6. Switch to enforcement mode"
+    ],
+    "rollbackProcedure": "Set-DlpCompliancePolicy -Identity 'PV04-DLP-Block-FinancialData-PCI' -Mode Disable"
+  },
+  "powershellCommands": {
+    "createPolicy": {
+      "cmdlet": "New-DlpCompliancePolicy",
+      "parameters": {
+        "Name": "PV04-DLP-Block-FinancialData-PCI",
+        "Comment": "PCI DSS compliance DLP policy. Blocks financial account data and cardholder data from external sharing across all M365 workloads.",
+        "ExchangeLocation": [
+          "All"
+        ],
+        "SharePointLocation": [
+          "All"
+        ],
+        "OneDriveLocation": [
+          "All"
+        ],
+        "TeamsLocation": [
+          "All"
+        ],
+        "Mode": "TestWithNotifications",
+        "Priority": 3
+      }
+    },
+    "createRule": {
+      "cmdlet": "New-DlpComplianceRule",
+      "parameters": {
+        "Name": "PV04-Rule-Block-FinancialData-External",
+        "Policy": "PV04-DLP-Block-FinancialData-PCI",
+        "ContentContainsSensitiveInformation": [
+          {
+            "name": "Credit Card Number",
+            "id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085",
+            "minCount": 1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.S. Bank Account Number",
+            "id": "a2ce32a8-f935-4bb6-8e96-2a5c55672ed2",
+            "minCount": 1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.K. Bank Account Number",
+            "id": "0959a6d0-eb1b-45b3-925e-aae46be37e5b",
+            "minCount": 1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "EU Debit Card Number",
+            "id": "0e9b3178-9678-47dd-a509-37222ca96b42",
+            "minCount": 1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "International Banking Account Number (IBAN)",
+            "id": "2c7f5672-8e8d-4f5e-8d14-b5dc5b426e1d",
+            "minCount": 1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "SWIFT Code",
+            "id": "9d828d89-5f09-4e3e-9f2a-a7b72c0f8e5f",
+            "minCount": 1,
+            "minConfidence": 85,
+            "maxConfidence": 100
+          },
+          {
+            "name": "ABA Routing Number",
+            "id": "cb353f78-2b72-4c3c-8827-92bbe4f69fdf",
+            "minCount": 1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.K. SWIFT Code",
+            "id": "1d7b61fc-fc61-4aa4-b4c6-c8a93ad9e9cf",
+            "minCount": 1,
+            "minConfidence": 85,
+            "maxConfidence": 100
+          }
+        ],
+        "AccessScope": "NotInOrganization",
+        "BlockAccess": true,
+        "BlockAccessScope": "ExternalUsers",
+        "NotifyUser": [
+          "SiteAdmin",
+          "LastModifier"
+        ],
+        "NotifyPolicyTipCustomText": "This content contains financial account data protected under PCI DSS. External sharing is blocked. Contact the finance or compliance team for approved data transfer methods.",
+        "GenerateIncidentReport": [],
+        "IncidentReportContent": [
+          "Title",
+          "DocumentAuthor",
+          "DocumentLastModifier",
+          "Service",
+          "MatchedItem",
+          "RulesMatched",
+          "Severity"
+        ],
+        "ReportSeverityLevel": "High"
+      }
+    }
+  },
+  "policySettings": {
+    "mode": "TestWithNotifications",
+    "priority": 3,
+    "policyTemplate": "PCI Data Security Standard (PCI DSS)",
+    "workloads": {
+      "exchangeOnline": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true,
+      "microsoftTeams": true
+    }
+  },
+  "overrideSettings": {
+    "allowOverride": false,
+    "requireBusinessJustification": false,
+    "_note": "No override for financial data external sharing under PCI DSS. Approved data transfer must use encrypted channels with explicit authorization."
+  }
 }

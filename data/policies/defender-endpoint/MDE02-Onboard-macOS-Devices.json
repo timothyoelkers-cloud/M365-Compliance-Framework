@@ -1,45 +1,188 @@
 {
-  "id": "MDE02",
-  "file": "MDE02-Onboard-macOS-Devices.json",
-  "type": "defender-endpoint",
-  "displayName": "MDE02 | Onboard-macOS-Devices",
-  "description": "Deploys MDE for macOS via Intune MDM configuration profile. Full EDR, Antivirus, and Network Protection on macOS 11+. Requires System Extensions approval profile.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "DORA",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "UK NCSC Cyber Essentials v3.2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CRI Profile v2.0",
-    "CJIS v6",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)"
-  ],
-  "cisChecks": [
-    "5.1.4.1",
-    "5.1.4.2"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "Microsoft Defender for Endpoint Plan 1 or Plan 2 licence. Intune-enrolled macOS devices.",
-  "requiredLicence": "Microsoft Defender for Endpoint P1/P2 or Microsoft 365 E5",
-  "version": "1.0",
-  "path": "policies/defender-endpoint/MDE02-Onboard-macOS-Devices.json"
+  "_metadata": {
+    "id": "MDE02",
+    "title": "Onboard macOS Devices to Defender for Endpoint",
+    "description": "Intune configuration profile for deploying Microsoft Defender for Endpoint on macOS. Enables real-time protection, cloud-delivered protection, automatic sample submission, and ensures active (non-passive) mode.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "DORA",
+      "CMMC v2.0",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "mitreMappings": [
+      "T1059.004",
+      "T1204",
+      "T1547.011",
+      "T1564.001"
+    ],
+    "requiredLicences": [
+      "Microsoft Defender for Endpoint P1 or P2",
+      "Microsoft 365 E5 or Microsoft 365 E5 Security"
+    ],
+    "requiredRoles": [
+      "Intune Administrator",
+      "Security Administrator"
+    ],
+    "deploymentOrder": 2,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "macOS devices must be enrolled in Intune via Apple MDM push certificate",
+      "System Extensions profile must be deployed BEFORE MDE to approve com.microsoft.wdav.epsext and com.microsoft.wdav.netext",
+      "Full Disk Access (TCC/Privacy Preferences) profile must grant access to com.microsoft.wdav",
+      "Network Content Filter profile required for Network Protection",
+      "Minimum OS: macOS 11 (Big Sur) or later",
+      "Microsoft Defender app must be deployed via Intune (LOB or VPP)"
+    ],
+    "deploymentSteps": [
+      "1. Deploy the System Extensions approval profile",
+      "2. Deploy the Full Disk Access / TCC profile",
+      "3. Deploy the Network Content Filter profile",
+      "4. Deploy this MDE configuration profile",
+      "5. Deploy the Microsoft Defender app package",
+      "6. Verify onboarding in security.microsoft.com > Assets > Devices"
+    ],
+    "rollbackProcedure": "Unassign the configuration profile and uninstall Microsoft Defender via Intune app uninstall. Remove the system extension and TCC profiles."
+  },
+  "intuneCustomConfigurationProfile": {
+    "@odata.type": "#microsoft.graph.macOSCustomConfiguration",
+    "displayName": "MDE02 - Defender for Endpoint macOS Configuration",
+    "description": "Microsoft Defender for Endpoint settings for macOS devices deployed via Intune managed preferences (plist).",
+    "deploymentChannel": "deviceChannel",
+    "payloadName": "com.microsoft.wdav.mobileconfig",
+    "payloadFileName": "com.microsoft.wdav.mobileconfig"
+  },
+  "mdeConfigurationPlist": {
+    "PayloadType": "Configuration",
+    "PayloadDisplayName": "MDE02 - Defender for Endpoint macOS",
+    "PayloadIdentifier": "com.microsoft.wdav.managed",
+    "PayloadUUID": "",
+    "PayloadVersion": 1,
+    "PayloadContent": [
+      {
+        "PayloadType": "com.microsoft.wdav",
+        "PayloadDisplayName": "Microsoft Defender for Endpoint",
+        "PayloadIdentifier": "com.microsoft.wdav.config",
+        "PayloadUUID": "",
+        "PayloadVersion": 1,
+        "antivirusEngine": {
+          "enforcementLevel": "real_time",
+          "enableRealTimeProtection": true,
+          "passiveMode": false,
+          "scanAfterDefinitionUpdate": true,
+          "scanArchives": true,
+          "maximumOnDemandScanThreads": 2,
+          "exclusionsMergePolicy": "admin_only",
+          "threatTypeSettings": [
+            {
+              "key": "potentially_unwanted_application",
+              "value": "block"
+            },
+            {
+              "key": "archive_bomb",
+              "value": "block"
+            }
+          ],
+          "exclusions": []
+        },
+        "cloudService": {
+          "enabled": true,
+          "diagnosticLevel": "optional",
+          "automaticSampleSubmission": true,
+          "automaticSampleSubmissionConsent": "safe",
+          "cloudBlockLevel": "normal"
+        },
+        "networkProtection": {
+          "enforcementLevel": "block"
+        },
+        "tamperProtection": {
+          "enforcementLevel": "block"
+        },
+        "features": {
+          "dataLossPrevention": "enabled",
+          "deviceControl": "enabled"
+        },
+        "edr": {
+          "tags": [
+            {
+              "key": "GROUP",
+              "value": ""
+            }
+          ]
+        },
+        "userInterface": {
+          "hideStatusMenuIcon": false,
+          "userInitiatedFeedback": "enabled"
+        }
+      }
+    ]
+  },
+  "systemExtensionsProfile": {
+    "PayloadType": "com.apple.system-extension-policy",
+    "PayloadDisplayName": "MDE System Extensions",
+    "AllowedSystemExtensions": {
+      "UBF8T346G9": [
+        "com.microsoft.wdav.epsext",
+        "com.microsoft.wdav.netext"
+      ]
+    },
+    "AllowedSystemExtensionTypes": {
+      "UBF8T346G9": [
+        "EndpointSecurityExtension",
+        "NetworkExtension"
+      ]
+    }
+  },
+  "fullDiskAccessProfile": {
+    "PayloadType": "com.apple.TCC.configuration-profile-policy",
+    "PayloadDisplayName": "MDE Full Disk Access",
+    "Services": {
+      "SystemPolicyAllFiles": [
+        {
+          "Identifier": "com.microsoft.wdav",
+          "IdentifierType": "bundleID",
+          "CodeRequirement": "identifier \"com.microsoft.wdav\" and anchor apple generic",
+          "Allowed": true
+        },
+        {
+          "Identifier": "com.microsoft.wdav.epsext",
+          "IdentifierType": "bundleID",
+          "CodeRequirement": "identifier \"com.microsoft.wdav.epsext\" and anchor apple generic",
+          "Allowed": true
+        }
+      ]
+    }
+  },
+  "assignments": {
+    "include": [
+      {
+        "@odata.type": "#microsoft.graph.groupAssignmentTarget",
+        "groupId": "",
+        "groupDisplayName": "All Managed macOS Devices"
+      }
+    ],
+    "exclude": []
+  }
 }

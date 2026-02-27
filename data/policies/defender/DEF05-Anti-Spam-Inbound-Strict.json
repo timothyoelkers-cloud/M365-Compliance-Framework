@@ -1,37 +1,93 @@
 {
-  "id": "DEF05",
-  "file": "DEF05-Anti-Spam-Inbound-Strict.json",
-  "type": "defender",
-  "displayName": "DEF05 | Anti-Spam-Inbound-Strict",
-  "description": "Strict inbound anti-spam. Quarantines spam (not junk folder). ZAP for retroactive spam removal. BCL threshold 5. Admin notifications. Deploys in audit mode.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "HPH CPGs",
-    "HITRUST CSF v11",
-    "Microsoft Cloud Security Benchmark",
-    "NZ ISM v3.8",
-    "TSA Security Directive",
-    "IASME Cyber Assurance"
+  "_metadata": {
+    "id": "DEF05",
+    "title": "Anti-Spam Inbound - Strict",
+    "description": "Strict inbound anti-spam policy. Routes all spam categories (spam, high-confidence spam, bulk, phish, high-confidence phish) to quarantine instead of junk mail folder. Enables ZAP for retroactive removal. Sets bulk complaint level threshold to 5.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.2",
+      "2.1.6"
+    ],
+    "severity": "High",
+    "category": "Defender for Office 365",
+    "deploymentOrder": 5,
+    "requiredLicence": "Exchange Online Protection (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "Quarantine is preferred over MoveToJmf (junk mail folder) because users cannot accidentally release quarantined messages without admin approval. BulkThreshold 5 is aggressive; values range from 1 (most strict) to 9 (least strict). IncreaseScoreWith* and MarkAsSpam* settings provide additional heuristic detection. SpamZapEnabled and PhishZapEnabled enable zero-hour auto purge."
+  },
+  "steps": [
+    {
+      "cmdlet": "New-HostedContentFilterPolicy",
+      "parameters": {
+        "Name": "Strict Inbound Anti-Spam Policy",
+        "SpamAction": "Quarantine",
+        "SpamQuarantineTag": "DefaultFullAccessPolicy",
+        "HighConfidenceSpamAction": "Quarantine",
+        "HighConfidenceSpamQuarantineTag": "AdminOnlyAccessPolicy",
+        "BulkSpamAction": "Quarantine",
+        "BulkQuarantineTag": "DefaultFullAccessPolicy",
+        "PhishSpamAction": "Quarantine",
+        "PhishQuarantineTag": "DefaultFullAccessPolicy",
+        "HighConfidencePhishAction": "Quarantine",
+        "HighConfidencePhishQuarantineTag": "AdminOnlyAccessPolicy",
+        "BulkThreshold": 5,
+        "MarkAsSpamBulkMail": "On",
+        "IncreaseScoreWithNumericIps": "On",
+        "IncreaseScoreWithRedirectToOtherPort": "On",
+        "IncreaseScoreWithBizOrInfoUrls": "Off",
+        "IncreaseScoreWithImageLinks": "Off",
+        "MarkAsSpamEmptyMessages": "On",
+        "MarkAsSpamJavaScriptInHtml": "On",
+        "MarkAsSpamObjectTagsInHtml": "Off",
+        "MarkAsSpamEmbedTagsInHtml": "Off",
+        "MarkAsSpamFormTagsInHtml": "Off",
+        "MarkAsSpamFramesInHtml": "Off",
+        "MarkAsSpamWebBugsInHtml": "Off",
+        "MarkAsSpamSensitiveWordList": "Off",
+        "MarkAsSpamSpfRecordHardFail": "On",
+        "MarkAsSpamFromAddressAuthFail": "On",
+        "MarkAsSpamNdrBackscatter": "On",
+        "SpamZapEnabled": true,
+        "PhishZapEnabled": true,
+        "InlineSafetyTipsEnabled": true,
+        "QuarantineRetentionPeriod": 30,
+        "EndUserSpamNotificationFrequency": 3,
+        "EnableEndUserSpamNotifications": true,
+        "AllowedSenders": [],
+        "AllowedSenderDomains": [],
+        "BlockedSenders": [],
+        "BlockedSenderDomains": []
+      }
+    },
+    {
+      "cmdlet": "New-HostedContentFilterRule",
+      "parameters": {
+        "Name": "Strict Inbound Anti-Spam Rule - All Recipients",
+        "HostedContentFilterPolicy": "Strict Inbound Anti-Spam Policy",
+        "RecipientDomainIs": [],
+        "Enabled": true,
+        "Priority": 0
+      }
+    }
   ],
-  "cisChecks": [
-    "2.1.2",
-    "2.1.6"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-DefenderPolicies.ps1",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "Exchange Online Protection (included with M365)",
-  "version": "1.0",
-  "path": "policies/defender/DEF05-Anti-Spam-Inbound-Strict.json"
+  "postDeployment": [
+    "Get-HostedContentFilterPolicy -Identity 'Strict Inbound Anti-Spam Policy' | Format-List",
+    "Get-HostedContentFilterRule -Identity 'Strict Inbound Anti-Spam Rule - All Recipients' | Format-List",
+    "Do NOT add entries to AllowedSenders or AllowedSenderDomains unless absolutely necessary (creates bypass risk)",
+    "Monitor quarantine volume for first 7 days; adjust BulkThreshold if too many legitimate bulk emails are quarantined",
+    "Review end-user spam notification settings to ensure users can request release of false positives"
+  ]
 }

@@ -1,46 +1,69 @@
 {
-  "id": "TEA06",
-  "file": "TEA06-Restrict-External-Access-Federation.json",
-  "type": "teams",
-  "displayName": "TEA06 | Restrict-External-Access-Federation",
-  "description": "Restricts Teams external access/federation. Allows only specific approved domains or disables federation entirely for high-security orgs.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "NIST CSF 2.0",
-    "NIST CSF 1.1",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "UK NCSC CAF v3.1",
-    "UK NCSC Cyber Essentials v3.2",
-    "ASD Essential Eight",
-    "MITRE ATT&CK",
-    "CISA CPG",
-    "CRI Profile v2.0",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "ISO 27701:2019"
-  ],
-  "cisChecks": [
-    "8.4.1"
-  ],
-  "importMethod": "powershell-teams",
-  "importScript": "scripts/Import-TeamsPolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/teams/TEA06-Restrict-External-Access-Federation.json"
+  "_metadata": {
+    "id": "TEA06",
+    "title": "Restrict External Access / Federation",
+    "description": "Restricts or disables Teams federation (external access) to prevent communication with users in other Microsoft 365 tenants. Provides two options: fully disable federation, or use an allow-list to permit only specific approved partner domains.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK T1199"
+    ],
+    "cisChecks": [
+      "8.4.1"
+    ],
+    "severity": "High",
+    "category": "Microsoft Teams",
+    "deploymentOrder": 6,
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "Federation (external access) allows users to chat and call users in other M365 tenants. With open federation (default), ANY external M365 tenant can communicate with your users. This creates a significant phishing/social engineering attack surface. Option A disables all federation. Option B uses AllowedDomains to permit only specific trusted partner domains. Choose based on business requirements. AllowTeamsConsumer is also set to false to block personal Teams accounts (complements TEA05)."
+  },
+  "options": {
+    "optionA_DisableAllFederation": {
+      "_notes": "Use this option for maximum security. Blocks all external Teams communication.",
+      "cmdlet": "Set-CsTenantFederationConfiguration",
+      "parameters": {
+        "AllowFederatedUsers": false,
+        "AllowTeamsConsumer": false,
+        "AllowTeamsConsumerInbound": false,
+        "AllowPublicUsers": false
+      }
+    },
+    "optionB_AllowListOnly": {
+      "_notes": "Use this option if the business needs to communicate with specific partner organizations. Only domains in AllowedDomains can federate.",
+      "cmdlet": "Set-CsTenantFederationConfiguration",
+      "parameters": {
+        "AllowFederatedUsers": true,
+        "AllowedDomainsAsAList": [
+          {
+            "Domain": ""
+          },
+          {
+            "Domain": ""
+          }
+        ],
+        "AllowTeamsConsumer": false,
+        "AllowTeamsConsumerInbound": false,
+        "AllowPublicUsers": false
+      }
+    }
+  },
+  "postDeployment": [
+    "Get-CsTenantFederationConfiguration | Format-List",
+    "If using Option B, verify allowed domains: (Get-CsTenantFederationConfiguration).AllowedDomains",
+    "Test by attempting to chat with a user in a non-allowed external tenant and verify the message is blocked",
+    "Test by attempting to chat with a user in an allowed domain (Option B) and verify it succeeds",
+    "Review and update the allowed domains list quarterly as business partnerships change"
+  ]
 }

@@ -1,51 +1,64 @@
 {
-  "id": "EXO03",
-  "file": "EXO03-Block-External-Auto-Forwarding.json",
-  "type": "exchange",
-  "displayName": "EXO03 | Block-External-Auto-Forwarding",
-  "description": "Blocks all automatic email forwarding to external domains (DefaultRemoteDomain AllowedOOFType=None, AutoForwardEnabled=False). Prevents BEC data exfiltration.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "FedRAMP Moderate",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "ISO 27701:2019",
-    "NIST CSF 1.1",
-    "CMMC v2.0",
-    "NYDFS 23 NYCRR 500",
-    "MITRE ATT&CK",
-    "CSA CCM v4",
-    "CRI Profile v2.0",
-    "COBIT 19",
-    "CJIS v6",
-    "GSMA FS.31",
-    "HPH CPGs",
-    "TSA Security Directive",
-    "HITRUST CSF v11",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)",
-    "SEC Cyber Rule",
-    "ISO 22301:2019"
+  "_metadata": {
+    "id": "EXO03",
+    "title": "Block External Auto-Forwarding",
+    "description": "Blocks automatic email forwarding to external domains using both the Remote Domain default setting and a transport rule. This is a critical anti-data-exfiltration control that prevents compromised accounts or malicious insiders from silently forwarding email externally.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK T1114.003"
+    ],
+    "cisChecks": ["2.2.1", "6.5.3"],
+    "severity": "Critical",
+    "category": "Exchange Online",
+    "deploymentOrder": 3,
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "This deploys TWO layers of protection: (1) Set-RemoteDomain disables auto-forwarding at the remote domain level, (2) a transport rule explicitly blocks any auto-forward messages to external recipients. Both are needed because Set-RemoteDomain alone does not catch all forwarding mechanisms (e.g., inbox rules using redirect). The outbound spam filter policy (DEF06) AutoForwardingMode: Off provides a third layer."
+  },
+  "steps": [
+    {
+      "cmdlet": "Set-RemoteDomain",
+      "parameters": {
+        "Identity": "Default",
+        "AutoForwardEnabled": false
+      },
+      "_notes": "Disables auto-forwarding for the default remote domain (all external domains). This blocks server-side forwarding set via OWA or Outlook."
+    },
+    {
+      "cmdlet": "New-TransportRule",
+      "parameters": {
+        "Name": "Block External Auto-Forward",
+        "Priority": 0,
+        "SentToScope": "NotInOrganization",
+        "MessageTypeMatches": "AutoForward",
+        "RejectMessageReasonText": "External email auto-forwarding is prohibited by organization policy. Contact IT if you require an exception.",
+        "RejectMessageEnhancedStatusCode": "5.7.1",
+        "Mode": "Enforce",
+        "StopRuleProcessing": true,
+        "Comments": "Blocks all auto-forwarded email to external recipients. Part of CIS 2.2.1 and data exfiltration prevention controls."
+      }
+    }
   ],
-  "cisChecks": [
-    "2.2.1",
-    "6.5.3"
-  ],
-  "importMethod": "powershell-exchange-online",
-  "importScript": "scripts/Import-ExchangePolicies.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/exchange/EXO03-Block-External-Auto-Forwarding.json"
+  "postDeployment": [
+    "Get-RemoteDomain -Identity Default | Select-Object Identity, AutoForwardEnabled",
+    "Get-TransportRule -Identity 'Block External Auto-Forward' | Format-List",
+    "Test by creating a forwarding rule to an external address in OWA and verify the forwarded message is rejected",
+    "Audit existing auto-forwarding rules: Get-Mailbox -ResultSize Unlimited | Where-Object {$_.ForwardingSmtpAddress -ne $null} | Select-Object DisplayName, ForwardingSmtpAddress",
+    "If specific users legitimately need external forwarding, create a RemoteDomain for the specific target domain or a transport rule exception"
+  ]
 }

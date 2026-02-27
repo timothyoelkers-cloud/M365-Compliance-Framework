@@ -1,45 +1,97 @@
 {
-  "id": "ENT08",
-  "file": "ENT08-Disable-LinkedIn-Account-Connection.json",
-  "type": "entra",
-  "displayName": "ENT08 | Disable-LinkedIn-Account-Connection",
-  "description": "Disables LinkedIn account connection feature in M365. Prevents M365 profile data correlation with LinkedIn. Mitigates social engineering risk.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "NIST CSF 1.1",
-    "NIST SP 800-171 Rev.3",
-    "CMMC v2.0",
-    "NERC-CIP",
-    "UK NCSC Cyber Essentials v3.2",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "CRI Profile v2.0",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "CIRCIA (US)"
+  "_metadata": {
+    "id": "ENT08",
+    "title": "Disable LinkedIn Account Connection",
+    "description": "Disables the LinkedIn account connection feature in Microsoft 365, preventing users from linking their M365 work account with LinkedIn. Mitigates data leakage risk and reduces social engineering exposure by preventing M365 profile data correlation with LinkedIn profiles.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2", "ISO 27001:2022", "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2", "SOC 2", "GDPR (EU) 2016/679",
+      "FedRAMP Moderate", "HITRUST CSF v11", "BSI IT-Grundschutz",
+      "DORA", "CMMC v2.0", "NERC-CIP",
+      "ASD Essential Eight", "NZ ISM v3.8",
+      "MITRE ATT&CK", "Microsoft Cloud Security Benchmark",
+      "CJIS v6", "EU Cyber Resilience Act"
+    ],
+    "cisChecks": ["5.1.2.6"],
+    "mitreMappings": ["T1589", "T1593", "T1598"],
+    "requiredLicences": ["Microsoft Entra ID Free (included with any M365 plan)"],
+    "requiredRoles": ["Global Administrator"],
+    "deploymentOrder": 8,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-EntraSettings.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Global Administrator role required",
+      "Understand that disabling this feature removes LinkedIn profile cards, resume assistant, and profile enrichment in M365 apps",
+      "Communicate to users that LinkedIn integration will no longer show in Outlook, Teams, and other M365 apps"
+    ],
+    "deploymentSteps": [
+      "1. Apply the Graph API PATCH to disable LinkedIn connections",
+      "2. Verify the setting is disabled",
+      "3. Existing LinkedIn connections will stop working within 24 hours",
+      "4. Communicate the change to users"
+    ],
+    "rollbackProcedure": "PATCH /settings with enableLinkedInAccountConnection: true"
+  },
+  "graphApiCalls": [
+    {
+      "stepOrder": 1,
+      "description": "Disable LinkedIn account connections for the organisation",
+      "method": "PATCH",
+      "endpoint": "https://graph.microsoft.com/v1.0/settings/",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer "
+      },
+      "body": {
+        "values": [
+          {
+            "name": "EnableLinkedInAccountConnection",
+            "value": "false"
+          }
+        ]
+      },
+      "_explanation": "Disables the ability for users to connect their Microsoft 365 work accounts with LinkedIn. When disabled, LinkedIn profile data will not appear in M365 apps (Outlook, Teams, etc.) and users cannot link their accounts."
+    },
+    {
+      "stepOrder": 2,
+      "description": "Verify LinkedIn account connection is disabled",
+      "method": "GET",
+      "endpoint": "https://graph.microsoft.com/v1.0/settings",
+      "expectedResponse": {
+        "values": {
+          "EnableLinkedInAccountConnection": "false"
+        }
+      }
+    }
   ],
-  "cisChecks": [
-    "5.1.2.6"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-EntraSettings.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/entra/ENT08-Disable-LinkedIn-Account-Connection.json"
+  "powershellAlternative": {
+    "module": "Microsoft.Graph",
+    "commands": [
+      {
+        "description": "Connect to Microsoft Graph",
+        "command": "Connect-MgGraph -Scopes 'Directory.ReadWrite.All'"
+      },
+      {
+        "description": "Get the directory settings ID for LinkedIn integration",
+        "command": "$settings = Get-MgDirectorySetting | Where-Object { $_.DisplayName -eq 'LinkedIn' }"
+      },
+      {
+        "description": "Disable LinkedIn account connections",
+        "command": "Update-MgDirectorySetting -DirectorySettingId $settings.Id -Values @(@{Name='EnableLinkedInAccountConnection'; Value='false'})"
+      },
+      {
+        "description": "Verify the change",
+        "command": "(Get-MgDirectorySetting | Where-Object { $_.DisplayName -eq 'LinkedIn' }).Values | Where-Object { $_.Name -eq 'EnableLinkedInAccountConnection' }"
+      }
+    ]
+  },
+  "entraPortalPath": {
+    "navigation": "Entra admin center > Identity > Users > User settings > LinkedIn account connections",
+    "setting": "No - Users cannot connect their work or school account with LinkedIn",
+    "_note": "This is the portal equivalent of the Graph API call"
+  }
 }

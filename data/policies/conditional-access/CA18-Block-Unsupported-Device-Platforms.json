@@ -1,42 +1,83 @@
 {
-  "id": "CA18",
-  "file": "CA18-Block-Unsupported-Device-Platforms.json",
-  "type": "conditional-access",
-  "displayName": "CA18 | Block-Unsupported-Device-Platforms",
-  "description": "Blocks access from Linux and other unsupported device platforms. Ensures only Windows, macOS, iOS, Android can access corporate resources.",
-  "frameworks": [
-    "NIS2",
-    "DORA",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "SOC 2",
-    "PCI DSS v4.0",
-    "HIPAA",
-    "CMMC v2.0",
-    "FedRAMP Moderate",
-    "UK NCSC CAF v3.2",
-    "UK NCSC Cyber Essentials v3.2",
-    "GDPR (EU) 2016/679",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "CRI Profile v2.0",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "Microsoft Cloud Security Benchmark",
-    "NERC-CIP"
-  ],
-  "cisChecks": [
-    "5.1.3.1",
-    "5.1.4.3"
-  ],
-  "importMethod": "entra-ui-or-powershell",
-  "importScript": "",
-  "deployState": "enabledForReportingButNotEnforced",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/conditional-access/CA18-Block-Unsupported-Device-Platforms.json"
+  "displayName": "CA18 | Block Access from Unsupported Device Platforms",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ],
+    "platforms": {
+      "includePlatforms": [
+        "all"
+      ],
+      "excludePlatforms": [
+        "android",
+        "iOS",
+        "windows",
+        "macOS"
+      ]
+    }
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "block"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA18",
+    "description": "Blocks access from unsupported device platforms by including all platforms and excluding only the approved ones (Android, iOS, Windows, macOS). This effectively blocks Linux, ChromeOS, and any other unrecognised or spoofed platform strings. Ensures only organisationally managed and supported operating systems can access corporate cloud resources.",
+    "platformLogic": {
+      "includePlatforms": "all - Targets every device platform",
+      "excludePlatforms": "android, iOS, windows, macOS - Only these four approved platforms are allowed through",
+      "effectivelyBlocked": "Linux, ChromeOS, WindowsPhone, unknown/unrecognised platforms"
+    },
+    "cisControls": [
+      "CIS 5.1.3.1 - Ensure that device code flow is restricted",
+      "CIS 5.1.4.3 - Ensure Conditional Access policies are configured to filter for devices"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "AC-19",
+        "CM-8",
+        "CM-7",
+        "SC-43"
+      ],
+      "CIS-Microsoft-365": [
+        "5.1.3.1",
+        "5.1.4.3"
+      ],
+      "ISO-27001-2022": [
+        "A.8.1 - User endpoint devices",
+        "A.8.9 - Configuration management"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078 - Valid Accounts",
+        "T1036 - Masquerading"
+      ],
+      "NIS2": [
+        "Article 21(2)(e) - Security in network and information systems acquisition"
+      ],
+      "Essential-Eight": [
+        "Application control",
+        "Patch operating systems"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "deploymentNotes": "This policy uses the platform include/exclude pattern to block all platforms except the four approved ones. Be aware that platform detection relies on the User-Agent string and can be spoofed in some scenarios. This policy is most effective when combined with CA06 or CA16 which enforce device compliance. Deploy in report-only first and monitor for legitimate users on Linux workstations or ChromeOS devices before enforcing. Replace  with the Object ID of your break-glass exclusion security group."
+  }
 }
