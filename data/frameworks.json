@@ -1,0 +1,199 @@
+{
+  "frameworks": [
+    "DORA",
+    "NIS2",
+    "ISO 27001:2022",
+    "NIST CSF 2.0",
+    "NIST CSF 1.1",
+    "NIST SP 800-171 Rev.3",
+    "NIST SP 800-171 Rev.2",
+    "NIST SP 800-53 Rev.5",
+    "SOC 2",
+    "PCI DSS v4.0",
+    "HIPAA",
+    "NYDFS 23 NYCRR 500",
+    "FFIEC-CAT",
+    "CMMC v2.0",
+    "NERC-CIP",
+    "UK NCSC CAF v3.2",
+    "UK NCSC CAF v3.1",
+    "UK NCSC Cyber Essentials v3.2",
+    "UK NCSC Cyber Essentials v2.2",
+    "ASD Essential Eight",
+    "NZ ISM v3.8",
+    "MITRE ATT&CK",
+    "CISA CPG",
+    "CSA CCM v4",
+    "CRI Profile v2.0",
+    "COBIT 19",
+    "Microsoft Cloud Security Benchmark",
+    "CJIS v6",
+    "GSMA FS.31",
+    "HPH CPGs",
+    "Cybersecure Canada",
+    "TSA Security Directive",
+    "GDPR (EU) 2016/679",
+    "ISO 27701:2019",
+    "ISO 27017:2015",
+    "FedRAMP Moderate",
+    "EU Cyber Resilience Act",
+    "CIRCIA (US)",
+    "SEC Cyber Rule",
+    "HITRUST CSF v11",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "ISO 22301:2019",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22"
+  ],
+  "fw_groups": {
+    "EU Regulatory": [
+      "DORA",
+      "NIS2",
+      "GDPR (EU) 2016/679",
+      "EU Cyber Resilience Act"
+    ],
+    "ISO Standards": [
+      "ISO 27001:2022",
+      "ISO 27701:2019",
+      "ISO 27017:2015",
+      "ISO 22301:2019"
+    ],
+    "NIST / US Federal": [
+      "NIST CSF 2.0",
+      "NIST CSF 1.1",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.3",
+      "NIST SP 800-171 Rev.2",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "CISA CPG"
+    ],
+    "US Sector": [
+      "HIPAA",
+      "HITRUST CSF v11",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "CRI Profile v2.0",
+      "CIRCIA (US)",
+      "SEC Cyber Rule"
+    ],
+    "UK & Ireland": [
+      "UK NCSC CAF v3.2",
+      "UK NCSC CAF v3.1",
+      "UK NCSC Cyber Essentials v3.2",
+      "UK NCSC Cyber Essentials v2.2",
+      "IASME Cyber Assurance",
+      "UK CS&R Bill 2025"
+    ],
+    "APAC & Other": [
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "Cybersecure Canada",
+      "GSMA FS.31"
+    ],
+    "Regional": [
+      "BSI IT-Grundschutz",
+      "ENS (Spain) RD311/22"
+    ],
+    "Sector Specific": [
+      "NERC-CIP",
+      "TSA Security Directive",
+      "CJIS v6",
+      "HPH CPGs"
+    ],
+    "Cloud & Tech": [
+      "CSA CCM v4",
+      "Microsoft Cloud Security Benchmark",
+      "COBIT 19",
+      "MITRE ATT&CK"
+    ]
+  },
+  "org_profiles": {
+    "EU Financial": [
+      "DORA",
+      "NIS2",
+      "GDPR (EU) 2016/679",
+      "EU Cyber Resilience Act",
+      "ISO 27001:2022",
+      "ISO 27701:2019",
+      "PCI DSS v4.0",
+      "IASME Cyber Assurance"
+    ],
+    "EU General (NIS2)": [
+      "NIS2",
+      "GDPR (EU) 2016/679",
+      "ISO 27001:2022",
+      "EU Cyber Resilience Act"
+    ],
+    "UK Organisation": [
+      "UK NCSC CAF v3.2",
+      "UK NCSC Cyber Essentials v3.2",
+      "IASME Cyber Assurance",
+      "UK CS&R Bill 2025",
+      "GDPR (EU) 2016/679",
+      "ISO 27001:2022"
+    ],
+    "US Federal": [
+      "NIST SP 800-53 Rev.5",
+      "NIST CSF 2.0",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "CISA CPG"
+    ],
+    "US Healthcare": [
+      "HIPAA",
+      "HITRUST CSF v11",
+      "NIST CSF 2.0",
+      "NIST SP 800-53 Rev.5",
+      "CRI Profile v2.0"
+    ],
+    "US Financial": [
+      "SOC 2",
+      "PCI DSS v4.0",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "NIST CSF 2.0"
+    ],
+    "US Listed/Public": [
+      "SEC Cyber Rule",
+      "CIRCIA (US)",
+      "SOC 2",
+      "NIST CSF 2.0"
+    ],
+    "Critical Infrastructure": [
+      "NERC-CIP",
+      "NIST SP 800-53 Rev.5",
+      "NIST CSF 2.0",
+      "CISA CPG",
+      "TSA Security Directive"
+    ],
+    "Defence / CMMC": [
+      "CMMC v2.0",
+      "NIST SP 800-171 Rev.3",
+      "NIST SP 800-171 Rev.2",
+      "NIST SP 800-53 Rev.5"
+    ],
+    "Germany (BSI)": [
+      "BSI IT-Grundschutz",
+      "NIS2",
+      "GDPR (EU) 2016/679",
+      "ISO 27001:2022"
+    ],
+    "Spain (ENS)": [
+      "ENS (Spain) RD311/22",
+      "NIS2",
+      "GDPR (EU) 2016/679",
+      "ISO 27001:2022"
+    ],
+    "Cloud/SaaS Vendor": [
+      "ISO 27001:2022",
+      "ISO 27017:2015",
+      "CSA CCM v4",
+      "SOC 2",
+      "GDPR (EU) 2016/679"
+    ]
+  }
+}

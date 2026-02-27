@@ -1,0 +1,33 @@
+{
+  "id": "TEA05",
+  "file": "TEA05-Disable-Unmanaged-Teams-Communication.json",
+  "type": "teams",
+  "displayName": "TEA05 | Disable-Unmanaged-Teams-Communication",
+  "description": "Blocks communication with external Teams users using unmanaged/personal Teams accounts. All external Teams federation uses managed organisational accounts.",
+  "frameworks": [
+    "NIS2",
+    "DORA",
+    "ISO 27001:2022",
+    "ISO 27701:2019",
+    "NIST SP 800-53 Rev.5",
+    "SOC 2",
+    "UK NCSC CAF v3.2",
+    "FedRAMP Moderate",
+    "GDPR (EU) 2016/679",
+    "HITRUST CSF v11",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22"
+  ],
+  "cisChecks": [
+    "8.2.4"
+  ],
+  "importMethod": "powershell-teams",
+  "importScript": "scripts/Import-TeamsPolicies.ps1",
+  "deployState": "",
+  "prerequisite": "",
+  "requiredLicence": "",
+  "version": "1.0",
+  "path": "policies/teams/TEA05-Disable-Unmanaged-Teams-Communication.json"
+}

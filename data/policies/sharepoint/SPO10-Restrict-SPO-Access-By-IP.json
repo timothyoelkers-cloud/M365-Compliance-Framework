@@ -1,0 +1,37 @@
+{
+  "id": "SPO10",
+  "file": "SPO10-Restrict-SPO-Access-By-IP.json",
+  "type": "sharepoint",
+  "displayName": "SPO10 | Restrict-SPO-Access-By-IP",
+  "description": "Configures SharePoint Online IP access control. Restricts or reports access from outside corporate IP ranges. Add your IP ranges to script parameters.",
+  "frameworks": [
+    "NIS2",
+    "DORA",
+    "ISO 27001:2022",
+    "ISO 27701:2019",
+    "NIST SP 800-53 Rev.5",
+    "SOC 2",
+    "CMMC v2.0",
+    "UK NCSC CAF v3.2",
+    "FedRAMP Moderate",
+    "GDPR (EU) 2016/679",
+    "HITRUST CSF v11",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22",
+    "NERC-CIP",
+    "TSA Security Directive",
+    "NYDFS 23 NYCRR 500"
+  ],
+  "cisChecks": [
+    "7.2.11"
+  ],
+  "importMethod": "powershell-spo",
+  "importScript": "scripts/Import-SharePointPolicies.ps1",
+  "deployState": "",
+  "prerequisite": "",
+  "requiredLicence": "",
+  "version": "1.0",
+  "path": "policies/sharepoint/SPO10-Restrict-SPO-Access-By-IP.json"
+}

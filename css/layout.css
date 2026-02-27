@@ -1,0 +1,223 @@
+/* ═══════════════════════════════════════════
+   LAYOUT — Dark nav/sidebar + Light content
+═══════════════════════════════════════════ */
+
+/* ── TOPBAR (dark) ────────────────────── */
+#topbar {
+  position: sticky; top: 0; z-index: 200;
+  background: rgba(13,17,23,0.97);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--dark-border);
+  display: flex; align-items: center; gap: 0;
+  height: 54px;
+  box-shadow: 0 1px 12px rgba(0,0,0,.25);
+}
+
+.logo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 0 20px; height: 100%;
+  border-right: 1px solid var(--dark-border);
+  min-width: 230px;
+  cursor: pointer;
+  text-decoration: none;
+}
+.logo:hover { background: var(--dark-bg2); text-decoration: none; }
+.logo-mark {
+  width: 26px; height: 26px;
+  background: linear-gradient(135deg, var(--amber2), var(--teal));
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  flex-shrink: 0;
+}
+.logo-text {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800; font-size: .85rem;
+  letter-spacing: -.01em; color: var(--dark-bright);
+  line-height: 1.15;
+}
+.logo-text span { color: var(--amber2); }
+
+.topbar-meta {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .62rem; color: var(--dark-dim);
+  padding: 0 16px;
+  border-right: 1px solid var(--dark-border);
+  height: 100%; display: flex; align-items: center;
+  white-space: nowrap;
+}
+
+/* ── NAV LINKS (in topbar) ────────────── */
+.topbar-nav {
+  display: flex; align-items: center;
+  height: 100%; margin-left: auto;
+}
+.nav-link {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 600; font-size: .72rem;
+  letter-spacing: .02em; text-transform: uppercase;
+  padding: 0 18px; height: 100%;
+  border: none; background: transparent;
+  color: var(--dark-muted); cursor: pointer;
+  border-left: 1px solid var(--dark-border);
+  display: flex; align-items: center; gap: 6px;
+  transition: all var(--dur) var(--ease);
+  text-decoration: none;
+  position: relative;
+}
+.nav-link:hover {
+  color: var(--dark-bright);
+  background: var(--dark-bg2);
+  text-decoration: none;
+}
+.nav-link.active {
+  color: var(--amber2);
+  background: rgba(240,165,0,.08);
+}
+.nav-link.active::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: var(--amber2);
+}
+.nav-count {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .58rem; padding: 1px 5px;
+  background: var(--dark-bg3); color: var(--dark-dim);
+  border-radius: var(--r2);
+}
+.nav-link.active .nav-count {
+  background: rgba(240,165,0,.15);
+  color: var(--amber2);
+}
+
+/* ── MOBILE NAV TOGGLE ────────────────── */
+.nav-toggle {
+  display: none;
+  background: none; border: none;
+  color: var(--dark-soft); cursor: pointer;
+  padding: 8px; margin-left: auto;
+  font-size: 1.2rem;
+}
+
+/* ── PAGE LAYOUT ──────────────────────── */
+#app {
+  display: flex;
+  min-height: calc(100vh - 54px);
+}
+
+/* ── SIDEBAR (dark) ───────────────────── */
+#sidebar {
+  width: 260px; min-width: 260px;
+  border-right: 1px solid var(--dark-border);
+  background: var(--dark-bg);
+  position: sticky; top: 54px;
+  height: calc(100vh - 54px);
+  overflow-y: auto;
+  flex-shrink: 0;
+  transition: transform var(--dur) var(--ease);
+}
+#sidebar::-webkit-scrollbar-thumb { background: var(--dark-border); }
+
+.sb-label {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .58rem; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--dark-dim);
+  padding: 14px 16px 6px;
+  border-bottom: 1px solid var(--dark-border);
+  background: var(--dark-bg2);
+}
+.sb-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 7px 16px; cursor: pointer;
+  font-size: .76rem; color: var(--dark-soft);
+  border-bottom: 1px solid var(--dark-border);
+  transition: all var(--dur) var(--ease);
+}
+.sb-item:hover { background: var(--dark-bg2); color: var(--dark-bright); }
+.sb-item.active { background: rgba(240,165,0,.1); color: var(--amber2); }
+.sb-item input[type="checkbox"] { accent-color: var(--amber2); }
+.sb-count {
+  margin-left: auto;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .6rem; color: var(--dark-dim);
+}
+
+.sb-group-hdr {
+  display: flex; align-items: center; gap: 6px;
+  padding: 9px 16px; cursor: pointer;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .65rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: .06em;
+  color: var(--dark-muted);
+  border-bottom: 1px solid var(--dark-border);
+  background: var(--dark-bg2);
+  transition: all var(--dur) var(--ease);
+}
+.sb-group-hdr:hover { color: var(--dark-bright); background: var(--dark-bg3); }
+.sb-group-hdr .chevron {
+  margin-left: auto; font-size: .55rem;
+  transition: transform var(--dur) var(--ease);
+}
+.sb-group-hdr.open .chevron { transform: rotate(90deg); }
+.sb-group-body { display: none; }
+.sb-group-hdr.open + .sb-group-body { display: block; }
+
+/* ── MAIN CONTENT (light) ─────────────── */
+#main {
+  flex: 1; min-width: 0;
+  padding: 28px 32px;
+  background: var(--bg);
+}
+
+/* ── PAGE SECTIONS ────────────────────── */
+.page { display: none; }
+.page.active { display: block; }
+
+/* ── FOOTER ───────────────────────────── */
+#footer {
+  background: var(--dark-bg);
+  border-top: 1px solid var(--dark-border);
+  padding: 20px 32px;
+  display: flex; align-items: center;
+  justify-content: space-between;
+  font-size: .68rem; color: var(--dark-dim);
+}
+#footer a { color: var(--amber2); }
+#footer a:hover { color: var(--dark-bright); }
+
+/* ── RESPONSIVE ───────────────────────── */
+@media (max-width: 1024px) {
+  #sidebar { width: 220px; min-width: 220px; }
+  #main { padding: 20px 20px; }
+}
+
+@media (max-width: 768px) {
+  .topbar-meta { display: none; }
+  .nav-toggle { display: block; }
+  .topbar-nav {
+    position: fixed; top: 54px; left: 0; right: 0;
+    background: var(--dark-bg);
+    border-bottom: 1px solid var(--dark-border);
+    flex-direction: column; height: auto;
+    display: none; z-index: 190;
+  }
+  .topbar-nav.open { display: flex; }
+  .nav-link {
+    border-left: none; border-bottom: 1px solid var(--dark-border);
+    width: 100%; padding: 12px 20px; height: auto;
+    justify-content: flex-start;
+  }
+  #sidebar {
+    position: fixed; top: 54px; left: 0; bottom: 0;
+    z-index: 180; transform: translateX(-100%);
+    box-shadow: 4px 0 20px rgba(0,0,0,.3);
+  }
+  #sidebar.open { transform: translateX(0); }
+  #main { padding: 16px; }
+  .logo { min-width: auto; }
+}
+
+@media (max-width: 480px) {
+  #main { padding: 12px; }
+  h1 { font-size: 1.4rem; }
+  h2 { font-size: 1.15rem; }
+}

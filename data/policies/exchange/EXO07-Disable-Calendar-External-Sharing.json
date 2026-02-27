@@ -1,0 +1,33 @@
+{
+  "id": "EXO07",
+  "file": "EXO07-Disable-Calendar-External-Sharing.json",
+  "type": "exchange",
+  "displayName": "EXO07 | Disable-Calendar-External-Sharing",
+  "description": "Restricts Exchange Online calendar sharing — prevents detailed availability/appointment data from being shared with external users.",
+  "frameworks": [
+    "NIS2",
+    "DORA",
+    "ISO 27001:2022",
+    "ISO 27701:2019",
+    "NIST SP 800-53 Rev.5",
+    "SOC 2",
+    "UK NCSC CAF v3.2",
+    "FedRAMP Moderate",
+    "GDPR (EU) 2016/679",
+    "HITRUST CSF v11",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025"
+  ],
+  "cisChecks": [
+    "6.2.1"
+  ],
+  "importMethod": "powershell-exchange-online",
+  "importScript": "scripts/Import-ExchangePolicies.ps1",
+  "deployState": "",
+  "prerequisite": "",
+  "requiredLicence": "",
+  "version": "1.0",
+  "path": "policies/exchange/EXO07-Disable-Calendar-External-Sharing.json"
+}

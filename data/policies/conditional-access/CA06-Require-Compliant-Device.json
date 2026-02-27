@@ -1,0 +1,43 @@
+{
+  "id": "CA06",
+  "file": "CA06-Require-Compliant-Device.json",
+  "type": "conditional-access",
+  "displayName": "CA06 | Require-Compliant-Device",
+  "description": "Requires Intune-compliant or Entra hybrid-joined devices. Deploy AFTER configuring Intune compliance policies. Imports in Report-Only mode.",
+  "frameworks": [
+    "NIS2",
+    "DORA",
+    "ISO 27001:2022",
+    "NIST SP 800-53 Rev.5",
+    "SOC 2",
+    "PCI DSS v4.0",
+    "HIPAA",
+    "CMMC v2.0",
+    "FedRAMP Moderate",
+    "UK NCSC CAF v3.2",
+    "UK NCSC Cyber Essentials v3.2",
+    "GDPR (EU) 2016/679",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22",
+    "CRI Profile v2.0",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "ASD Essential Eight",
+    "NZ ISM v3.8",
+    "Microsoft Cloud Security Benchmark",
+    "MITRE ATT&CK"
+  ],
+  "cisChecks": [
+    "1.3.7",
+    "5.1.4.1",
+    "5.2.2.9",
+    "5.2.2.12"
+  ],
+  "importMethod": "entra-ui-or-powershell",
+  "importScript": "",
+  "deployState": "enabledForReportingButNotEnforced",
+  "prerequisite": "Microsoft Intune enrolment and device compliance policies must be configured first",
+  "requiredLicence": "",
+  "version": "1.0",
+  "path": "policies/conditional-access/CA06-Require-Compliant-Device.json"
+}

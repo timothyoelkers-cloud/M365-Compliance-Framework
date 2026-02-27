@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M365 Compliance Framework</title>
+<meta name="description" content="Open-source M365 compliance toolkit: 46 frameworks, 140 CIS checks, 110 deployment-ready policies.">
+<link rel="stylesheet" href="css/design-system.css">
+<link rel="stylesheet" href="css/layout.css">
+<link rel="stylesheet" href="css/components.css">
+<style>
+  @media print {
+    #topbar, #sidebar, #footer, .topbar-nav, .nav-toggle,
+    .step-bar, .filter-bar, .btn, .search-input { display: none !important; }
+    #main { padding: 0 !important; }
+    #app { display: block !important; }
+    #report-canvas { box-shadow: none !important; border: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══ TOPBAR ═══ -->
+<header id="topbar">
+  <a class="logo" onclick="Router.navigate('home')" title="Home">
+    <div class="logo-mark"></div>
+    <div class="logo-text">M365 Compliance<br><span>Framework</span></div>
+  </a>
+  <div class="topbar-meta">v2.0 &middot; CIS M365 v3</div>
+  <button class="nav-toggle" onclick="document.querySelector('.topbar-nav').classList.toggle('open')" aria-label="Menu">&#9776;</button>
+  <nav class="topbar-nav">
+    <a class="nav-link active" data-page="home" onclick="Router.navigate('home')">Home</a>
+    <a class="nav-link" data-page="assessment" onclick="Router.navigate('assessment')">Assessment</a>
+    <a class="nav-link" data-page="dashboard" onclick="Router.navigate('dashboard')">Dashboard</a>
+    <a class="nav-link" data-page="policies" onclick="Router.navigate('policies')">
+      Policies <span class="nav-count" id="nav-policy-count">110</span>
+    </a>
+    <a class="nav-link" data-page="reports" onclick="Router.navigate('reports')">Reports</a>
+  </nav>
+</header>
+
+<!-- ═══ APP ═══ -->
+<div id="app">
+  <aside id="sidebar"></aside>
+  <main id="main">
+
+    <!-- ── HOME PAGE ─────────────────────── -->
+    <section id="page-home" class="page active">
+      <div class="hero">
+        <h1>M365 Compliance<br><span>Framework</span></h1>
+        <p class="subtitle">Open-source compliance toolkit mapping 46 global frameworks to CIS Microsoft 365 Benchmark v3 controls, with 110 deployment-ready JSON policies.</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><div class="num" id="stat-frameworks">46</div><div class="lbl">Frameworks</div></div>
+          <div class="hero-stat"><div class="num" id="stat-checks">140</div><div class="lbl">CIS Checks</div></div>
+          <div class="hero-stat"><div class="num" id="stat-policies">110</div><div class="lbl">Policies</div></div>
+          <div class="hero-stat"><div class="num">8</div><div class="lbl">Policy Types</div></div>
+        </div>
+      </div>
+
+      <!-- Quick Start -->
+      <div class="section-hdr">Quick Start</div>
+      <div class="quick-cards">
+        <a class="quick-card" onclick="Router.navigate('assessment')">
+          <div class="icon">&#128203;</div>
+          <h3>Compliance Assessment</h3>
+          <p>Select your applicable frameworks, review required controls, and mark compliance status with a step-by-step wizard.</p>
+        </a>
+        <a class="quick-card" onclick="Router.navigate('dashboard')">
+          <div class="icon">&#128200;</div>
+          <h3>Compliance Dashboard</h3>
+          <p>View your compliance score, framework coverage, and a prioritised gap register after completing an assessment.</p>
+        </a>
+        <a class="quick-card" onclick="Router.navigate('policies')">
+          <div class="icon">&#128230;</div>
+          <h3>Policy Library</h3>
+          <p>Browse 110 deployment-ready JSON policies across 8 types. Download individually or as a filtered bundle.</p>
+        </a>
+        <a class="quick-card" onclick="Router.navigate('reports')">
+          <div class="icon">&#128196;</div>
+          <h3>Report Generator</h3>
+          <p>Generate branded compliance assessment reports with configurable sections, exportable as PDF or HTML.</p>
+        </a>
+      </div>
+
+      <!-- Organisation Profiles -->
+      <div class="section-hdr">Organisation Profiles</div>
+      <p style="font-size:.74rem;color:var(--ink3);margin-bottom:12px">One-click profiles to start an assessment with the right frameworks for your organisation type.</p>
+      <div class="profile-grid" id="home-profiles"></div>
+
+      <!-- Framework Groups -->
+      <div class="section-hdr" style="margin-top:28px">Framework Coverage</div>
+      <p style="font-size:.74rem;color:var(--ink3);margin-bottom:12px">46 compliance frameworks organised by region and sector.</p>
+      <div class="card-grid" id="home-fw-groups"></div>
+    </section>
+
+    <!-- ── ASSESSMENT PAGE ───────────────── -->
+    <section id="page-assessment" class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h2>Compliance Assessment</h2>
+        <button class="btn btn-sm" onclick="if(confirm('Reset all assessment data?')) AppState.resetAssessment()">Reset</button>
+      </div>
+      <div class="step-bar" id="assessment-steps"></div>
+      <div id="assessment-content"></div>
+    </section>
+
+    <!-- ── DASHBOARD PAGE ────────────────── -->
+    <section id="page-dashboard" class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h2>Compliance Dashboard</h2>
+        <button class="btn btn-sm" onclick="Dashboard.render()">Refresh</button>
+      </div>
+      <div id="dashboard-content"></div>
+    </section>
+
+    <!-- ── POLICIES PAGE ─────────────────── -->
+    <section id="page-policies" class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h2>Policy Library</h2>
+        <span style="font-size:.72rem;color:var(--ink3)">110 deployment-ready M365 policies</span>
+      </div>
+      <div id="policies-content"></div>
+    </section>
+
+    <!-- ── REPORTS PAGE ──────────────────── -->
+    <section id="page-reports" class="page">
+      <div style="margin-bottom:16px">
+        <h2>Report Generator</h2>
+        <p style="font-size:.74rem;color:var(--ink3);margin-top:4px">Configure and generate branded compliance assessment reports.</p>
+      </div>
+      <div id="reports-content"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer id="footer">
+  <span>M365 Compliance Framework &middot; CIS Benchmark v3 &middot; Open Source</span>
+  <span>
+    <a href="https://github.com" target="_blank">GitHub</a> &middot;
+    Built with care
+  </span>
+</footer>
+
+<!-- ═══ MODAL ═══ -->
+<div id="modal-overlay" class="modal-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+  <div id="modal" class="modal"></div>
+</div>
+
+<!-- ═══ TOAST ═══ -->
+<div id="toast" class="toast"></div>
+
+<!-- ═══ SCRIPTS ═══ -->
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/router.js"></script>
+<script src="js/assessment.js"></script>
+<script src="js/dashboard.js"></script>
+<script src="js/policies.js"></script>
+<script src="js/reports.js"></script>
+<script>
+// ── Utility functions ──
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+function showToast(msg) {
+  const el = document.getElementById('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), 2500);
+}
+
+// ── Bootstrap ──
+async function bootstrap() {
+  try {
+    const { manifest, checks, frameworks, policyTypes, totalPolicies } = await DataStore.loadAll();
+
+    // Populate state
+    AppState.set('manifest', manifest);
+    AppState.set('checks', checks);
+    AppState.set('frameworks', frameworks.frameworks);
+    AppState.set('fwGroups', frameworks.fw_groups);
+    AppState.set('orgProfiles', frameworks.org_profiles);
+    AppState.set('categories', manifest.categories);
+    AppState.set('policyTypes', policyTypes);
+
+    // Update stats
+    const statFw = document.getElementById('stat-frameworks');
+    const statCk = document.getElementById('stat-checks');
+    const statPol = document.getElementById('stat-policies');
+    if (statFw) statFw.textContent = frameworks.frameworks.length;
+    if (statCk) statCk.textContent = checks.length;
+    if (statPol) statPol.textContent = totalPolicies;
+
+    // Load all policies (we need a bulk endpoint)
+    await loadAllPolicies(policyTypes);
+
+    // Render home page elements
+    renderHomeProfiles();
+    renderHomeFwGroups();
+
+    // Register page initializers
+    Router.register('home', () => { renderHomeSidebar(); renderHomeProfiles(); renderHomeFwGroups(); });
+    Router.register('assessment', () => { Assessment.init(); });
+    Router.register('dashboard', () => { Dashboard.init(); });
+    Router.register('policies', () => { Policies.init(); });
+    Router.register('reports', () => { Reports.init(); });
+
+    // Start router
+    Router.init();
+
+  } catch (err) {
+    console.error('Bootstrap failed:', err);
+    document.getElementById('main').innerHTML = `<div class="card" style="padding:40px;text-align:center">
+      <h3 style="color:var(--red)">Failed to load data</h3>
+      <p style="color:var(--ink3);margin:8px 0">${escHtml(err.message)}</p>
+      <p style="color:var(--ink4);font-size:.72rem">Make sure you're serving this site via HTTP (not file://). Use a local server.</p>
+    </div>`;
+  }
+}
+
+async function loadAllPolicies(policyTypes) {
+  // Fetch all policies from individual JSON files
+  const types = Object.keys(policyTypes);
+  const allPolicies = [];
+
+  // Use a manifest approach: for each type directory, list files
+  // Since we can't list directories from static hosting, we'll use the policy index
+  // We need a comprehensive policies list. Let's fetch it from a generated file.
+  try {
+    const policiesAll = await DataStore.fetchJSON('policies-all.json');
+    AppState.set('policies', policiesAll);
+    return;
+  } catch (e) {
+    // Fallback: policies-all.json doesn't exist yet
+    console.warn('policies-all.json not found, policies may not load');
+    AppState.set('policies', []);
+  }
+}
+
+function renderHomeSidebar() {
+  const sidebar = document.getElementById('sidebar');
+  if (!sidebar) return;
+  sidebar.innerHTML = `
+    <div class="sb-label">Navigation</div>
+    <div class="sb-item active" onclick="Router.navigate('home')">Home</div>
+    <div class="sb-item" onclick="Router.navigate('assessment')">Assessment</div>
+    <div class="sb-item" onclick="Router.navigate('dashboard')">Dashboard</div>
+    <div class="sb-item" onclick="Router.navigate('policies')">Policies</div>
+    <div class="sb-item" onclick="Router.navigate('reports')">Reports</div>
+    <div class="sb-label" style="margin-top:8px">Resources</div>
+    <a class="sb-item" href="data/checks.json" target="_blank">checks.json</a>
+    <a class="sb-item" href="data/frameworks.json" target="_blank">frameworks.json</a>
+    <a class="sb-item" href="data/policies/index.json" target="_blank">policies/index.json</a>
+  `;
+}
+
+function applyHomeProfile(name) {
+  const profiles = AppState.get('orgProfiles');
+  const fws = profiles[name];
+  if (!fws) return;
+  AppState.set('selectedFrameworks', new Set(fws));
+  AppState.set('assessmentStep', 1);
+  Router.navigate('assessment');
+}
+
+function renderHomeProfiles() {
+  const container = document.getElementById('home-profiles');
+  if (!container) return;
+  const profiles = AppState.get('orgProfiles');
+  if (!profiles) return;
+
+  container.innerHTML = Object.entries(profiles).map(([name, fws]) =>
+    `<div class="profile-card" onclick="applyHomeProfile('${escHtml(name)}')">
+      <h4>${name}</h4>
+      <div class="fw-count">${fws.length} frameworks</div>
+    </div>`
+  ).join('');
+}
+
+function renderHomeFwGroups() {
+  const container = document.getElementById('home-fw-groups');
+  if (!container) return;
+  const groups = AppState.get('fwGroups');
+  if (!groups) return;
+
+  const colors = {
+    'EU Regulatory': 'var(--blue)', 'ISO Standards': 'var(--teal)',
+    'NIST / US Federal': 'var(--red)', 'US Sector': 'var(--amber)',
+    'UK & Ireland': 'var(--purple)', 'APAC & Other': 'var(--green)',
+    'Regional': 'var(--amber2)', 'Sector Specific': 'var(--red)',
+    'Cloud & Tech': 'var(--teal)',
+  };
+
+  container.innerHTML = Object.entries(groups).map(([group, fws]) => {
+    const clr = colors[group] || 'var(--ink3)';
+    return `<div class="group-card animate-in">
+      <div class="group-card-hdr" onclick="this.parentElement.querySelector('.group-card-body').style.display = this.parentElement.querySelector('.group-card-body').style.display === 'none' ? 'block' : 'none'">
+        <div class="dot" style="background:${clr}"></div>
+        <h4>${group}</h4>
+        <span class="badge badge-dark">${fws.length}</span>
+      </div>
+      <div class="group-card-body" style="display:none">
+        ${fws.map(fw => `<div class="group-fw-item"><span class="fw-tag">${fw}</span></div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// Start the app
+bootstrap();
+</script>
+</body>
+</html>

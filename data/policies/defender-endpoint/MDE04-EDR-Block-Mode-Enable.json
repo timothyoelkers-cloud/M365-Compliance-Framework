@@ -1,0 +1,43 @@
+{
+  "id": "MDE04",
+  "file": "MDE04-EDR-Block-Mode-Enable.json",
+  "type": "defender-endpoint",
+  "displayName": "MDE04 | EDR-Block-Mode-Enable",
+  "description": "Enables EDR in Block Mode. MDE blocks malicious artefacts even when non-Microsoft AV is the primary protection. Adds post-breach protection layer for mixed AV environments.",
+  "frameworks": [
+    "NIS2",
+    "DORA",
+    "ISO 27001:2022",
+    "NIST SP 800-53 Rev.5",
+    "UK NCSC CAF v3.2",
+    "SOC 2",
+    "FedRAMP Moderate",
+    "HITRUST CSF v11",
+    "BSI IT-Grundschutz",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "ASD Essential Eight",
+    "MITRE ATT&CK",
+    "Microsoft Cloud Security Benchmark",
+    "NIST CSF 2.0",
+    "NIST SP 800-171 Rev.3",
+    "CMMC v2.0",
+    "PCI DSS v4.0",
+    "HIPAA",
+    "CRI Profile v2.0",
+    "TSA Security Directive",
+    "EU Cyber Resilience Act",
+    "CIRCIA (US)"
+  ],
+  "cisChecks": [
+    "5.1.4.1",
+    "5.1.4.2"
+  ],
+  "importMethod": "powershell-graph",
+  "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
+  "deployState": "",
+  "prerequisite": "Requires Microsoft Defender for Endpoint Plan 2 (MDE P2)",
+  "requiredLicence": "Microsoft Defender for Endpoint P2 or Microsoft 365 E5",
+  "version": "1.0",
+  "path": "policies/defender-endpoint/MDE04-EDR-Block-Mode-Enable.json"
+}

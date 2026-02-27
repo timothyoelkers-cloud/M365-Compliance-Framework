@@ -1,0 +1,41 @@
+{
+  "id": "TEA03",
+  "file": "TEA03-Restrict-Internal-Only-Lobby-Bypass.json",
+  "type": "teams",
+  "displayName": "TEA03 | Restrict-Internal-Only-Lobby-Bypass",
+  "description": "Only same-organisation users bypass the meeting lobby. External guests, federated users, and dial-in callers always wait in lobby.",
+  "frameworks": [
+    "NIS2",
+    "ISO 27001:2022",
+    "NIST SP 800-53 Rev.5",
+    "UK NCSC CAF v3.2",
+    "SOC 2",
+    "GDPR (EU) 2016/679",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "FedRAMP Moderate",
+    "HITRUST CSF v11",
+    "DORA",
+    "NIST CSF 2.0",
+    "PCI DSS v4.0",
+    "HIPAA",
+    "CMMC v2.0",
+    "UK NCSC CAF v3.1",
+    "MITRE ATT&CK",
+    "Microsoft Cloud Security Benchmark",
+    "EU Cyber Resilience Act"
+  ],
+  "cisChecks": [
+    "8.1.2",
+    "8.5.3"
+  ],
+  "importMethod": "powershell-teams",
+  "importScript": "scripts/Import-TeamsPolicies.ps1",
+  "deployState": "",
+  "prerequisite": "",
+  "requiredLicence": "",
+  "version": "1.0",
+  "path": "policies/teams/TEA03-Restrict-Internal-Only-Lobby-Bypass.json"
+}

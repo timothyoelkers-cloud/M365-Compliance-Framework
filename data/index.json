@@ -1,0 +1,17 @@
+{
+  "version": "2.0",
+  "lastUpdated": "2026-02-25",
+  "description": "CIS M365 Benchmark v3 compliance policy library — 8 policy types covering all 45 frameworks",
+  "totalPolicies": 110,
+  "totalChecks": 140,
+  "totalFrameworks": 45,
+  "categories": [
+    "Defender For Office 365",
+    "Entra",
+    "Exchange",
+    "M365",
+    "Purview",
+    "Sharepoint",
+    "Teams"
+  ]
+}

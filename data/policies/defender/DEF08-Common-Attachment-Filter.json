@@ -1,0 +1,37 @@
+{
+  "id": "DEF08",
+  "file": "DEF08-Common-Attachment-Filter.json",
+  "type": "defender",
+  "displayName": "DEF08 | Common-Attachment-Filter",
+  "description": "Enables the Common Attachment Types Filter. Blocks 70+ malicious file types (.exe, .js, .vbs, .cmd, .ps1, .reg, .hta, and more). Zero configuration needed.",
+  "frameworks": [
+    "NIS2",
+    "ISO 27001:2022",
+    "NIST SP 800-53 Rev.5",
+    "UK NCSC CAF v3.2",
+    "UK NCSC Cyber Essentials v3.2",
+    "SOC 2",
+    "PCI DSS v4.0",
+    "HIPAA",
+    "CMMC v2.0",
+    "FedRAMP Moderate",
+    "GDPR (EU) 2016/679",
+    "ASD Essential Eight",
+    "NZ ISM v3.8",
+    "MITRE ATT&CK",
+    "Microsoft Cloud Security Benchmark",
+    "IASME Cyber Assurance",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22"
+  ],
+  "cisChecks": [
+    "2.1.1"
+  ],
+  "importMethod": "powershell-exchange-online",
+  "importScript": "scripts/Import-DefenderPolicies.ps1",
+  "deployState": "enabledForReportingButNotEnforced",
+  "prerequisite": "",
+  "requiredLicence": "Exchange Online Protection (included with M365)",
+  "version": "1.0",
+  "path": "policies/defender/DEF08-Common-Attachment-Filter.json"
+}

@@ -1,0 +1,111 @@
+{
+  "policyTypes": {
+    "conditional-access": {
+      "label": "Conditional Access (Entra ID)",
+      "importMethod": "Entra Portal UI or PowerShell Graph API",
+      "script": "scripts/Import-ConditionalAccessPolicies.ps1",
+      "colour": "blue",
+      "guideSteps": [
+        "Download JSON file(s)",
+        "Go to Entra admin centre → Protection → Conditional Access → Policies",
+        "Click New policy → Upload policy file (single) or run Import-ConditionalAccessPolicies.ps1 (bulk)",
+        "ALL policies import in Report-Only mode — review Sign-in logs 1–2 weeks",
+        "Set to Enabled once confirmed no legitimate access is blocked",
+        "IMPORTANT: Configure break-glass emergency access accounts as exclusions BEFORE enabling"
+      ]
+    },
+    "defender": {
+      "label": "Defender for Office 365",
+      "importMethod": "PowerShell (Exchange Online)",
+      "script": "scripts/Import-DefenderPolicies.ps1",
+      "colour": "red",
+      "requiredLicence": "Microsoft Defender for Office 365 Plan 1 or Plan 2",
+      "guideSteps": [
+        "Edit DEF05/DEF06: replace REPLACE-WITH-SECURITY-TEAM-EMAIL with your security team address",
+        "Run: Install-Module ExchangeOnlineManagement",
+        "Run: .\\Import-DefenderPolicies.ps1",
+        "Authenticate as Security Administrator or Global Administrator",
+        "All Defender policies deploy disabled/audit — review in Microsoft Defender portal before enabling"
+      ]
+    },
+    "exchange": {
+      "label": "Exchange Online",
+      "importMethod": "PowerShell (Exchange Online) + DNS changes",
+      "script": "scripts/Import-ExchangePolicies.ps1",
+      "colour": "green",
+      "guideSteps": [
+        "Run: .\\Import-ExchangePolicies.ps1",
+        "For DKIM (EXO01): publish CNAME records output by script to your DNS provider",
+        "For DMARC (EXO02): add DNS TXT record — start p=none, monitor 2–4 weeks, move to p=quarantine then p=reject",
+        "Wait 24–48 hours DNS propagation, verify at mxtoolbox.com/dmarc.aspx"
+      ]
+    },
+    "sharepoint": {
+      "label": "SharePoint Online & OneDrive",
+      "importMethod": "PowerShell (SharePoint Online PnP)",
+      "script": "scripts/Import-SharePointPolicies.ps1",
+      "colour": "green",
+      "guideSteps": [
+        "Install-Module PnP.PowerShell",
+        "Run: .\\Import-SharePointPolicies.ps1 -TenantName yourtenant",
+        "Authenticate as SharePoint Administrator",
+        "For SPO10 (IP restriction): add corporate IP ranges to script parameters first",
+        "Review settings in SharePoint admin centre after deployment"
+      ]
+    },
+    "teams": {
+      "label": "Microsoft Teams",
+      "importMethod": "PowerShell (Microsoft Teams)",
+      "script": "scripts/Import-TeamsPolicies.ps1",
+      "colour": "green",
+      "guideSteps": [
+        "Install-Module MicrosoftTeams",
+        "Run: .\\Import-TeamsPolicies.ps1",
+        "Authenticate as Teams Administrator or Global Administrator",
+        "Policies apply globally — assign to pilot group first via Intune policy assignment",
+        "Review meeting settings in Teams admin centre after deployment"
+      ]
+    },
+    "purview": {
+      "label": "Microsoft Purview (DLP & Compliance)",
+      "importMethod": "PowerShell (Security & Compliance)",
+      "script": "scripts/Import-PurviewPolicies.ps1",
+      "colour": "amber",
+      "guideSteps": [
+        "Run: .\\Import-PurviewPolicies.ps1 -TestMode (deploys ALL policies in Simulation/Test mode first)",
+        "Review DLP Activity Explorer in Microsoft Purview portal for 2–4 weeks",
+        "Tune false positives by adjusting confidence thresholds or adding exceptions",
+        "Re-run: .\\Import-PurviewPolicies.ps1 (without -TestMode) to enforce",
+        "For sensitivity labels (PV10): publish labels to users via a label policy after creation"
+      ]
+    },
+    "entra": {
+      "label": "Entra ID Settings",
+      "importMethod": "PowerShell (Microsoft Graph API)",
+      "script": "scripts/Import-EntraSettings.ps1",
+      "colour": "blue",
+      "guideSteps": [
+        "Install-Module Microsoft.Graph",
+        "Run: .\\Import-EntraSettings.ps1",
+        "Authenticate as Global Administrator",
+        "Review each setting in Entra admin centre after deployment",
+        "Test user consent block (ENT01/ENT02) with a test app registration before enforcing org-wide"
+      ]
+    },
+    "intune": {
+      "label": "Microsoft Intune / Device Management",
+      "importMethod": "PowerShell (Microsoft Graph API)",
+      "script": "scripts/Import-IntunePolicies.ps1",
+      "colour": "amber",
+      "guideSteps": [
+        "Ensure Microsoft Intune is licensed and configured",
+        "Install-Module Microsoft.Graph",
+        "Run: .\\Import-IntunePolicies.ps1 -PilotGroupId <AAD-Group-ID>",
+        "Assign compliance policies to pilot group first",
+        "Monitor device compliance in Intune > Devices > Monitor > Device compliance",
+        "Once validated: expand assignment to All Devices / All Users"
+      ]
+    }
+  },
+  "totalPolicies": 110
+}

@@ -1,0 +1,33 @@
+{
+  "id": "SPO07",
+  "file": "SPO07-Restrict-External-Sharing-Org-Accounts.json",
+  "type": "sharepoint",
+  "displayName": "SPO07 | Restrict-External-Sharing-Org-Accounts",
+  "description": "SharePoint external sharing restricted to organisational accounts only (no personal Microsoft accounts).",
+  "frameworks": [
+    "NIS2",
+    "DORA",
+    "ISO 27001:2022",
+    "ISO 27701:2019",
+    "NIST SP 800-53 Rev.5",
+    "SOC 2",
+    "UK NCSC CAF v3.2",
+    "FedRAMP Moderate",
+    "GDPR (EU) 2016/679",
+    "HITRUST CSF v11",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22"
+  ],
+  "cisChecks": [
+    "7.2.9"
+  ],
+  "importMethod": "powershell-spo",
+  "importScript": "scripts/Import-SharePointPolicies.ps1",
+  "deployState": "",
+  "prerequisite": "",
+  "requiredLicence": "",
+  "version": "1.0",
+  "path": "policies/sharepoint/SPO07-Restrict-External-Sharing-Org-Accounts.json"
+}

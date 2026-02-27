@@ -1,0 +1,33 @@
+{
+  "id": "TEA09",
+  "file": "TEA09-Disable-Meeting-Recording-External-Participants.json",
+  "type": "teams",
+  "displayName": "TEA09 | Disable-Meeting-Recording-External-Participants",
+  "description": "External participants cannot initiate meeting recordings. Only internal organisers/co-organisers can record.",
+  "frameworks": [
+    "NIS2",
+    "DORA",
+    "ISO 27001:2022",
+    "ISO 27701:2019",
+    "NIST SP 800-53 Rev.5",
+    "SOC 2",
+    "UK NCSC CAF v3.2",
+    "FedRAMP Moderate",
+    "GDPR (EU) 2016/679",
+    "HITRUST CSF v11",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22"
+  ],
+  "cisChecks": [
+    "8.5.5"
+  ],
+  "importMethod": "powershell-teams",
+  "importScript": "scripts/Import-TeamsPolicies.ps1",
+  "deployState": "",
+  "prerequisite": "",
+  "requiredLicence": "",
+  "version": "1.0",
+  "path": "policies/teams/TEA09-Disable-Meeting-Recording-External-Participants.json"
+}

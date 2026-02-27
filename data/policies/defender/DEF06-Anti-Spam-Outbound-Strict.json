@@ -1,0 +1,31 @@
+{
+  "id": "DEF06",
+  "file": "DEF06-Anti-Spam-Outbound-Strict.json",
+  "type": "defender",
+  "displayName": "DEF06 | Anti-Spam-Outbound-Strict",
+  "description": "Strict outbound spam filtering. Per-user hourly limits (500/hr). Blocks and alerts on users exceeding limits (indicates account compromise). Deploys in audit mode.",
+  "frameworks": [
+    "NIS2",
+    "ISO 27001:2022",
+    "NIST SP 800-53 Rev.5",
+    "UK NCSC CAF v3.2",
+    "SOC 2",
+    "FedRAMP Moderate",
+    "GDPR (EU) 2016/679",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22",
+    "IASME Cyber Assurance",
+    "Microsoft Cloud Security Benchmark"
+  ],
+  "cisChecks": [
+    "2.1.15",
+    "2.1.2"
+  ],
+  "importMethod": "powershell-exchange-online",
+  "importScript": "scripts/Import-DefenderPolicies.ps1",
+  "deployState": "enabledForReportingButNotEnforced",
+  "prerequisite": "",
+  "requiredLicence": "Exchange Online Protection (included with M365)",
+  "version": "1.0",
+  "path": "policies/defender/DEF06-Anti-Spam-Outbound-Strict.json"
+}

@@ -1,0 +1,43 @@
+{
+  "id": "EXO08",
+  "file": "EXO08-Configure-Connection-Filter-Clear-Safelist.json",
+  "type": "exchange",
+  "displayName": "EXO08 | Configure-Connection-Filter-Clear-Safelist",
+  "description": "Ensures connection filter IP allow list is empty and safe sender list does not bypass spam filtering. Audits and removes insecure bypasses.",
+  "frameworks": [
+    "NIS2",
+    "ISO 27001:2022",
+    "NIST SP 800-53 Rev.5",
+    "UK NCSC CAF v3.2",
+    "SOC 2",
+    "PCI DSS v4.0",
+    "HIPAA",
+    "FedRAMP Moderate",
+    "GDPR (EU) 2016/679",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "NIST CSF 1.1",
+    "NIST SP 800-171 Rev.3",
+    "CMMC v2.0",
+    "FFIEC-CAT",
+    "NZ ISM v3.8",
+    "MITRE ATT&CK",
+    "CRI Profile v2.0",
+    "CJIS v6",
+    "Cybersecure Canada"
+  ],
+  "cisChecks": [
+    "2.1.14",
+    "6.5.4",
+    "6.5.5"
+  ],
+  "importMethod": "powershell-exchange-online",
+  "importScript": "scripts/Import-ExchangePolicies.ps1",
+  "deployState": "",
+  "prerequisite": "",
+  "requiredLicence": "",
+  "version": "1.0",
+  "path": "policies/exchange/EXO08-Configure-Connection-Filter-Clear-Safelist.json"
+}

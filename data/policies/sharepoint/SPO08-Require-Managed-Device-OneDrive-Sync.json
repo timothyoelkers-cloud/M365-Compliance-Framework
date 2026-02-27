@@ -1,0 +1,34 @@
+{
+  "id": "SPO08",
+  "file": "SPO08-Require-Managed-Device-OneDrive-Sync.json",
+  "type": "sharepoint",
+  "displayName": "SPO08 | Require-Managed-Device-OneDrive-Sync",
+  "description": "Restricts OneDrive/SharePoint sync to domain-joined or Intune-compliant devices. Prevents sync to unmanaged personal devices.",
+  "frameworks": [
+    "NIS2",
+    "DORA",
+    "ISO 27001:2022",
+    "ISO 27701:2019",
+    "NIST SP 800-53 Rev.5",
+    "SOC 2",
+    "CMMC v2.0",
+    "UK NCSC CAF v3.2",
+    "FedRAMP Moderate",
+    "GDPR (EU) 2016/679",
+    "HITRUST CSF v11",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22"
+  ],
+  "cisChecks": [
+    "7.2.10"
+  ],
+  "importMethod": "powershell-spo",
+  "importScript": "scripts/Import-SharePointPolicies.ps1",
+  "deployState": "",
+  "prerequisite": "",
+  "requiredLicence": "",
+  "version": "1.0",
+  "path": "policies/sharepoint/SPO08-Require-Managed-Device-OneDrive-Sync.json"
+}

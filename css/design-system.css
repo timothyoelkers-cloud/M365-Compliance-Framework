@@ -1,0 +1,138 @@
+/* ═══════════════════════════════════════════
+   DESIGN SYSTEM — MIXED THEME
+   Dark nav/sidebar + Light content
+═══════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* ── Dark zone (nav, sidebar, hero) ─── */
+  --dark-bg:      #0d1117;
+  --dark-bg2:     #161b22;
+  --dark-bg3:     #21262d;
+  --dark-border:  #30363d;
+  --dark-rule:    #373e47;
+  --dark-dim:     #6e7681;
+  --dark-muted:   #8b949e;
+  --dark-soft:    #c9d1d9;
+  --dark-bright:  #e6edf3;
+
+  /* ── Light zone (main content) ──────── */
+  --bg:           #f4f6f9;
+  --bg2:          #eef0f4;
+  --surface:      #ffffff;
+  --surface2:     #f8f9fc;
+  --border:       #d8dce6;
+  --border2:      #c4c9d8;
+  --ink:          #111827;
+  --ink2:         #374151;
+  --ink3:         #6b7280;
+  --ink4:         #9ca3af;
+
+  /* ── Accent palette ─────────────────── */
+  --accent:       #16a34a;
+  --accent2:      #15803d;
+  --accent-lt:    #f0fdf4;
+  --accent-lt2:   #dcfce7;
+  --green:        #16a34a;
+  --green-lt:     #f0fdf4;
+  --green-lt2:    #dcfce7;
+  --red:          #dc2626;
+  --red-lt:       #fef2f2;
+  --red-lt2:      #fee2e2;
+  --amber:        #ca8a04;
+  --amber2:       #f0a500;
+  --amber-lt:     #fefce8;
+  --amber-lt2:    #fef08a;
+  --blue:         #1d4ed8;
+  --blue-lt:      #eff6ff;
+  --blue-lt2:     #dbeafe;
+  --teal:         #0891b2;
+  --teal-lt:      #ecfeff;
+  --purple:       #7c3aed;
+  --purple-lt:    #f5f3ff;
+
+  /* ── Borders & Shadows ──────────────── */
+  --r:            0px;
+  --r2:           2px;
+  --r3:           4px;
+  --r4:           8px;
+  --shadow:       0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
+  --shadow2:      0 4px 12px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06);
+  --shadow3:      0 10px 30px rgba(0,0,0,.12);
+
+  /* ── Transitions ────────────────────── */
+  --ease:         cubic-bezier(.4,0,.2,1);
+  --dur:          150ms;
+}
+
+/* ── RESET ────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; background: var(--bg); -webkit-font-smoothing: antialiased; }
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  color: var(--ink);
+  min-height: 100vh;
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+/* ── TYPOGRAPHY ───────────────────────── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -.02em;
+}
+h1 { font-size: 2rem; }
+h2 { font-size: 1.5rem; }
+h3 { font-size: 1.15rem; }
+h4 { font-size: .95rem; }
+
+code, .mono {
+  font-family: 'IBM Plex Mono', 'Fira Code', monospace;
+}
+
+a { color: var(--blue); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── SCROLLBAR ────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--ink4); }
+
+/* ── UTILITY CLASSES ──────────────────── */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); border: 0;
+}
+.text-mono { font-family: 'IBM Plex Mono', monospace; }
+.text-xs { font-size: .65rem; }
+.text-sm { font-size: .75rem; }
+.text-md { font-size: .85rem; }
+.text-dim { color: var(--ink3); }
+.text-muted { color: var(--ink4); }
+.text-green { color: var(--green); }
+.text-red { color: var(--red); }
+.text-amber { color: var(--amber); }
+.text-blue { color: var(--blue); }
+.text-teal { color: var(--teal); }
+.text-purple { color: var(--purple); }
+.uppercase { text-transform: uppercase; letter-spacing: .06em; }
+.truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.flex { display: flex; }
+.flex-col { display: flex; flex-direction: column; }
+.items-center { align-items: center; }
+.justify-between { justify-content: space-between; }
+.gap-xs { gap: 4px; }
+.gap-sm { gap: 8px; }
+.gap-md { gap: 16px; }
+.gap-lg { gap: 24px; }
+.hidden { display: none !important; }
+
+/* ── SELECTION ────────────────────────── */
+::selection {
+  background: var(--accent-lt2);
+  color: var(--accent2);
+}

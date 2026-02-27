@@ -1,0 +1,35 @@
+{
+  "id": "INT18",
+  "file": "INT18-Windows-Diagnostic-Data-Limit.json",
+  "type": "intune",
+  "displayName": "INT18 | Windows-Diagnostic-Data-Limit",
+  "description": "Configures Windows diagnostic data to Security level (minimum). Disables telemetry beyond required security data. Required for GDPR-compliant Windows 11 deployments.",
+  "frameworks": [
+    "GDPR (EU) 2016/679",
+    "ISO 27701:2019",
+    "NIS2",
+    "DORA",
+    "ISO 27001:2022",
+    "NIST SP 800-53 Rev.5",
+    "UK NCSC CAF v3.2",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "HITRUST CSF v11",
+    "NIST CSF 2.0",
+    "NIST SP 800-171 Rev.3",
+    "CJIS v6",
+    "EU Cyber Resilience Act"
+  ],
+  "cisChecks": [
+    "5.1.4.1"
+  ],
+  "importMethod": "powershell-graph",
+  "importScript": "scripts/Import-IntunePolicies.ps1",
+  "deployState": "",
+  "prerequisite": "Microsoft Intune licence required",
+  "requiredLicence": "Microsoft Intune / Microsoft 365 Business Premium or above",
+  "version": "1.0",
+  "path": "policies/intune/INT18-Windows-Diagnostic-Data-Limit.json"
+}

@@ -1,0 +1,43 @@
+{
+  "id": "EXO02",
+  "file": "EXO02-DMARC-Policy-Enforcement.json",
+  "type": "exchange",
+  "displayName": "EXO02 | DMARC-Policy-Enforcement",
+  "description": "Configures DMARC DNS record (start p=none, progress to p=quarantine then p=reject). Script generates the TXT record string to add to DNS. Prevents domain spoofing.",
+  "frameworks": [
+    "NIS2",
+    "ISO 27001:2022",
+    "NIST SP 800-53 Rev.5",
+    "UK NCSC CAF v3.2",
+    "SOC 2",
+    "PCI DSS v4.0",
+    "HIPAA",
+    "FedRAMP Moderate",
+    "GDPR (EU) 2016/679",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22",
+    "IASME Cyber Assurance",
+    "UK CS&R Bill 2025",
+    "DORA",
+    "NZ ISM v3.8",
+    "CRI Profile v2.0",
+    "CJIS v6",
+    "Cybersecure Canada",
+    "TSA Security Directive",
+    "EU Cyber Resilience Act",
+    "CIRCIA (US)",
+    "SEC Cyber Rule",
+    "HITRUST CSF v11",
+    "UK NCSC Cyber Essentials v3.2"
+  ],
+  "cisChecks": [
+    "2.1.10"
+  ],
+  "importMethod": "dns-record",
+  "importScript": "scripts/Import-ExchangePolicies.ps1",
+  "deployState": "",
+  "prerequisite": "",
+  "requiredLicence": "",
+  "version": "1.0",
+  "path": "policies/exchange/EXO02-DMARC-Policy-Enforcement.json"
+}

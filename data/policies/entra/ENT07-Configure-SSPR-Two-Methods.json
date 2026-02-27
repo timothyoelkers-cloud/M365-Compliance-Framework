@@ -1,0 +1,35 @@
+{
+  "id": "ENT07",
+  "file": "ENT07-Configure-SSPR-Two-Methods.json",
+  "type": "entra",
+  "displayName": "ENT07 | Configure-SSPR-Two-Methods",
+  "description": "Configures Self-Service Password Reset requiring two authentication methods. Prevents account takeover via single-method SSPR.",
+  "frameworks": [
+    "DORA",
+    "NIS2",
+    "ISO 27001:2022",
+    "NIST SP 800-53 Rev.5",
+    "SOC 2",
+    "CMMC v2.0",
+    "UK NCSC CAF v3.2",
+    "FedRAMP Moderate",
+    "GDPR (EU) 2016/679",
+    "HITRUST CSF v11",
+    "UK CS&R Bill 2025",
+    "BSI IT-Grundschutz",
+    "ENS (Spain) RD311/22",
+    "IASME Cyber Assurance",
+    "ISO 27017:2015",
+    "ISO 27701:2019"
+  ],
+  "cisChecks": [
+    "5.2.4.1"
+  ],
+  "importMethod": "powershell-graph",
+  "importScript": "scripts/Import-EntraSettings.ps1",
+  "deployState": "",
+  "prerequisite": "",
+  "requiredLicence": "",
+  "version": "1.0",
+  "path": "policies/entra/ENT07-Configure-SSPR-Two-Methods.json"
+}
