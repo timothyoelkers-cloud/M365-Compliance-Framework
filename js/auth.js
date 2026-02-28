@@ -10,15 +10,18 @@ const TenantAuth = (() => {
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
   const REDIRECT_URI = window.location.origin + window.location.pathname;
 
-  // Fully-qualified Graph scope URIs — forces token audience to graph.microsoft.com
+  // .default returns ALL admin-consented Graph permissions in the token
+  const GRAPH_TOKEN_SCOPE = ['https://graph.microsoft.com/.default'];
+
+  // Display list for reference
   const GRAPH_SCOPES = [
-    'https://graph.microsoft.com/User.Read',
-    'https://graph.microsoft.com/Policy.ReadWrite.ConditionalAccess',
-    'https://graph.microsoft.com/DeviceManagementManagedDevices.ReadWrite.All',
-    'https://graph.microsoft.com/DeviceManagementConfiguration.ReadWrite.All',
-    'https://graph.microsoft.com/Policy.ReadWrite.Authorization',
-    'https://graph.microsoft.com/Directory.ReadWrite.All',
-    'https://graph.microsoft.com/Policy.ReadWrite.AuthenticationMethod',
+    'User.Read',
+    'Policy.ReadWrite.ConditionalAccess',
+    'DeviceManagementManagedDevices.ReadWrite.All',
+    'DeviceManagementConfiguration.ReadWrite.All',
+    'Policy.ReadWrite.Authorization',
+    'Directory.ReadWrite.All',
+    'Policy.ReadWrite.AuthenticationMethod',
   ];
 
   // ─── Initialization ───
@@ -67,11 +70,17 @@ const TenantAuth = (() => {
     }
   }
 
+  function decodeToken(token) {
+    try {
+      return JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+    } catch (e) { return {}; }
+  }
+
   // ─── Login / Logout ───
   async function login() {
     if (!msalInstance) await init();
     try {
-      // Step 1: Authenticate user with basic OIDC scopes only
+      // Step 1: Authenticate user
       const loginResponse = await msalInstance.loginPopup({
         scopes: ['openid', 'profile'],
       });
@@ -80,19 +89,16 @@ const TenantAuth = (() => {
         msalInstance.setActiveAccount(currentAccount);
         updateAuthState();
 
-        // Step 2: Pre-acquire a Graph token (separate from login token)
+        // Step 2: Pre-acquire Graph token using .default
         try {
           const tokenResponse = await msalInstance.acquireTokenSilent({
-            scopes: GRAPH_SCOPES,
+            scopes: GRAPH_TOKEN_SCOPE,
             account: currentAccount,
           });
-          console.log('[Auth] Graph token acquired, aud:', decodeAud(tokenResponse.accessToken));
+          const decoded = decodeToken(tokenResponse.accessToken);
+          console.log('[Auth] Graph token acquired — aud:', decoded.aud, '| scp:', decoded.scp);
         } catch (e) {
-          // If silent fails, get via popup
-          const tokenResponse = await msalInstance.acquireTokenPopup({
-            scopes: GRAPH_SCOPES,
-          });
-          console.log('[Auth] Graph token acquired via popup, aud:', decodeAud(tokenResponse.accessToken));
+          console.warn('[Auth] Silent token failed, will acquire on demand:', e.message);
         }
       }
       return loginResponse;
@@ -101,12 +107,6 @@ const TenantAuth = (() => {
       if (typeof showToast === 'function') showToast('Login failed: ' + err.message);
       return null;
     }
-  }
-
-  function decodeAud(token) {
-    try {
-      return JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).aud || '?';
-    } catch (e) { return '?'; }
   }
 
   async function logout() {
@@ -126,9 +126,8 @@ const TenantAuth = (() => {
   async function getAccessToken() {
     if (!msalInstance || !currentAccount) return null;
     try {
-      // forceRefresh bypasses cache — always gets a fresh Graph token from token endpoint
       const response = await msalInstance.acquireTokenSilent({
-        scopes: GRAPH_SCOPES,
+        scopes: GRAPH_TOKEN_SCOPE,
         account: currentAccount,
         forceRefresh: true,
       });
@@ -137,7 +136,7 @@ const TenantAuth = (() => {
       if (err instanceof msal.InteractionRequiredAuthError) {
         try {
           const response = await msalInstance.acquireTokenPopup({
-            scopes: GRAPH_SCOPES,
+            scopes: GRAPH_TOKEN_SCOPE,
           });
           if (response && response.account) {
             currentAccount = response.account;

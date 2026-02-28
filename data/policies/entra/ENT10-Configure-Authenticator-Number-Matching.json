@@ -1,47 +1,309 @@
 {
-  "id": "ENT10",
-  "file": "ENT10-Configure-Authenticator-Number-Matching.json",
-  "type": "entra",
-  "displayName": "ENT10 | Configure-Authenticator-Number-Matching",
-  "description": "Enables number matching and additional context for Microsoft Authenticator push notifications. Prevents MFA fatigue attacks. Requires users to type number shown at sign-in into Authenticator app.",
-  "frameworks": [
-    "NIS2",
-    "ISO 27001:2022",
-    "NIST SP 800-53 Rev.5",
-    "UK NCSC CAF v3.2",
-    "SOC 2",
-    "GDPR (EU) 2016/679",
-    "FedRAMP Moderate",
-    "HITRUST CSF v11",
-    "BSI IT-Grundschutz",
-    "ENS (Spain) RD311/22",
-    "IASME Cyber Assurance",
-    "UK CS&R Bill 2025",
-    "DORA",
-    "NIST CSF 1.1",
-    "UK NCSC Cyber Essentials v3.2",
-    "ASD Essential Eight",
-    "NZ ISM v3.8",
-    "MITRE ATT&CK",
-    "CISA CPG",
-    "CRI Profile v2.0",
-    "Microsoft Cloud Security Benchmark",
-    "CJIS v6",
-    "HPH CPGs",
-    "TSA Security Directive",
-    "EU Cyber Resilience Act",
-    "SEC Cyber Rule"
+  "_metadata": {
+    "id": "ENT10",
+    "title": "Configure Microsoft Authenticator Number Matching and Additional Context",
+    "description": "Enables number matching and additional context (application name and geographic location) for Microsoft Authenticator push notifications. Prevents MFA fatigue attacks by requiring users to type the number displayed at the sign-in screen into the Authenticator app, rather than simply approving a push notification.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-27",
+    "frameworks": [
+      "NIS2", "ISO 27001:2022", "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2", "SOC 2", "GDPR (EU) 2016/679",
+      "FedRAMP Moderate", "HITRUST CSF v11", "BSI IT-Grundschutz",
+      "DORA", "CMMC v2.0", "NIST CSF 1.1",
+      "ASD Essential Eight", "NZ ISM v3.8",
+      "MITRE ATT&CK", "Microsoft Cloud Security Benchmark",
+      "CJIS v6", "EU Cyber Resilience Act", "SEC Cyber Rule"
+    ],
+    "cisChecks": ["1.2.1", "5.2.3.4", "5.2.3.5"],
+    "mitreMappings": ["T1621", "T1078", "T1556"],
+    "requiredLicences": [
+      "Microsoft Entra ID Free (number matching is available on all plans)",
+      "Microsoft Entra ID P1 or P2 (for Conditional Access integration)"
+    ],
+    "requiredRoles": ["Global Administrator", "Authentication Policy Administrator"],
+    "deploymentOrder": 10,
+    "importMethod": "powershell-graph",
+    "importScript": "scripts/Import-EntraSettings.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Global Administrator or Authentication Policy Administrator role required",
+      "Users must have Microsoft Authenticator app installed and registered",
+      "Number matching is now enabled by default for all Entra ID tenants (since May 2023)",
+      "Verify current state before deployment - may already be enforced",
+      "Ensure users are aware of the changed MFA experience before enabling",
+      "NFC-based authentication and Watch notifications do not support number matching"
+    ],
+    "mfaFatigueContext": {
+      "attack": "MFA fatigue (also known as MFA bombing or MFA push spam)",
+      "technique": "Attacker repeatedly triggers MFA push notifications hoping the user will approve one out of frustration",
+      "realWorldExamples": [
+        "Uber breach (September 2022) - attacker used MFA fatigue to gain initial access",
+        "Cisco breach (May 2022) - MFA fatigue attack via repeated Duo push notifications"
+      ],
+      "mitigation": "Number matching requires the user to see a number on the sign-in screen and type it into the Authenticator app, making blind approval impossible"
+    },
+    "deploymentSteps": [
+      "1. Verify current Authenticator configuration via Graph API",
+      "2. Enable number matching for all users (may already be default)",
+      "3. Enable application name display in push notifications",
+      "4. Enable geographic location display in push notifications",
+      "5. Test MFA flow to confirm number matching appears",
+      "6. Communicate the change to users with guidance on the new experience"
+    ],
+    "rollbackProcedure": "PATCH authenticationMethodConfigurations/MicrosoftAuthenticator with numberMatchingRequiredState.state: 'default' (note: Microsoft enforces number matching by default since May 2023, so rolling back may not disable it)"
+  },
+  "graphApiCalls": [
+    {
+      "stepOrder": 1,
+      "description": "Get current Microsoft Authenticator authentication method configuration",
+      "method": "GET",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator",
+      "headers": {
+        "Authorization": "Bearer <ACCESS-TOKEN>"
+      },
+      "_explanation": "Retrieve the current Microsoft Authenticator configuration to verify the existing state of number matching and additional context settings."
+    },
+    {
+      "stepOrder": 2,
+      "description": "Enable number matching, application context, and location context for Microsoft Authenticator",
+      "method": "PATCH",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator",
+      "headers": {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer <ACCESS-TOKEN>"
+      },
+      "body": {
+        "@odata.type": "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+        "state": "enabled",
+        "featureSettings": {
+          "numberMatchingRequiredState": {
+            "state": "enabled",
+            "includeTarget": {
+              "targetType": "group",
+              "id": "all_users"
+            }
+          },
+          "displayAppInformationRequiredState": {
+            "state": "enabled",
+            "includeTarget": {
+              "targetType": "group",
+              "id": "all_users"
+            }
+          },
+          "displayLocationInformationRequiredState": {
+            "state": "enabled",
+            "includeTarget": {
+              "targetType": "group",
+              "id": "all_users"
+            }
+          }
+        },
+        "includeTargets": [
+          {
+            "targetType": "group",
+            "id": "all_users",
+            "authenticationMode": "any"
+          }
+        ]
+      },
+      "_explanation": "Enables three critical features for Microsoft Authenticator: (1) Number matching - users must type the number shown on the sign-in screen into the Authenticator app, preventing MFA fatigue attacks. (2) Application name display - shows the name of the application requesting authentication, helping users identify suspicious sign-in attempts. (3) Geographic location display - shows the approximate location of the sign-in request, enabling users to detect sign-ins from unexpected locations."
+    },
+    {
+      "stepOrder": 3,
+      "description": "Verify Microsoft Authenticator configuration is applied",
+      "method": "GET",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator",
+      "headers": {
+        "Authorization": "Bearer <ACCESS-TOKEN>"
+      },
+      "expectedResponse": {
+        "state": "enabled",
+        "featureSettings": {
+          "numberMatchingRequiredState": {
+            "state": "enabled"
+          },
+          "displayAppInformationRequiredState": {
+            "state": "enabled"
+          },
+          "displayLocationInformationRequiredState": {
+            "state": "enabled"
+          }
+        }
+      }
+    }
   ],
-  "cisChecks": [
-    "1.2.1",
-    "5.2.3.4",
-    "5.2.3.5"
-  ],
-  "importMethod": "powershell-graph",
-  "importScript": "scripts/Import-EntraSettings.ps1",
-  "deployState": "",
-  "prerequisite": "",
-  "requiredLicence": "",
-  "version": "1.0",
-  "path": "policies/entra/ENT10-Configure-Authenticator-Number-Matching.json"
+  "graphApiCallsBeta": {
+    "_description": "Beta endpoint with additional companion app settings",
+    "steps": [
+      {
+        "stepOrder": 1,
+        "description": "Configure Authenticator with companion app lock-out (beta)",
+        "method": "PATCH",
+        "endpoint": "https://graph.microsoft.com/beta/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator",
+        "headers": {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer <ACCESS-TOKEN>"
+        },
+        "body": {
+          "@odata.type": "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+          "state": "enabled",
+          "featureSettings": {
+            "numberMatchingRequiredState": {
+              "state": "enabled",
+              "includeTarget": {
+                "targetType": "group",
+                "id": "all_users"
+              }
+            },
+            "displayAppInformationRequiredState": {
+              "state": "enabled",
+              "includeTarget": {
+                "targetType": "group",
+                "id": "all_users"
+              }
+            },
+            "displayLocationInformationRequiredState": {
+              "state": "enabled",
+              "includeTarget": {
+                "targetType": "group",
+                "id": "all_users"
+              }
+            },
+            "companionAppAllowedState": {
+              "state": "enabled",
+              "includeTarget": {
+                "targetType": "group",
+                "id": "all_users"
+              }
+            }
+          },
+          "isSoftwareOathEnabled": false
+        },
+        "_explanation": "Beta endpoint includes companion app settings and the ability to disable software OATH tokens in favour of push notifications with number matching."
+      }
+    ]
+  },
+  "powershellAlternative": {
+    "module": "Microsoft.Graph",
+    "commands": [
+      {
+        "description": "Connect to Microsoft Graph with required scopes",
+        "command": "Connect-MgGraph -Scopes 'Policy.ReadWrite.AuthenticationMethod'"
+      },
+      {
+        "description": "Get current Authenticator configuration",
+        "command": "Get-MgPolicyAuthenticationMethodPolicyAuthenticationMethodConfiguration -AuthenticationMethodConfigurationId 'MicrosoftAuthenticator' | ConvertTo-Json -Depth 10"
+      },
+      {
+        "description": "Enable number matching, app context, and location context for all users",
+        "command": "Update-MgPolicyAuthenticationMethodPolicyAuthenticationMethodConfiguration -AuthenticationMethodConfigurationId 'MicrosoftAuthenticator' -BodyParameter @{'@odata.type'='#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration'; state='enabled'; featureSettings=@{numberMatchingRequiredState=@{state='enabled'; includeTarget=@{targetType='group'; id='all_users'}}; displayAppInformationRequiredState=@{state='enabled'; includeTarget=@{targetType='group'; id='all_users'}}; displayLocationInformationRequiredState=@{state='enabled'; includeTarget=@{targetType='group'; id='all_users'}}}; includeTargets=@(@{targetType='group'; id='all_users'; authenticationMode='any'})}"
+      },
+      {
+        "description": "Verify the configuration",
+        "command": "$config = Get-MgPolicyAuthenticationMethodPolicyAuthenticationMethodConfiguration -AuthenticationMethodConfigurationId 'MicrosoftAuthenticator'; $config.AdditionalProperties.featureSettings | ConvertTo-Json -Depth 5"
+      }
+    ]
+  },
+  "entraPortalPath": {
+    "navigation": "Entra admin center > Protection > Authentication methods > Microsoft Authenticator",
+    "settings": {
+      "state": "Enabled",
+      "target": "All users",
+      "authenticationMode": "Any",
+      "numberMatching": {
+        "status": "Enabled",
+        "target": "All users",
+        "_portalLabel": "Require number matching for push notifications"
+      },
+      "showApplicationInPushNotifications": {
+        "status": "Enabled",
+        "target": "All users",
+        "_portalLabel": "Show application name in push and passwordless notifications"
+      },
+      "showGeographicLocationInPushNotifications": {
+        "status": "Enabled",
+        "target": "All users",
+        "_portalLabel": "Show geographic location in push and passwordless notifications"
+      }
+    }
+  },
+  "featureDetails": {
+    "numberMatching": {
+      "description": "Requires the user to enter a two-digit number displayed on the sign-in screen into the Microsoft Authenticator app to approve the MFA request",
+      "userExperience": "Sign-in screen shows a two-digit number (e.g., '37'). User opens Authenticator, sees the approval request, and must type '37' to approve.",
+      "securityBenefit": "Eliminates blind approval of push notifications. User must actively view the sign-in screen to see the number.",
+      "attackMitigated": "MFA fatigue / MFA bombing (MITRE T1621)",
+      "enforcementStatus": "Enforced by default since May 8, 2023 for all Entra ID tenants"
+    },
+    "applicationContext": {
+      "description": "Displays the name of the application requesting authentication in the Authenticator push notification",
+      "userExperience": "Push notification shows 'Sign in to [Application Name]?' instead of generic 'Approve sign-in request?'",
+      "securityBenefit": "Users can identify if the sign-in request matches the application they are trying to access",
+      "attackMitigated": "Phishing and social engineering where attacker triggers MFA for a different application"
+    },
+    "locationContext": {
+      "description": "Displays the approximate geographic location of the sign-in request in the Authenticator push notification",
+      "userExperience": "Push notification shows the city and country of the sign-in request (e.g., 'Sign-in from London, United Kingdom')",
+      "securityBenefit": "Users can identify sign-in attempts from unexpected or foreign locations",
+      "attackMitigated": "Credential theft with remote access - user can detect sign-in from attacker's location",
+      "accuracy": "Location is based on IP geolocation and may not be precise for VPN users"
+    }
+  },
+  "groupTargeting": {
+    "_description": "For phased rollout, target specific groups instead of all_users",
+    "phasedRolloutExample": {
+      "phase1": {
+        "description": "IT and Security teams",
+        "targetGroup": "<IT-SECURITY-GROUP-ID>",
+        "duration": "1 week"
+      },
+      "phase2": {
+        "description": "All office-based employees",
+        "targetGroup": "<OFFICE-EMPLOYEES-GROUP-ID>",
+        "duration": "2 weeks"
+      },
+      "phase3": {
+        "description": "All users",
+        "targetGroup": "all_users",
+        "duration": "Permanent"
+      }
+    },
+    "graphApiPhasedExample": {
+      "method": "PATCH",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator",
+      "body": {
+        "@odata.type": "#microsoft.graph.microsoftAuthenticatorAuthenticationMethodConfiguration",
+        "state": "enabled",
+        "featureSettings": {
+          "numberMatchingRequiredState": {
+            "state": "enabled",
+            "includeTarget": {
+              "targetType": "group",
+              "id": "<TARGET-GROUP-ID>"
+            }
+          }
+        },
+        "includeTargets": [
+          {
+            "targetType": "group",
+            "id": "<TARGET-GROUP-ID>",
+            "authenticationMode": "any"
+          }
+        ]
+      }
+    }
+  },
+  "monitoringAndReporting": {
+    "signInLogs": {
+      "description": "Monitor sign-in logs for Authenticator usage patterns",
+      "logAnalyticsQuery": "SigninLogs | where AuthenticationDetails has 'microsoftAuthenticator' | summarize count() by ResultType, AuthenticationMethodDetail | order by count_ desc",
+      "_note": "Track adoption of number matching by monitoring successful vs failed Authenticator authentications"
+    },
+    "registrationReport": {
+      "description": "Check user registration status for Microsoft Authenticator",
+      "graphEndpoint": "https://graph.microsoft.com/v1.0/reports/authenticationMethods/userRegistrationDetails",
+      "powershellCommand": "Get-MgReportAuthenticationMethodUserRegistrationDetail | Where-Object { $_.MethodsRegistered -contains 'microsoftAuthenticator' } | Measure-Object"
+    }
+  }
 }

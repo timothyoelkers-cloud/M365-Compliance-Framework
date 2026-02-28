@@ -18,8 +18,29 @@ const DeployEngine = (() => {
     return clone;
   }
 
+  // Remove empty arrays/objects and null values to prevent Graph from
+  // checking permissions for fields that aren't actually used
+  function cleanPayload(obj) {
+    if (Array.isArray(obj)) return obj.map(cleanPayload);
+    if (obj && typeof obj === 'object') {
+      const out = {};
+      for (const [k, v] of Object.entries(obj)) {
+        if (v === null || v === undefined) continue;
+        if (Array.isArray(v) && v.length === 0) continue;
+        if (typeof v === 'object' && !Array.isArray(v)) {
+          const cleaned = cleanPayload(v);
+          if (Object.keys(cleaned).length > 0) out[k] = cleaned;
+        } else {
+          out[k] = cleanPayload(v);
+        }
+      }
+      return out;
+    }
+    return obj;
+  }
+
   function extractConditionalAccessPayload(raw) {
-    const body = stripMeta(raw);
+    const body = cleanPayload(stripMeta(raw));
     return {
       calls: [{
         endpoint: '/v1.0/identity/conditionalAccess/policies',
@@ -176,7 +197,7 @@ const DeployEngine = (() => {
           console.error('[Deploy Debug] Token audience:', tokenInfo.aud);
           console.error('[Deploy Debug] Token appId:', tokenInfo.appid);
           console.error('[Deploy Debug] Endpoint:', method, url);
-          return { success: false, status: res.status, error: msg + ' [Token scp: ' + tokenInfo.scp + ']', data: data };
+          return { success: false, status: res.status, error: msg + ' [aud: ' + tokenInfo.aud + ' | scp: ' + tokenInfo.scp + ']', data: data };
         }
         return { success: false, status: res.status, error: msg, data: data };
       }
@@ -185,10 +206,40 @@ const DeployEngine = (() => {
     }
   }
 
+  // Pre-flight: verify Graph token works before attempting deployment
+  let preflightPassed = false;
+  async function runPreflight() {
+    if (preflightPassed) return true;
+    const token = await TenantAuth.getGraphToken();
+    if (!token) {
+      showToast('No Graph token — please sign in first');
+      return false;
+    }
+    const info = decodeTokenScopes(token);
+    console.log('[Preflight] Token aud:', info.aud, '| appid:', info.appid, '| scp:', info.scp);
+
+    // Test basic Graph access
+    const me = await callGraphApi('/v1.0/me', 'GET', null);
+    if (!me.success) {
+      showToast('Graph preflight failed: GET /me returned ' + me.status + ' — ' + me.error);
+      console.error('[Preflight] GET /me failed:', me);
+      return false;
+    }
+    console.log('[Preflight] GET /me OK:', me.data && me.data.displayName);
+    preflightPassed = true;
+    return true;
+  }
+
   async function deploySinglePolicy(id) {
     const pol = AppState.get('policies').find(p => p.id === id);
     if (!pol) return { success: false, error: 'Policy not found' };
     if (!isGraphDeployable(pol.type)) return { success: false, error: 'PowerShell-only policy' };
+
+    // Run preflight on first deployment
+    if (!await runPreflight()) {
+      setDeploymentStatus(id, 'failed', 'Graph API preflight failed — check token');
+      return { success: false, error: 'Preflight failed' };
+    }
 
     setDeploymentStatus(id, 'deploying', 'Deploying...');
 
