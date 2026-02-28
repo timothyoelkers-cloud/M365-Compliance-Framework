@@ -10,8 +10,7 @@ const TenantAuth = (() => {
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
   const REDIRECT_URI = window.location.origin + window.location.pathname;
 
-  // Fully-qualified scope URIs ensure the token is issued for Microsoft Graph
-  // (aud: https://graph.microsoft.com) instead of for the client app itself.
+  // Fully-qualified Graph scope URIs — forces token audience to graph.microsoft.com
   const GRAPH_SCOPES = [
     'https://graph.microsoft.com/User.Read',
     'https://graph.microsoft.com/Policy.ReadWrite.ConditionalAccess',
@@ -72,23 +71,42 @@ const TenantAuth = (() => {
   async function login() {
     if (!msalInstance) await init();
     try {
-      // No prompt:'consent' — admin consent is pre-granted on the app registration.
-      // Using 'consent' would create a user-level grant that overrides admin consent
-      // and strips the admin-only scopes from the token.
-      const response = await msalInstance.loginPopup({
-        scopes: GRAPH_SCOPES,
+      // Step 1: Authenticate user with basic OIDC scopes only
+      const loginResponse = await msalInstance.loginPopup({
+        scopes: ['openid', 'profile'],
       });
-      if (response && response.account) {
-        currentAccount = response.account;
+      if (loginResponse && loginResponse.account) {
+        currentAccount = loginResponse.account;
         msalInstance.setActiveAccount(currentAccount);
         updateAuthState();
+
+        // Step 2: Pre-acquire a Graph token (separate from login token)
+        try {
+          const tokenResponse = await msalInstance.acquireTokenSilent({
+            scopes: GRAPH_SCOPES,
+            account: currentAccount,
+          });
+          console.log('[Auth] Graph token acquired, aud:', decodeAud(tokenResponse.accessToken));
+        } catch (e) {
+          // If silent fails, get via popup
+          const tokenResponse = await msalInstance.acquireTokenPopup({
+            scopes: GRAPH_SCOPES,
+          });
+          console.log('[Auth] Graph token acquired via popup, aud:', decodeAud(tokenResponse.accessToken));
+        }
       }
-      return response;
+      return loginResponse;
     } catch (err) {
       console.error('Login failed:', err);
       if (typeof showToast === 'function') showToast('Login failed: ' + err.message);
       return null;
     }
+  }
+
+  function decodeAud(token) {
+    try {
+      return JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))).aud || '?';
+    } catch (e) { return '?'; }
   }
 
   async function logout() {
@@ -108,9 +126,11 @@ const TenantAuth = (() => {
   async function getAccessToken() {
     if (!msalInstance || !currentAccount) return null;
     try {
+      // forceRefresh bypasses cache — always gets a fresh Graph token from token endpoint
       const response = await msalInstance.acquireTokenSilent({
         scopes: GRAPH_SCOPES,
         account: currentAccount,
+        forceRefresh: true,
       });
       return response.accessToken;
     } catch (err) {
