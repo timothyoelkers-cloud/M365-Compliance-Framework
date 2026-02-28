@@ -10,14 +10,16 @@ const TenantAuth = (() => {
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
   const REDIRECT_URI = window.location.origin + window.location.pathname;
 
+  // Fully-qualified scope URIs ensure the token is issued for Microsoft Graph
+  // (aud: https://graph.microsoft.com) instead of for the client app itself.
   const GRAPH_SCOPES = [
-    'User.Read',
-    'Policy.ReadWrite.ConditionalAccess',
-    'DeviceManagementManagedDevices.ReadWrite.All',
-    'DeviceManagementConfiguration.ReadWrite.All',
-    'Policy.ReadWrite.Authorization',
-    'Directory.ReadWrite.All',
-    'Policy.ReadWrite.AuthenticationMethod',
+    'https://graph.microsoft.com/User.Read',
+    'https://graph.microsoft.com/Policy.ReadWrite.ConditionalAccess',
+    'https://graph.microsoft.com/DeviceManagementManagedDevices.ReadWrite.All',
+    'https://graph.microsoft.com/DeviceManagementConfiguration.ReadWrite.All',
+    'https://graph.microsoft.com/Policy.ReadWrite.Authorization',
+    'https://graph.microsoft.com/Directory.ReadWrite.All',
+    'https://graph.microsoft.com/Policy.ReadWrite.AuthenticationMethod',
   ];
 
   // ─── Initialization ───
