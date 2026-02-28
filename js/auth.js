@@ -10,6 +10,7 @@ const TenantAuth = (() => {
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
   const REDIRECT_URI = window.location.origin + window.location.pathname;
 
+  // Individual scopes (shown on consent screen)
   const GRAPH_SCOPES = [
     'User.Read',
     'Policy.ReadWrite.ConditionalAccess',
@@ -19,6 +20,9 @@ const TenantAuth = (() => {
     'Directory.ReadWrite.All',
     'Policy.ReadWrite.AuthenticationMethod',
   ];
+
+  // .default scope — returns ALL admin-consented permissions in the token
+  const TOKEN_SCOPES = ['https://graph.microsoft.com/.default'];
 
   // ─── Initialization ───
   async function init() {
@@ -110,11 +114,11 @@ const TenantAuth = (() => {
   }
 
   // ─── Token Acquisition ───
-  async function getAccessToken(scopes) {
+  async function getAccessToken() {
     if (!msalInstance || !currentAccount) return null;
     try {
       const response = await msalInstance.acquireTokenSilent({
-        scopes: scopes || GRAPH_SCOPES,
+        scopes: TOKEN_SCOPES,
         account: currentAccount,
         forceRefresh: true,
       });
@@ -123,7 +127,7 @@ const TenantAuth = (() => {
       if (err instanceof msal.InteractionRequiredAuthError) {
         try {
           const response = await msalInstance.acquireTokenPopup({
-            scopes: scopes || GRAPH_SCOPES,
+            scopes: TOKEN_SCOPES,
             prompt: 'consent',
           });
           if (response && response.account) {
@@ -142,7 +146,7 @@ const TenantAuth = (() => {
   }
 
   async function getGraphToken() {
-    return getAccessToken(GRAPH_SCOPES);
+    return getAccessToken();
   }
 
   // ─── Auth State ───

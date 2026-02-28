@@ -36,6 +36,18 @@ const DeployEngine = (() => {
     let endpoint;
     if (odata.toLowerCase().includes('compliancepolicy')) {
       endpoint = '/v1.0/deviceManagement/deviceCompliancePolicies';
+      // Graph API requires scheduledActionsForRule with a block action
+      if (!body.scheduledActionsForRule || body.scheduledActionsForRule.length === 0) {
+        body.scheduledActionsForRule = [{
+          ruleName: 'DefaultRule',
+          scheduledActionConfigurations: [{
+            actionType: 'block',
+            gracePeriodHours: 0,
+            notificationTemplateId: '',
+            notificationMessageCCList: [],
+          }],
+        }];
+      }
     } else {
       endpoint = '/v1.0/deviceManagement/deviceConfigurations';
     }
