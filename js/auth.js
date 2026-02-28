@@ -1,9 +1,14 @@
 /* ═══════════════════════════════════════════
    TENANT AUTH — MSAL.js 2.x browser authentication
+   App Registration: "Framework-Assessment-Deployment"
 ═══════════════════════════════════════════ */
 const TenantAuth = (() => {
   let msalInstance = null;
   let currentAccount = null;
+
+  // ─── App Registration: Framework-Assessment-Deployment ───
+  const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
+  const REDIRECT_URI = window.location.origin + window.location.pathname;
 
   const GRAPH_SCOPES = [
     'User.Read',
@@ -15,19 +20,18 @@ const TenantAuth = (() => {
     'Policy.ReadWrite.AuthenticationMethod',
   ];
 
-  const CLIENT_ID_KEY = 'm365-compliance-clientId';
-
   // ─── Initialization ───
-  async function init(clientId, redirectUri) {
+  async function init() {
+    if (msalInstance) return true;
     if (!window.msal) {
       console.error('MSAL.js not loaded');
       return false;
     }
     const config = {
       auth: {
-        clientId: clientId,
+        clientId: CLIENT_ID,
         authority: 'https://login.microsoftonline.com/common',
-        redirectUri: redirectUri || window.location.origin + window.location.pathname,
+        redirectUri: REDIRECT_URI,
       },
       cache: {
         cacheLocation: 'localStorage',
@@ -48,7 +52,6 @@ const TenantAuth = (() => {
         msalInstance.setActiveAccount(currentAccount);
         updateAuthState();
       } else {
-        // Check for already logged-in accounts
         const accounts = msalInstance.getAllAccounts();
         if (accounts.length > 0) {
           currentAccount = accounts[0];
@@ -65,12 +68,22 @@ const TenantAuth = (() => {
 
   // ─── Login / Logout ───
   async function login() {
-    if (!msalInstance) return;
+    if (!msalInstance) await init();
     try {
-      await msalInstance.loginRedirect({ scopes: GRAPH_SCOPES });
+      const response = await msalInstance.loginPopup({
+        scopes: GRAPH_SCOPES,
+        prompt: 'consent',
+      });
+      if (response && response.account) {
+        currentAccount = response.account;
+        msalInstance.setActiveAccount(currentAccount);
+        updateAuthState();
+      }
+      return response;
     } catch (err) {
       console.error('Login failed:', err);
       if (typeof showToast === 'function') showToast('Login failed: ' + err.message);
+      return null;
     }
   }
 
@@ -79,8 +92,8 @@ const TenantAuth = (() => {
     currentAccount = null;
     updateAuthState();
     try {
-      await msalInstance.logoutRedirect({
-        postLogoutRedirectUri: window.location.origin + window.location.pathname,
+      await msalInstance.logoutPopup({
+        postLogoutRedirectUri: REDIRECT_URI,
       });
     } catch (err) {
       console.error('Logout error:', err);
@@ -99,11 +112,12 @@ const TenantAuth = (() => {
     } catch (err) {
       if (err instanceof msal.InteractionRequiredAuthError) {
         try {
-          await msalInstance.acquireTokenRedirect({
+          const response = await msalInstance.acquireTokenPopup({
             scopes: scopes || GRAPH_SCOPES,
           });
-        } catch (redirectErr) {
-          console.error('Token redirect failed:', redirectErr);
+          return response.accessToken;
+        } catch (popupErr) {
+          console.error('Token popup failed:', popupErr);
         }
       } else {
         console.error('Token acquisition failed:', err);
@@ -139,23 +153,11 @@ const TenantAuth = (() => {
     }
   }
 
-  // ─── Client ID Storage ───
-  function getStoredClientId() {
-    try { return localStorage.getItem(CLIENT_ID_KEY) || ''; }
-    catch (e) { return ''; }
-  }
-
-  function setStoredClientId(clientId) {
-    try { localStorage.setItem(CLIENT_ID_KEY, clientId); }
-    catch (e) { /* storage unavailable */ }
-  }
-
   return {
     init, handleRedirectPromise,
     login, logout,
     getAccessToken, getGraphToken,
     isAuthenticated, getAccount, updateAuthState,
-    getStoredClientId, setStoredClientId,
     GRAPH_SCOPES,
   };
 })();

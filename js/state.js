@@ -36,11 +36,10 @@ const AppState = (() => {
     sidebarOpen: false,
     navOpen: false,
 
-    // Auth (session-only except clientId)
+    // Auth (session-only)
     authIsConnected: false,
     authAccount: null,
     authTenantId: null,
-    authClientId: '',
 
     // Deployment (session-only)
     deploymentStatus: {},
@@ -85,7 +84,6 @@ const AppState = (() => {
         checkStatus: state.checkStatus,
         assessmentStep: state.assessmentStep,
         selectedPolicies: [...state.selectedPolicies],
-        authClientId: state.authClientId,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
     } catch (e) { /* storage full or unavailable */ }
@@ -99,7 +97,6 @@ const AppState = (() => {
       if (saved.checkStatus) state.checkStatus = saved.checkStatus;
       if (saved.assessmentStep) state.assessmentStep = saved.assessmentStep;
       if (saved.selectedPolicies) state.selectedPolicies = new Set(saved.selectedPolicies);
-      if (saved.authClientId) state.authClientId = saved.authClientId;
     } catch (e) { /* corrupt data */ }
   }
 
