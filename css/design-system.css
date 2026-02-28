@@ -52,28 +52,43 @@
   --purple-lt:    #f5f3ff;
 
   /* ── Borders & Shadows ──────────────── */
-  --r:            0px;
-  --r2:           2px;
-  --r3:           4px;
-  --r4:           8px;
+  --r:            8px;
+  --r2:           12px;
+  --r3:           16px;
+  --r4:           24px;
   --shadow:       0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.04);
   --shadow2:      0 4px 12px rgba(0,0,0,.1), 0 2px 4px rgba(0,0,0,.06);
   --shadow3:      0 10px 30px rgba(0,0,0,.12);
+  --shadow-glass: 0 8px 32px rgba(0,0,0,.08), 0 2px 8px rgba(0,0,0,.04);
+  --shadow-glass-lg: 0 16px 48px rgba(0,0,0,.12), 0 4px 12px rgba(0,0,0,.06);
+
+  /* ── Glassmorphism ─────────────────── */
+  --glass-bg:     rgba(255,255,255,0.65);
+  --glass-bg2:    rgba(255,255,255,0.45);
+  --glass-dark:   rgba(13,17,23,0.75);
+  --glass-dark2:  rgba(22,27,34,0.65);
+  --glass-blur:   blur(16px);
+  --glass-blur-sm: blur(8px);
+  --glass-blur-lg: blur(24px);
+  --glass-border: rgba(255,255,255,0.18);
+  --glass-border-dark: rgba(255,255,255,0.08);
 
   /* ── Transitions ────────────────────── */
   --ease:         cubic-bezier(.4,0,.2,1);
-  --dur:          150ms;
+  --dur:          200ms;
 }
 
 /* ── RESET ────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 14px; background: var(--bg); -webkit-font-smoothing: antialiased; }
+html { font-size: 14px; -webkit-font-smoothing: antialiased; }
 body {
   font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   color: var(--ink);
   min-height: 100vh;
   overflow-x: hidden;
   line-height: 1.5;
+  background: linear-gradient(135deg, #e8ecf4 0%, #f4f0f8 50%, #e8f4f0 100%);
+  background-attachment: fixed;
 }
 
 /* ── TYPOGRAPHY ───────────────────────── */

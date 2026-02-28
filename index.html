@@ -16,9 +16,137 @@
     #app { display: block !important; }
     #report-canvas { box-shadow: none !important; border: none !important; }
   }
+
+  /* ── ACCESS GATE ────────────────────── */
+  .access-gate {
+    position: fixed; inset: 0; z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #0d1117 0%, #161b22 40%, #1a1030 70%, #0d1117 100%);
+    transition: opacity .5s cubic-bezier(.4,0,.2,1), visibility .5s;
+  }
+  .access-gate.hidden {
+    opacity: 0; visibility: hidden; pointer-events: none;
+  }
+  .access-gate::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(rgba(55,62,71,.15) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(55,62,71,.15) 1px, transparent 1px);
+    background-size: 40px 40px;
+    animation: gateGridDrift 20s linear infinite;
+  }
+  @keyframes gateGridDrift {
+    from { transform: translate(0,0); }
+    to { transform: translate(40px,40px); }
+  }
+  .gate-card {
+    position: relative; z-index: 1;
+    background: rgba(22, 27, 34, 0.65);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid rgba(255,255,255,.08);
+    border-top-color: rgba(255,255,255,.15);
+    border-radius: 16px;
+    padding: 48px 40px 36px;
+    width: 380px; max-width: 90vw;
+    text-align: center;
+    box-shadow: 0 16px 48px rgba(0,0,0,.4), 0 4px 12px rgba(0,0,0,.2);
+  }
+  .gate-logo {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    margin-bottom: 8px;
+  }
+  .gate-logo-mark {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #f0a500, #0891b2);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    flex-shrink: 0;
+  }
+  .gate-logo-text {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 1rem;
+    letter-spacing: -.01em; color: #e6edf3;
+    line-height: 1.15; text-align: left;
+  }
+  .gate-logo-text span { color: #f0a500; }
+  .gate-subtitle {
+    font-size: .78rem; color: #6e7681;
+    margin: 16px 0 24px;
+  }
+  .gate-input-wrap { position: relative; margin-bottom: 16px; }
+  .gate-input {
+    width: 100%; padding: 12px 16px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: .82rem; color: #e6edf3;
+    background: rgba(13, 17, 23, 0.6);
+    border: 1px solid rgba(255,255,255,.1);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .gate-input:focus {
+    border-color: #f0a500;
+    box-shadow: 0 0 0 3px rgba(240,165,0,.15);
+  }
+  .gate-input::placeholder { color: #6e7681; }
+  .gate-error {
+    font-size: .68rem; color: #dc2626;
+    margin-top: 8px;
+    opacity: 0; transform: translateY(-4px);
+    transition: opacity .2s, transform .2s;
+  }
+  .gate-error.visible {
+    opacity: 1; transform: translateY(0);
+  }
+  .gate-btn {
+    width: 100%; padding: 12px;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: .82rem;
+    letter-spacing: .02em;
+    background: linear-gradient(135deg, #f0a500, #d98e00);
+    color: #fff; border: none; border-radius: 8px;
+    cursor: pointer;
+    transition: transform .15s, box-shadow .15s;
+  }
+  .gate-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(240,165,0,.3);
+  }
+  .gate-btn:active { transform: translateY(0); }
+  .gate-request {
+    display: inline-block; margin-top: 20px;
+    font-size: .68rem; color: #6e7681;
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .gate-request:hover { color: #f0a500; text-decoration: none; }
+  @keyframes gateShake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+  .gate-card.shake { animation: gateShake .4s ease-in-out; }
 </style>
 </head>
 <body>
+
+<!-- ═══ ACCESS GATE ═══ -->
+<div id="access-gate" class="access-gate">
+  <div class="gate-card">
+    <div class="gate-logo">
+      <div class="gate-logo-mark"></div>
+      <div class="gate-logo-text">M365 Compliance<br><span>Framework</span></div>
+    </div>
+    <p class="gate-subtitle">Enter your access code to continue</p>
+    <div class="gate-input-wrap">
+      <input type="password" id="gate-input" class="gate-input" placeholder="Access code" autocomplete="off" autofocus>
+      <div class="gate-error" id="gate-error">Invalid access code</div>
+    </div>
+    <button class="gate-btn" id="gate-btn" onclick="validateGate()">Unlock</button>
+    <a class="gate-request" href="mailto:timothy.oelkers@outlook.com?subject=M365%20Compliance%20Framework%20-%20Access%20Request">Request Access</a>
+  </div>
+</div>
 
 <!-- ═══ TOPBAR ═══ -->
 <header id="topbar">
@@ -459,8 +587,57 @@ function renderHomeFwGroups() {
   }).join('');
 }
 
-// Start the app
-bootstrap();
+// ── Access Gate ──
+const GATE_HASH = '29352a43448317a963073bb9349844a2a2c993bf8072ff612be31e5943c40a47';
+const GATE_TOKEN_KEY = 'm365-gate-token';
+
+async function sha256(text) {
+  const data = new TextEncoder().encode(text);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function checkAccess() {
+  const token = localStorage.getItem(GATE_TOKEN_KEY);
+  if (token === GATE_HASH) {
+    grantAccess();
+  } else {
+    document.getElementById('access-gate').classList.remove('hidden');
+    document.getElementById('gate-input').focus();
+  }
+}
+
+async function validateGate() {
+  const input = document.getElementById('gate-input').value;
+  if (!input) return;
+  const hash = await sha256(input);
+  if (hash === GATE_HASH) {
+    localStorage.setItem(GATE_TOKEN_KEY, GATE_HASH);
+    grantAccess();
+  } else {
+    const card = document.querySelector('.gate-card');
+    const error = document.getElementById('gate-error');
+    error.classList.add('visible');
+    card.classList.add('shake');
+    setTimeout(() => card.classList.remove('shake'), 400);
+    document.getElementById('gate-input').value = '';
+    document.getElementById('gate-input').focus();
+  }
+}
+
+function grantAccess() {
+  const gate = document.getElementById('access-gate');
+  gate.classList.add('hidden');
+  bootstrap();
+}
+
+// Enter key support for gate input
+document.getElementById('gate-input').addEventListener('keydown', (e) => {
+  if (e.key === 'Enter') validateGate();
+});
+
+// Start with gate check
+checkAccess();
 </script>
 </body>
 </html>

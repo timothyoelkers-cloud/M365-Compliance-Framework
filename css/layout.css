@@ -2,12 +2,13 @@
    LAYOUT — Dark nav/sidebar + Light content
 ═══════════════════════════════════════════ */
 
-/* ── TOPBAR (dark) ────────────────────── */
+/* ── TOPBAR (dark glass) ──────────────── */
 #topbar {
   position: sticky; top: 0; z-index: 200;
-  background: rgba(13,17,23,0.97);
-  backdrop-filter: blur(16px);
-  border-bottom: 1px solid var(--dark-border);
+  background: var(--glass-dark);
+  backdrop-filter: var(--glass-blur-lg);
+  -webkit-backdrop-filter: var(--glass-blur-lg);
+  border-bottom: 1px solid var(--glass-border-dark);
   display: flex; align-items: center; gap: 0;
   height: 54px;
   box-shadow: 0 1px 12px rgba(0,0,0,.25);
@@ -16,7 +17,7 @@
 .logo {
   display: flex; align-items: center; gap: 10px;
   padding: 0 20px; height: 100%;
-  border-right: 1px solid var(--dark-border);
+  border-right: 1px solid var(--glass-border-dark);
   min-width: 230px;
   cursor: pointer;
   text-decoration: none;
@@ -40,7 +41,7 @@
   font-family: 'IBM Plex Mono', monospace;
   font-size: .62rem; color: var(--dark-dim);
   padding: 0 16px;
-  border-right: 1px solid var(--dark-border);
+  border-right: 1px solid var(--glass-border-dark);
   height: 100%; display: flex; align-items: center;
   white-space: nowrap;
 }
@@ -57,7 +58,7 @@
   padding: 0 18px; height: 100%;
   border: none; background: transparent;
   color: var(--dark-muted); cursor: pointer;
-  border-left: 1px solid var(--dark-border);
+  border-left: 1px solid var(--glass-border-dark);
   display: flex; align-items: center; gap: 6px;
   transition: all var(--dur) var(--ease);
   text-decoration: none;
@@ -104,11 +105,13 @@
   min-height: calc(100vh - 54px);
 }
 
-/* ── SIDEBAR (dark) ───────────────────── */
+/* ── SIDEBAR (dark glass) ─────────────── */
 #sidebar {
   width: 260px; min-width: 260px;
-  border-right: 1px solid var(--dark-border);
-  background: var(--dark-bg);
+  border-right: 1px solid var(--glass-border-dark);
+  background: var(--glass-dark);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
   position: sticky; top: 54px;
   height: calc(100vh - 54px);
   overflow-y: auto;
@@ -122,14 +125,14 @@
   font-size: .58rem; letter-spacing: .1em;
   text-transform: uppercase; color: var(--dark-dim);
   padding: 14px 16px 6px;
-  border-bottom: 1px solid var(--dark-border);
-  background: var(--dark-bg2);
+  border-bottom: 1px solid var(--glass-border-dark);
+  background: rgba(22,27,34,.4);
 }
 .sb-item {
   display: flex; align-items: center; gap: 8px;
   padding: 7px 16px; cursor: pointer;
   font-size: .76rem; color: var(--dark-soft);
-  border-bottom: 1px solid var(--dark-border);
+  border-bottom: 1px solid var(--glass-border-dark);
   transition: all var(--dur) var(--ease);
 }
 .sb-item:hover { background: var(--dark-bg2); color: var(--dark-bright); }
@@ -148,8 +151,8 @@
   font-size: .65rem; font-weight: 600;
   text-transform: uppercase; letter-spacing: .06em;
   color: var(--dark-muted);
-  border-bottom: 1px solid var(--dark-border);
-  background: var(--dark-bg2);
+  border-bottom: 1px solid var(--glass-border-dark);
+  background: rgba(22,27,34,.4);
   transition: all var(--dur) var(--ease);
 }
 .sb-group-hdr:hover { color: var(--dark-bright); background: var(--dark-bg3); }
@@ -161,21 +164,23 @@
 .sb-group-body { display: none; }
 .sb-group-hdr.open + .sb-group-body { display: block; }
 
-/* ── MAIN CONTENT (light) ─────────────── */
+/* ── MAIN CONTENT (transparent for glass) ── */
 #main {
   flex: 1; min-width: 0;
   padding: 28px 32px;
-  background: var(--bg);
+  background: transparent;
 }
 
 /* ── PAGE SECTIONS ────────────────────── */
 .page { display: none; }
 .page.active { display: block; }
 
-/* ── FOOTER ───────────────────────────── */
+/* ── FOOTER (dark glass) ─────────────── */
 #footer {
-  background: var(--dark-bg);
-  border-top: 1px solid var(--dark-border);
+  background: var(--glass-dark);
+  backdrop-filter: var(--glass-blur);
+  -webkit-backdrop-filter: var(--glass-blur);
+  border-top: 1px solid var(--glass-border-dark);
   padding: 20px 32px;
   display: flex; align-items: center;
   justify-content: space-between;
@@ -195,8 +200,10 @@
   .nav-toggle { display: block; }
   .topbar-nav {
     position: fixed; top: 54px; left: 0; right: 0;
-    background: var(--dark-bg);
-    border-bottom: 1px solid var(--dark-border);
+    background: var(--glass-dark);
+    backdrop-filter: var(--glass-blur-lg);
+    -webkit-backdrop-filter: var(--glass-blur-lg);
+    border-bottom: 1px solid var(--glass-border-dark);
     flex-direction: column; height: auto;
     display: none; z-index: 190;
   }
