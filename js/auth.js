@@ -91,6 +91,12 @@ const TenantAuth = (() => {
     if (!msalInstance) return;
     currentAccount = null;
     updateAuthState();
+    // Force-clear all MSAL cached tokens from localStorage
+    Object.keys(localStorage).forEach(key => {
+      if (key.indexOf('msal') !== -1 || key.indexOf('login.windows.net') !== -1) {
+        localStorage.removeItem(key);
+      }
+    });
     try {
       await msalInstance.logoutPopup({
         postLogoutRedirectUri: REDIRECT_URI,
@@ -98,6 +104,9 @@ const TenantAuth = (() => {
     } catch (err) {
       console.error('Logout error:', err);
     }
+    // Re-initialize MSAL with a clean instance
+    msalInstance = null;
+    await init();
   }
 
   // ─── Token Acquisition ───
@@ -107,6 +116,7 @@ const TenantAuth = (() => {
       const response = await msalInstance.acquireTokenSilent({
         scopes: scopes || GRAPH_SCOPES,
         account: currentAccount,
+        forceRefresh: true,
       });
       return response.accessToken;
     } catch (err) {
@@ -114,7 +124,12 @@ const TenantAuth = (() => {
         try {
           const response = await msalInstance.acquireTokenPopup({
             scopes: scopes || GRAPH_SCOPES,
+            prompt: 'consent',
           });
+          if (response && response.account) {
+            currentAccount = response.account;
+            msalInstance.setActiveAccount(currentAccount);
+          }
           return response.accessToken;
         } catch (popupErr) {
           console.error('Token popup failed:', popupErr);
