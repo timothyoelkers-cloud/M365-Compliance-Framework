@@ -13,16 +13,23 @@ const TenantAuth = (() => {
   // .default returns ALL admin-consented Graph permissions in the token
   const GRAPH_TOKEN_SCOPE = ['https://graph.microsoft.com/.default'];
 
-  // Display list for reference
+  // Display list — all 16 delegated permissions on the app registration
   const GRAPH_SCOPES = [
     'User.Read',
     'Policy.Read.All',
     'Policy.ReadWrite.ConditionalAccess',
     'Application.Read.All',
-    'DeviceManagementManagedDevices.ReadWrite.All',
+    'DeviceManagementConfiguration.Read.All',
     'DeviceManagementConfiguration.ReadWrite.All',
-    'Policy.ReadWrite.Authorization',
+    'DeviceManagementManagedDevices.Read.All',
+    'DeviceManagementManagedDevices.ReadWrite.All',
+    'DeviceManagementServiceConfig.Read.All',
+    'DeviceManagementServiceConfig.ReadWrite.All',
+    'DeviceManagementApps.Read.All',
+    'DeviceManagementApps.ReadWrite.All',
+    'Directory.Read.All',
     'Directory.ReadWrite.All',
+    'Policy.ReadWrite.Authorization',
     'Policy.ReadWrite.AuthenticationMethod',
   ];
 
