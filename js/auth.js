@@ -16,7 +16,9 @@ const TenantAuth = (() => {
   // Display list for reference
   const GRAPH_SCOPES = [
     'User.Read',
+    'Policy.Read.All',
     'Policy.ReadWrite.ConditionalAccess',
+    'Application.Read.All',
     'DeviceManagementManagedDevices.ReadWrite.All',
     'DeviceManagementConfiguration.ReadWrite.All',
     'Policy.ReadWrite.Authorization',
