@@ -1,0 +1,41 @@
+{
+  "_metadata": {
+    "id": "SPO19",
+    "title": "Block Guest Users from Resharing Content",
+    "description": "Prevents external guest users from resharing content they have been given access to with additional external users. When enabled, guests can access content shared with them but cannot extend sharing to other external parties. This provides a critical control against uncontrolled data dissemination through guest sharing chains.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "DORA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "UK NCSC CAF v3.2",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["7.2.3", "7.2.5"],
+    "severity": "High",
+    "category": "SharePoint Online",
+    "deploymentOrder": 19,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "_notes": "PreventExternalUsersFromResharing stops guest users from forwarding or resharing content with other external users. Without this control, a guest user could share content with additional external parties, creating an uncontrolled chain of external access that bypasses your sharing governance. This applies to all external guest users across all SharePoint Online and OneDrive for Business sites. Internal users retain their normal sharing capabilities based on other tenant and site-level sharing policies."
+  },
+  "cmdlet": "Set-SPOTenant",
+  "parameters": {
+    "PreventExternalUsersFromResharing": true
+  },
+  "postDeployment": [
+    "Get-SPOTenant | Select-Object PreventExternalUsersFromResharing",
+    "Test by signing in as a guest user and attempting to reshare a document with another external email address; the reshare should be blocked",
+    "Verify that internal users can still share content with external guests as permitted by other sharing policies",
+    "Review the current list of external users and their access: Get-SPOExternalUser -PageSize 50 | Select-Object DisplayName, Email, WhenCreated",
+    "Communicate to external partners that they cannot forward or reshare content received from your organisation with additional external parties",
+    "Monitor sharing audit logs for any attempts by guests to reshare: Search-UnifiedAuditLog -Operations SharingSet -UserIds *#ext#* -StartDate (Get-Date).AddDays(-7) -EndDate (Get-Date)"
+  ]
+}

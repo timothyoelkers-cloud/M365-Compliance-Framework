@@ -1,0 +1,162 @@
+{
+  "_metadata": {
+    "id": "PV17",
+    "title": "DLP - Block U.S. Social Security Numbers Shared Externally",
+    "description": "Data Loss Prevention policy that detects and blocks U.S. Social Security Numbers (SSN) from being shared with external recipients across Exchange, SharePoint, OneDrive, and Teams. Protects against accidental or intentional disclosure of one of the most sensitive U.S. personal identifiers.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "HIPAA",
+      "NIST SP 800-53 Rev.5",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "SOC 2",
+      "NYDFS 23 NYCRR 500",
+      "HITRUST CSF v11",
+      "NIS2",
+      "ISO 27001:2022",
+      "GDPR (EU) 2016/679",
+      "PCI DSS v4.0",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "mitreMappings": [
+      "T1048",
+      "T1567",
+      "T1041"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E3 (basic DLP)",
+      "Microsoft 365 E5 or Microsoft 365 E5 Compliance (advanced DLP)",
+      "Microsoft Purview Data Loss Prevention add-on"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Security Administrator"
+    ],
+    "deploymentOrder": 17,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "DLP licensing must be assigned to all users in scope",
+      "Deploy in TestWithNotifications mode first, then switch to Enable after validation",
+      "Ensure Exchange Online, SharePoint Online, and Teams services are active",
+      "U.S. SSN SIT definition is built-in and requires no additional configuration"
+    ],
+    "deploymentSteps": [
+      "1. Connect to Security & Compliance PowerShell",
+      "2. Run the New-DlpCompliancePolicy cmdlet to create the policy",
+      "3. Run the New-DlpComplianceRule cmdlet to create the detection rule",
+      "4. Set Mode to TestWithNotifications for initial 2-week pilot",
+      "5. Review DLP reports in compliance.microsoft.com > Reports > DLP",
+      "6. After validation, change Mode to Enable for enforcement"
+    ],
+    "rollbackProcedure": "Set-DlpCompliancePolicy -Identity 'PV17-DLP-Block-US-SSN-External' -Mode Disable"
+  },
+  "powershellCommands": {
+    "createPolicy": {
+      "cmdlet": "New-DlpCompliancePolicy",
+      "parameters": {
+        "Name": "PV17-DLP-Block-US-SSN-External",
+        "Comment": "Blocks U.S. Social Security Numbers from being shared externally across Exchange, SharePoint, OneDrive, and Teams. HIPAA, NIST, and state privacy law compliance.",
+        "ExchangeLocation": [
+          "All"
+        ],
+        "SharePointLocation": [
+          "All"
+        ],
+        "OneDriveLocation": [
+          "All"
+        ],
+        "TeamsLocation": [
+          "All"
+        ],
+        "Mode": "TestWithNotifications",
+        "Priority": 0
+      }
+    },
+    "createRule": {
+      "cmdlet": "New-DlpComplianceRule",
+      "parameters": {
+        "Name": "PV17-Rule-Block-US-SSN-External",
+        "Policy": "PV17-DLP-Block-US-SSN-External",
+        "ContentContainsSensitiveInformation": [
+          {
+            "name": "U.S. Social Security Number (SSN)",
+            "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+            "minCount": 1,
+            "maxCount": -1,
+            "minConfidence": 85,
+            "maxConfidence": 100
+          }
+        ],
+        "AccessScope": "NotInOrganization",
+        "BlockAccess": true,
+        "BlockAccessScope": "ExternalUsers",
+        "NotifyUser": [
+          "SiteAdmin",
+          "LastModifier"
+        ],
+        "NotifyUserType": "NotifyAll",
+        "NotifyPolicyTipCustomText": "This content contains U.S. Social Security Number(s) and cannot be shared externally. Please remove the sensitive data or contact your compliance team for assistance.",
+        "GenerateAlert": "SiteAdmin",
+        "AlertProperties": {
+          "AggregationType": "SimpleAggregation",
+          "Threshold": 1,
+          "TimeWindow": 60
+        },
+        "GenerateIncidentReport": [],
+        "IncidentReportContent": [
+          "Title",
+          "DocumentAuthor",
+          "DocumentLastModifier",
+          "Service",
+          "MatchedItem",
+          "RulesMatched",
+          "Severity"
+        ],
+        "ReportSeverityLevel": "High"
+      }
+    }
+  },
+  "sensitiveInformationTypes": [
+    {
+      "name": "U.S. Social Security Number (SSN)",
+      "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+      "description": "Detects U.S. Social Security Numbers in both formatted (XXX-XX-XXXX) and unformatted (XXXXXXXXX) patterns with contextual validation",
+      "publisher": "Microsoft",
+      "rulePackId": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "policySettings": {
+    "mode": "TestWithNotifications",
+    "_modeOptions": [
+      "Enable",
+      "TestWithNotifications",
+      "TestWithoutNotifications",
+      "Disable"
+    ],
+    "priority": 0,
+    "workloads": {
+      "exchangeOnline": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true,
+      "microsoftTeams": true,
+      "endpointDevices": false,
+      "onPremisesRepositories": false,
+      "powerBI": false,
+      "thirdPartyApps": false
+    }
+  },
+  "overrideSettings": {
+    "allowOverride": false,
+    "requireBusinessJustification": false,
+    "_note": "U.S. Social Security Numbers must never be shared externally. No override permitted for HIPAA and state privacy law compliance."
+  }
+}

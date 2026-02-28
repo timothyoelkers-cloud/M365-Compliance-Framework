@@ -1,0 +1,38 @@
+{
+  "_metadata": {
+    "id": "SPO16",
+    "title": "Disable Custom Script Execution on SharePoint Sites",
+    "description": "Prevents execution of custom scripts on SharePoint Online sites to mitigate cross-site scripting (XSS), script injection, and other code-based attacks. When enabled, users and administrators cannot add or run custom web parts, scripts, or HTML form web parts that execute client-side code on SharePoint pages.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "UK NCSC CAF v3.2",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [],
+    "severity": "High",
+    "category": "SharePoint Online",
+    "deploymentOrder": 16,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "_notes": "DenyAddAndCustomizePages prevents users from adding custom scripts, Script Editor Web Parts, Content Editor Web Parts with scripts, and custom HTML form web parts. This is a critical security hardening measure that blocks common XSS and injection attack vectors. If developers require custom script capabilities for specific sites, consider using the SharePoint Framework (SPFx) which provides a sandboxed execution environment with governance controls. Individual sites can be temporarily exempted using Set-SPOSite -Identity <url> -DenyAddAndCustomizePages $false but this should be time-limited and audited."
+  },
+  "cmdlet": "Set-SPOTenant",
+  "parameters": {
+    "DenyAddAndCustomizePages": true
+  },
+  "postDeployment": [
+    "Get-SPOTenant | Select-Object DenyAddAndCustomizePages",
+    "Verify that Script Editor and Content Editor web parts with scripts are blocked on a test site",
+    "Audit existing sites for custom script usage: Get-SPOSite -Limit All | Select-Object Url, DenyAddAndCustomizePages | Where-Object {$_.DenyAddAndCustomizePages -eq $false}",
+    "Communicate to developers and site owners that custom scripts are no longer permitted; direct them to the SharePoint Framework (SPFx) for custom development",
+    "Establish a governance process for any temporary exemptions, requiring approval and time-limited access"
+  ]
+}

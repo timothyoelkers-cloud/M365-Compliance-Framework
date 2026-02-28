@@ -1,0 +1,44 @@
+{
+  "_metadata": {
+    "id": "SPO17",
+    "title": "Enable DLP Integration for SharePoint Content Protection",
+    "description": "Enables SharePoint-specific Data Loss Prevention integration by marking newly uploaded files as sensitive by default until they are scanned by the DLP engine. External sharing is blocked for new files until DLP classification is complete, preventing sensitive content from being shared before policies can be evaluated.",
+    "frameworks": [
+      "GDPR (EU) 2016/679",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "DORA",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": ["9.1.6"],
+    "severity": "High",
+    "category": "SharePoint Online",
+    "deploymentOrder": 17,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "_notes": "MarkNewFilesSensitiveByDefault set to BlockExternalSharing ensures that newly uploaded files cannot be externally shared until DLP scanning is complete. This closes a timing gap where sensitive files could be shared externally in the brief window between upload and DLP scan completion. Internal sharing is not affected; only external sharing is blocked pending scan. This setting works in conjunction with Microsoft Purview DLP policies. Ensure DLP policies are configured in the Microsoft Purview compliance portal before enabling this setting for maximum protection."
+  },
+  "cmdlet": "Set-SPOTenant",
+  "parameters": {
+    "MarkNewFilesSensitiveByDefault": "BlockExternalSharing"
+  },
+  "postDeployment": [
+    "Get-SPOTenant | Select-Object MarkNewFilesSensitiveByDefault",
+    "Test by uploading a new file to SharePoint and attempting to share it externally immediately; the share should be blocked until DLP scan completes",
+    "Verify DLP policies are configured in the Microsoft Purview compliance portal: Navigate to Microsoft Purview > Data loss prevention > Policies",
+    "Monitor DLP policy matches in the Activity Explorer: Microsoft Purview > Data loss prevention > Activity explorer",
+    "Communicate to users that newly uploaded files may experience a brief delay before external sharing is available while content is scanned for sensitive information",
+    "Review DLP scan performance and adjust policies if excessive false positives are causing workflow disruption"
+  ]
+}

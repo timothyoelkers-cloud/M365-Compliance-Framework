@@ -69,6 +69,13 @@
   ],
   "checkCount": 63,
   "policies": [
+    "ENT01",
+    "ENT03",
+    "ENT05",
+    "ENT06",
+    "INT01",
+    "PV05",
+    "PV12",
     "SPO01",
     "SPO02",
     "SPO03",
@@ -78,14 +85,7 @@
     "TEA02",
     "TEA03",
     "TEA06",
-    "TEA08",
-    "PV05",
-    "PV12",
-    "ENT01",
-    "ENT03",
-    "ENT05",
-    "ENT06",
-    "INT01"
+    "TEA08"
   ],
   "policyCount": 17,
   "orgProfiles": []

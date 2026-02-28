@@ -1,0 +1,135 @@
+{
+  "_metadata": {
+    "id": "PV23",
+    "title": "Retention Policy - Regulatory Hold for Financial Services",
+    "description": "Immutable retention policy for financial services organisations to comply with SEC Rule 17a-4, FINRA 4511, and MiFID II record-keeping requirements. Applies Preservation Lock to prevent any modification or deletion of the retention policy, ensuring regulatory compliance for broker-dealer and investment advisor records.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "DORA",
+      "NYDFS 23 NYCRR 500",
+      "SEC Cyber Rule",
+      "NIS2",
+      "SOC 2",
+      "ISO 27001:2022",
+      "PCI DSS v4.0",
+      "NIST SP 800-53 Rev.5",
+      "FedRAMP Moderate",
+      "CMMC v2.0"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "mitreMappings": [],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Records Management add-on",
+      "Exchange Online Plan 2"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Organization Management"
+    ],
+    "deploymentOrder": 23,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Legal review of regulatory requirements (SEC 17a-4, FINRA 4511) completed",
+      "Confirm 7-year retention requirement with legal counsel before applying Preservation Lock",
+      "CRITICAL: Preservation Lock is IRREVERSIBLE - policy cannot be modified, disabled, or deleted once locked",
+      "Test retention policy without RestrictiveRetention first to validate scope"
+    ],
+    "regulatoryContext": {
+      "sec17a4": "SEC Rule 17a-4(f): Electronic storage media must preserve records in non-rewriteable, non-erasable format (WORM)",
+      "finra4511": "FINRA Rule 4511: Books and records must be preserved for at least 6 years",
+      "mifidII": "MiFID II Article 16: Investment firms must keep records for a minimum of 5 years",
+      "dodd_frank": "Dodd-Frank Act: Swap dealers must retain records for 5 years"
+    },
+    "deploymentSteps": [
+      "1. Connect to Security & Compliance PowerShell",
+      "2. Obtain written legal approval for immutable retention policy",
+      "3. Create the retention policy WITHOUT Preservation Lock first",
+      "4. Create the retention rule with 7-year duration",
+      "5. Validate policy scope and verify correct workloads are targeted",
+      "6. Apply Preservation Lock (RestrictiveRetention) - THIS IS IRREVERSIBLE",
+      "7. Document the locked policy for audit evidence"
+    ],
+    "rollbackProcedure": "NONE. Preservation Lock is irreversible. Once RestrictiveRetention is set to $true, the policy cannot be modified, disabled, or deleted. This is by design to meet SEC 17a-4 WORM requirements. Plan carefully before enabling."
+  },
+  "powershellCommands": {
+    "createPolicy": {
+      "cmdlet": "New-RetentionCompliancePolicy",
+      "parameters": {
+        "Name": "PV23-Retention-RegulatoryHold-Financial",
+        "Comment": "Immutable retention policy for financial services regulatory compliance (SEC 17a-4, FINRA 4511). Preservation Lock applied - IRREVERSIBLE.",
+        "ExchangeLocation": [
+          "All"
+        ],
+        "SharePointLocation": [
+          "All"
+        ],
+        "OneDriveLocation": [
+          "All"
+        ],
+        "TeamsChannelLocation": [
+          "All"
+        ],
+        "TeamsChatLocation": [
+          "All"
+        ],
+        "Enabled": true
+      }
+    },
+    "createRule": {
+      "cmdlet": "New-RetentionComplianceRule",
+      "parameters": {
+        "Name": "PV23-Rule-RegulatoryRetain-7Years",
+        "Policy": "PV23-Retention-RegulatoryHold-Financial",
+        "RetentionDuration": 2555,
+        "RetentionDurationDisplayHint": "Years",
+        "RetentionAction": "KeepAndDelete",
+        "ExpirationDateOption": "CreatedDate"
+      }
+    },
+    "applyPreservationLock": {
+      "cmdlet": "Set-RetentionCompliancePolicy",
+      "parameters": {
+        "Identity": "PV23-Retention-RegulatoryHold-Financial",
+        "RestrictiveRetention": true
+      },
+      "_warning": "IRREVERSIBLE: Once RestrictiveRetention is set to $true, the policy is locked permanently. The retention period can only be extended, never shortened. The policy cannot be disabled or deleted."
+    },
+    "verifyPreservationLock": {
+      "cmdlet": "Get-RetentionCompliancePolicy",
+      "parameters": {
+        "Identity": "PV23-Retention-RegulatoryHold-Financial",
+        "DistributionDetail": true
+      },
+      "expectedResult": "RestrictiveRetention: True, DistributionStatus: Success"
+    }
+  },
+  "policySettings": {
+    "retentionDuration": "2555 days (7 years)",
+    "retentionAction": "KeepAndDelete",
+    "expirationDateOption": "CreatedDate",
+    "preservationLock": true,
+    "scope": "organisationWide",
+    "workloads": {
+      "exchangeOnline": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true,
+      "teamsChannelMessages": true,
+      "teamsChatMessages": true
+    }
+  },
+  "complianceMappings": {
+    "cis": "CIS M365 9.1.12: Ensure a retention policy exists for all Microsoft 365 workloads",
+    "sec17a4": "SEC 17a-4(f): Non-rewriteable, non-erasable electronic record preservation (WORM)",
+    "finra4511": "FINRA 4511(c): Preservation of books and records in a format that meets SEC requirements",
+    "dora": "DORA Article 12: Data retention for financial entities with immutability controls",
+    "nydfs": "NYDFS 23 NYCRR 500.13: Limitations on data retention with regulatory preservation requirements"
+  }
+}

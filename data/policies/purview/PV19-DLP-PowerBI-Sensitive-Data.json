@@ -1,0 +1,167 @@
+{
+  "_metadata": {
+    "id": "PV19",
+    "title": "DLP - Power BI Sensitive Data Protection",
+    "description": "Data Loss Prevention policy that detects credit card numbers and U.S. Social Security Numbers in Power BI workspaces and datasets. Prevents sensitive data from being exposed through dashboards, reports, and datasets in the Power BI service.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "PCI DSS v4.0",
+      "GDPR (EU) 2016/679",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "SOC 2",
+      "NIS2",
+      "HIPAA",
+      "DORA",
+      "Microsoft Cloud Security Benchmark",
+      "CMMC v2.0"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "mitreMappings": [
+      "T1530",
+      "T1567",
+      "T1048"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or Microsoft 365 E5 Compliance",
+      "Microsoft Purview Data Loss Prevention add-on",
+      "Power BI Pro or Power BI Premium Per User (for workspace DLP)"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Power BI Administrator"
+    ],
+    "deploymentOrder": 19,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Power BI DLP must be enabled in the Power BI admin portal (Admin > Tenant settings > Information protection)",
+      "Sensitivity labels must be enabled for Power BI (PV10)",
+      "Power BI workspaces must be hosted on Premium capacity or Premium Per User",
+      "DLP licensing must be assigned to workspace owners and content creators",
+      "Deploy in TestWithNotifications mode first, then switch to Enable after validation"
+    ],
+    "deploymentSteps": [
+      "1. Enable DLP for Power BI in the compliance portal settings",
+      "2. Connect to Security & Compliance PowerShell",
+      "3. Run the New-DlpCompliancePolicy cmdlet with PowerBILocation",
+      "4. Run the New-DlpComplianceRule cmdlet to create the detection rule",
+      "5. Set Mode to TestWithNotifications for initial 2-week pilot",
+      "6. Review DLP alerts for Power BI in compliance.microsoft.com > Data loss prevention > Alerts",
+      "7. After validation, change Mode to Enable for enforcement"
+    ],
+    "rollbackProcedure": "Set-DlpCompliancePolicy -Identity 'PV19-DLP-PowerBI-SensitiveData' -Mode Disable"
+  },
+  "powershellCommands": {
+    "createPolicy": {
+      "cmdlet": "New-DlpCompliancePolicy",
+      "parameters": {
+        "Name": "PV19-DLP-PowerBI-SensitiveData",
+        "Comment": "DLP policy for Power BI workspaces detecting credit card numbers and U.S. SSN in datasets, reports, and dashboards. PCI DSS and privacy compliance.",
+        "PowerBILocation": [
+          "All"
+        ],
+        "Mode": "TestWithNotifications",
+        "Priority": 0
+      }
+    },
+    "createRule": {
+      "cmdlet": "New-DlpComplianceRule",
+      "parameters": {
+        "Name": "PV19-Rule-PowerBI-Block-SensitiveData",
+        "Policy": "PV19-DLP-PowerBI-SensitiveData",
+        "ContentContainsSensitiveInformation": [
+          {
+            "name": "Credit Card Number",
+            "id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085",
+            "minCount": 1,
+            "maxCount": -1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.S. Social Security Number (SSN)",
+            "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+            "minCount": 1,
+            "maxCount": -1,
+            "minConfidence": 85,
+            "maxConfidence": 100
+          }
+        ],
+        "BlockAccess": true,
+        "BlockAccessScope": "ExternalUsers",
+        "NotifyUser": [
+          "SiteAdmin",
+          "LastModifier"
+        ],
+        "NotifyUserType": "NotifyAll",
+        "NotifyPolicyTipCustomText": "This Power BI content contains sensitive information (credit card numbers or SSN). External sharing is blocked. Please remove the sensitive data from your dataset or contact your compliance team for assistance.",
+        "GenerateAlert": "SiteAdmin",
+        "AlertProperties": {
+          "AggregationType": "SimpleAggregation",
+          "Threshold": 1,
+          "TimeWindow": 60
+        },
+        "GenerateIncidentReport": [],
+        "IncidentReportContent": [
+          "Title",
+          "DocumentAuthor",
+          "DocumentLastModifier",
+          "Service",
+          "MatchedItem",
+          "RulesMatched",
+          "Severity"
+        ],
+        "ReportSeverityLevel": "High"
+      }
+    }
+  },
+  "sensitiveInformationTypes": [
+    {
+      "name": "Credit Card Number",
+      "id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085",
+      "description": "Detects all major credit card formats including Visa, Mastercard, Amex, Discover, JCB, and Diners Club",
+      "publisher": "Microsoft",
+      "rulePackId": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "name": "U.S. Social Security Number (SSN)",
+      "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+      "description": "Detects U.S. Social Security Numbers in formatted and unformatted patterns",
+      "publisher": "Microsoft",
+      "rulePackId": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "policySettings": {
+    "mode": "TestWithNotifications",
+    "_modeOptions": [
+      "Enable",
+      "TestWithNotifications",
+      "TestWithoutNotifications",
+      "Disable"
+    ],
+    "priority": 0,
+    "workloads": {
+      "exchangeOnline": false,
+      "sharePointOnline": false,
+      "oneDriveForBusiness": false,
+      "microsoftTeams": false,
+      "endpointDevices": false,
+      "onPremisesRepositories": false,
+      "powerBI": true,
+      "thirdPartyApps": false
+    }
+  },
+  "overrideSettings": {
+    "allowOverride": false,
+    "requireBusinessJustification": false,
+    "_note": "Sensitive data in Power BI datasets should be masked or removed at the data source level. No override permitted."
+  }
+}

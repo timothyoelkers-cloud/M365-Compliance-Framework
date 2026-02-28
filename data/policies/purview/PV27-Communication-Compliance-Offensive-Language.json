@@ -1,0 +1,166 @@
+{
+  "_metadata": {
+    "id": "PV27",
+    "title": "Communication Compliance - Offensive Language Detection",
+    "description": "Configures Microsoft Purview Communication Compliance to monitor Exchange, Teams, and Viva Engage for offensive language, harassment, threats, and discrimination. Uses built-in machine learning classifiers to detect policy violations and routes flagged communications to designated reviewers for investigation.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "DORA",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz",
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight",
+      "SEC Cyber Rule",
+      "NERC-CIP",
+      "MITRE ATT&CK"
+    ],
+    "cisChecks": [
+      "9.1.8"
+    ],
+    "mitreMappings": [
+      "T1566",
+      "T1534"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Communication Compliance add-on",
+      "Microsoft 365 E5 Insider Risk Management"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Communication Compliance Admin"
+    ],
+    "deploymentOrder": 27,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Microsoft 365 E5 Compliance or Communication Compliance add-on licence required",
+      "Assign Communication Compliance role group to reviewers",
+      "Conduct Data Protection Impact Assessment (DPIA) for employee monitoring under GDPR",
+      "Document lawful basis for communications monitoring (GDPR Article 6)",
+      "Notify employees of monitoring in accordance with local employment law",
+      "Configure reviewer mailbox (compliance@contoso.com) with appropriate permissions"
+    ],
+    "classifierDetails": {
+      "offensiveLanguage": "Detects profanity, slurs, and offensive content using Microsoft trained ML classifiers",
+      "threat": "Detects threatening language, intimidation, and violence-related communications",
+      "harassment": "Detects patterns of harassment, bullying, and hostile behaviour in communications",
+      "discrimination": "Detects discriminatory language based on protected characteristics"
+    },
+    "deploymentSteps": [
+      "1. Connect to Security & Compliance PowerShell",
+      "2. Complete DPIA and legal review for employee monitoring",
+      "3. Create the Communication Compliance policy with offensive language classifiers",
+      "4. Create the supervisory review rule with 100% sampling rate",
+      "5. Assign reviewers to the policy",
+      "6. Monitor flagged communications in compliance.microsoft.com > Communication compliance",
+      "7. Review and investigate flagged items, documenting outcomes",
+      "8. Generate periodic reports for compliance team"
+    ],
+    "rollbackProcedure": "Remove-SupervisoryReviewPolicyV2 -Identity 'PV27-CommCompliance-OffensiveLanguage'. Previously captured communications remain in the review queue until resolved."
+  },
+  "powershellCommands": {
+    "createPolicy": {
+      "cmdlet": "New-SupervisoryReviewPolicyV2",
+      "parameters": {
+        "Name": "PV27-CommCompliance-OffensiveLanguage",
+        "Comment": "Monitors Exchange, Teams, and Viva Engage for offensive language, harassment, threats, and discrimination. CIS 9.1.8 compliance. Flagged items are routed to compliance reviewers.",
+        "Reviewers": [
+          "compliance@contoso.com"
+        ],
+        "UserReportingWorkloads": [
+          "Exchange",
+          "Teams",
+          "VivaEngage"
+        ]
+      }
+    },
+    "createRule": {
+      "cmdlet": "New-SupervisoryReviewRule",
+      "parameters": {
+        "Name": "PV27-Rule-OffensiveLanguage",
+        "Policy": "PV27-CommCompliance-OffensiveLanguage",
+        "ContentMatchesClassifier": [
+          "offensive-language",
+          "threat",
+          "harassment",
+          "discrimination"
+        ],
+        "SamplingRate": 100
+      }
+    },
+    "verifyPolicy": {
+      "cmdlet": "Get-SupervisoryReviewPolicyV2",
+      "parameters": {
+        "Identity": "PV27-CommCompliance-OffensiveLanguage"
+      },
+      "expectedResult": "Policy exists with reviewers assigned and workloads configured"
+    },
+    "verifyRule": {
+      "cmdlet": "Get-SupervisoryReviewRule",
+      "parameters": {
+        "Policy": "PV27-CommCompliance-OffensiveLanguage"
+      },
+      "expectedResult": "Rule with classifiers: offensive-language, threat, harassment, discrimination and SamplingRate: 100"
+    }
+  },
+  "policySettings": {
+    "monitoredWorkloads": {
+      "exchangeOnline": true,
+      "microsoftTeams": true,
+      "vivaEngage": true,
+      "thirdPartyConnectors": false
+    },
+    "classifiers": [
+      {
+        "name": "offensive-language",
+        "description": "Microsoft built-in ML classifier for offensive language detection",
+        "enabled": true
+      },
+      {
+        "name": "threat",
+        "description": "Microsoft built-in ML classifier for threatening language detection",
+        "enabled": true
+      },
+      {
+        "name": "harassment",
+        "description": "Microsoft built-in ML classifier for harassment pattern detection",
+        "enabled": true
+      },
+      {
+        "name": "discrimination",
+        "description": "Microsoft built-in ML classifier for discriminatory language detection",
+        "enabled": true
+      }
+    ],
+    "samplingRate": 100,
+    "reviewers": [
+      "compliance@contoso.com"
+    ],
+    "userScope": "allUsers"
+  },
+  "complianceMappings": {
+    "cis": "CIS M365 9.1.8: Ensure Communication Compliance policies are configured",
+    "gdpr": "GDPR Article 6(1)(f): Legitimate interest for preventing hostile work environment (requires DPIA)",
+    "iso27001": "ISO 27001:2022 A.5.7: Threat intelligence - detecting internal threats via communications",
+    "nist": "NIST SP 800-53 AU-6: Audit Record Review, Analysis, and Reporting",
+    "soc2": "SOC 2 CC6.1: Logical and physical access controls - monitoring for policy violations",
+    "hipaa": "HIPAA 164.308(a)(1)(ii)(D): Information system activity review",
+    "secCyberRule": "SEC Cyber Rule: Monitoring for insider threat indicators in communications"
+  }
+}

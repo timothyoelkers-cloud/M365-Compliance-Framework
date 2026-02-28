@@ -1,0 +1,214 @@
+{
+  "_metadata": {
+    "id": "PV30",
+    "title": "eDiscovery - Standard Case Templates",
+    "description": "Provides templates for standard eDiscovery cases with predefined search queries for common investigation scenarios: data breach investigation, HR investigation, and regulatory inquiry. Creates reusable case structures with content searches targeting Exchange, SharePoint, and OneDrive for rapid incident response and legal hold.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "NIS2",
+      "DORA",
+      "SOC 2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "9.1.1"
+    ],
+    "mitreMappings": [
+      "T1530",
+      "T1567",
+      "T1048"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E3 (eDiscovery Standard)",
+      "Microsoft 365 E5 or E5 Compliance (eDiscovery Premium)",
+      "Microsoft Purview eDiscovery add-on"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "eDiscovery Manager",
+      "eDiscovery Administrator"
+    ],
+    "deploymentOrder": 30,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "eDiscovery Manager or eDiscovery Administrator role assigned",
+      "Audit logging enabled and retained (see PV11)",
+      "Understand legal hold obligations before creating cases",
+      "These are template searches - modify date ranges, custodians, and keywords for each specific investigation",
+      "Coordinate with legal counsel before executing searches or placing holds"
+    ],
+    "caseTemplates": {
+      "dataBreach": "Template for investigating potential data breaches - searches for exfiltration indicators, sensitive data access, and anomalous sharing patterns",
+      "hrInvestigation": "Template for HR-related investigations - searches for harassment, policy violations, and employee misconduct communications",
+      "regulatoryInquiry": "Template for regulatory inquiry responses - searches for financial records, compliance documents, and communications relevant to regulatory examinations"
+    },
+    "deploymentSteps": [
+      "1. Connect to Security & Compliance PowerShell",
+      "2. Create the eDiscovery case using New-ComplianceCase",
+      "3. Create predefined content searches within the case",
+      "4. Modify search queries with specific dates, custodians, and keywords for the investigation",
+      "5. Run searches and preview results",
+      "6. Export results for legal review",
+      "7. Apply legal holds to custodian mailboxes if required"
+    ],
+    "rollbackProcedure": "Remove-ComplianceCase -Identity '<CaseName>' -Confirm:$false. Note: Cases with active holds cannot be removed until holds are released. Search results are deleted when the case is removed."
+  },
+  "powershellCommands": {
+    "createCase": {
+      "cmdlet": "New-ComplianceCase",
+      "parameters": {
+        "Name": "PV30-eDiscovery-Template-Case",
+        "Description": "Template eDiscovery case with predefined searches for data breach, HR investigation, and regulatory inquiry scenarios. Clone this case and modify parameters for specific investigations.",
+        "CaseType": "eDiscovery"
+      }
+    },
+    "createSearches": [
+      {
+        "cmdlet": "New-ComplianceSearch",
+        "parameters": {
+          "Name": "PV30-Search-DataBreach-Exfiltration",
+          "Case": "PV30-eDiscovery-Template-Case",
+          "Description": "Searches for indicators of data exfiltration including large file transfers, sensitive data access, and external sharing. Modify date range and custodians for specific incidents.",
+          "ExchangeLocation": [
+            "All"
+          ],
+          "SharePointLocation": [
+            "All"
+          ],
+          "OneDriveLocation": [
+            "All"
+          ],
+          "ContentMatchQuery": "(subject:\"data transfer\" OR subject:\"file share\" OR subject:\"download\" OR subject:\"export\") AND (\"confidential\" OR \"sensitive\" OR \"restricted\" OR \"password\" OR \"credentials\" OR \"API key\" OR \"secret\")",
+          "AllowNotFoundExchangeLocationsEnabled": true
+        },
+        "_usage": "Modify ContentMatchQuery date range: AND (date>=2026-01-01 AND date<=2026-02-28)"
+      },
+      {
+        "cmdlet": "New-ComplianceSearch",
+        "parameters": {
+          "Name": "PV30-Search-HRInvestigation",
+          "Case": "PV30-eDiscovery-Template-Case",
+          "Description": "Searches for HR-related content including harassment, bullying, discrimination, and policy violation communications. Replace custodian locations for specific employees under investigation.",
+          "ExchangeLocation": [
+            "All"
+          ],
+          "SharePointLocation": [
+            "All"
+          ],
+          "ContentMatchQuery": "(\"harassment\" OR \"bullying\" OR \"discrimination\" OR \"hostile\" OR \"threat\" OR \"intimidation\" OR \"retaliation\" OR \"complaint\" OR \"grievance\") AND (kind:email OR kind:microsoftteams)",
+          "AllowNotFoundExchangeLocationsEnabled": true
+        },
+        "_usage": "Replace ExchangeLocation 'All' with specific custodian mailboxes: [\"user1@contoso.com\", \"user2@contoso.com\"]"
+      },
+      {
+        "cmdlet": "New-ComplianceSearch",
+        "parameters": {
+          "Name": "PV30-Search-RegulatoryInquiry",
+          "Case": "PV30-eDiscovery-Template-Case",
+          "Description": "Searches for financial and regulatory content relevant to regulatory examinations, audits, and inquiries. Covers financial statements, trading records, and compliance communications.",
+          "ExchangeLocation": [
+            "All"
+          ],
+          "SharePointLocation": [
+            "All"
+          ],
+          "OneDriveLocation": [
+            "All"
+          ],
+          "ContentMatchQuery": "(\"financial statement\" OR \"trading\" OR \"transaction\" OR \"audit\" OR \"compliance\" OR \"regulatory\" OR \"SEC\" OR \"FINRA\" OR \"material non-public\" OR \"insider\") AND (kind:email OR kind:document OR kind:microsoftteams)",
+          "AllowNotFoundExchangeLocationsEnabled": true
+        },
+        "_usage": "Modify date range and add specific custodians as directed by regulatory inquiry scope"
+      }
+    ],
+    "startSearches": {
+      "cmdlet": "Start-ComplianceSearch",
+      "parameters": {
+        "Identity": "PV30-Search-DataBreach-Exfiltration"
+      },
+      "_note": "Run Start-ComplianceSearch for each search individually after modifying parameters for the specific investigation"
+    },
+    "verifyCase": {
+      "cmdlet": "Get-ComplianceCase",
+      "parameters": {
+        "Identity": "PV30-eDiscovery-Template-Case"
+      },
+      "expectedResult": "Case exists with Status Active and CaseType eDiscovery"
+    },
+    "verifySearches": {
+      "cmdlet": "Get-ComplianceSearch",
+      "parameters": {
+        "Case": "PV30-eDiscovery-Template-Case"
+      },
+      "expectedResult": "Three content searches listed: DataBreach-Exfiltration, HRInvestigation, RegulatoryInquiry"
+    },
+    "exportResults": {
+      "cmdlet": "New-ComplianceSearchAction",
+      "parameters": {
+        "SearchName": "PV30-Search-DataBreach-Exfiltration",
+        "Export": true,
+        "ExportFormat": "FxStream",
+        "Scope": "BothIndexedAndUnindexedItems"
+      },
+      "_note": "Export search results for legal review. Use eDiscovery Export Tool to download results."
+    }
+  },
+  "caseTemplates": {
+    "dataBreach": {
+      "name": "Data Breach Investigation",
+      "description": "Template for investigating potential data breaches and exfiltration incidents",
+      "searchScope": ["Exchange", "SharePoint", "OneDrive"],
+      "typicalKeywords": ["data transfer", "export", "download", "confidential", "sensitive", "credentials"],
+      "holdRequired": true,
+      "estimatedDuration": "2-4 weeks"
+    },
+    "hrInvestigation": {
+      "name": "HR Investigation",
+      "description": "Template for workplace conduct investigations including harassment and policy violations",
+      "searchScope": ["Exchange", "Teams"],
+      "typicalKeywords": ["harassment", "bullying", "discrimination", "complaint", "grievance"],
+      "holdRequired": true,
+      "estimatedDuration": "1-3 weeks"
+    },
+    "regulatoryInquiry": {
+      "name": "Regulatory Inquiry Response",
+      "description": "Template for responding to regulatory examinations and audit requests",
+      "searchScope": ["Exchange", "SharePoint", "OneDrive", "Teams"],
+      "typicalKeywords": ["financial statement", "trading", "compliance", "regulatory", "audit"],
+      "holdRequired": true,
+      "estimatedDuration": "4-8 weeks"
+    }
+  },
+  "policySettings": {
+    "caseType": "eDiscovery Standard",
+    "defaultSearchScope": "organisationWide",
+    "workloads": {
+      "exchangeOnline": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true,
+      "microsoftTeams": true
+    }
+  },
+  "complianceMappings": {
+    "cis": "CIS M365 9.1.1: Ensure eDiscovery is configured for content search and legal holds",
+    "gdpr": "GDPR Article 15: Right of access - eDiscovery supports data subject access requests (DSARs)",
+    "hipaa": "HIPAA 164.316(b): Documentation and evidence preservation for investigations",
+    "nist": "NIST SP 800-53 AU-6: Audit Record Review, Analysis, and Reporting",
+    "soc2": "SOC 2 CC7.3: Evaluation and communication of security events with evidence collection",
+    "dora": "DORA Article 17: ICT-related incident response and evidence preservation",
+    "iso27001": "ISO 27001:2022 A.5.28: Collection of evidence for information security investigations"
+  }
+}

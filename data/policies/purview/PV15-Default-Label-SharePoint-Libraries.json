@@ -1,0 +1,116 @@
+{
+  "_metadata": {
+    "id": "PV15",
+    "title": "Default Sensitivity Label for SharePoint Document Libraries",
+    "description": "Configures default sensitivity labels for SharePoint Online document libraries so that all new and uploaded documents automatically inherit the library-level default label. This ensures baseline classification for content stored in SharePoint without relying on user-applied labels.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "Microsoft Cloud Security Benchmark",
+      "UK NCSC CAF v3.2",
+      "DORA"
+    ],
+    "cisChecks": [
+      "9.1.6",
+      "9.1.11"
+    ],
+    "mitreMappings": [
+      "T1530",
+      "T1567"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Information Protection",
+      "SharePoint Online Plan 2"
+    ],
+    "requiredRoles": [
+      "SharePoint Administrator",
+      "Compliance Administrator"
+    ],
+    "deploymentOrder": 15,
+    "importMethod": "powershell-sharepoint-online",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "This policy uses PnP.PowerShell or SPO Management Shell cmdlets, NOT Connect-IPPSSession",
+      "Connect to SharePoint Online: Connect-SPOService -Url https://<tenant>-admin.sharepoint.com",
+      "Sensitivity labels must already be created and published (PV10)",
+      "The label GUID must be retrieved from the Security & Compliance portal or via Get-Label",
+      "SharePoint Online must have sensitivity label support enabled at the tenant level"
+    ],
+    "deploymentSteps": [
+      "1. Connect to SharePoint Online Administration: Connect-SPOService",
+      "2. Enable default sensitivity label support at the tenant level via Set-SPOTenant",
+      "3. Retrieve the label GUID for the desired default label using Get-Label in IPPS session",
+      "4. Apply default sensitivity label to target site collections using Set-SPOSite",
+      "5. Validate that new documents in the library inherit the default label",
+      "6. Repeat Set-SPOSite for additional site collections as needed"
+    ],
+    "rollbackProcedure": "Set-SPOSite -Identity 'https://<tenant>.sharepoint.com/sites/<site>' -SensitivityLabel '' to remove the default label. Note: existing labelled documents retain their label."
+  },
+  "powershellCommands": {
+    "steps": [
+      {
+        "step": 1,
+        "description": "Enable default sensitivity label feature at tenant level",
+        "cmdlet": "Set-SPOTenant",
+        "parameters": {
+          "EnableAutoSensitivityLabelForPDFAndOfficeFiles": true
+        }
+      },
+      {
+        "step": 2,
+        "description": "Retrieve the GUID for the Confidential sensitivity label",
+        "cmdlet": "Get-Label",
+        "parameters": {
+          "Identity": "Confidential"
+        },
+        "_note": "Run this in an IPPSSession to get the label GUID. Use the returned GUID in step 3."
+      },
+      {
+        "step": 3,
+        "description": "Set default sensitivity label on a SharePoint site collection",
+        "cmdlet": "Set-SPOSite",
+        "parameters": {
+          "Identity": "https://<tenant>.sharepoint.com/sites/<site-name>",
+          "SensitivityLabel": "<label-GUID-from-step-2>"
+        },
+        "_note": "Repeat for each site collection that should have a default label. Replace <tenant> and <site-name> with actual values."
+      },
+      {
+        "step": 4,
+        "description": "Verify the label was applied to the site",
+        "cmdlet": "Get-SPOSite",
+        "parameters": {
+          "Identity": "https://<tenant>.sharepoint.com/sites/<site-name>"
+        },
+        "expectedOutput": "SensitivityLabel property should show the GUID of the Confidential label"
+      }
+    ]
+  },
+  "policySettings": {
+    "defaultLabel": "Confidential",
+    "_defaultLabelNote": "New and uploaded documents in labelled libraries inherit this label unless the user applies a higher-priority label",
+    "workloads": {
+      "sharePointOnline": true,
+      "oneDriveForBusiness": false,
+      "exchangeOnline": false,
+      "microsoftTeams": false,
+      "endpointDevices": false,
+      "powerBI": false
+    },
+    "tenantSettings": {
+      "enableAutoSensitivityLabelForPDFAndOfficeFiles": true
+    }
+  }
+}

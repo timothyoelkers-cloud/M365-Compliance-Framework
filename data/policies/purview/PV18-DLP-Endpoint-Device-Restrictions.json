@@ -1,0 +1,191 @@
+{
+  "_metadata": {
+    "id": "PV18",
+    "title": "DLP - Endpoint Device Restrictions",
+    "description": "Extends Data Loss Prevention to endpoint devices using Microsoft Defender for Endpoint integration. Blocks copying sensitive data to USB removable media, printing sensitive documents, copying to clipboard, and uploading to unauthorised cloud services from managed endpoints.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "SOC 2",
+      "DORA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "ASD Essential Eight",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "mitreMappings": [
+      "T1052",
+      "T1048",
+      "T1567",
+      "T1041",
+      "T1091",
+      "T1039"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or Microsoft 365 E5 Compliance",
+      "Microsoft Purview Data Loss Prevention add-on",
+      "Microsoft Defender for Endpoint Plan 2"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Security Administrator"
+    ],
+    "deploymentOrder": 18,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Microsoft Defender for Endpoint must be onboarded on target devices (MDE01, MDE02, MDE03)",
+      "Endpoint DLP must be enabled in the Microsoft Purview compliance portal",
+      "Devices must be running Windows 10 1809 or later, or Windows 11",
+      "macOS Catalina 10.15 or later supported for limited Endpoint DLP features",
+      "DLP licensing (E5 or E5 Compliance) must be assigned to users with managed endpoints",
+      "Deploy in TestWithNotifications mode first before enforcing blocks"
+    ],
+    "deploymentSteps": [
+      "1. Ensure MDE onboarding is complete (MDE01-MDE03 policies)",
+      "2. Enable Endpoint DLP in compliance.microsoft.com > Settings > Endpoint DLP settings",
+      "3. Connect to Security & Compliance PowerShell",
+      "4. Run the New-DlpCompliancePolicy cmdlet with EndpointDlpLocation",
+      "5. Run the New-DlpComplianceRule cmdlet with endpoint-specific restrictions",
+      "6. Set Mode to TestWithNotifications for initial 2-week pilot",
+      "7. Review endpoint DLP alerts in the Microsoft Purview compliance portal",
+      "8. After validation, change Mode to Enable for enforcement"
+    ],
+    "rollbackProcedure": "Set-DlpCompliancePolicy -Identity 'PV18-DLP-Endpoint-Device-Restrictions' -Mode Disable"
+  },
+  "powershellCommands": {
+    "createPolicy": {
+      "cmdlet": "New-DlpCompliancePolicy",
+      "parameters": {
+        "Name": "PV18-DLP-Endpoint-Device-Restrictions",
+        "Comment": "Endpoint DLP policy that blocks copying sensitive data to USB, printing, clipboard, and cloud upload from managed devices. Requires MDE onboarding.",
+        "EndpointDlpLocation": [
+          "All"
+        ],
+        "Mode": "TestWithNotifications",
+        "Priority": 0
+      }
+    },
+    "createRule": {
+      "cmdlet": "New-DlpComplianceRule",
+      "parameters": {
+        "Name": "PV18-Rule-Endpoint-Block-Sensitive-Actions",
+        "Policy": "PV18-DLP-Endpoint-Device-Restrictions",
+        "ContentContainsSensitiveInformation": [
+          {
+            "name": "Credit Card Number",
+            "id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085",
+            "minCount": 1,
+            "maxCount": -1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.S. Social Security Number (SSN)",
+            "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+            "minCount": 1,
+            "maxCount": -1,
+            "minConfidence": 85,
+            "maxConfidence": 100
+          }
+        ],
+        "EndpointDlpRestrictions": {
+          "BlockEndpointDlpPrint": true,
+          "BlockEndpointDlpCopyToClipboard": true,
+          "BlockEndpointDlpCopyToRemovableMedia": true,
+          "BlockEndpointDlpUploadToCloudService": true,
+          "BlockEndpointDlpCopyToNetworkShare": true,
+          "BlockEndpointDlpAccessByUnallowedApps": true
+        },
+        "NotifyUser": [
+          "LastModifier"
+        ],
+        "NotifyUserType": "NotifyAll",
+        "NotifyPolicyTipCustomText": "This action is blocked because the content contains sensitive information. Copying to USB, printing, clipboard copy, and cloud upload are restricted for this content. Contact your compliance team if you need assistance.",
+        "GenerateAlert": "SiteAdmin",
+        "AlertProperties": {
+          "AggregationType": "SimpleAggregation",
+          "Threshold": 1,
+          "TimeWindow": 60
+        },
+        "GenerateIncidentReport": [],
+        "IncidentReportContent": [
+          "Title",
+          "DocumentAuthor",
+          "DocumentLastModifier",
+          "Service",
+          "MatchedItem",
+          "RulesMatched",
+          "Severity"
+        ],
+        "ReportSeverityLevel": "High"
+      }
+    }
+  },
+  "sensitiveInformationTypes": [
+    {
+      "name": "Credit Card Number",
+      "id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085",
+      "description": "Detects all major credit card formats including Visa, Mastercard, Amex, Discover, JCB, and Diners Club",
+      "publisher": "Microsoft",
+      "rulePackId": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "name": "U.S. Social Security Number (SSN)",
+      "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+      "description": "Detects U.S. Social Security Numbers in formatted and unformatted patterns",
+      "publisher": "Microsoft",
+      "rulePackId": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "policySettings": {
+    "mode": "TestWithNotifications",
+    "_modeOptions": [
+      "Enable",
+      "TestWithNotifications",
+      "TestWithoutNotifications",
+      "Disable"
+    ],
+    "priority": 0,
+    "workloads": {
+      "exchangeOnline": false,
+      "sharePointOnline": false,
+      "oneDriveForBusiness": false,
+      "microsoftTeams": false,
+      "endpointDevices": true,
+      "onPremisesRepositories": false,
+      "powerBI": false,
+      "thirdPartyApps": false
+    },
+    "endpointRestrictions": {
+      "blockPrint": true,
+      "blockCopyToClipboard": true,
+      "blockCopyToRemovableMedia": true,
+      "blockUploadToCloudService": true,
+      "blockCopyToNetworkShare": true,
+      "blockAccessByUnallowedApps": true
+    }
+  },
+  "overrideSettings": {
+    "allowOverride": false,
+    "requireBusinessJustification": false,
+    "_note": "Endpoint DLP restrictions are enforced without override to prevent data exfiltration via physical and logical channels."
+  }
+}

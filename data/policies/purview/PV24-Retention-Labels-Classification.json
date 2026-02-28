@@ -1,0 +1,246 @@
+{
+  "_metadata": {
+    "id": "PV24",
+    "title": "Retention Labels - Classification-Based Retention",
+    "description": "Creates a four-tier retention label taxonomy for classification-based data retention: Business General (3 years), Financial Records (7 years), Legal Hold (10 years), and Regulatory (7 years immutable). Labels are published via a label policy to all users across Exchange, SharePoint, and OneDrive for manual or auto-application.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "SOC 2",
+      "DORA",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "UK NCSC CAF v3.2",
+      "FedRAMP Moderate",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "mitreMappings": [],
+    "requiredLicences": [
+      "Microsoft 365 E3 or E5",
+      "Microsoft 365 E5 Compliance (for auto-apply and regulatory labels)",
+      "Microsoft Purview Records Management add-on (for regulatory immutable labels)"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator"
+    ],
+    "deploymentOrder": 24,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Review existing retention labels to avoid naming conflicts",
+      "Coordinate retention periods with legal, compliance, and records management teams",
+      "For Regulatory label: Microsoft 365 E5 Compliance or Records Management add-on required",
+      "Plan user training on label selection and application"
+    ],
+    "labelTaxonomy": {
+      "businessGeneral": "3-year retention for general business correspondence, meeting notes, routine communications",
+      "financialRecords": "7-year retention for financial statements, invoices, tax records, audit documentation",
+      "legalHold": "10-year retention for legal documents, contracts, litigation-related content",
+      "regulatory": "7-year immutable retention for regulatory records that cannot be modified or deleted"
+    },
+    "deploymentSteps": [
+      "1. Connect to Security & Compliance PowerShell",
+      "2. Create all four retention labels using New-ComplianceTag",
+      "3. Create the label publishing policy to distribute labels to all users",
+      "4. Create retention rules for each label",
+      "5. Verify labels appear in compliance.microsoft.com > Data lifecycle management > Labels",
+      "6. Configure auto-apply label policies as needed (optional)",
+      "7. Train users on selecting appropriate retention labels"
+    ],
+    "rollbackProcedure": "Remove-ComplianceTag -Identity '<LabelName>'. Note: labels cannot be removed while assigned to content. Remove label assignments first, then delete the label."
+  },
+  "powershellCommands": {
+    "createLabels": [
+      {
+        "cmdlet": "New-ComplianceTag",
+        "parameters": {
+          "Name": "Business General",
+          "Comment": "3-year retention for general business content including correspondence, meeting notes, and routine communications. Content is deleted after retention period expires.",
+          "RetentionDuration": 1095,
+          "RetentionAction": "KeepAndDelete",
+          "RetentionType": "CreationAgeInDays",
+          "IsRecordLabel": false,
+          "Regulatory": false
+        }
+      },
+      {
+        "cmdlet": "New-ComplianceTag",
+        "parameters": {
+          "Name": "Financial Records",
+          "Comment": "7-year retention for financial records including statements, invoices, tax records, and audit documentation. Compliant with SOX, PCI DSS, and tax record requirements.",
+          "RetentionDuration": 2555,
+          "RetentionAction": "KeepAndDelete",
+          "RetentionType": "CreationAgeInDays",
+          "IsRecordLabel": false,
+          "Regulatory": false
+        }
+      },
+      {
+        "cmdlet": "New-ComplianceTag",
+        "parameters": {
+          "Name": "Legal Hold",
+          "Comment": "10-year retention for legal documents, contracts, litigation-related content, and legal correspondence. Extended retention to cover statute of limitations periods.",
+          "RetentionDuration": 3650,
+          "RetentionAction": "KeepAndDelete",
+          "RetentionType": "CreationAgeInDays",
+          "IsRecordLabel": false,
+          "Regulatory": false
+        }
+      },
+      {
+        "cmdlet": "New-ComplianceTag",
+        "parameters": {
+          "Name": "Regulatory",
+          "Comment": "7-year immutable retention for regulatory records. Content is locked and cannot be modified or deleted during the retention period. Meets SEC 17a-4 and FINRA requirements.",
+          "RetentionDuration": 2555,
+          "RetentionAction": "KeepAndDelete",
+          "RetentionType": "CreationAgeInDays",
+          "IsRecordLabel": true,
+          "Regulatory": true
+        }
+      }
+    ],
+    "publishPolicy": {
+      "cmdlet": "New-RetentionCompliancePolicy",
+      "parameters": {
+        "Name": "PV24-RetentionLabels-PublishPolicy",
+        "Comment": "Publishes retention labels (Business General, Financial Records, Legal Hold, Regulatory) to all users across Exchange, SharePoint, and OneDrive.",
+        "ExchangeLocation": [
+          "All"
+        ],
+        "SharePointLocation": [
+          "All"
+        ],
+        "OneDriveLocation": [
+          "All"
+        ],
+        "PublishComplianceTag": [
+          "Business General",
+          "Financial Records",
+          "Legal Hold",
+          "Regulatory"
+        ],
+        "Enabled": true
+      }
+    },
+    "createRules": [
+      {
+        "cmdlet": "New-RetentionComplianceRule",
+        "parameters": {
+          "Name": "PV24-Rule-BusinessGeneral-3Years",
+          "Policy": "PV24-RetentionLabels-PublishPolicy",
+          "PublishComplianceTag": "Business General",
+          "RetentionDuration": 1095,
+          "RetentionDurationDisplayHint": "Years",
+          "RetentionAction": "KeepAndDelete",
+          "ExpirationDateOption": "CreatedDate"
+        }
+      },
+      {
+        "cmdlet": "New-RetentionComplianceRule",
+        "parameters": {
+          "Name": "PV24-Rule-FinancialRecords-7Years",
+          "Policy": "PV24-RetentionLabels-PublishPolicy",
+          "PublishComplianceTag": "Financial Records",
+          "RetentionDuration": 2555,
+          "RetentionDurationDisplayHint": "Years",
+          "RetentionAction": "KeepAndDelete",
+          "ExpirationDateOption": "CreatedDate"
+        }
+      },
+      {
+        "cmdlet": "New-RetentionComplianceRule",
+        "parameters": {
+          "Name": "PV24-Rule-LegalHold-10Years",
+          "Policy": "PV24-RetentionLabels-PublishPolicy",
+          "PublishComplianceTag": "Legal Hold",
+          "RetentionDuration": 3650,
+          "RetentionDurationDisplayHint": "Years",
+          "RetentionAction": "KeepAndDelete",
+          "ExpirationDateOption": "CreatedDate"
+        }
+      },
+      {
+        "cmdlet": "New-RetentionComplianceRule",
+        "parameters": {
+          "Name": "PV24-Rule-Regulatory-7Years",
+          "Policy": "PV24-RetentionLabels-PublishPolicy",
+          "PublishComplianceTag": "Regulatory",
+          "RetentionDuration": 2555,
+          "RetentionDurationDisplayHint": "Years",
+          "RetentionAction": "KeepAndDelete",
+          "ExpirationDateOption": "CreatedDate"
+        }
+      }
+    ],
+    "verifyLabels": {
+      "cmdlet": "Get-ComplianceTag",
+      "parameters": {},
+      "expectedResult": "Lists all four retention labels with their retention durations and record/regulatory flags"
+    }
+  },
+  "policySettings": {
+    "labelTaxonomy": [
+      {
+        "name": "Business General",
+        "retentionDays": 1095,
+        "retentionYears": 3,
+        "action": "KeepAndDelete",
+        "isRecord": false,
+        "isRegulatory": false
+      },
+      {
+        "name": "Financial Records",
+        "retentionDays": 2555,
+        "retentionYears": 7,
+        "action": "KeepAndDelete",
+        "isRecord": false,
+        "isRegulatory": false
+      },
+      {
+        "name": "Legal Hold",
+        "retentionDays": 3650,
+        "retentionYears": 10,
+        "action": "KeepAndDelete",
+        "isRecord": false,
+        "isRegulatory": false
+      },
+      {
+        "name": "Regulatory",
+        "retentionDays": 2555,
+        "retentionYears": 7,
+        "action": "KeepAndDelete",
+        "isRecord": true,
+        "isRegulatory": true
+      }
+    ],
+    "scope": "organisationWide",
+    "workloads": {
+      "exchangeOnline": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true
+    }
+  },
+  "complianceMappings": {
+    "cis": "CIS M365 9.1.12: Ensure a retention policy exists for all Microsoft 365 workloads",
+    "gdpr": "GDPR Article 5(1)(e): Storage limitation - data kept no longer than necessary for processing purposes",
+    "hipaa": "HIPAA 164.530(j): Documentation retention of at least 6 years from date of creation",
+    "pciDss": "PCI DSS v4.0 Req 3.1: Data retention and disposal policies for cardholder data",
+    "iso27001": "ISO 27001:2022 A.5.33: Protection of records",
+    "nist": "NIST SP 800-53 SI-12: Information Management and Retention"
+  }
+}

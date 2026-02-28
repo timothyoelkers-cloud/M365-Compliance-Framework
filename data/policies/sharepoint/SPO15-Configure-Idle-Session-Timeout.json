@@ -1,0 +1,47 @@
+{
+  "_metadata": {
+    "id": "SPO15",
+    "title": "Configure Idle Session Sign-Out Timeout",
+    "description": "Configures automatic sign-out for inactive SharePoint Online and OneDrive for Business browser sessions. Users receive a warning after 55 minutes of inactivity and are signed out after 60 minutes. This reduces the risk of unauthorised access from unattended browser sessions on shared or public computers.",
+    "frameworks": [
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "SOC 2",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "DORA",
+      "CMMC v2.0",
+      "UK NCSC CAF v3.2",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [],
+    "severity": "Medium",
+    "category": "SharePoint Online",
+    "deploymentOrder": 15,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "_notes": "Idle session timeout applies to browser-based access to SharePoint Online and OneDrive for Business only. It does not affect desktop sync clients, mobile apps, or Teams access to SharePoint content. WarnAfter must be less than SignOutAfter. The minimum SignOutAfter value is 5 minutes (00:05:00). Values are specified as TimeSpan strings in hh:mm:ss format. This setting is particularly important for environments with shared workstations or kiosk devices."
+  },
+  "steps": [
+    {
+      "cmdlet": "Set-SPOBrowserIdleSignOut",
+      "parameters": {
+        "Enabled": true,
+        "WarnAfter": "00:55:00",
+        "SignOutAfter": "01:00:00"
+      },
+      "_notes": "Enables idle session timeout with a 55-minute warning and 60-minute automatic sign-out. Users will see a notification banner at 55 minutes warning them that their session will expire. At 60 minutes of inactivity, the browser session is ended and the user must re-authenticate."
+    }
+  ],
+  "postDeployment": [
+    "Get-SPOBrowserIdleSignOut",
+    "Verify the setting by leaving a SharePoint browser session idle for the configured duration and confirming the warning appears and sign-out occurs",
+    "Communicate to users that inactive browser sessions will be automatically signed out after 60 minutes",
+    "Review whether the timeout value is appropriate for your organisation; adjust WarnAfter and SignOutAfter values as needed for different user populations",
+    "Consider implementing Conditional Access session controls in Entra ID for more granular session management across all Microsoft 365 apps"
+  ]
+}

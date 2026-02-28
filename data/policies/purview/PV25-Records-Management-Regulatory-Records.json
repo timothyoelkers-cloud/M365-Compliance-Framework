@@ -1,0 +1,165 @@
+{
+  "_metadata": {
+    "id": "PV25",
+    "title": "Records Management - Regulatory Records Declaration",
+    "description": "Configures retention labels with record declaration and regulatory lock for formal records management. Creates 'Official Business Record' (7-year, record label) and 'Regulatory Record' (7-year, regulatory lock) labels that prevent content modification or deletion once applied. Regulatory records meet SEC 17a-4 WORM storage requirements.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "DORA",
+      "SEC Cyber Rule",
+      "HIPAA",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "NIS2",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "NYDFS 23 NYCRR 500"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "mitreMappings": [],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Records Management add-on",
+      "Microsoft 365 E5 Information Protection and Governance"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Records Management"
+    ],
+    "deploymentOrder": 25,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Microsoft 365 E5 Compliance or Records Management add-on is required for regulatory records",
+      "Records management must be enabled in the Microsoft Purview compliance portal",
+      "Legal review completed for record declaration and regulatory lock requirements",
+      "CRITICAL: Regulatory record labels cannot be removed once applied to content - content is locked immutably",
+      "Users with record label permissions must understand the implications of declaring records"
+    ],
+    "recordTypes": {
+      "recordLabel": "Content marked as a record can be modified with version tracking but cannot be deleted during the retention period. Administrators can unlock if needed.",
+      "regulatoryRecordLabel": "Content marked as a regulatory record cannot be modified, deleted, or have the label removed for the entire retention period. This is IRREVERSIBLE and meets WORM requirements."
+    },
+    "deploymentSteps": [
+      "1. Connect to Security & Compliance PowerShell",
+      "2. Enable Records Management in the compliance portal if not already active",
+      "3. Create the Official Business Record label with IsRecordLabel flag",
+      "4. Create the Regulatory Record label with both IsRecordLabel and Regulatory flags",
+      "5. Publish labels via a retention label policy",
+      "6. Configure auto-apply policies for known record types (optional)",
+      "7. Train records managers on label application and implications"
+    ],
+    "rollbackProcedure": "Record labels: Remove-ComplianceTag can remove unpublished labels. Published record labels must first be removed from content. CRITICAL: Regulatory record labels CANNOT be removed from content once applied - content remains locked for the full retention period."
+  },
+  "powershellCommands": {
+    "createRecordLabels": [
+      {
+        "cmdlet": "New-ComplianceTag",
+        "parameters": {
+          "Name": "Official Business Record",
+          "Comment": "Declares content as an official business record. Record cannot be deleted during 7-year retention period. Content versioning is tracked. Administrator can unlock if needed.",
+          "RetentionDuration": 2555,
+          "RetentionAction": "KeepAndDelete",
+          "RetentionType": "CreationAgeInDays",
+          "IsRecordLabel": true,
+          "Regulatory": false
+        }
+      },
+      {
+        "cmdlet": "New-ComplianceTag",
+        "parameters": {
+          "Name": "Regulatory Record",
+          "Comment": "Declares content as an immutable regulatory record. Content CANNOT be modified, deleted, or have the label removed for the entire 7-year retention period. Meets SEC 17a-4 WORM requirements. THIS IS IRREVERSIBLE.",
+          "RetentionDuration": 2555,
+          "RetentionAction": "KeepAndDelete",
+          "RetentionType": "CreationAgeInDays",
+          "IsRecordLabel": true,
+          "Regulatory": true
+        }
+      }
+    ],
+    "publishPolicy": {
+      "cmdlet": "New-RetentionCompliancePolicy",
+      "parameters": {
+        "Name": "PV25-RecordsManagement-PublishPolicy",
+        "Comment": "Publishes record and regulatory record retention labels to all users across Exchange, SharePoint, and OneDrive for records declaration.",
+        "ExchangeLocation": [
+          "All"
+        ],
+        "SharePointLocation": [
+          "All"
+        ],
+        "OneDriveLocation": [
+          "All"
+        ],
+        "PublishComplianceTag": [
+          "Official Business Record",
+          "Regulatory Record"
+        ],
+        "Enabled": true
+      }
+    },
+    "verifyLabels": {
+      "cmdlet": "Get-ComplianceTag",
+      "parameters": {
+        "Identity": "Official Business Record"
+      },
+      "expectedResult": "IsRecordLabel: True, Regulatory: False, RetentionDuration: 2555"
+    },
+    "verifyRegulatoryLabel": {
+      "cmdlet": "Get-ComplianceTag",
+      "parameters": {
+        "Identity": "Regulatory Record"
+      },
+      "expectedResult": "IsRecordLabel: True, Regulatory: True, RetentionDuration: 2555"
+    }
+  },
+  "policySettings": {
+    "recordLabels": [
+      {
+        "name": "Official Business Record",
+        "retentionDays": 2555,
+        "retentionYears": 7,
+        "action": "KeepAndDelete",
+        "isRecord": true,
+        "isRegulatory": false,
+        "canUnlock": true,
+        "description": "Standard record declaration - prevents deletion, allows versioned modifications"
+      },
+      {
+        "name": "Regulatory Record",
+        "retentionDays": 2555,
+        "retentionYears": 7,
+        "action": "KeepAndDelete",
+        "isRecord": true,
+        "isRegulatory": true,
+        "canUnlock": false,
+        "description": "Immutable regulatory record - prevents all modification and deletion (WORM)"
+      }
+    ],
+    "scope": "organisationWide",
+    "workloads": {
+      "exchangeOnline": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true
+    }
+  },
+  "complianceMappings": {
+    "cis": "CIS M365 9.1.12: Ensure a retention policy exists for all Microsoft 365 workloads",
+    "sec17a4": "SEC 17a-4(f): Records preserved in non-rewriteable, non-erasable format (WORM)",
+    "finra4511": "FINRA 4511(c): Books and records preserved to meet SEC requirements",
+    "hipaa": "HIPAA 164.530(j): Documentation retention for minimum 6 years",
+    "gdpr": "GDPR Article 17(3)(b): Right to erasure does not apply where processing is for compliance with legal obligation",
+    "dora": "DORA Article 12: Data retention and integrity for financial entities",
+    "iso27001": "ISO 27001:2022 A.5.33: Protection of records against loss, destruction, falsification"
+  }
+}

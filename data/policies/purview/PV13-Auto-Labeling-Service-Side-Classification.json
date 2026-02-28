@@ -1,0 +1,167 @@
+{
+  "_metadata": {
+    "id": "PV13",
+    "title": "Auto-Labeling - Service-Side Classification",
+    "description": "Automatically applies sensitivity labels to content at rest in SharePoint Online, OneDrive for Business, and Exchange Online based on sensitive information type detection. Service-side auto-labelling scans existing and new content to ensure consistent classification without relying on client-side user interaction.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "SOC 2",
+      "DORA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.6",
+      "9.1.7",
+      "9.1.10",
+      "9.1.11"
+    ],
+    "mitreMappings": [
+      "T1048",
+      "T1567",
+      "T1530"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Information Protection",
+      "Azure Information Protection P2 (for auto-labelling)"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Security Administrator"
+    ],
+    "deploymentOrder": 13,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Sensitivity labels must already be created and published (PV10)",
+      "Azure Information Protection unified labelling must be activated",
+      "E5 or AIP P2 licence required for service-side auto-labelling",
+      "Deploy in TestWithNotifications mode first to review simulation results before enforcement"
+    ],
+    "deploymentSteps": [
+      "1. Connect to Security & Compliance PowerShell",
+      "2. Run the New-AutoSensitivityLabelPolicy cmdlet to create the auto-labelling policy",
+      "3. Run the New-AutoSensitivityLabelRule cmdlet to create the detection rule",
+      "4. Set Mode to TestWithNotifications for initial simulation (minimum 48 hours recommended)",
+      "5. Review simulation results in compliance.microsoft.com > Information Protection > Auto-labelling",
+      "6. After validation, change Mode to Enable for enforcement",
+      "7. Monitor labelling activity via Activity Explorer"
+    ],
+    "rollbackProcedure": "Set-AutoSensitivityLabelPolicy -Identity 'PV13-AutoLabel-ServiceSide-Classification' -Mode Disable"
+  },
+  "powershellCommands": {
+    "createPolicy": {
+      "cmdlet": "New-AutoSensitivityLabelPolicy",
+      "parameters": {
+        "Name": "PV13-AutoLabel-ServiceSide-Classification",
+        "Comment": "Service-side auto-labelling policy that scans content at rest in Exchange, SharePoint, and OneDrive for sensitive information types and applies the Confidential sensitivity label.",
+        "ExchangeLocation": [
+          "All"
+        ],
+        "SharePointLocation": [
+          "All"
+        ],
+        "OneDriveLocation": [
+          "All"
+        ],
+        "ApplySensitivityLabel": "Confidential",
+        "Mode": "TestWithNotifications",
+        "Priority": 0
+      }
+    },
+    "createRule": {
+      "cmdlet": "New-AutoSensitivityLabelRule",
+      "parameters": {
+        "Name": "PV13-AutoLabel-Rule-SIT-Detection",
+        "Policy": "PV13-AutoLabel-ServiceSide-Classification",
+        "ContentContainsSensitiveInformation": [
+          {
+            "name": "Credit Card Number",
+            "id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085",
+            "minCount": 1,
+            "maxCount": -1,
+            "minConfidence": 85,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.S. Social Security Number (SSN)",
+            "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+            "minCount": 1,
+            "maxCount": -1,
+            "minConfidence": 85,
+            "maxConfidence": 100
+          },
+          {
+            "name": "U.S. / U.K. Passport Number",
+            "id": "178ec42a-18b4-47cc-85c7-d62c92fd67f8",
+            "minCount": 1,
+            "maxCount": -1,
+            "minConfidence": 75,
+            "maxConfidence": 100
+          }
+        ],
+        "WorkloadArea": "All"
+      }
+    }
+  },
+  "sensitiveInformationTypes": [
+    {
+      "name": "Credit Card Number",
+      "id": "50842eb7-edc8-4019-85dd-5a5c1f2bb085",
+      "description": "Detects all major credit card formats including Visa, Mastercard, Amex, Discover, JCB, and Diners Club",
+      "publisher": "Microsoft",
+      "rulePackId": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "name": "U.S. Social Security Number (SSN)",
+      "id": "a44669fe-0d48-453d-a9b1-2cc83f2cba77",
+      "description": "Detects U.S. Social Security Numbers in formatted and unformatted patterns",
+      "publisher": "Microsoft",
+      "rulePackId": "00000000-0000-0000-0000-000000000000"
+    },
+    {
+      "name": "U.S. / U.K. Passport Number",
+      "id": "178ec42a-18b4-47cc-85c7-d62c92fd67f8",
+      "description": "Detects U.S. and U.K. passport number patterns",
+      "publisher": "Microsoft",
+      "rulePackId": "00000000-0000-0000-0000-000000000000"
+    }
+  ],
+  "policySettings": {
+    "mode": "TestWithNotifications",
+    "_modeOptions": [
+      "Enable",
+      "TestWithNotifications",
+      "TestWithoutNotifications",
+      "Disable"
+    ],
+    "priority": 0,
+    "applySensitivityLabel": "Confidential",
+    "workloads": {
+      "exchangeOnline": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true,
+      "microsoftTeams": false,
+      "endpointDevices": false,
+      "onPremisesRepositories": false,
+      "powerBI": false,
+      "thirdPartyApps": false
+    }
+  }
+}

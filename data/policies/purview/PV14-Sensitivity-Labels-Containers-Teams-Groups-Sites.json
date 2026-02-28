@@ -1,0 +1,199 @@
+{
+  "_metadata": {
+    "id": "PV14",
+    "title": "Sensitivity Labels - Containers (Teams, Groups & Sites)",
+    "description": "Applies sensitivity labels to Microsoft 365 Groups, Teams, and SharePoint Online sites to control guest access, privacy settings, and unmanaged device access at the container level. Container labels enforce governance boundaries without affecting individual document labelling.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "DORA",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "UK NCSC CAF v3.2",
+      "FedRAMP Moderate",
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.10",
+      "9.1.11"
+    ],
+    "mitreMappings": [
+      "T1199",
+      "T1530",
+      "T1567"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Information Protection",
+      "Azure Active Directory P1 (for group settings)"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Global Administrator",
+      "SharePoint Administrator"
+    ],
+    "deploymentOrder": 14,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Enable sensitivity labels for containers in Azure AD: Set-AzureADDirectorySetting with EnableMIPLabels = true",
+      "Run the Azure AD PowerShell script to enable group classification: Execute-AzureAdLabelSync",
+      "Sensitivity labels must already be created (PV10)",
+      "Microsoft 365 Groups must be enabled for the tenant",
+      "Allow up to 24 hours for Azure AD sync after enabling container labels"
+    ],
+    "deploymentSteps": [
+      "1. Enable Azure AD settings for sensitivity labels on containers",
+      "2. Run Execute-AzureAdLabelSync to sync labels to Azure AD",
+      "3. Create container-scoped sensitivity labels (Public, Internal, Confidential)",
+      "4. Update existing label policy to include container labels",
+      "5. Wait for replication (up to 24 hours)",
+      "6. Apply labels to existing Teams, Groups, and Sites as needed",
+      "7. Validate guest access and privacy settings are enforced"
+    ],
+    "rollbackProcedure": "Remove-Label -Identity '<LabelName>' for each container label. Note: removing a container label from a site does not change the site privacy or guest access settings retroactively."
+  },
+  "powershellCommands": {
+    "enableContainerLabels": {
+      "cmdlet": "Execute-AzureAdLabelSync",
+      "parameters": {},
+      "_note": "One-time sync command to enable sensitivity labels for M365 Groups/Teams/Sites"
+    },
+    "createContainerLabels": [
+      {
+        "cmdlet": "New-Label",
+        "parameters": {
+          "Name": "Public-Container",
+          "DisplayName": "Public",
+          "Comment": "Container label for public Teams, Groups, and Sites. Guest access allowed. Privacy set to Public.",
+          "Tooltip": "Apply to Teams, Groups, or Sites that should be accessible to guests and visible to all members.",
+          "Priority": 0,
+          "Settings": {
+            "color": "#00AA00",
+            "siteAndGroupSettings": {
+              "privacy": "Public",
+              "allowGuestAccess": true,
+              "allowExternalUsersToBeAddedToGroup": true,
+              "accessFromUnmanagedDevices": "Allow",
+              "sharingLinkType": "AnonymousAccess"
+            }
+          },
+          "SiteAndGroupProtectionEnabled": true,
+          "SiteAndGroupProtectionPrivacy": "Public",
+          "SiteAndGroupProtectionAllowAccessToGuestUsers": true,
+          "SiteAndGroupProtectionAllowEmailFromGuestUsers": true,
+          "SiteAndGroupProtectionBlockAccess": false
+        }
+      },
+      {
+        "cmdlet": "New-Label",
+        "parameters": {
+          "Name": "Internal-Container",
+          "DisplayName": "Internal",
+          "Comment": "Container label for internal-only Teams, Groups, and Sites. No guest access. Privacy set to Private.",
+          "Tooltip": "Apply to Teams, Groups, or Sites that should be restricted to internal members only. External guests cannot be added.",
+          "Priority": 1,
+          "Settings": {
+            "color": "#0078D4",
+            "siteAndGroupSettings": {
+              "privacy": "Private",
+              "allowGuestAccess": false,
+              "allowExternalUsersToBeAddedToGroup": false,
+              "accessFromUnmanagedDevices": "Allow",
+              "sharingLinkType": "OrganizationEdit"
+            }
+          },
+          "SiteAndGroupProtectionEnabled": true,
+          "SiteAndGroupProtectionPrivacy": "Private",
+          "SiteAndGroupProtectionAllowAccessToGuestUsers": false,
+          "SiteAndGroupProtectionAllowEmailFromGuestUsers": false,
+          "SiteAndGroupProtectionBlockAccess": false
+        }
+      },
+      {
+        "cmdlet": "New-Label",
+        "parameters": {
+          "Name": "Confidential-Container",
+          "DisplayName": "Confidential",
+          "Comment": "Container label for confidential Teams, Groups, and Sites. No guest access. Private privacy. Unmanaged device access blocked.",
+          "Tooltip": "Apply to Teams, Groups, or Sites containing sensitive data. No guest access, private visibility, and unmanaged devices are blocked from accessing content.",
+          "Priority": 2,
+          "Settings": {
+            "color": "#FF8C00",
+            "siteAndGroupSettings": {
+              "privacy": "Private",
+              "allowGuestAccess": false,
+              "allowExternalUsersToBeAddedToGroup": false,
+              "accessFromUnmanagedDevices": "Block",
+              "sharingLinkType": "ExistingAccess"
+            }
+          },
+          "SiteAndGroupProtectionEnabled": true,
+          "SiteAndGroupProtectionPrivacy": "Private",
+          "SiteAndGroupProtectionAllowAccessToGuestUsers": false,
+          "SiteAndGroupProtectionAllowEmailFromGuestUsers": false,
+          "SiteAndGroupProtectionBlockAccess": true,
+          "SiteAndGroupProtectionAllowFullAccess": false,
+          "SiteAndGroupProtectionAllowLimitedAccess": false
+        }
+      }
+    ],
+    "updateLabelPolicy": {
+      "cmdlet": "Set-LabelPolicy",
+      "parameters": {
+        "Identity": "PV10-SensitivityLabelPolicy-AllUsers",
+        "AddLabels": [
+          "Public-Container",
+          "Internal-Container",
+          "Confidential-Container"
+        ],
+        "Settings": {
+          "sitesAndGroupsLabelEnabled": true,
+          "teamworkLabelEnabled": true
+        }
+      }
+    }
+  },
+  "policySettings": {
+    "containerLabels": [
+      {
+        "labelName": "Public",
+        "privacy": "Public",
+        "guestAccess": true,
+        "unmanagedDeviceAccess": "Allow"
+      },
+      {
+        "labelName": "Internal",
+        "privacy": "Private",
+        "guestAccess": false,
+        "unmanagedDeviceAccess": "Allow"
+      },
+      {
+        "labelName": "Confidential",
+        "privacy": "Private",
+        "guestAccess": false,
+        "unmanagedDeviceAccess": "Block"
+      }
+    ],
+    "workloads": {
+      "microsoftTeams": true,
+      "microsoft365Groups": true,
+      "sharePointOnlineSites": true,
+      "exchangeOnline": false,
+      "oneDriveForBusiness": false,
+      "endpointDevices": false,
+      "powerBI": false
+    }
+  }
+}

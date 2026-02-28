@@ -3245,5 +3245,826 @@
     "importMethod": "",
     "deployState": "",
     "version": "2.0"
+  },
+  {
+    "id": "PV13",
+    "type": "purview",
+    "file": "PV13-Auto-Labeling-Service-Side-Classification.json",
+    "displayName": "Auto-Labeling - Service-Side Classification",
+    "description": "Automatically applies sensitivity labels to content at rest in SharePoint Online, OneDrive for Business, and Exchange Online based on sensitive information type detection. Service-side auto-labelling scans existing and new content to ensure consistent classification without relying on client-side user interaction.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "SOC 2",
+      "DORA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.6",
+      "9.1.7",
+      "9.1.10",
+      "9.1.11"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV14",
+    "type": "purview",
+    "file": "PV14-Sensitivity-Labels-Containers-Teams-Groups-Sites.json",
+    "displayName": "Sensitivity Labels - Containers (Teams, Groups & Sites)",
+    "description": "Applies sensitivity labels to Microsoft 365 Groups, Teams, and SharePoint Online sites to control guest access, privacy settings, and unmanaged device access at the container level. Container labels enforce governance boundaries without affecting individual document labelling.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "DORA",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "UK NCSC CAF v3.2",
+      "FedRAMP Moderate",
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.10",
+      "9.1.11"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV15",
+    "type": "purview",
+    "file": "PV15-Default-Label-SharePoint-Libraries.json",
+    "displayName": "Default Sensitivity Label for SharePoint Document Libraries",
+    "description": "Configures default sensitivity labels for SharePoint Online document libraries so that all new and uploaded documents automatically inherit the library-level default label. This ensures baseline classification for content stored in SharePoint without relying on user-applied labels.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "Microsoft Cloud Security Benchmark",
+      "UK NCSC CAF v3.2",
+      "DORA"
+    ],
+    "cisChecks": [
+      "9.1.6",
+      "9.1.11"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-sharepoint-online",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV16",
+    "type": "purview",
+    "file": "PV16-DLP-Block-Australian-PII-External.json",
+    "displayName": "DLP - Block Australian PII Shared Externally",
+    "description": "Data Loss Prevention policy that detects and blocks Australian Personally Identifiable Information (Tax File Numbers, Medicare Numbers, and Driver Licence Numbers) from being shared with external recipients across Exchange, SharePoint, OneDrive, and Teams.",
+    "frameworks": [
+      "ASD Essential Eight",
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "Microsoft Cloud Security Benchmark",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E3 (basic DLP)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV17",
+    "type": "purview",
+    "file": "PV17-DLP-Block-US-SSN-External.json",
+    "displayName": "DLP - Block U.S. Social Security Numbers Shared Externally",
+    "description": "Data Loss Prevention policy that detects and blocks U.S. Social Security Numbers (SSN) from being shared with external recipients across Exchange, SharePoint, OneDrive, and Teams. Protects against accidental or intentional disclosure of one of the most sensitive U.S. personal identifiers.",
+    "frameworks": [
+      "HIPAA",
+      "NIST SP 800-53 Rev.5",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "SOC 2",
+      "NYDFS 23 NYCRR 500",
+      "HITRUST CSF v11",
+      "NIS2",
+      "ISO 27001:2022",
+      "GDPR (EU) 2016/679",
+      "PCI DSS v4.0",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E3 (basic DLP)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV18",
+    "type": "purview",
+    "file": "PV18-DLP-Endpoint-Device-Restrictions.json",
+    "displayName": "DLP - Endpoint Device Restrictions",
+    "description": "Extends Data Loss Prevention to endpoint devices using Microsoft Defender for Endpoint integration. Blocks copying sensitive data to USB removable media, printing sensitive documents, copying to clipboard, and uploading to unauthorised cloud services from managed endpoints.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "SOC 2",
+      "DORA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "ASD Essential Eight",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or Microsoft 365 E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV19",
+    "type": "purview",
+    "file": "PV19-DLP-PowerBI-Sensitive-Data.json",
+    "displayName": "DLP - Power BI Sensitive Data Protection",
+    "description": "Data Loss Prevention policy that detects credit card numbers and U.S. Social Security Numbers in Power BI workspaces and datasets. Prevents sensitive data from being exposed through dashboards, reports, and datasets in the Power BI service.",
+    "frameworks": [
+      "PCI DSS v4.0",
+      "GDPR (EU) 2016/679",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "SOC 2",
+      "NIS2",
+      "HIPAA",
+      "DORA",
+      "Microsoft Cloud Security Benchmark",
+      "CMMC v2.0"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or Microsoft 365 E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV20",
+    "type": "purview",
+    "file": "PV20-Information-Barriers-Segments.json",
+    "displayName": "Information Barriers - Organizational Segments",
+    "description": "Creates organizational segments for Microsoft Purview Information Barriers based on department attributes. Segments define logical user groups (Research, Trading, Compliance, Board) that can then be used in Information Barrier policies to restrict or allow communication and collaboration between groups.",
+    "frameworks": [
+      "DORA",
+      "NIS2",
+      "NYDFS 23 NYCRR 500",
+      "SOC 2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "Microsoft Cloud Security Benchmark",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.6"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV21",
+    "type": "purview",
+    "file": "PV21-Information-Barriers-Policies.json",
+    "displayName": "Information Barriers - Policies",
+    "description": "Creates Information Barrier policies that block communication and collaboration between defined organizational segments. Prevents Research from communicating with Trading (Chinese wall), and Trading from communicating with Board members to comply with insider trading regulations and conflict of interest requirements.",
+    "frameworks": [
+      "DORA",
+      "NIS2",
+      "NYDFS 23 NYCRR 500",
+      "SOC 2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "Microsoft Cloud Security Benchmark",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.6"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV22",
+    "type": "purview",
+    "file": "PV22-Retention-Policy-All-Workloads-7-Years.json",
+    "displayName": "Retention Policy - All Workloads 7-Year Retention",
+    "description": "Organisation-wide retention policy that retains content for 7 years (2555 days) then deletes across Exchange Online, SharePoint Online, OneDrive for Business, Teams channels, and Teams chats. Provides baseline data governance and regulatory compliance for records retention obligations.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "SOC 2",
+      "DORA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz",
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight",
+      "NERC-CIP",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "requiredLicence": "Microsoft 365 E3 or E5",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV23",
+    "type": "purview",
+    "file": "PV23-Retention-Policy-Regulatory-Hold-Financial.json",
+    "displayName": "Retention Policy - Regulatory Hold for Financial Services",
+    "description": "Immutable retention policy for financial services organisations to comply with SEC Rule 17a-4, FINRA 4511, and MiFID II record-keeping requirements. Applies Preservation Lock to prevent any modification or deletion of the retention policy.",
+    "frameworks": [
+      "DORA",
+      "NYDFS 23 NYCRR 500",
+      "SEC Cyber Rule",
+      "NIS2",
+      "SOC 2",
+      "ISO 27001:2022",
+      "PCI DSS v4.0",
+      "NIST SP 800-53 Rev.5",
+      "FedRAMP Moderate",
+      "CMMC v2.0"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV24",
+    "type": "purview",
+    "file": "PV24-Retention-Labels-Classification.json",
+    "displayName": "Retention Labels - Classification-Based Retention",
+    "description": "Creates a four-tier retention label taxonomy for classification-based data retention: Business General (3 years), Financial Records (7 years), Legal Hold (10 years), and Regulatory (7 years immutable). Labels are published via a label policy to all users across Exchange, SharePoint, and OneDrive.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "SOC 2",
+      "DORA",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "UK NCSC CAF v3.2",
+      "FedRAMP Moderate",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "requiredLicence": "Microsoft 365 E3 or E5",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV25",
+    "type": "purview",
+    "file": "PV25-Records-Management-Regulatory-Records.json",
+    "displayName": "Records Management - Regulatory Records Declaration",
+    "description": "Configures retention labels with record declaration and regulatory lock for formal records management. Creates Official Business Record (7-year, record label) and Regulatory Record (7-year, regulatory lock) labels that prevent content modification or deletion once applied.",
+    "frameworks": [
+      "DORA",
+      "SEC Cyber Rule",
+      "HIPAA",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "NIS2",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "NYDFS 23 NYCRR 500"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV26",
+    "type": "purview",
+    "file": "PV26-Records-Management-Disposition-Review.json",
+    "displayName": "Records Management - Disposition Review Labels",
+    "description": "Creates retention labels with disposition review at the end of the retention period. Instead of automatic deletion, content is routed to designated reviewers who decide whether to permanently delete, extend retention, or apply a different label.",
+    "frameworks": [
+      "GDPR (EU) 2016/679",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "NIS2",
+      "HIPAA",
+      "DORA",
+      "PCI DSS v4.0",
+      "UK NCSC CAF v3.2",
+      "FedRAMP Moderate"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV27",
+    "type": "purview",
+    "file": "PV27-Communication-Compliance-Offensive-Language.json",
+    "displayName": "Communication Compliance - Offensive Language Detection",
+    "description": "Configures Microsoft Purview Communication Compliance to monitor Exchange, Teams, and Viva Engage for offensive language, harassment, threats, and discrimination. Uses built-in machine learning classifiers to detect policy violations and routes flagged communications to designated reviewers.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "DORA",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz",
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight",
+      "SEC Cyber Rule",
+      "NERC-CIP",
+      "MITRE ATT&CK"
+    ],
+    "cisChecks": [
+      "9.1.8"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV28",
+    "type": "purview",
+    "file": "PV28-Communication-Compliance-Regulatory-Violations.json",
+    "displayName": "Communication Compliance - Financial Regulatory Violations",
+    "description": "Configures Microsoft Purview Communication Compliance to monitor for financial regulatory violations including insider trading signals, conflict-of-interest discussions, and unauthorised disclosures of material non-public information (MNPI).",
+    "frameworks": [
+      "DORA",
+      "SEC Cyber Rule",
+      "NYDFS 23 NYCRR 500",
+      "NIS2",
+      "SOC 2",
+      "ISO 27001:2022",
+      "PCI DSS v4.0",
+      "NIST SP 800-53 Rev.5",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "UK NCSC CAF v3.2",
+      "HIPAA",
+      "Microsoft Cloud Security Benchmark",
+      "BSI IT-Grundschutz",
+      "HITRUST CSF v11"
+    ],
+    "cisChecks": [
+      "9.1.8"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV29",
+    "type": "purview",
+    "file": "PV29-Adaptive-Protection-Dynamic-DLP.json",
+    "displayName": "Adaptive Protection - Dynamic DLP Based on Insider Risk Levels",
+    "description": "Configures Microsoft Purview Adaptive Protection to dynamically adjust Data Loss Prevention policies based on user insider risk levels. Users classified as elevated, moderate, or minor risk by Insider Risk Management automatically receive stricter DLP controls.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "DORA",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CMMC v2.0",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK",
+      "UK NCSC CAF v3.2"
+    ],
+    "cisChecks": [
+      "9.1.4"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV30",
+    "type": "purview",
+    "file": "PV30-eDiscovery-Standard-Case-Template.json",
+    "displayName": "eDiscovery - Standard Case Templates",
+    "description": "Provides templates for standard eDiscovery cases with predefined search queries for common investigation scenarios: data breach investigation, HR investigation, and regulatory inquiry.",
+    "frameworks": [
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "NIS2",
+      "DORA",
+      "SOC 2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "9.1.1"
+    ],
+    "requiredLicence": "Microsoft 365 E3 (eDiscovery Standard)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO11",
+    "type": "sharepoint",
+    "file": "SPO11-Enable-Site-Classification.json",
+    "displayName": "Enable Site Classification Labels",
+    "description": "Configures SharePoint site classification labels to categorise sites by business impact level (Low, Medium, High). Sets the default classification to Medium Business Impact.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "UK NCSC CAF v3.2",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.4"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO12",
+    "type": "sharepoint",
+    "file": "SPO12-Enable-Versioning-Limits.json",
+    "displayName": "Enable Version Expiration with Major Version Limits",
+    "description": "Enables automatic version history trimming with a maximum of 500 major versions and expiration of versions older than 30 days.",
+    "frameworks": [
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "NIS2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "Microsoft Cloud Security Benchmark",
+      "UK NCSC CAF v3.2",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate"
+    ],
+    "cisChecks": [],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO13",
+    "type": "sharepoint",
+    "file": "SPO13-Restrict-Sharing-Domain-Allowlist.json",
+    "displayName": "Restrict External Sharing to Allowed Domains Only",
+    "description": "Limits external sharing to a specific allowlist of approved partner domains. Only users from the specified domains can receive sharing invitations or access shared content.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "DORA",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "UK NCSC CAF v3.2",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500"
+    ],
+    "cisChecks": [
+      "7.2.3",
+      "7.2.5",
+      "7.2.7",
+      "7.2.9"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO14",
+    "type": "sharepoint",
+    "file": "SPO14-Block-Apps-No-Device-Enforcement.json",
+    "displayName": "Block Access from Apps Without Device-Based Restrictions",
+    "description": "Restricts access from applications that cannot enforce device-based conditional access policies. Limits unmanaged device access to web-only preview without editing or download capabilities.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "HIPAA",
+      "UK NCSC CAF v3.2",
+      "DORA",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.2",
+      "7.2.10"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO15",
+    "type": "sharepoint",
+    "file": "SPO15-Configure-Idle-Session-Timeout.json",
+    "displayName": "Configure Idle Session Sign-Out Timeout",
+    "description": "Configures automatic sign-out for inactive SharePoint Online and OneDrive for Business browser sessions after 60 minutes of inactivity.",
+    "frameworks": [
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "SOC 2",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "DORA",
+      "CMMC v2.0",
+      "UK NCSC CAF v3.2",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO16",
+    "type": "sharepoint",
+    "file": "SPO16-Disable-Custom-Script.json",
+    "displayName": "Disable Custom Script Execution on SharePoint Sites",
+    "description": "Prevents execution of custom scripts on SharePoint Online sites to mitigate cross-site scripting (XSS), script injection, and other code-based attacks.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "UK NCSC CAF v3.2",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO17",
+    "type": "sharepoint",
+    "file": "SPO17-Enable-DLP-Integration-SharePoint.json",
+    "displayName": "Enable DLP Integration for SharePoint Content Protection",
+    "description": "Enables SharePoint-specific Data Loss Prevention integration by marking newly uploaded files as sensitive by default until scanned by the DLP engine.",
+    "frameworks": [
+      "GDPR (EU) 2016/679",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "DORA",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.6"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO18",
+    "type": "sharepoint",
+    "file": "SPO18-Advanced-Access-Control-Sensitive-Sites.json",
+    "displayName": "Enable Restricted Access Control for Sensitive Sites",
+    "description": "Enables restricted access control on sensitive SharePoint site collections, limiting access to members of a specified Entra ID security group.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "DORA",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "UK NCSC CAF v3.2",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.2",
+      "7.2.10"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO19",
+    "type": "sharepoint",
+    "file": "SPO19-Block-Guest-Resharing.json",
+    "displayName": "Block Guest Users from Resharing Content",
+    "description": "Prevents external guest users from resharing content they have been given access to with additional external users.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "DORA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "UK NCSC CAF v3.2",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.3",
+      "7.2.5"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO20",
+    "type": "sharepoint",
+    "file": "SPO20-Enable-SharePoint-Audit-Events.json",
+    "displayName": "Enable Comprehensive SharePoint Audit Events",
+    "description": "Configures comprehensive audit logging for SharePoint Online activities. Ensures complete visibility into user activities, sharing events, administrative changes, and application access across all SharePoint sites.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "DORA",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark",
+      "BSI IT-Grundschutz",
+      "NERC-CIP",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "9.1.1"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
   }
 ]

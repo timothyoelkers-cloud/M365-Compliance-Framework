@@ -1,0 +1,213 @@
+{
+  "_metadata": {
+    "id": "PV29",
+    "title": "Adaptive Protection - Dynamic DLP Based on Insider Risk Levels",
+    "description": "Configures Microsoft Purview Adaptive Protection to dynamically adjust Data Loss Prevention policies based on user insider risk levels. Users classified as elevated, moderate, or minor risk by Insider Risk Management automatically receive stricter DLP controls. This is primarily portal-configured; this policy provides verification commands and configuration guidance.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "DORA",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CMMC v2.0",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK",
+      "UK NCSC CAF v3.2"
+    ],
+    "cisChecks": [
+      "9.1.4"
+    ],
+    "mitreMappings": [
+      "T1048",
+      "T1567",
+      "T1041",
+      "T1530",
+      "T1052",
+      "T1039"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Insider Risk Management",
+      "Microsoft Purview Data Loss Prevention",
+      "Microsoft 365 E5 Information Protection and Governance"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Insider Risk Management Admin",
+      "Security Administrator"
+    ],
+    "deploymentOrder": 29,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Insider Risk Management policies must be deployed and active (see PV12)",
+      "DLP policies must be deployed (see PV01-PV09)",
+      "Microsoft 365 E5 or E5 Compliance licence required for Adaptive Protection",
+      "Insider Risk Management must have sufficient data to classify user risk levels",
+      "Conduct Data Protection Impact Assessment (DPIA) for risk-based user monitoring",
+      "Adaptive Protection is primarily configured via the Microsoft Purview compliance portal"
+    ],
+    "configurationMethod": "Portal-based configuration with PowerShell verification",
+    "portalUrl": "https://compliance.microsoft.com/insiderriskmanagement/adaptiveprotection",
+    "adaptiveProtectionLevels": {
+      "elevatedRisk": "Users with the highest insider risk score. Maximum DLP restrictions applied: block all external sharing, USB copy, and cloud upload.",
+      "moderateRisk": "Users with moderate insider risk indicators. Enhanced DLP controls: block external sharing of sensitive content, warn on USB copy.",
+      "minorRisk": "Users with low-level risk signals. Standard DLP controls with additional monitoring and policy tips."
+    },
+    "deploymentSteps": [
+      "1. Ensure Insider Risk Management policies are active and generating risk scores (PV12)",
+      "2. Navigate to compliance.microsoft.com > Insider risk management > Adaptive protection",
+      "3. Enable Adaptive Protection and configure risk level thresholds",
+      "4. Map risk levels to DLP policy actions (Elevated=Block, Moderate=BlockWithOverride, Minor=Notify)",
+      "5. Create or update DLP policies to use Adaptive Protection conditions",
+      "6. Monitor risk level assignments in the Adaptive Protection dashboard",
+      "7. Run verification commands to confirm configuration"
+    ],
+    "rollbackProcedure": "Disable Adaptive Protection in compliance.microsoft.com > Insider risk management > Adaptive protection. DLP policies will revert to their standard behaviour without risk-based conditions."
+  },
+  "powershellCommands": {
+    "steps": [
+      {
+        "step": 1,
+        "description": "Verify Insider Risk Management policies are active",
+        "cmdlet": "Get-InsiderRiskPolicy",
+        "parameters": {},
+        "expectedResult": "Lists active Insider Risk Management policies including departing employee and data leak policies",
+        "_note": "Insider Risk policies must be generating risk scores before Adaptive Protection can function"
+      },
+      {
+        "step": 2,
+        "description": "Verify DLP policies exist for Adaptive Protection integration",
+        "cmdlet": "Get-DlpCompliancePolicy",
+        "parameters": {},
+        "expectedResult": "Lists DLP policies (PV01-PV09) that will be dynamically adjusted by Adaptive Protection"
+      },
+      {
+        "step": 3,
+        "description": "Check Adaptive Protection configuration status",
+        "cmdlet": "Get-InsiderRiskPolicy",
+        "parameters": {
+          "Identity": "AdaptiveProtection"
+        },
+        "expectedResult": "Adaptive Protection policy exists and is enabled",
+        "_note": "Adaptive Protection is configured via the portal but status can be verified via PowerShell"
+      },
+      {
+        "step": 4,
+        "description": "Verify DLP policies are configured with risk-based conditions",
+        "cmdlet": "Get-DlpComplianceRule",
+        "parameters": {},
+        "expectedResult": "DLP rules include conditions for InsiderRiskLevel (Elevated, Moderate, Minor)"
+      },
+      {
+        "step": 5,
+        "description": "Create DLP policy with Adaptive Protection condition for elevated risk users",
+        "cmdlet": "New-DlpCompliancePolicy",
+        "parameters": {
+          "Name": "PV29-DLP-AdaptiveProtection-ElevatedRisk",
+          "Comment": "DLP policy triggered for users with Elevated insider risk level. Blocks all external sharing and exfiltration attempts.",
+          "ExchangeLocation": [
+            "All"
+          ],
+          "SharePointLocation": [
+            "All"
+          ],
+          "OneDriveLocation": [
+            "All"
+          ],
+          "TeamsLocation": [
+            "All"
+          ],
+          "Mode": "Enable",
+          "Priority": 0
+        }
+      },
+      {
+        "step": 6,
+        "description": "Create DLP rule for elevated risk users with block action",
+        "cmdlet": "New-DlpComplianceRule",
+        "parameters": {
+          "Name": "PV29-Rule-ElevatedRisk-BlockExternal",
+          "Policy": "PV29-DLP-AdaptiveProtection-ElevatedRisk",
+          "BlockAccess": true,
+          "BlockAccessScope": "ExternalUsers",
+          "NotifyUser": [
+            "SiteAdmin",
+            "LastModifier"
+          ],
+          "GenerateAlert": "SiteAdmin",
+          "ReportSeverityLevel": "High",
+          "_note": "InsiderRiskLevel condition is applied via portal-based Adaptive Protection configuration linking this DLP policy to the Elevated risk level"
+        }
+      }
+    ],
+    "verifyAdaptiveProtection": {
+      "cmdlet": "Get-DlpCompliancePolicy",
+      "parameters": {
+        "Identity": "PV29-DLP-AdaptiveProtection-ElevatedRisk"
+      },
+      "expectedResult": "DLP policy exists with Adaptive Protection conditions linked"
+    }
+  },
+  "portalConfiguration": {
+    "adaptiveProtectionSettings": {
+      "enabled": true,
+      "riskLevelMappings": [
+        {
+          "riskLevel": "Elevated",
+          "dlpAction": "Block",
+          "description": "Block all sharing with external users. Block copy to USB/removable media. Block upload to personal cloud storage.",
+          "autoAssignment": true,
+          "expirationDays": 30
+        },
+        {
+          "riskLevel": "Moderate",
+          "dlpAction": "BlockWithOverride",
+          "description": "Block external sharing with business justification override. Warn on USB copy. Enhanced monitoring.",
+          "autoAssignment": true,
+          "expirationDays": 15
+        },
+        {
+          "riskLevel": "Minor",
+          "dlpAction": "Notify",
+          "description": "Show policy tips for sensitive content. Notify compliance team. Standard monitoring with enhanced logging.",
+          "autoAssignment": true,
+          "expirationDays": 7
+        }
+      ],
+      "riskLevelThresholds": {
+        "elevated": "Risk score >= 75",
+        "moderate": "Risk score 50-74",
+        "minor": "Risk score 25-49"
+      }
+    }
+  },
+  "policySettings": {
+    "adaptiveProtection": true,
+    "insiderRiskIntegration": true,
+    "dynamicDlp": true,
+    "workloads": {
+      "exchangeOnline": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true,
+      "microsoftTeams": true,
+      "endpointDevices": true
+    }
+  },
+  "complianceMappings": {
+    "cis": "CIS M365 9.1.4: Ensure Insider Risk Management policies are configured",
+    "iso27001": "ISO 27001:2022 A.8.12: Data leakage prevention with risk-adaptive controls",
+    "nist": "NIST SP 800-53 AC-2(12): Account monitoring for atypical usage with adaptive response",
+    "soc2": "SOC 2 CC6.1: Logical access controls that adapt based on risk indicators",
+    "gdpr": "GDPR Article 32: Appropriate security measures including risk-based access controls",
+    "dora": "DORA Article 9: Protection and prevention with dynamic risk-based controls",
+    "mitre": "MITRE ATT&CK T1048/T1567: Exfiltration detection and prevention through adaptive DLP"
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "_metadata": {
+    "id": "SPO11",
+    "title": "Enable Site Classification Labels",
+    "description": "Configures SharePoint site classification labels to categorise sites by business impact level (Low, Medium, High). Sets the default classification to Medium Business Impact. Site classification helps organisations apply appropriate governance, security controls, and data protection policies based on the sensitivity of content stored in each site collection.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "UK NCSC CAF v3.2",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["7.2.4"],
+    "severity": "Medium",
+    "category": "SharePoint Online",
+    "deploymentOrder": 11,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "_notes": "Site classification labels are informational metadata applied to site collections. They do not enforce policy on their own but are used in conjunction with Conditional Access, DLP, and sensitivity labels to drive automated governance. Requires PnP PowerShell module. Classification values should align with your organisation's data classification taxonomy. Consider migrating to Microsoft Purview sensitivity labels for more granular control."
+  },
+  "steps": [
+    {
+      "cmdlet": "Set-PnPTenant",
+      "parameters": {
+        "SiteClassification": "Low Business Impact,Medium Business Impact,High Business Impact",
+        "DefaultSiteClassification": "Medium Business Impact"
+      },
+      "_notes": "Sets available site classification labels and the default value applied to new sites. Requires PnP PowerShell module connected with appropriate admin permissions. Existing sites will not be retroactively classified; review and classify them manually or via script."
+    }
+  ],
+  "postDeployment": [
+    "Get-PnPTenant | Select-Object SiteClassification, DefaultSiteClassification",
+    "Verify in the SharePoint admin center that site classification labels appear when creating new sites",
+    "Review existing sites without classification: Get-SPOSite -Limit All | Where-Object {$_.Classification -eq ''} | Select-Object Url, Template",
+    "Communicate to site owners that they should review and set appropriate classification labels on their existing sites",
+    "Consider implementing automation to apply governance policies based on classification level (e.g., restrict external sharing on High Business Impact sites)"
+  ]
+}

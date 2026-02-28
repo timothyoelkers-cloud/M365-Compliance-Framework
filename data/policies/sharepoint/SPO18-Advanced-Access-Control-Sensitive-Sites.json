@@ -1,0 +1,51 @@
+{
+  "_metadata": {
+    "id": "SPO18",
+    "title": "Enable Restricted Access Control for Sensitive Sites",
+    "description": "Enables restricted access control on sensitive SharePoint site collections, limiting access to members of a specified Entra ID security group. This provides an additional layer of access governance beyond standard site permissions, ensuring that only explicitly approved users can access high-sensitivity content even if they have been granted site-level permissions.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "DORA",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "UK NCSC CAF v3.2",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["7.2.2", "7.2.10"],
+    "severity": "High",
+    "category": "SharePoint Online",
+    "deploymentOrder": 18,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "_notes": "Replace <tenant>, <sensitive-site>, and <security-group-id> with your actual tenant name, site URL path, and Entra ID security group object ID. RestrictedAccessControl enforces that only members of the specified security group can access the site, regardless of other SharePoint permissions. This must be applied on a per-site basis for each sensitive site collection. Repeat the step for every site that requires restricted access. The security group should be managed through your identity governance process with regular access reviews."
+  },
+  "steps": [
+    {
+      "cmdlet": "Set-SPOSite",
+      "parameters": {
+        "Identity": "https://<tenant>.sharepoint.com/sites/<sensitive-site>",
+        "RestrictedAccessControl": true,
+        "RestrictedAccessControlGroups": "<security-group-id>"
+      },
+      "_notes": "Replace <tenant>, <sensitive-site>, and <security-group-id> with your values. Repeat for each sensitive site. The security group ID is the Entra ID object ID (GUID) of the security group whose members should have access. Users not in this group will be denied access even if they have SharePoint permissions on the site."
+    }
+  ],
+  "postDeployment": [
+    "Get-SPOSite -Identity 'https://<tenant>.sharepoint.com/sites/<sensitive-site>' | Select-Object Url, RestrictedAccessControl, RestrictedAccessControlGroups",
+    "Test access with a user who IS a member of the security group to confirm they can access the site",
+    "Test access with a user who is NOT a member of the security group to confirm they are denied access",
+    "Document all sites with restricted access control enabled and their associated security groups",
+    "Configure Entra ID Access Reviews for the security groups to ensure regular attestation of membership",
+    "Monitor access denied events in the SharePoint audit logs for the restricted sites",
+    "Repeat the deployment step for each additional sensitive site collection that requires restricted access control"
+  ]
+}

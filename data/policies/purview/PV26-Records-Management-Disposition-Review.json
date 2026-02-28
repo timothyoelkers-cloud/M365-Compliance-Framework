@@ -1,0 +1,192 @@
+{
+  "_metadata": {
+    "id": "PV26",
+    "title": "Records Management - Disposition Review Labels",
+    "description": "Creates retention labels with disposition review at the end of the retention period. Instead of automatic deletion, content is routed to designated reviewers who decide whether to permanently delete, extend retention, or apply a different label. Ensures human oversight for content disposal decisions.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "GDPR (EU) 2016/679",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "NIS2",
+      "HIPAA",
+      "DORA",
+      "PCI DSS v4.0",
+      "UK NCSC CAF v3.2",
+      "FedRAMP Moderate"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "mitreMappings": [],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Records Management add-on"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Records Management"
+    ],
+    "deploymentOrder": 26,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Records Management feature must be enabled in the compliance portal",
+      "Microsoft 365 E5 Compliance or Records Management add-on required for disposition review",
+      "Disposition reviewers must have appropriate compliance portal access",
+      "Mailbox for reviewers (compliance@contoso.com) must be valid and monitored",
+      "Define disposition review workflow with records management team"
+    ],
+    "dispositionProcess": {
+      "triggerEvent": "Retention period expires for content with this label",
+      "reviewerNotification": "Disposition reviewers receive email notification when items are pending review",
+      "reviewOptions": [
+        "Approve disposal (permanently delete)",
+        "Extend retention period",
+        "Apply a different retention label",
+        "Add additional reviewers"
+      ],
+      "auditTrail": "All disposition decisions are logged in the unified audit log for compliance evidence"
+    },
+    "deploymentSteps": [
+      "1. Connect to Security & Compliance PowerShell",
+      "2. Create retention labels with disposition review enabled",
+      "3. Publish labels via a retention label policy",
+      "4. Configure disposition reviewer mailbox and permissions",
+      "5. Test disposition workflow with sample content",
+      "6. Monitor pending dispositions in compliance.microsoft.com > Records management > Disposition"
+    ],
+    "rollbackProcedure": "Remove-ComplianceTag -Identity '<LabelName>'. Pending disposition items will need to be resolved before label removal. Items already in disposition review will remain pending until a decision is made."
+  },
+  "powershellCommands": {
+    "createDispositionLabels": [
+      {
+        "cmdlet": "New-ComplianceTag",
+        "parameters": {
+          "Name": "Contract - 5yr Disposition Review",
+          "Comment": "5-year retention for contracts with mandatory disposition review before deletion. Reviewers must approve disposal or extend retention.",
+          "RetentionDuration": 1825,
+          "RetentionAction": "KeepAndDelete",
+          "RetentionType": "CreationAgeInDays",
+          "IsRecordLabel": true,
+          "Regulatory": false,
+          "ReviewerEmail": [
+            "compliance@contoso.com"
+          ]
+        }
+      },
+      {
+        "cmdlet": "New-ComplianceTag",
+        "parameters": {
+          "Name": "HR Records - 7yr Disposition Review",
+          "Comment": "7-year retention for HR employee records with mandatory disposition review. Covers employment records, performance reviews, and personnel files.",
+          "RetentionDuration": 2555,
+          "RetentionAction": "KeepAndDelete",
+          "RetentionType": "CreationAgeInDays",
+          "IsRecordLabel": true,
+          "Regulatory": false,
+          "ReviewerEmail": [
+            "compliance@contoso.com"
+          ]
+        }
+      },
+      {
+        "cmdlet": "New-ComplianceTag",
+        "parameters": {
+          "Name": "Project Records - 3yr Disposition Review",
+          "Comment": "3-year retention for project documentation with disposition review. Reviewers assess ongoing business value before disposal.",
+          "RetentionDuration": 1095,
+          "RetentionAction": "KeepAndDelete",
+          "RetentionType": "CreationAgeInDays",
+          "IsRecordLabel": false,
+          "Regulatory": false,
+          "ReviewerEmail": [
+            "compliance@contoso.com"
+          ]
+        }
+      }
+    ],
+    "publishPolicy": {
+      "cmdlet": "New-RetentionCompliancePolicy",
+      "parameters": {
+        "Name": "PV26-DispositionReview-PublishPolicy",
+        "Comment": "Publishes disposition review retention labels to all users. Labels trigger human review before content is permanently deleted at end of retention period.",
+        "ExchangeLocation": [
+          "All"
+        ],
+        "SharePointLocation": [
+          "All"
+        ],
+        "OneDriveLocation": [
+          "All"
+        ],
+        "PublishComplianceTag": [
+          "Contract - 5yr Disposition Review",
+          "HR Records - 7yr Disposition Review",
+          "Project Records - 3yr Disposition Review"
+        ],
+        "Enabled": true
+      }
+    },
+    "verifyDispositionLabels": {
+      "cmdlet": "Get-ComplianceTag",
+      "parameters": {},
+      "expectedResult": "Labels with ReviewerEmail configured and disposition review enabled"
+    },
+    "checkPendingDispositions": {
+      "cmdlet": "Get-ComplianceTagStorage",
+      "parameters": {},
+      "expectedResult": "Shows compliance tag storage status and any pending dispositions"
+    }
+  },
+  "policySettings": {
+    "dispositionLabels": [
+      {
+        "name": "Contract - 5yr Disposition Review",
+        "retentionDays": 1825,
+        "retentionYears": 5,
+        "action": "KeepAndDelete",
+        "isRecord": true,
+        "dispositionReview": true,
+        "reviewerEmail": "compliance@contoso.com"
+      },
+      {
+        "name": "HR Records - 7yr Disposition Review",
+        "retentionDays": 2555,
+        "retentionYears": 7,
+        "action": "KeepAndDelete",
+        "isRecord": true,
+        "dispositionReview": true,
+        "reviewerEmail": "compliance@contoso.com"
+      },
+      {
+        "name": "Project Records - 3yr Disposition Review",
+        "retentionDays": 1095,
+        "retentionYears": 3,
+        "action": "KeepAndDelete",
+        "isRecord": false,
+        "dispositionReview": true,
+        "reviewerEmail": "compliance@contoso.com"
+      }
+    ],
+    "scope": "organisationWide",
+    "workloads": {
+      "exchangeOnline": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true
+    }
+  },
+  "complianceMappings": {
+    "cis": "CIS M365 9.1.12: Ensure a retention policy exists for all Microsoft 365 workloads",
+    "gdpr": "GDPR Article 5(1)(e): Storage limitation with controlled disposal process and accountability",
+    "iso27001": "ISO 27001:2022 A.5.33: Protection of records including controlled destruction",
+    "nist": "NIST SP 800-53 SI-12: Information Management and Retention - controlled disposal",
+    "hipaa": "HIPAA 164.530(j): Documentation retention with auditable disposal decisions",
+    "soc2": "SOC 2 CC6.5: Secure disposal of information assets with oversight"
+  }
+}

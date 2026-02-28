@@ -432,6 +432,16 @@ const DeployEngine = (() => {
     s += '# Replace <tenant> with your tenant name\n';
     s += 'Connect-PnPOnline -Url "https://<tenant>-admin.sharepoint.com" -Interactive\n\n';
 
+    // Handle flat cmdlet+parameters format (SPO02, SPO04, etc.)
+    if (raw.cmdlet && raw.parameters) {
+      s += '$params = @{\n';
+      for (const [k, v] of Object.entries(raw.parameters)) {
+        s += `    ${k} = ${formatPsValue(v)}\n`;
+      }
+      s += '}\n';
+      s += `${raw.cmdlet} @params\n\n`;
+    }
+
     for (const step of (raw.steps || [])) {
       if (step._notes) s += `# ${step._notes.substring(0, 120)}\n`;
       s += '$params = @{\n';
@@ -492,9 +502,27 @@ const DeployEngine = (() => {
     s += 'Connect-IPPSSession\n\n';
 
     // Purview uses powershellCommands: { createPolicy: {cmdlet, parameters}, createRule: {cmdlet, parameters} }
+    // Some keys are arrays of commands (e.g. createLabels[], createSegments[])
     const cmds = raw.powershellCommands || {};
     for (const [key, cmd] of Object.entries(cmds)) {
-      if (!cmd || !cmd.cmdlet) continue;
+      if (!cmd) continue;
+      // Handle array of commands
+      if (Array.isArray(cmd)) {
+        s += `# --- ${key} ---\n`;
+        for (const item of cmd) {
+          if (!item || !item.cmdlet) continue;
+          s += `# ${item.cmdlet}\n`;
+          s += '$params = @{\n';
+          for (const [k, v] of Object.entries(item.parameters || {})) {
+            if (k.startsWith('_')) continue;
+            s += `    ${k} = ${formatPsValue(v)}\n`;
+          }
+          s += '}\n';
+          s += `${item.cmdlet} @params\n\n`;
+        }
+        continue;
+      }
+      if (!cmd.cmdlet) continue;
       s += `# ${key}\n`;
       s += '$params = @{\n';
       for (const [k, v] of Object.entries(cmd.parameters || {})) {

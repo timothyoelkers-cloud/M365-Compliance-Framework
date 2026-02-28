@@ -1,0 +1,171 @@
+{
+  "_metadata": {
+    "id": "PV21",
+    "title": "Information Barriers - Policies",
+    "description": "Creates Information Barrier policies that block communication and collaboration between defined organizational segments. Prevents Research from communicating with Trading (Chinese wall), and Trading from communicating with Board members to comply with insider trading regulations and conflict of interest requirements.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "DORA",
+      "NIS2",
+      "NYDFS 23 NYCRR 500",
+      "SOC 2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "Microsoft Cloud Security Benchmark",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.6"
+    ],
+    "mitreMappings": [
+      "T1530",
+      "T1199",
+      "T1534"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Information Barriers",
+      "Office 365 E5 (includes Information Barriers)"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Information Barriers Administrator"
+    ],
+    "deploymentOrder": 21,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Organizational segments must be created first (PV20)",
+      "Information Barriers mode must be enabled: Set-OrganizationConfig -InformationBarrierMode Enabled",
+      "Azure AD Department attributes must be populated for all in-scope users",
+      "Audit logging must be enabled (PV11)",
+      "Legal and Compliance teams must approve the barrier definitions before deployment",
+      "Allow up to 24 hours for policy application to propagate across all workloads"
+    ],
+    "deploymentSteps": [
+      "1. Verify segments are created and active (PV20): Get-OrganizationSegment",
+      "2. Connect to Security & Compliance PowerShell",
+      "3. Create the Research-Trading barrier policy using New-InformationBarrierPolicy",
+      "4. Create the Trading-Board barrier policy using New-InformationBarrierPolicy",
+      "5. Set policies to Active state",
+      "6. Apply policies using Start-InformationBarrierPoliciesApplication",
+      "7. Monitor application status: Get-InformationBarrierPoliciesApplicationStatus",
+      "8. Validate barriers by testing communication between blocked segments",
+      "9. Allow up to 24 hours for full propagation across Exchange, Teams, SharePoint, and OneDrive"
+    ],
+    "rollbackProcedure": "Set-InformationBarrierPolicy -Identity '<PolicyName>' -State Inactive for each policy, then run Start-InformationBarrierPoliciesApplication to apply the change. Policies can be deactivated without deletion."
+  },
+  "powershellCommands": {
+    "createPolicies": [
+      {
+        "cmdlet": "New-InformationBarrierPolicy",
+        "parameters": {
+          "Name": "PV21-IB-Block-Research-Trading",
+          "AssignedSegment": "Research",
+          "SegmentsBlocked": [
+            "Trading"
+          ],
+          "State": "Active",
+          "Comment": "Chinese wall policy: blocks all communication and collaboration between Research and Trading segments to prevent insider trading and comply with DORA, NYDFS, and MiFID II requirements."
+        }
+      },
+      {
+        "cmdlet": "New-InformationBarrierPolicy",
+        "parameters": {
+          "Name": "PV21-IB-Block-Trading-Research",
+          "AssignedSegment": "Trading",
+          "SegmentsBlocked": [
+            "Research"
+          ],
+          "State": "Active",
+          "Comment": "Reciprocal Chinese wall policy: blocks Trading segment from communicating with Research. Information Barriers require bidirectional policies for full enforcement."
+        }
+      },
+      {
+        "cmdlet": "New-InformationBarrierPolicy",
+        "parameters": {
+          "Name": "PV21-IB-Block-Trading-Board",
+          "AssignedSegment": "Trading",
+          "SegmentsBlocked": [
+            "Board"
+          ],
+          "State": "Active",
+          "Comment": "Blocks Trading segment from communicating with Board members to prevent MNPI (Material Non-Public Information) leakage and insider trading risks."
+        }
+      },
+      {
+        "cmdlet": "New-InformationBarrierPolicy",
+        "parameters": {
+          "Name": "PV21-IB-Block-Board-Trading",
+          "AssignedSegment": "Board",
+          "SegmentsBlocked": [
+            "Trading"
+          ],
+          "State": "Active",
+          "Comment": "Reciprocal policy: blocks Board members from communicating with Trading segment. Required for bidirectional Information Barrier enforcement."
+        }
+      }
+    ],
+    "applyPolicies": {
+      "cmdlet": "Start-InformationBarrierPoliciesApplication",
+      "parameters": {},
+      "_note": "Triggers the application of all active Information Barrier policies. Processing may take up to 24 hours to complete across all workloads."
+    },
+    "verifyApplication": {
+      "cmdlet": "Get-InformationBarrierPoliciesApplicationStatus",
+      "parameters": {},
+      "_note": "Check the status of policy application. Status should be 'Completed' before validating barriers."
+    }
+  },
+  "informationBarrierPolicies": [
+    {
+      "policyName": "PV21-IB-Block-Research-Trading",
+      "assignedSegment": "Research",
+      "segmentsBlocked": [
+        "Trading"
+      ],
+      "direction": "Bidirectional",
+      "description": "Chinese wall: Research cannot communicate with or discover Trading users"
+    },
+    {
+      "policyName": "PV21-IB-Block-Trading-Board",
+      "assignedSegment": "Trading",
+      "segmentsBlocked": [
+        "Board"
+      ],
+      "direction": "Bidirectional",
+      "description": "Trading cannot communicate with or discover Board members"
+    }
+  ],
+  "policySettings": {
+    "mode": "Active",
+    "_modeOptions": [
+      "Active",
+      "Inactive"
+    ],
+    "enforcementScope": {
+      "exchangeOnline": true,
+      "microsoftTeams": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true
+    },
+    "blockedActions": {
+      "chat": true,
+      "channelMessages": true,
+      "callingVoIP": true,
+      "meetingInvitations": true,
+      "emailCommunication": true,
+      "fileSharing": true,
+      "directorySearch": true,
+      "groupMembership": true
+    }
+  }
+}
