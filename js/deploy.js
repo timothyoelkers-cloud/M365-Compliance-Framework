@@ -134,6 +134,13 @@ const DeployEngine = (() => {
 
   const GRAPH_BASE = 'https://graph.microsoft.com';
 
+  function decodeTokenScopes(token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      return { scp: payload.scp || '(none)', roles: payload.roles || [], aud: payload.aud || '', appid: payload.appid || payload.azp || '' };
+    } catch (e) { return { scp: '(decode error)', roles: [], aud: '', appid: '' }; }
+  }
+
   async function callGraphApi(endpoint, method, body) {
     const token = await TenantAuth.getGraphToken();
     if (!token) return { success: false, status: 0, error: 'No access token — please sign in' };
@@ -162,6 +169,15 @@ const DeployEngine = (() => {
         return { success: false, status: 429, error: 'Rate limited — try again shortly', data: data };
       } else {
         const msg = (data && data.error && data.error.message) || text || res.statusText;
+        // Log token debug info on permission errors
+        if (res.status === 401 || res.status === 403 || msg.toLowerCase().includes('scope')) {
+          const tokenInfo = decodeTokenScopes(token);
+          console.error('[Deploy Debug] Token scopes:', tokenInfo.scp);
+          console.error('[Deploy Debug] Token audience:', tokenInfo.aud);
+          console.error('[Deploy Debug] Token appId:', tokenInfo.appid);
+          console.error('[Deploy Debug] Endpoint:', method, url);
+          return { success: false, status: res.status, error: msg + ' [Token scp: ' + tokenInfo.scp + ']', data: data };
+        }
         return { success: false, status: res.status, error: msg, data: data };
       }
     } catch (err) {
