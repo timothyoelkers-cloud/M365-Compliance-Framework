@@ -10,7 +10,6 @@ const TenantAuth = (() => {
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
   const REDIRECT_URI = window.location.origin + window.location.pathname;
 
-  // Individual scopes (shown on consent screen)
   const GRAPH_SCOPES = [
     'User.Read',
     'Policy.ReadWrite.ConditionalAccess',
@@ -20,9 +19,6 @@ const TenantAuth = (() => {
     'Directory.ReadWrite.All',
     'Policy.ReadWrite.AuthenticationMethod',
   ];
-
-  // .default scope — returns ALL admin-consented permissions in the token
-  const TOKEN_SCOPES = ['https://graph.microsoft.com/.default'];
 
   // ─── Initialization ───
   async function init() {
@@ -74,9 +70,11 @@ const TenantAuth = (() => {
   async function login() {
     if (!msalInstance) await init();
     try {
+      // No prompt:'consent' — admin consent is pre-granted on the app registration.
+      // Using 'consent' would create a user-level grant that overrides admin consent
+      // and strips the admin-only scopes from the token.
       const response = await msalInstance.loginPopup({
         scopes: GRAPH_SCOPES,
-        prompt: 'consent',
       });
       if (response && response.account) {
         currentAccount = response.account;
@@ -95,12 +93,6 @@ const TenantAuth = (() => {
     if (!msalInstance) return;
     currentAccount = null;
     updateAuthState();
-    // Force-clear all MSAL cached tokens from localStorage
-    Object.keys(localStorage).forEach(key => {
-      if (key.indexOf('msal') !== -1 || key.indexOf('login.windows.net') !== -1) {
-        localStorage.removeItem(key);
-      }
-    });
     try {
       await msalInstance.logoutPopup({
         postLogoutRedirectUri: REDIRECT_URI,
@@ -108,9 +100,6 @@ const TenantAuth = (() => {
     } catch (err) {
       console.error('Logout error:', err);
     }
-    // Re-initialize MSAL with a clean instance
-    msalInstance = null;
-    await init();
   }
 
   // ─── Token Acquisition ───
@@ -118,17 +107,15 @@ const TenantAuth = (() => {
     if (!msalInstance || !currentAccount) return null;
     try {
       const response = await msalInstance.acquireTokenSilent({
-        scopes: TOKEN_SCOPES,
+        scopes: GRAPH_SCOPES,
         account: currentAccount,
-        forceRefresh: true,
       });
       return response.accessToken;
     } catch (err) {
       if (err instanceof msal.InteractionRequiredAuthError) {
         try {
           const response = await msalInstance.acquireTokenPopup({
-            scopes: TOKEN_SCOPES,
-            prompt: 'consent',
+            scopes: GRAPH_SCOPES,
           });
           if (response && response.account) {
             currentAccount = response.account;
