@@ -146,6 +146,81 @@ a:hover { text-decoration: underline; }
 .gap-lg { gap: 24px; }
 .hidden { display: none !important; }
 
+/* ── SCAN STATUS BADGES ──────────────── */
+.scan-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-size: .54rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  letter-spacing: .02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+.scan-badge-configured {
+  background: var(--green-lt2);
+  color: var(--green);
+}
+.scan-badge-missing {
+  background: var(--red-lt2);
+  color: var(--red);
+}
+.scan-badge-manual {
+  background: var(--amber-lt2);
+  color: var(--amber);
+}
+.scan-badge-not-scanned {
+  background: var(--bg2);
+  color: var(--ink4);
+}
+
+/* ── SCAN SUMMARY BAR ───────────────── */
+.scan-summary-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  margin-bottom: 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: .72rem;
+  flex-wrap: wrap;
+}
+.scan-summary-bar .scan-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.scan-summary-bar .scan-stat .dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.scan-summary-bar .scan-stat .dot-green  { background: var(--green); }
+.scan-summary-bar .scan-stat .dot-red    { background: var(--red); }
+.scan-summary-bar .scan-stat .dot-amber  { background: var(--amber); }
+.scan-summary-bar .scan-stat .dot-grey   { background: var(--ink4); }
+
+/* ── SCAN PROGRESS ───────────────────── */
+.scan-progress-bar {
+  height: 4px;
+  background: var(--bg2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.scan-progress-bar .fill {
+  height: 100%;
+  background: var(--blue);
+  border-radius: 2px;
+  transition: width .3s ease;
+}
+
 /* ── SELECTION ────────────────────────── */
 ::selection {
   background: var(--accent-lt2);

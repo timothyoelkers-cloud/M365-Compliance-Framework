@@ -1,8 +1,25 @@
 /* ═══════════════════════════════════════════
-   POLICY LIBRARY — Browse, filter, deploy, download
+   POLICY LIBRARY — Browse, filter, deploy, download, scan
 ═══════════════════════════════════════════ */
 const Policies = (() => {
+  let scanStatusFilter = '';  // '', 'configured', 'missing', 'manual'
+
   function init() {
+    render();
+  }
+
+  // ── Scan Tenant ──
+  async function scanTenant() {
+    if (TenantScanner.isScanning()) {
+      showToast('Scan already in progress...');
+      return;
+    }
+    render(); // show progress bar
+    const result = await TenantScanner.scanTenant();
+    if (result.success) {
+      const policies = AppState.get('policies');
+      PolicyMatcher.matchAll(policies);
+    }
     render();
   }
 
@@ -18,6 +35,9 @@ const Policies = (() => {
     const searchQuery = AppState.get('searchQuery');
     const selectedFws = AppState.get('selectedFrameworks');
     const isConnected = TenantAuth.isAuthenticated();
+    const scanResults = AppState.get('tenantScanResults');
+    const scanProgress = AppState.get('scanProgress');
+    const hasScanResults = scanResults && Object.keys(scanResults).length > 0;
 
     // Filter policies
     let filtered = policies;
@@ -30,6 +50,14 @@ const Policies = (() => {
         p.description.toLowerCase().includes(q) ||
         p.id.toLowerCase().includes(q)
       );
+    }
+    // Scan status filter
+    if (scanStatusFilter && hasScanResults) {
+      filtered = filtered.filter(p => {
+        const r = scanResults[p.id];
+        if (!r) return scanStatusFilter === 'not_scanned';
+        return r.status === scanStatusFilter;
+      });
     }
 
     // Group by type
@@ -52,7 +80,34 @@ const Policies = (() => {
 
     let html = '';
 
-    // Selection bar
+    // ── Scan summary bar ──
+    if (hasScanResults) {
+      const summary = PolicyMatcher.getSummary();
+      const scanData = TenantScanner.getScanResults();
+      const agoText = scanData ? timeSince(scanData.timestamp) : '';
+
+      html += `<div class="scan-summary-bar">
+        <strong style="font-size:.74rem;color:var(--ink)">Tenant Scan</strong>
+        <span class="scan-stat"><span class="dot dot-green"></span> ${summary.configured} Configured</span>
+        <span class="scan-stat"><span class="dot dot-red"></span> ${summary.missing} Missing</span>
+        <span class="scan-stat"><span class="dot dot-amber"></span> ${summary.manual} Manual Check</span>
+        ${summary.error > 0 ? `<span class="scan-stat" style="color:var(--red)">${summary.error} errors</span>` : ''}
+        <div style="flex:1"></div>
+        <span style="font-size:.62rem;color:var(--ink4)">${agoText}</span>
+        <button class="btn btn-sm" onclick="Policies.scanTenant()" ${TenantScanner.isScanning() ? 'disabled' : ''}>Re-scan</button>
+      </div>`;
+    }
+
+    // ── Scan progress bar ──
+    if (scanProgress && scanProgress.completed < scanProgress.total) {
+      const pct = Math.round((scanProgress.completed / scanProgress.total) * 100);
+      html += `<div class="scan-progress-bar"><div class="fill" style="width:${pct}%"></div></div>
+        <div style="font-size:.62rem;color:var(--ink4);margin:-10px 0 14px;text-align:center">
+          Scanning: ${scanProgress.current} (${scanProgress.completed}/${scanProgress.total})
+        </div>`;
+    }
+
+    // ── Selection bar ──
     html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap">
       <span class="badge badge-dark">${filtered.length} policies</span>
       <span class="badge badge-green">${sel.size} selected</span>`;
@@ -65,6 +120,12 @@ const Policies = (() => {
     }
 
     html += `<div style="flex:1"></div>`;
+
+    // Scan Tenant button
+    if (isConnected && !hasScanResults) {
+      html += `<button class="btn btn-sm btn-primary" onclick="Policies.scanTenant()" ${TenantScanner.isScanning() ? 'disabled' : ''}>${TenantScanner.isScanning() ? 'Scanning...' : 'Scan Tenant'}</button>`;
+    }
+
     if (sel.size > 0) {
       html += `<button class="btn btn-sm btn-primary" onclick="Policies.downloadBundle()">Download Bundle (${sel.size})</button>`;
 
@@ -87,10 +148,10 @@ const Policies = (() => {
     html += `<button class="btn btn-sm" onclick="Policies.selectAll()">Select All</button>
     </div>`;
 
-    // Search
+    // ── Search ──
     html += `<input class="search-input" type="text" placeholder="Search policies..." value="${escHtml(searchQuery)}" oninput="Policies.search(this.value)" style="margin-bottom:12px">`;
 
-    // Type filter pills
+    // ── Type filter pills ──
     html += `<div class="filter-bar">
       <button class="filter-pill${!typeFilter ? ' active' : ''}" onclick="Policies.filterType('')">All Types</button>`;
     for (const t of types) {
@@ -102,7 +163,18 @@ const Policies = (() => {
     }
     html += `</div>`;
 
-    // Policy type sections
+    // ── Scan status filter pills ──
+    if (hasScanResults) {
+      const summary = PolicyMatcher.getSummary();
+      html += `<div class="filter-bar" style="margin-top:6px">
+        <button class="filter-pill${!scanStatusFilter ? ' active' : ''}" onclick="Policies.filterScanStatus('')">All Statuses</button>
+        <button class="filter-pill${scanStatusFilter === 'configured' ? ' active' : ''}" onclick="Policies.filterScanStatus('configured')" style="--pill-color:var(--green)">Configured <span class="text-mono text-xs">${summary.configured}</span></button>
+        <button class="filter-pill${scanStatusFilter === 'missing' ? ' active' : ''}" onclick="Policies.filterScanStatus('missing')" style="--pill-color:var(--red)">Missing <span class="text-mono text-xs">${summary.missing}</span></button>
+        <button class="filter-pill${scanStatusFilter === 'manual' ? ' active' : ''}" onclick="Policies.filterScanStatus('manual')" style="--pill-color:var(--amber)">Manual Check <span class="text-mono text-xs">${summary.manual}</span></button>
+      </div>`;
+    }
+
+    // ── Policy type sections ──
     for (const type of types) {
       const typePols = byType[type];
       if (!typePols || typePols.length === 0) continue;
@@ -112,10 +184,20 @@ const Policies = (() => {
       const typeSel = typePols.filter(p => sel.has(p.id)).length;
       const isGraph = DeployEngine.isGraphDeployable(type);
 
+      // Type-level scan stats
+      let typeStats = '';
+      if (hasScanResults) {
+        const configured = typePols.filter(p => scanResults[p.id]?.status === 'configured').length;
+        const missing = typePols.filter(p => scanResults[p.id]?.status === 'missing').length;
+        if (configured > 0) typeStats += `<span class="scan-badge scan-badge-configured">${configured} configured</span> `;
+        if (missing > 0) typeStats += `<span class="scan-badge scan-badge-missing">${missing} missing</span> `;
+      }
+
       html += `<div class="policy-type-section">
         <div class="policy-type-hdr" style="border-left:3px solid ${clr}" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
           <h3 style="color:${clr}">${info.label || type}</h3>
           ${isGraph ? '<span class="badge badge-blue" style="font-size:.54rem">Graph API</span>' : '<span class="badge badge-amber" style="font-size:.54rem">PowerShell</span>'}
+          ${typeStats}
           ${typeSel > 0 ? `<span class="badge badge-green">${typeSel} selected</span>` : ''}
           <span class="count-badge" style="background:${clr}">${typePols.length}</span>
           <span class="chevron">&#9654;</span>
@@ -132,6 +214,7 @@ const Policies = (() => {
       for (const pol of typePols) {
         const isSelected = sel.has(pol.id);
         const ds = DeployEngine.getDeploymentStatus(pol.id);
+        const scanResult = hasScanResults ? (scanResults[pol.id] || null) : null;
 
         html += `<div class="policy-card">
           <input type="checkbox" ${isSelected ? 'checked' : ''} onchange="Policies.togglePolicy('${pol.id}')">
@@ -146,14 +229,25 @@ const Policies = (() => {
           else if (ds.status === 'deploying') html += ` <span class="deploy-status deploy-status-deploying">deploying...</span>`;
         }
 
+        // Inline scan status badge
+        if (scanResult) {
+          html += ` ${scanBadgeHtml(scanResult)}`;
+        }
+
         html += `</div>
             <div class="policy-desc">${pol.description}</div>
             <div class="policy-meta">
               ${pol.cisChecks.map(c => `<span class="badge badge-blue">${c}</span>`).join('')}
               ${pol.requiredLicence ? `<span class="badge badge-amber" title="${escHtml(pol.requiredLicence)}">Licence</span>` : ''}
               ${pol.deployState ? `<span class="badge badge-green">${pol.deployState.replace(/([A-Z])/g, ' $1').trim()}</span>` : ''}
-            </div>
-          </div>
+            </div>`;
+
+        // Scan detail line
+        if (scanResult && scanResult.detail) {
+          html += `<div style="font-size:.6rem;color:var(--ink4);margin-top:2px">${escHtml(scanResult.detail)}</div>`;
+        }
+
+        html += `</div>
           <div style="display:flex;flex-direction:column;gap:4px;flex-shrink:0">
             <button class="btn btn-sm" onclick="Policies.downloadSingle('${pol.id}')" title="Download JSON">JSON</button>
             <button class="btn btn-sm" onclick="Policies.viewDetail('${pol.id}')" title="View details">View</button>`;
@@ -187,6 +281,30 @@ const Policies = (() => {
     container.innerHTML = html;
   }
 
+  // ── Scan badge helper ──
+  function scanBadgeHtml(result) {
+    if (!result) return '';
+    const map = {
+      configured:  { cls: 'scan-badge-configured', label: 'Configured' },
+      missing:     { cls: 'scan-badge-missing',    label: 'Missing' },
+      manual:      { cls: 'scan-badge-manual',     label: 'Manual Check' },
+      error:       { cls: 'scan-badge-missing',    label: 'Error' },
+      not_scanned: { cls: 'scan-badge-not-scanned', label: 'Not Scanned' },
+    };
+    const m = map[result.status] || map.not_scanned;
+    return `<span class="scan-badge ${m.cls}" title="${escHtml(result.detail || '')}">${m.label}</span>`;
+  }
+
+  // ── Time since helper ──
+  function timeSince(ts) {
+    if (!ts) return '';
+    const diff = Math.floor((Date.now() - ts) / 1000);
+    if (diff < 60) return 'Scanned just now';
+    if (diff < 3600) return 'Scanned ' + Math.floor(diff / 60) + 'm ago';
+    if (diff < 86400) return 'Scanned ' + Math.floor(diff / 3600) + 'h ago';
+    return 'Scanned ' + Math.floor(diff / 86400) + 'd ago';
+  }
+
   function togglePolicy(id) {
     AppState.toggleInSet('selectedPolicies', id);
     render();
@@ -209,6 +327,11 @@ const Policies = (() => {
 
   function filterType(type) {
     AppState.set('polTypeFilter', type);
+    render();
+  }
+
+  function filterScanStatus(status) {
+    scanStatusFilter = status;
     render();
   }
 
@@ -273,6 +396,8 @@ const Policies = (() => {
     const isConnected = TenantAuth.isAuthenticated();
     const perms = DeployEngine.getRequiredPermissions(pol.type);
     const roles = DeployEngine.getRequiredRoles(pol.type);
+    const scanResults = AppState.get('tenantScanResults');
+    const scanResult = scanResults ? scanResults[pol.id] : null;
 
     let actionHtml = '';
     if (isGraph) {
@@ -298,6 +423,27 @@ const Policies = (() => {
       }
     }
 
+    // Scan status section
+    let scanHtml = '';
+    if (scanResult) {
+      scanHtml = `<div class="section-hdr" style="margin-top:20px">Tenant Scan Status</div>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+          ${scanBadgeHtml(scanResult)}
+          <span style="font-size:.72rem;color:var(--ink2)">${escHtml(scanResult.detail || '')}</span>
+        </div>`;
+      if (scanResult.matchedItem) {
+        scanHtml += `<div style="font-size:.66rem;color:var(--ink3);margin-bottom:8px">
+          Matched: <strong>${escHtml(scanResult.matchedItem.displayName || scanResult.matchedItem.id || '')}</strong>
+        </div>`;
+      }
+      if (scanResult.status === 'manual' && pol.postDeployment) {
+        scanHtml += `<div style="font-size:.66rem;color:var(--ink3);margin-bottom:8px">
+          <strong>Verification command:</strong>
+          <pre style="background:var(--surface2);padding:8px;border-radius:4px;margin-top:4px;font-size:.62rem;overflow-x:auto;cursor:pointer" onclick="navigator.clipboard.writeText(this.textContent);showToast('Copied verification command')" title="Click to copy">${escHtml(typeof pol.postDeployment === 'string' ? pol.postDeployment : JSON.stringify(pol.postDeployment, null, 2))}</pre>
+        </div>`;
+      }
+    }
+
     modal.innerHTML = `<div class="modal-header">
       <h3>${pol.displayName}</h3>
       <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">&times;</button>
@@ -316,6 +462,8 @@ const Policies = (() => {
           ${pol.requiredLicence ? `<tr><td style="font-weight:600">Required Licence</td><td>${pol.requiredLicence}</td></tr>` : ''}
         </tbody>
       </table>
+
+      ${scanHtml}
 
       <div class="section-hdr">CIS Checks</div>
       <div style="display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px">
@@ -413,9 +561,9 @@ const Policies = (() => {
 
   return {
     init, render, togglePolicy, selectAll, clearSelection,
-    filterType, filterByAssessment, search,
+    filterType, filterScanStatus, filterByAssessment, search,
     downloadSingle, downloadBundle, viewDetail,
-    deploy, deploySelected,
+    deploy, deploySelected, scanTenant,
     generateScript, downloadScriptBundle,
   };
 })();

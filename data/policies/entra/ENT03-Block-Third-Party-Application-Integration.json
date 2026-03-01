@@ -62,7 +62,7 @@
       "stepOrder": 1,
       "description": "Disable users from creating app registrations",
       "method": "PATCH",
-      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy/authorizationPolicy",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy",
       "headers": {
         "Content-Type": "application/json",
         "Authorization": "Bearer "
@@ -78,7 +78,7 @@
       "stepOrder": 2,
       "description": "Verify that users cannot create app registrations",
       "method": "GET",
-      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy/authorizationPolicy",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy",
       "expectedResponse": {
         "defaultUserRolePermissions": {
           "allowedToCreateApps": false

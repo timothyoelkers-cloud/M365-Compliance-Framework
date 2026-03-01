@@ -63,7 +63,7 @@
       "stepOrder": 1,
       "description": "Remove all user consent permission grant policies - disable user consent to third-party apps",
       "method": "PATCH",
-      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy/authorizationPolicy",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy",
       "headers": {
         "Content-Type": "application/json",
         "Authorization": "Bearer "
@@ -79,7 +79,7 @@
       "stepOrder": 2,
       "description": "Verify the user consent policy has been removed",
       "method": "GET",
-      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy/authorizationPolicy",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy",
       "expectedResponse": {
         "defaultUserRolePermissions": {
           "permissionGrantPoliciesAssigned": []

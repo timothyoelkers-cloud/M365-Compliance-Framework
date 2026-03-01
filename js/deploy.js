@@ -89,6 +89,11 @@ const DeployEngine = (() => {
       if ((apiCall.method || '').toUpperCase() === 'GET') continue;
       let endpoint = apiCall.endpoint || '';
       endpoint = endpoint.replace('https://graph.microsoft.com', '');
+      // Substitute tenant ID placeholder (used by ENT09 branding endpoints)
+      const acct = TenantAuth.getAccount();
+      if (acct && acct.tenantId) {
+        endpoint = endpoint.replace('<TENANT-ID>', acct.tenantId);
+      }
       const body = apiCall.body ? JSON.parse(JSON.stringify(apiCall.body)) : undefined;
       calls.push({
         endpoint: endpoint,

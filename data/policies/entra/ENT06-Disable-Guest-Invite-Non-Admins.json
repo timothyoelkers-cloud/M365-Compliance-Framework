@@ -72,7 +72,7 @@
       "stepOrder": 1,
       "description": "Restrict guest invitations to admins and Guest Inviter role members only",
       "method": "PATCH",
-      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy/authorizationPolicy",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy",
       "headers": {
         "Content-Type": "application/json",
         "Authorization": "Bearer "
@@ -86,7 +86,7 @@
       "stepOrder": 2,
       "description": "Verify the guest invitation restriction",
       "method": "GET",
-      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy/authorizationPolicy",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy",
       "expectedResponse": {
         "allowInvitesFrom": "adminsAndGuestInviters"
       }
