@@ -36,9 +36,11 @@
         "RecipientLimitPerDay": 1000,
         "ActionWhenThresholdReached": "BlockUser",
         "AutoForwardingMode": "Off",
-        "NotifyOutboundSpam": true,
+        "NotifyOutboundSpam": false,
+        "_postDeploymentNote_Notify": "Enable outbound spam notifications: Set-HostedOutboundSpamFilterPolicy -Identity 'Strict Outbound Anti-Spam Policy' -NotifyOutboundSpam $true -NotifyOutboundSpamRecipients 'security-ops@yourdomain.com'",
         "NotifyOutboundSpamRecipients": "",
-        "BccSuspiciousOutboundMail": true,
+        "BccSuspiciousOutboundMail": false,
+        "_postDeploymentNote_Bcc": "Enable BCC monitoring: Set-HostedOutboundSpamFilterPolicy -Identity 'Strict Outbound Anti-Spam Policy' -BccSuspiciousOutboundMail $true -BccSuspiciousOutboundAdditionalRecipients 'security-ops@yourdomain.com'",
         "BccSuspiciousOutboundAdditionalRecipients": ""
       }
     },
@@ -56,7 +58,7 @@
   "postDeployment": [
     "Get-HostedOutboundSpamFilterPolicy -Identity 'Strict Outbound Anti-Spam Policy' | Format-List",
     "Get-HostedOutboundSpamFilterRule -Identity 'Strict Outbound Anti-Spam Rule - All Senders' | Format-List",
-    "Replace  with the actual security operations mailbox",
+    "Enable notifications and BCC: Set-HostedOutboundSpamFilterPolicy -Identity 'Strict Outbound Anti-Spam Policy' -NotifyOutboundSpam $true -NotifyOutboundSpamRecipients 'security-ops@yourdomain.com' -BccSuspiciousOutboundMail $true -BccSuspiciousOutboundAdditionalRecipients 'security-ops@yourdomain.com'",
     "Communicate to helpdesk: blocked users will need admin unblock via Remove-BlockedConnector or the Security & Compliance portal",
     "Monitor for legitimate high-volume senders (e.g., marketing, automated systems) and create exceptions if necessary"
   ]

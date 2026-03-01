@@ -18,21 +18,23 @@ const DeployEngine = (() => {
   const PS_TYPES = ['defender', 'exchange', 'sharepoint', 'teams', 'purview'];
 
   // Type → default deployment method
+  // Note: InvokeCommand code is ready for DEF/EXO/PV but both endpoints
+  // (outlook.office365.com, ps.compliance.protection.outlook.com) block CORS
+  // from GitHub Pages. An Azure Function proxy would unlock 52 more policies.
   const TYPE_DEPLOY_MAP = {
     'conditional-access': DEPLOY_METHOD.GRAPH,
     'intune':             DEPLOY_METHOD.GRAPH,
     'entra':              DEPLOY_METHOD.GRAPH,
     'defender-endpoint':  DEPLOY_METHOD.GRAPH,
-    'defender':           DEPLOY_METHOD.EXO_INVOKE,
-    'exchange':           DEPLOY_METHOD.EXO_INVOKE,
-    'purview':            DEPLOY_METHOD.COMPLIANCE_INVOKE,
+    'defender':           DEPLOY_METHOD.PS_ONLY,    // InvokeCommand ready, CORS-blocked from SPA
+    'exchange':           DEPLOY_METHOD.PS_ONLY,    // InvokeCommand ready, CORS-blocked from SPA
+    'purview':            DEPLOY_METHOD.PS_ONLY,    // InvokeCommand ready, CORS-blocked from SPA
     'sharepoint':         DEPLOY_METHOD.PS_ONLY,
     'teams':              DEPLOY_METHOD.PS_ONLY,
   };
 
-  // Per-policy overrides (SPO Graph subset + EXO02 DNS-only)
+  // Per-policy overrides (SPO Graph subset — these 5 have Graph API support)
   const POLICY_DEPLOY_OVERRIDE = {
-    'EXO02': DEPLOY_METHOD.PS_ONLY,
     'SPO07': DEPLOY_METHOD.SPO_GRAPH,
     'SPO09': DEPLOY_METHOD.SPO_GRAPH,
     'SPO13': DEPLOY_METHOD.SPO_GRAPH,

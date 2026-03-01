@@ -34,7 +34,7 @@
     "requiredLicence": "Microsoft Defender for Office 365 Plan 1 or Plan 2",
     "version": "2.0",
     "lastUpdated": "2026-02-27",
-    "_notes": "Requires Defender for Office 365 P1/P2. Deploy the policy first (step 1), then assign to recipients via the rule (step 2). TargetedUsersToProtect must be populated with high-value targets (C-suite, finance, HR) before deployment. Review quarantine for false positives during the first 7 days."
+    "_notes": "Requires Defender for Office 365 P1/P2. Deploy the policy first (step 1), then assign to recipients via the rule (step 2). TargetedUserProtection is disabled by default — enable post-deployment and add high-value targets (C-suite, finance, HR). Review quarantine for false positives during the first 7 days."
   },
   "steps": [
     {
@@ -52,12 +52,9 @@
         "AuthenticationFailAction": "Quarantine",
         "EnableOrganizationDomainsProtection": true,
         "EnableTargetedDomainsProtection": false,
-        "EnableTargetedUserProtection": true,
-        "TargetedUsersToProtect": [
-          ";",
-          ";",
-          ";"
-        ],
+        "EnableTargetedUserProtection": false,
+        "_postDeploymentNote_TargetedUsers": "Enable TargetedUserProtection and add C-suite/high-value UPNs post-deployment: Set-AntiPhishPolicy -Identity 'Strict Anti-Phish Policy' -EnableTargetedUserProtection $true -TargetedUsersToProtect @('ceo@domain.com;CEO','cfo@domain.com;CFO')",
+        "TargetedUsersToProtect": [],
         "TargetedUserProtectionAction": "Quarantine",
         "TargetedUserQuarantineTag": "DefaultFullAccessPolicy",
         "TargetedDomainProtectionAction": "Quarantine",
@@ -88,7 +85,7 @@
   "postDeployment": [
     "Get-AntiPhishPolicy -Identity 'Strict Anti-Phish Policy' | Format-List",
     "Get-AntiPhishRule -Identity 'Strict Anti-Phish Rule - All Recipients' | Format-List",
-    "Populate TargetedUsersToProtect with actual C-suite and high-value user entries before enforcement",
+    "Enable TargetedUserProtection and add C-suite UPNs: Set-AntiPhishPolicy -Identity 'Strict Anti-Phish Policy' -EnableTargetedUserProtection $true -TargetedUsersToProtect @('ceo@domain.com;CEO','cfo@domain.com;CFO')",
     "Monitor quarantine for false positives during first 7 days of deployment"
   ]
 }

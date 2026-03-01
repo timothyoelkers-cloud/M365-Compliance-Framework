@@ -54,7 +54,7 @@
       "Conduct Data Protection Impact Assessment (DPIA) for employee monitoring under GDPR",
       "Document lawful basis for communications monitoring (GDPR Article 6)",
       "Notify employees of monitoring in accordance with local employment law",
-      "Configure reviewer mailbox (compliance@contoso.com) with appropriate permissions"
+      "Configure reviewer mailbox (compliance-review@yourdomain.com) with appropriate permissions"
     ],
     "classifierDetails": {
       "offensiveLanguage": "Detects profanity, slurs, and offensive content using Microsoft trained ML classifiers",
@@ -81,7 +81,7 @@
         "Name": "PV27-CommCompliance-OffensiveLanguage",
         "Comment": "Monitors Exchange, Teams, and Viva Engage for offensive language, harassment, threats, and discrimination. CIS 9.1.8 compliance. Flagged items are routed to compliance reviewers.",
         "Reviewers": [
-          "compliance@contoso.com"
+          "compliance-review@yourdomain.com"
         ],
         "UserReportingWorkloads": [
           "Exchange",
@@ -150,7 +150,7 @@
     ],
     "samplingRate": 100,
     "reviewers": [
-      "compliance@contoso.com"
+      "compliance-review@yourdomain.com"
     ],
     "userScope": "allUsers"
   },

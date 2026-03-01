@@ -78,7 +78,7 @@
         "Name": "PV28-CommCompliance-RegulatoryViolations",
         "Comment": "Monitors for financial regulatory violations including insider trading signals, conflict-of-interest, and unauthorised disclosures across Exchange, Teams, and Viva Engage. CIS 9.1.8 compliance.",
         "Reviewers": [
-          "financial-compliance@contoso.com"
+          "financial-compliance@yourdomain.com"
         ],
         "UserReportingWorkloads": [
           "Exchange",
@@ -147,7 +147,7 @@
     ],
     "samplingRate": 100,
     "reviewers": [
-      "financial-compliance@contoso.com"
+      "financial-compliance@yourdomain.com"
     ],
     "userScope": "allUsers"
   },

@@ -53,23 +53,25 @@
     {
       "cmdlet": "New-ReportSubmissionPolicy",
       "parameters": {
-        "ReportJunkToCustomizedAddress": true,
-        "ReportNotJunkToCustomizedAddress": true,
-        "ReportPhishToCustomizedAddress": true,
+        "ReportJunkToCustomizedAddress": false,
+        "ReportNotJunkToCustomizedAddress": false,
+        "ReportPhishToCustomizedAddress": false,
         "ReportJunkAddresses": [],
         "ReportNotJunkAddresses": [],
         "ReportPhishAddresses": [],
+        "EnableReportToMicrosoft": true,
         "ReportChatMessageEnabled": false,
         "ReportChatMessageToCustomizedAddressEnabled": false
       },
-      "_notes": "Routes user-reported messages to the security team mailbox in addition to Microsoft. Replace  with your SOC or phishing response mailbox."
+      "_postDeploymentNote": "To also route reports to your SOC mailbox: Set-ReportSubmissionPolicy -ReportJunkToCustomizedAddress $true -ReportNotJunkToCustomizedAddress $true -ReportPhishToCustomizedAddress $true -ReportJunkAddresses 'security-ops@yourdomain.com' -ReportNotJunkAddresses 'security-ops@yourdomain.com' -ReportPhishAddresses 'security-ops@yourdomain.com'",
+      "_notes": "Reports submitted to Microsoft for analysis by default. Enable custom addresses post-deployment to also route to your SOC mailbox."
     }
   ],
   "postDeployment": [
     "Get-App -OrganizationApp | Where-Object {$_.DisplayName -like '*Report*'} | Select-Object DisplayName, Enabled, DefaultStateForUser",
     "Get-ReportSubmissionPolicy | Format-List",
     "Verify the Report Message button appears in Outlook Web Access and Outlook desktop for test users",
-    "Replace  with the actual security operations mailbox address",
+    "Configure SOC mailbox routing: Set-ReportSubmissionPolicy -ReportJunkToCustomizedAddress $true -ReportPhishToCustomizedAddress $true -ReportJunkAddresses 'security-ops@yourdomain.com' -ReportPhishAddresses 'security-ops@yourdomain.com'",
     "Train users on when and how to use the Report Message and Report Phishing buttons",
     "Marketplace URLs - Report Message: https://appsource.microsoft.com/en-us/product/office/WA104381180 | Report Phishing: https://appsource.microsoft.com/en-us/product/office/WA200002469"
   ]

@@ -98,31 +98,8 @@
             "minCount": 1,
             "maxCount": -1,
             "minConfidence": 75,
-            "maxConfidence": 100
-          },
-          {
-            "name": "Visa Card Number",
-            "id": "82b5f0f4-e55f-4fbb-b tried",
-            "minCount": 1,
-            "minConfidence": 75
-          },
-          {
-            "name": "Mastercard Card Number",
-            "id": "fca93088-e9af-4c6b-abf7-f0402d40a704",
-            "minCount": 1,
-            "minConfidence": 75
-          },
-          {
-            "name": "American Express Card Number",
-            "id": "9b21b198-3d5b-4296-bd0d-db8caf813310",
-            "minCount": 1,
-            "minConfidence": 75
-          },
-          {
-            "name": "Discover Card Number",
-            "id": "b1b1b1b1-0000-4c6b-abf7-discover00001",
-            "minCount": 1,
-            "minConfidence": 75
+            "maxConfidence": 100,
+            "_note": "Detects all major card brands: Visa, Mastercard, Amex, Discover, JCB, Diners Club, UnionPay"
           }
         ],
         "AccessScope": "NotInOrganization",
