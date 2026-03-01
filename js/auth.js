@@ -10,10 +10,13 @@ const TenantAuth = (() => {
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
   const REDIRECT_URI = window.location.origin + window.location.pathname;
 
-  // .default returns ALL admin-consented Graph permissions in the token
-  const GRAPH_TOKEN_SCOPE = ['https://graph.microsoft.com/.default'];
+  // ─── Token Scopes (per-resource) ───
+  // .default returns ALL admin-consented permissions for that resource
+  const GRAPH_TOKEN_SCOPE      = ['https://graph.microsoft.com/.default'];
+  const EXO_TOKEN_SCOPE        = ['https://outlook.office365.com/.default'];
+  const COMPLIANCE_TOKEN_SCOPE = ['https://ps.compliance.protection.outlook.com/.default'];
 
-  // Display list — all 16 delegated permissions on the app registration
+  // Display list — delegated permissions on the app registration
   const GRAPH_SCOPES = [
     'User.Read',
     'Policy.Read.All',
@@ -31,6 +34,7 @@ const TenantAuth = (() => {
     'Directory.ReadWrite.All',
     'Policy.ReadWrite.Authorization',
     'Policy.ReadWrite.AuthenticationMethod',
+    'SharePointTenantSettings.ReadWrite.All',
   ];
 
   // ─── Initialization ───
@@ -107,8 +111,19 @@ const TenantAuth = (() => {
           const decoded = decodeToken(tokenResponse.accessToken);
           console.log('[Auth] Graph token acquired — aud:', decoded.aud, '| scp:', decoded.scp);
         } catch (e) {
-          console.warn('[Auth] Silent token failed, will acquire on demand:', e.message);
+          console.warn('[Auth] Silent Graph token failed, will acquire on demand:', e.message);
         }
+
+        // Step 3: Pre-acquire Exchange & Compliance tokens (fail silently if not consented)
+        try {
+          await msalInstance.acquireTokenSilent({ scopes: EXO_TOKEN_SCOPE, account: currentAccount });
+          console.log('[Auth] Exchange token pre-acquired');
+        } catch (e) { /* will acquire on demand */ }
+
+        try {
+          await msalInstance.acquireTokenSilent({ scopes: COMPLIANCE_TOKEN_SCOPE, account: currentAccount });
+          console.log('[Auth] Compliance token pre-acquired');
+        } catch (e) { /* will acquire on demand */ }
       }
       return loginResponse;
     } catch (err) {
@@ -132,20 +147,24 @@ const TenantAuth = (() => {
   }
 
   // ─── Token Acquisition ───
-  async function getAccessToken() {
+
+  /**
+   * Acquire a token for a specific resource.
+   * Tries silent first, falls back to popup on InteractionRequired.
+   */
+  async function getTokenForResource(scopes) {
     if (!msalInstance || !currentAccount) return null;
     try {
       const response = await msalInstance.acquireTokenSilent({
-        scopes: GRAPH_TOKEN_SCOPE,
+        scopes: scopes,
         account: currentAccount,
-        forceRefresh: true,
       });
       return response.accessToken;
     } catch (err) {
       if (err instanceof msal.InteractionRequiredAuthError) {
         try {
           const response = await msalInstance.acquireTokenPopup({
-            scopes: GRAPH_TOKEN_SCOPE,
+            scopes: scopes,
           });
           if (response && response.account) {
             currentAccount = response.account;
@@ -153,17 +172,28 @@ const TenantAuth = (() => {
           }
           return response.accessToken;
         } catch (popupErr) {
-          console.error('Token popup failed:', popupErr);
+          console.error('Token popup failed for', scopes[0], popupErr);
         }
       } else {
-        console.error('Token acquisition failed:', err);
+        console.error('Token acquisition failed for', scopes[0], err);
       }
       return null;
     }
   }
 
+  /** Graph API token (graph.microsoft.com) */
   async function getGraphToken() {
-    return getAccessToken();
+    return getTokenForResource(GRAPH_TOKEN_SCOPE);
+  }
+
+  /** Exchange Online token (outlook.office365.com) — for DEF/EXO InvokeCommand */
+  async function getExchangeToken() {
+    return getTokenForResource(EXO_TOKEN_SCOPE);
+  }
+
+  /** Compliance Center token (ps.compliance.protection.outlook.com) — for PV InvokeCommand */
+  async function getComplianceToken() {
+    return getTokenForResource(COMPLIANCE_TOKEN_SCOPE);
   }
 
   // ─── Auth State ───
@@ -192,8 +222,9 @@ const TenantAuth = (() => {
   return {
     init, handleRedirectPromise,
     login, logout,
-    getAccessToken, getGraphToken,
-    isAuthenticated, getAccount, updateAuthState,
-    GRAPH_SCOPES,
+    getAccessToken: getGraphToken, getGraphToken,
+    getExchangeToken, getComplianceToken, getTokenForResource,
+    isAuthenticated, getAccount, updateAuthState, decodeToken,
+    GRAPH_SCOPES, EXO_TOKEN_SCOPE, COMPLIANCE_TOKEN_SCOPE,
   };
 })();

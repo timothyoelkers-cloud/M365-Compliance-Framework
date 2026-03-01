@@ -129,16 +129,16 @@ const Policies = (() => {
     if (sel.size > 0) {
       html += `<button class="btn btn-sm btn-primary" onclick="Policies.downloadBundle()">Download Bundle (${sel.size})</button>`;
 
-      // Bulk deploy button (Graph API policies only)
+      // Bulk deploy button (all deployable policies — Graph, InvokeCommand, SPO Graph)
       if (isConnected) {
-        const deployable = policies.filter(p => sel.has(p.id) && DeployEngine.isGraphDeployable(p.type));
+        const deployable = policies.filter(p => sel.has(p.id) && DeployEngine.isDeployable(p.type, p.id));
         if (deployable.length > 0) {
           html += ` <button class="btn btn-sm btn-deploy" onclick="Policies.deploySelected()">Deploy ${deployable.length} to Tenant</button>`;
         }
       }
 
-      // Bulk script button (PowerShell policies only)
-      const scriptable = policies.filter(p => sel.has(p.id) && DeployEngine.isPowerShellOnly(p.type));
+      // Bulk script button (all types that have PS1 generation)
+      const scriptable = policies.filter(p => sel.has(p.id) && DeployEngine.hasScript(p.type));
       if (scriptable.length > 0) {
         html += ` <button class="btn btn-sm btn-script" onclick="Policies.downloadScriptBundle()">Generate ${scriptable.length} Scripts</button>`;
       }
@@ -182,7 +182,7 @@ const Policies = (() => {
       const info = policyTypes[type] || {};
       const clr = typeColors[type] || 'var(--ink3)';
       const typeSel = typePols.filter(p => sel.has(p.id)).length;
-      const isGraph = DeployEngine.isGraphDeployable(type);
+      const typeMethod = DeployEngine.getDeployMethod(type);
 
       // Type-level scan stats
       let typeStats = '';
@@ -193,10 +193,23 @@ const Policies = (() => {
         if (missing > 0) typeStats += `<span class="scan-badge scan-badge-missing">${missing} missing</span> `;
       }
 
+      // Deployment method badge(s)
+      let methodBadge = '';
+      if (typeMethod === 'graph') {
+        methodBadge = '<span class="badge badge-blue" style="font-size:.54rem">Graph API</span>';
+      } else if (typeMethod === 'exo-invoke' || typeMethod === 'cc-invoke') {
+        methodBadge = '<span class="badge badge-blue" style="font-size:.54rem">REST API</span>';
+      } else if (type === 'sharepoint') {
+        // SharePoint has partial Graph coverage (5 policies) + PS-only remainder
+        methodBadge = '<span class="badge badge-blue" style="font-size:.54rem">Partial API</span> <span class="badge badge-amber" style="font-size:.54rem">PowerShell</span>';
+      } else {
+        methodBadge = '<span class="badge badge-amber" style="font-size:.54rem">PowerShell</span>';
+      }
+
       html += `<div class="policy-type-section">
         <div class="policy-type-hdr" style="border-left:3px solid ${clr}" onclick="this.classList.toggle('open');this.nextElementSibling.style.display=this.classList.contains('open')?'block':'none'">
           <h3 style="color:${clr}">${info.label || type}</h3>
-          ${isGraph ? '<span class="badge badge-blue" style="font-size:.54rem">Graph API</span>' : '<span class="badge badge-amber" style="font-size:.54rem">PowerShell</span>'}
+          ${methodBadge}
           ${typeStats}
           ${typeSel > 0 ? `<span class="badge badge-green">${typeSel} selected</span>` : ''}
           <span class="count-badge" style="background:${clr}">${typePols.length}</span>
@@ -252,8 +265,11 @@ const Policies = (() => {
             <button class="btn btn-sm" onclick="Policies.downloadSingle('${pol.id}')" title="Download JSON">JSON</button>
             <button class="btn btn-sm" onclick="Policies.viewDetail('${pol.id}')" title="View details">View</button>`;
 
-        // Deploy or Script button
-        if (isGraph) {
+        // Deploy button (Graph, InvokeCommand, or SPO Graph policies)
+        const canDeploy = DeployEngine.isDeployable(pol.type, pol.id);
+        const canScript = DeployEngine.hasScript(pol.type);
+
+        if (canDeploy) {
           if (ds && ds.status === 'success') {
             html += `<button class="btn btn-sm btn-deployed" disabled>Deployed</button>`;
           } else if (ds && ds.status === 'deploying') {
@@ -267,7 +283,9 @@ const Policies = (() => {
           } else {
             html += `<button class="btn btn-sm btn-deploy" onclick="handleConnectTenant()" title="Connect tenant to deploy">Deploy</button>`;
           }
-        } else {
+        }
+        // PS1 button (always shown for types with script generation, even if also deployable)
+        if (canScript) {
           html += `<button class="btn btn-sm btn-script" onclick="Policies.generateScript('${pol.id}')" title="Download PowerShell script">PS1</button>`;
         }
 
@@ -279,6 +297,18 @@ const Policies = (() => {
     }
 
     container.innerHTML = html;
+  }
+
+  // ── Deploy method label helper ──
+  function deployMethodLabel(method) {
+    switch (method) {
+      case 'graph':       return '<span class="badge badge-blue">Graph API</span>';
+      case 'exo-invoke':  return '<span class="badge badge-blue">Exchange REST API</span>';
+      case 'cc-invoke':   return '<span class="badge badge-blue">Compliance REST API</span>';
+      case 'spo-graph':   return '<span class="badge badge-blue">SharePoint Graph API</span>';
+      case 'ps-only':     return '<span class="badge badge-amber">PowerShell Only</span>';
+      default:            return '<span class="badge badge-amber">PowerShell</span>';
+    }
   }
 
   // ── Scan badge helper ──
@@ -392,22 +422,25 @@ const Policies = (() => {
     const modal = document.getElementById('modal');
     if (!overlay || !modal) return;
 
-    const isGraph = DeployEngine.isGraphDeployable(pol.type);
+    const canDeploy = DeployEngine.isDeployable(pol.type, pol.id);
+    const canScript = DeployEngine.hasScript(pol.type);
+    const deployMethod = DeployEngine.getDeployMethod(pol.type, pol.id);
     const isConnected = TenantAuth.isAuthenticated();
-    const perms = DeployEngine.getRequiredPermissions(pol.type);
+    const perms = DeployEngine.getRequiredPermissions(pol.type, pol.id);
     const roles = DeployEngine.getRequiredRoles(pol.type);
     const scanResults = AppState.get('tenantScanResults');
     const scanResult = scanResults ? scanResults[pol.id] : null;
 
     let actionHtml = '';
-    if (isGraph) {
+    if (canDeploy) {
       if (isConnected) {
         actionHtml += `<button class="btn btn-deploy" onclick="Policies.deploy('${pol.id}');document.getElementById('modal-overlay').classList.remove('open')">Deploy to Tenant</button>`;
       } else {
         actionHtml += `<button class="btn" onclick="handleConnectTenant()">Connect Tenant to Deploy</button>`;
       }
-    } else {
-      actionHtml += `<button class="btn btn-script" onclick="Policies.generateScript('${pol.id}');document.getElementById('modal-overlay').classList.remove('open')">Generate PowerShell Script</button>`;
+    }
+    if (canScript) {
+      actionHtml += ` <button class="btn btn-script" onclick="Policies.generateScript('${pol.id}');document.getElementById('modal-overlay').classList.remove('open')">Generate PowerShell Script</button>`;
     }
 
     let permHtml = '';
@@ -455,7 +488,7 @@ const Policies = (() => {
       <table class="data-table" style="margin-bottom:20px">
         <tbody>
           <tr><td style="font-weight:600;width:140px">Type</td><td>${pol.type}</td></tr>
-          <tr><td style="font-weight:600">Deploy Method</td><td>${isGraph ? '<span class="badge badge-blue">Graph API</span>' : '<span class="badge badge-amber">PowerShell</span>'}</td></tr>
+          <tr><td style="font-weight:600">Deploy Method</td><td>${deployMethodLabel(deployMethod)}</td></tr>
           <tr><td style="font-weight:600">Import Method</td><td>${pol.importMethod || 'N/A'}</td></tr>
           <tr><td style="font-weight:600">Deploy State</td><td>${pol.deployState || 'N/A'}</td></tr>
           <tr><td style="font-weight:600">Version</td><td>${pol.version || '1.0'}</td></tr>
@@ -502,7 +535,7 @@ const Policies = (() => {
     }
     const sel = AppState.get('selectedPolicies');
     const ids = AppState.get('policies')
-      .filter(p => sel.has(p.id) && DeployEngine.isGraphDeployable(p.type))
+      .filter(p => sel.has(p.id) && DeployEngine.isDeployable(p.type, p.id))
       .map(p => p.id);
     if (ids.length === 0) return;
     showToast(`Deploying ${ids.length} policies...`);
@@ -526,7 +559,7 @@ const Policies = (() => {
   async function downloadScriptBundle() {
     const sel = AppState.get('selectedPolicies');
     const policies = AppState.get('policies').filter(p =>
-      sel.has(p.id) && DeployEngine.isPowerShellOnly(p.type)
+      sel.has(p.id) && DeployEngine.hasScript(p.type)
     );
     if (policies.length === 0) return;
 
