@@ -2,8 +2,17 @@
    DASHBOARD — Compliance status overview
 ═══════════════════════════════════════════ */
 const Dashboard = (() => {
+  let remediationLoaded = false;
+
   function init() {
     render();
+    // Re-render when scan results change
+    AppState.on('tenantScanResults', function () {
+      if (AppState.get('currentPage') === 'dashboard') {
+        remediationLoaded = false;
+        render();
+      }
+    });
   }
 
   function render() {
@@ -45,6 +54,9 @@ const Dashboard = (() => {
         <div class="kpi-label">Frameworks Assessed</div>
       </div>
     </div>`;
+
+    // ── Tenant Policy Compliance (from scan results) ──
+    html += renderTenantComplianceSection();
 
     // Score Breakdown + Donut
     html += `<div class="section-hdr">Score Breakdown</div>
@@ -123,7 +135,150 @@ const Dashboard = (() => {
         </div>`;
     }
 
+    // Remediation Priorities placeholder
+    html += '<div id="dashboard-remediation"></div>';
+
     container.innerHTML = html;
+
+    // Lazy-load remediation data
+    if (!remediationLoaded) {
+      loadRemediationPriorities();
+    }
+  }
+
+  // ── Tenant Policy Compliance ──
+  function renderTenantComplianceSection() {
+    var scanResults = AppState.get('tenantScanResults');
+    if (!scanResults || Object.keys(scanResults).length === 0) return '';
+
+    var summary = (typeof PolicyMatcher !== 'undefined') ? PolicyMatcher.getSummary() : null;
+    if (!summary) return '';
+
+    var policies = AppState.get('policies') || [];
+    var policyTypes = AppState.get('policyTypes') || {};
+
+    // Group by category
+    var byCategory = {};
+    for (var i = 0; i < policies.length; i++) {
+      var pol = policies[i];
+      var cat = pol.type;
+      if (!byCategory[cat]) byCategory[cat] = { configured: 0, missing: 0, manual: 0, total: 0 };
+      byCategory[cat].total++;
+      var result = scanResults[pol.id];
+      if (!result) continue;
+      if (result.status === 'configured') byCategory[cat].configured++;
+      else if (result.status === 'missing') byCategory[cat].missing++;
+      else if (result.status === 'manual') byCategory[cat].manual++;
+    }
+
+    var html = '<div class="section-hdr">Tenant Policy Compliance</div>';
+
+    // Secure Score widget
+    var scanData = (typeof TenantScanner !== 'undefined') ? TenantScanner.getScanResults() : null;
+    if (scanData && scanData.data && scanData.data.secureScores && scanData.data.secureScores.length > 0) {
+      var ss = scanData.data.secureScores[0];
+      var ssScore = ss.currentScore || 0;
+      var ssMax = ss.maxScore || 1;
+      var ssPct = Math.round(ssScore / ssMax * 100);
+      var ssClr = ssPct >= 80 ? 'var(--green)' : ssPct >= 50 ? 'var(--amber2)' : 'var(--red)';
+      html += `<div class="card score-widget" style="display:flex;align-items:center;gap:16px;padding:14px;margin-bottom:16px;border-left:3px solid ${ssClr}">
+        <div style="text-align:center">
+          <div class="text-mono" style="font-size:1.2rem;font-weight:700;color:${ssClr}">${ssScore}/${ssMax}</div>
+          <div style="font-size:.58rem;color:var(--ink4);text-transform:uppercase">Secure Score</div>
+        </div>
+        <div style="flex:1">
+          <div class="progress-track"><div class="progress-fill" style="width:${ssPct}%;background:${ssClr}"></div></div>
+        </div>
+        <div class="text-mono" style="font-size:.78rem;color:${ssClr};font-weight:600">${ssPct}%</div>
+      </div>`;
+    }
+
+    // Scan KPI row
+    html += `<div class="kpi-row">
+      <div class="kpi">
+        <div class="kpi-num" style="color:var(--green)">${summary.configured}</div>
+        <div class="kpi-label">Policies Configured</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num" style="color:var(--red)">${summary.missing}</div>
+        <div class="kpi-label">Policies Missing</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num" style="color:var(--blue)">${summary.manual}</div>
+        <div class="kpi-label">Manual Verification</div>
+      </div>
+      <div class="kpi">
+        <div class="kpi-num" style="color:var(--ink4)">${summary.total}</div>
+        <div class="kpi-label">Total Policies</div>
+      </div>
+    </div>`;
+
+    // Per-category progress bars
+    var cats = Object.keys(byCategory).sort();
+    for (var c = 0; c < cats.length; c++) {
+      var type = cats[c];
+      var counts = byCategory[type];
+      var label = (policyTypes[type] && policyTypes[type].label) || type;
+      var pct = counts.total > 0 ? Math.round(counts.configured / counts.total * 100) : 0;
+      var clr = pct >= 80 ? 'var(--green)' : pct >= 50 ? 'var(--amber2)' : 'var(--red)';
+      html += `<div class="fw-bar">
+        <div class="fw-bar-name">${escHtml(label)}</div>
+        <div class="progress-track"><div class="progress-fill" style="width:${pct}%;background:${clr}"></div></div>
+        <div class="fw-bar-pct">${counts.configured}/${counts.total}</div>
+      </div>`;
+    }
+
+    // PS Verify buttons
+    if (summary.manual > 0 && typeof PSVerify !== 'undefined') {
+      html += `<div style="display:flex;gap:8px;margin-top:12px;margin-bottom:8px">
+        <button class="btn btn-sm" onclick="PSVerify.showGenerateModal()">Generate PS Verification Script</button>
+        <button class="btn btn-sm" onclick="PSVerify.showImportModal()">Import PS Results</button>
+      </div>`;
+    }
+
+    return html;
+  }
+
+  // ── Remediation Priorities ──
+  function loadRemediationPriorities() {
+    var el = document.getElementById('dashboard-remediation');
+    if (!el) return;
+
+    var scanResults = AppState.get('tenantScanResults') || {};
+    var missingCount = Object.keys(scanResults).filter(function (id) {
+      return scanResults[id].status === 'missing';
+    }).length;
+
+    if (missingCount === 0 || typeof Remediation === 'undefined') {
+      el.innerHTML = '';
+      return;
+    }
+
+    el.innerHTML = '<div class="section-hdr" style="margin-top:28px">Remediation Priorities</div>' +
+      '<div style="font-size:.68rem;color:var(--ink4)">Loading remediation data...</div>';
+
+    Remediation.getRemediationsForGaps(15).then(function (rems) {
+      remediationLoaded = true;
+      var remEl = document.getElementById('dashboard-remediation');
+      if (!remEl) return;
+
+      var html = '<div class="section-hdr" style="margin-top:28px">Remediation Priorities (' + missingCount + ' missing policies)</div>';
+
+      if (rems.length === 0) {
+        html += '<div style="font-size:.68rem;color:var(--ink4)">No remediation data available.</div>';
+      } else {
+        for (var i = 0; i < rems.length; i++) {
+          html += Remediation.renderCard(rems[i]);
+        }
+        if (missingCount > rems.length) {
+          html += '<div style="font-size:.68rem;color:var(--ink4);margin-top:8px">' +
+            (missingCount - rems.length) + ' more missing policies not shown. ' +
+            '<a href="#" onclick="event.preventDefault();Router.navigate(\'policies\')" style="color:var(--accent)">View all policies &rarr;</a></div>';
+        }
+      }
+
+      remEl.innerHTML = html;
+    });
   }
 
   function buildDonut(stats, size) {

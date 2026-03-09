@@ -23,6 +23,11 @@ const TenantScanner = (() => {
     authenticatorConfig:     { url: '/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator', isList: false },
     organization:            { url: '/v1.0/organization',                             isList: true  },
     groupSettings:           { url: '/v1.0/groupSettings',                            isList: true  },
+    // ── Extended coverage ──
+    sharepointSettings:      { url: '/v1.0/admin/sharepoint/settings',               isList: false },
+    secureScores:            { url: '/v1.0/security/secureScores?$top=1',             isList: true  },
+    secureScoreProfiles:     { url: '/v1.0/security/secureScoreControlProfiles',      isList: true  },
+    sensitivityLabels:       { url: '/beta/security/informationProtection/sensitivityLabels', isList: true },
   };
 
   // ─── Graph Fetch Helpers ───

@@ -863,8 +863,11 @@ const PolicyMatcher = (() => {
     // ─────────────────────────────────────────────────────────
 
     SPO01: {
-      status: 'manual',
-      detail: 'Requires PowerShell verification',
+      scanSource: 'sharepointSettings',
+      matchMode: 'direct',
+      conditions: [
+        { path: 'sharingCapability', op: 'equals', value: 'existingExternalUserSharingOnly' },
+      ],
       verifyCommand: 'Connect-PnPOnline -Url https://<tenant>-admin.sharepoint.com -Interactive; Get-PnPTenant | Format-List SharingCapability',
     },
 
@@ -899,20 +902,30 @@ const PolicyMatcher = (() => {
     },
 
     SPO07: {
-      status: 'manual',
-      detail: 'Requires PowerShell verification',
+      scanSource: 'sharepointSettings',
+      matchMode: 'direct',
+      conditions: [
+        { path: 'sharingCapability', op: 'containsAny', values: ['externalUserSharingOnly', 'existingExternalUserSharingOnly', 'disabled'] },
+        { path: 'isRequireAcceptingUserToMatchInvitedUserEnabled', op: 'equals', value: true },
+      ],
       verifyCommand: 'Connect-PnPOnline -Url https://<tenant>-admin.sharepoint.com -Interactive; Get-PnPTenant | Format-List SharingCapability, SharingDomainRestrictionMode',
     },
 
     SPO08: {
-      status: 'manual',
-      detail: 'Requires PowerShell verification',
+      scanSource: 'sharepointSettings',
+      matchMode: 'direct',
+      conditions: [
+        { path: 'isUnmanagedSyncAppForTenantRestricted', op: 'equals', value: true },
+      ],
       verifyCommand: 'Connect-PnPOnline -Url https://<tenant>-admin.sharepoint.com -Interactive; Get-PnPTenant | Format-List AllowedDomainListForSyncClient, IsUnmanagedSyncClientForTenantRestricted',
     },
 
     SPO09: {
-      status: 'manual',
-      detail: 'Requires PowerShell verification',
+      scanSource: 'sharepointSettings',
+      matchMode: 'direct',
+      conditions: [
+        { path: 'isLegacyAuthProtocolsEnabled', op: 'equals', value: false },
+      ],
       verifyCommand: 'Connect-PnPOnline -Url https://<tenant>-admin.sharepoint.com -Interactive; Get-PnPTenant | Format-List LegacyAuthProtocolsEnabled',
     },
 
@@ -935,8 +948,12 @@ const PolicyMatcher = (() => {
     },
 
     SPO13: {
-      status: 'manual',
-      detail: 'Requires PowerShell verification',
+      scanSource: 'sharepointSettings',
+      matchMode: 'direct',
+      conditions: [
+        { path: 'sharingDomainRestrictionMode', op: 'equals', value: 'allowList' },
+        { path: 'sharingAllowedDomainList', op: 'isNotEmpty' },
+      ],
       verifyCommand: 'Connect-PnPOnline -Url https://<tenant>-admin.sharepoint.com -Interactive; Get-PnPTenant | Format-List SharingAllowedDomainList, SharingDomainRestrictionMode',
     },
 
@@ -947,8 +964,11 @@ const PolicyMatcher = (() => {
     },
 
     SPO15: {
-      status: 'manual',
-      detail: 'Requires PowerShell verification',
+      scanSource: 'sharepointSettings',
+      matchMode: 'direct',
+      conditions: [
+        { path: 'idleSessionSignOut.isEnabled', op: 'equals', value: true },
+      ],
       verifyCommand: 'Connect-PnPOnline -Url https://<tenant>-admin.sharepoint.com -Interactive; Get-PnPTenant | Format-List BrowserIdleSignout, BrowserIdleSignoutMinutes',
     },
 
@@ -971,8 +991,11 @@ const PolicyMatcher = (() => {
     },
 
     SPO19: {
-      status: 'manual',
-      detail: 'Requires PowerShell verification',
+      scanSource: 'sharepointSettings',
+      matchMode: 'direct',
+      conditions: [
+        { path: 'isResharingByExternalUsersEnabled', op: 'equals', value: false },
+      ],
       verifyCommand: 'Connect-PnPOnline -Url https://<tenant>-admin.sharepoint.com -Interactive; Get-PnPTenant | Format-List PreventExternalUsersFromResharing',
     },
 
@@ -1107,8 +1130,11 @@ const PolicyMatcher = (() => {
     },
 
     PV10: {
-      status: 'manual',
-      detail: 'Requires PowerShell verification',
+      scanSource: 'sensitivityLabels',
+      matchMode: 'any',
+      conditions: [
+        { path: 'name', op: 'exists' },
+      ],
       verifyCommand: 'Connect-IPPSSession; Get-Label | Format-List Name, DisplayName, IsActive',
     },
 
@@ -1131,8 +1157,11 @@ const PolicyMatcher = (() => {
     },
 
     PV14: {
-      status: 'manual',
-      detail: 'Requires PowerShell verification',
+      scanSource: 'sensitivityLabels',
+      matchMode: 'any',
+      conditions: [
+        { path: 'contentFormats', op: 'containsAny', values: ['site', 'unifiedGroup', 'group'] },
+      ],
       verifyCommand: 'Connect-IPPSSession; Get-Label | Where-Object {$_.ContentType -like "*Site*" -or $_.ContentType -like "*UnifiedGroup*"} | Format-List Name',
     },
 
@@ -1233,6 +1262,86 @@ const PolicyMatcher = (() => {
     },
   };
 
+  // ─── Secure Score Mapping ────────────────────────────────
+  // Maps policy IDs to Microsoft Secure Score control names.
+  // When a policy is marked 'manual', we check Secure Score
+  // control profiles as a fallback to infer compliance.
+
+  const SECURE_SCORE_MAP = {
+    // Defender for Office 365
+    DEF01: 'AdminAuditPhishPolicy',
+    DEF02: 'SafeLinksPolicy',
+    DEF03: 'SafeAttachmentsPolicy',
+    DEF04: 'MalwareFilterPolicy',
+    DEF05: 'SpamFilterPolicy',
+    DEF06: 'OutboundSpamFilterPolicy',
+    DEF07: 'AtpForSPOTeamsODB',
+    DEF08: 'CommonAttachmentTypesFilter',
+    // Exchange Online
+    EXO01: 'DKIMEnabled',
+    EXO02: 'DMARCPolicy',
+    EXO03: 'BlockAutoForwardRule',
+    EXO04: 'DisableBasicAuthExchange',
+    EXO05: 'ModernAuthExchange',
+    EXO07: 'CalendarExternalSharing',
+    // Teams
+    TEA01: 'DisableAnonymousJoinMeeting',
+    TEA02: 'MeetingLobby',
+    TEA04: 'BlockExternalFileSharing',
+    TEA05: 'RestrictExternalAccess',
+    TEA06: 'FederationConfiguration',
+    // SharePoint (fallback for those not in Graph settings)
+    SPO02: 'DefaultSharingLinkType',
+    SPO03: 'AnonymousLinkExpiry',
+    SPO04: 'ConditionalAccessSPO',
+    SPO16: 'CustomScriptSites',
+    // Purview
+    PV11: 'AuditLogRetention',
+    PV12: 'InsiderRiskPolicy',
+  };
+
+  /**
+   * Try to match a manual policy via Secure Score control profiles.
+   * Returns a match result or null if no mapping exists.
+   */
+  function matchViaSecureScore(policyId, scanData) {
+    var controlName = SECURE_SCORE_MAP[policyId];
+    if (!controlName) return null;
+
+    var profiles = scanData.secureScoreProfiles;
+    if (!Array.isArray(profiles) || profiles.length === 0) return null;
+
+    // Find the matching control profile (case-insensitive partial match on id)
+    var profile = null;
+    for (var i = 0; i < profiles.length; i++) {
+      var p = profiles[i];
+      if (p.id && p.id.toLowerCase().indexOf(controlName.toLowerCase()) !== -1) {
+        profile = p;
+        break;
+      }
+    }
+
+    if (!profile) return null;
+
+    // Check if score equals maxScore (fully implemented)
+    var score = typeof profile.score === 'number' ? profile.score : (profile.currentScore || 0);
+    var maxScore = typeof profile.maxScore === 'number' ? profile.maxScore : (profile.maxScoreInCategory || 1);
+    var isConfigured = maxScore > 0 && score >= maxScore;
+
+    return {
+      status: isConfigured ? 'configured' : 'missing',
+      confidence: 'medium',
+      matchedItem: {
+        displayName: profile.title || profile.id || controlName,
+        id: profile.id || null,
+      },
+      detail: isConfigured
+        ? 'Secure Score: ' + score + '/' + maxScore + ' (fully implemented)'
+        : 'Secure Score: ' + score + '/' + maxScore + ' (not fully implemented)',
+      source: 'secureScore',
+    };
+  }
+
   // ─── Main Matching Functions ─────────────────────────────
 
   /**
@@ -1273,8 +1382,12 @@ const PolicyMatcher = (() => {
       };
     }
 
-    // Manual rules short-circuit immediately
+    // Manual rules — try Secure Score fallback before giving up
     if (rule.status === 'manual') {
+      if (scanData && typeof scanData === 'object') {
+        var ssResult = matchViaSecureScore(policy.id, scanData);
+        if (ssResult) return ssResult;
+      }
       return evaluateRule(scanData, rule);
     }
 

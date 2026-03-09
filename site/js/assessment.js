@@ -4,6 +4,56 @@
 const Assessment = (() => {
   let initialized = false;
   let sortCol = 'id', sortAsc = true;
+  let checkToPolicyMap = null;
+  let autoSuggestDismissed = false;
+
+  // ─── Check-to-Policy Mapping ───
+  function buildCheckToPolicyMap() {
+    var policies = AppState.get('policies') || [];
+    var map = {};
+    for (var i = 0; i < policies.length; i++) {
+      var pol = policies[i];
+      var checks = pol.cisChecks || [];
+      for (var j = 0; j < checks.length; j++) {
+        if (!map[checks[j]]) map[checks[j]] = [];
+        map[checks[j]].push(pol.id);
+      }
+    }
+    checkToPolicyMap = map;
+    return map;
+  }
+
+  function getCheckToPolicyMap() {
+    if (!checkToPolicyMap) buildCheckToPolicyMap();
+    return checkToPolicyMap;
+  }
+
+  function aggregateScanStatus(policyIds, scanResults) {
+    if (!policyIds || policyIds.length === 0) return 'no-mapping';
+    var configured = 0, missing = 0, manual = 0;
+    for (var i = 0; i < policyIds.length; i++) {
+      var r = scanResults[policyIds[i]];
+      if (!r) continue;
+      if (r.status === 'configured') configured++;
+      else if (r.status === 'missing') missing++;
+      else if (r.status === 'manual') manual++;
+    }
+    if (configured === policyIds.length) return 'all_configured';
+    if (configured > 0) return 'some_configured';
+    if (missing > 0) return 'all_missing';
+    if (manual > 0) return 'manual';
+    return 'not_scanned';
+  }
+
+  function getScanBadgeHtml(agg) {
+    switch (agg) {
+      case 'all_configured': return '<span class="scan-badge scan-badge-configured">Configured</span>';
+      case 'some_configured': return '<span class="scan-badge scan-badge-partial">Partial</span>';
+      case 'all_missing': return '<span class="scan-badge scan-badge-missing">Missing</span>';
+      case 'manual': return '<span class="scan-badge scan-badge-manual">Manual</span>';
+      default: return '<span style="color:var(--ink4);font-size:.58rem">&mdash;</span>';
+    }
+  }
 
   function init() {
     if (!initialized) {
@@ -340,6 +390,32 @@ const Assessment = (() => {
       </div>
     </div>`;
 
+    // Scan-assisted banner
+    const scanResults = AppState.get('tenantScanResults') || {};
+    const hasScan = Object.keys(scanResults).length > 0;
+    const polMap = getCheckToPolicyMap();
+
+    if (hasScan && !autoSuggestDismissed) {
+      let autoConfigured = 0, autoMissing = 0;
+      for (const c of checks) {
+        if (status[c.id]) continue;
+        const related = polMap[c.id] || [];
+        if (related.length === 0) continue;
+        const agg = aggregateScanStatus(related, scanResults);
+        if (agg === 'all_configured') autoConfigured++;
+        else if (agg === 'all_missing') autoMissing++;
+      }
+      if (autoConfigured > 0 || autoMissing > 0) {
+        html += `<div class="card" style="border-color:var(--accent);padding:12px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+          <strong style="font-size:.74rem">Scan-Assisted Assessment</strong>
+          <span style="font-size:.7rem;color:var(--ink2)">${autoConfigured} checks auto-detected as configured, ${autoMissing} detected as missing.</span>
+          <div style="flex:1"></div>
+          <button class="btn btn-sm btn-primary" onclick="Assessment.applyAutoSuggestions()">Apply Suggestions</button>
+          <button class="btn btn-sm" onclick="Assessment.dismissAutoSuggestions()">Dismiss</button>
+        </div>`;
+      }
+    }
+
     // Bulk actions
     html += `<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
       <button class="btn btn-sm btn-primary" onclick="Assessment.markAllDone()">Mark All Done</button>
@@ -380,6 +456,7 @@ const Assessment = (() => {
         <th style="width:100px">Category</th>
         <th style="width:50px">Level</th>
         <th style="width:70px">Impact</th>
+        ${hasScan ? '<th style="width:80px">Scan</th>' : ''}
         <th style="width:140px">Status</th>
       </tr></thead>
       <tbody>`;
@@ -388,12 +465,15 @@ const Assessment = (() => {
       const s = status[c.id] || '';
       const impact = AppState.getCheckFwsInScope(c).length;
       const lvlClr = c.level === 'L1' ? 'var(--green)' : 'var(--amber)';
+      const relatedPolicies = polMap[c.id] || [];
+      const scanAgg = hasScan ? aggregateScanStatus(relatedPolicies, scanResults) : '';
       html += `<tr>
         <td class="text-mono" style="font-size:.67rem;color:var(--blue);font-weight:600">${c.id}</td>
         <td style="font-size:.74rem">${c.name}</td>
         <td><span class="badge badge-blue">${c.cat}</span></td>
         <td><span class="text-mono" style="font-weight:600;color:${lvlClr}">${c.level}</span></td>
         <td class="text-mono" style="font-size:.67rem">${impact} fw</td>
+        ${hasScan ? '<td>' + getScanBadgeHtml(scanAgg) + '</td>' : ''}
         <td>
           <div style="display:flex;gap:4px">
             <button class="btn btn-sm${s === 'done' ? ' btn-primary' : ''}" onclick="Assessment.setStatus('${c.id}','done')" style="font-size:.6rem">Done</button>
@@ -402,10 +482,38 @@ const Assessment = (() => {
           </div>
         </td>
       </tr>`;
+      // Remediation drawer for gaps
+      if (s === 'gap' && relatedPolicies.length > 0) {
+        const colSpan = hasScan ? 7 : 6;
+        html += `<tr><td colspan="${colSpan}" style="padding:0;border-top:none">
+          <div class="remediation-drawer" id="rem-drawer-${c.id}" style="padding:8px 12px;background:rgba(220,38,38,.03);border-bottom:1px solid var(--border)">
+            <div style="font-size:.66rem;color:var(--ink3);margin-bottom:6px"><strong>Remediation for ${relatedPolicies.length} related policy${relatedPolicies.length > 1 ? 'ies' : ''}:</strong></div>
+            <div id="rem-cards-${c.id}" style="font-size:.66rem;color:var(--ink4)">Loading remediation data...</div>
+          </div>
+        </td></tr>`;
+      }
     }
     html += `</tbody></table>`;
 
     container.innerHTML = html;
+
+    // Load remediation cards for gap rows
+    if (typeof Remediation !== 'undefined') {
+      for (const c of filtered) {
+        if (status[c.id] !== 'gap') continue;
+        const related = polMap[c.id] || [];
+        if (related.length === 0) continue;
+        (function (checkId, pIds) {
+          Promise.all(pIds.map(function (pid) { return Remediation.getRemediation(pid); }))
+            .then(function (rems) {
+              var el = document.getElementById('rem-cards-' + checkId);
+              if (!el) return;
+              var cardsHtml = rems.filter(Boolean).map(function (r) { return Remediation.renderCard(r); }).join('');
+              el.innerHTML = cardsHtml || '<span style="color:var(--ink4);font-size:.62rem">No remediation data available.</span>';
+            });
+        })(c.id, related);
+      }
+    }
   }
 
   function setStatus(id, status) {
@@ -439,6 +547,32 @@ const Assessment = (() => {
 
   function clearAllStatus() {
     AppState.set('checkStatus', {});
+    renderCurrentStep();
+  }
+
+  function applyAutoSuggestions() {
+    var polMap = getCheckToPolicyMap();
+    var scanResults = AppState.get('tenantScanResults') || {};
+    var cs = AppState.get('checkStatus');
+    var checks = AppState.getRequiredChecks();
+    var applied = 0;
+
+    for (var i = 0; i < checks.length; i++) {
+      var c = checks[i];
+      if (cs[c.id]) continue; // don't overwrite existing status
+      var related = polMap[c.id] || [];
+      if (related.length === 0) continue;
+      var agg = aggregateScanStatus(related, scanResults);
+      if (agg === 'all_configured') { cs[c.id] = 'done'; applied++; }
+      else if (agg === 'all_missing') { cs[c.id] = 'gap'; applied++; }
+    }
+    AppState.notify('checkStatus');
+    renderCurrentStep();
+    if (typeof showToast === 'function') showToast('Applied ' + applied + ' auto-suggestions');
+  }
+
+  function dismissAutoSuggestions() {
+    autoSuggestDismissed = true;
     renderCurrentStep();
   }
 
@@ -505,6 +639,7 @@ const Assessment = (() => {
     sort, setCatFilter, setStatusFilter,
     toggleHeatmap, setStatus,
     markAllDone, markAllGap, clearAllStatus,
+    applyAutoSuggestions, dismissAutoSuggestions,
     exportAssessment, importAssessment,
   };
 })();

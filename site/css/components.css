@@ -951,6 +951,61 @@
 .deploy-progress-stats .stat-failed { color: #dc2626; }
 .deploy-progress-stats .stat-exists { color: #d97706; }
 
+/* ── REMEDIATION ─────────────────────── */
+.ps-cmd {
+  background: var(--surface2, rgba(13,17,23,.6));
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .6rem;
+  color: var(--ink2);
+  cursor: pointer;
+  overflow-x: auto;
+  margin: 2px 0;
+  border: 1px solid var(--glass-border);
+  transition: border-color var(--dur) var(--ease);
+}
+.ps-cmd:hover { border-color: var(--accent); }
+
+.remediation-card {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r);
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+.remediation-collapse {
+  margin-top: 6px;
+  font-size: .68rem;
+}
+.remediation-collapse summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--ink2);
+  font-size: .66rem;
+  user-select: none;
+}
+.remediation-collapse summary:hover { color: var(--accent); }
+
+.scan-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .54rem; font-weight: 600;
+  padding: 2px 6px;
+  border-radius: var(--r4);
+}
+.scan-badge-configured { background: rgba(22,163,74,.12); color: var(--green); }
+.scan-badge-missing { background: rgba(220,38,38,.1); color: var(--red); }
+.scan-badge-manual { background: rgba(29,78,216,.1); color: var(--blue); }
+.scan-badge-partial { background: rgba(202,138,4,.1); color: var(--amber2); }
+
+.score-widget {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--r);
+  box-shadow: var(--shadow-glass);
+}
+
 /* ── RESPONSIVE AUTH ─────────────────── */
 @media (max-width: 768px) {
   .topbar-auth { padding: 0 8px; }

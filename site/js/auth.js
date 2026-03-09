@@ -35,6 +35,8 @@ const TenantAuth = (() => {
     'Policy.ReadWrite.Authorization',
     'Policy.ReadWrite.AuthenticationMethod',
     'SharePointTenantSettings.ReadWrite.All',
+    'SecurityEvents.Read.All',
+    'InformationProtection.Read.All',
   ];
 
   // ─── Initialization ───
