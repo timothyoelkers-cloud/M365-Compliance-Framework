@@ -1,0 +1,43 @@
+{
+  "_metadata": {
+    "id": "SPO14",
+    "title": "Block Access from Apps Without Device-Based Restrictions",
+    "description": "Restricts access from applications that cannot enforce device-based conditional access policies. Limits unmanaged device access to web-only preview of files without editing or download capabilities. This ensures that sensitive content cannot be exfiltrated through applications that bypass device compliance checks.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "HIPAA",
+      "UK NCSC CAF v3.2",
+      "DORA",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["7.2.2", "7.2.10"],
+    "severity": "High",
+    "category": "SharePoint Online",
+    "deploymentOrder": 14,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "_notes": "ConditionalAccessPolicy set to AllowLimitedAccess enables app-enforced restrictions from Entra ID Conditional Access. AllowEditing false prevents document editing from unmanaged devices. LimitedAccessFileType set to WebPreviewableFiles restricts unmanaged device users to browser-based preview only; they cannot open files in desktop or mobile apps. This policy works in conjunction with Entra ID Conditional Access policies that define which devices are considered managed/compliant. Ensure Conditional Access policies are configured before enabling this setting."
+  },
+  "cmdlet": "Set-SPOTenant",
+  "parameters": {
+    "ConditionalAccessPolicy": "AllowLimitedAccess",
+    "AllowEditing": false,
+    "LimitedAccessFileType": "WebPreviewableFiles"
+  },
+  "postDeployment": [
+    "Get-SPOTenant | Select-Object ConditionalAccessPolicy, AllowEditing, LimitedAccessFileType",
+    "Verify Entra ID Conditional Access policies are configured to mark compliant/hybrid-joined devices",
+    "Test access from an unmanaged device to confirm files are only available for web preview without edit or download options",
+    "Test access from a managed/compliant device to confirm full functionality is retained",
+    "Communicate to users that accessing SharePoint from personal or unmanaged devices will be limited to read-only web preview",
+    "Monitor sign-in logs in Entra ID for blocked or limited access events: Review Sign-in logs filtered by Conditional Access status"
+  ]
+}

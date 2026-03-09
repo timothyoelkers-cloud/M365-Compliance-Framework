@@ -1,0 +1,41 @@
+{
+  "_metadata": {
+    "id": "SPO03",
+    "title": "Enable Anonymous Link Expiry - 30 Days",
+    "description": "Sets anonymous (Anyone) sharing links to automatically expire after 30 days. Prevents indefinite anonymous access to shared files and folders. If anonymous sharing is permitted, this ensures temporary shares do not persist forever.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": ["7.2.6"],
+    "severity": "Medium",
+    "category": "SharePoint Online",
+    "deploymentOrder": 3,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "This setting only applies if anonymous (Anyone) sharing links are permitted by the tenant SharingCapability setting. If SharingCapability is set to ExistingExternalUserSharingOnly or Disabled, anonymous links are already blocked and this setting has no effect. The 30-day expiry is a balance between usability and security. CIS recommends setting an expiration. After expiry, the link becomes invalid and the recipient must request a new share."
+  },
+  "cmdlet": "Set-SPOTenant",
+  "parameters": {
+    "RequireAnonymousLinksExpireInDays": 30
+  },
+  "postDeployment": [
+    "Get-SPOTenant | Select-Object RequireAnonymousLinksExpireInDays",
+    "Verify the setting applies to new anonymous links created after deployment",
+    "Note: This does NOT retroactively expire existing anonymous links; only new links created after this setting is applied",
+    "If stricter control is needed, reduce to 14 or 7 days, or disable anonymous sharing entirely via SPO01"
+  ]
+}

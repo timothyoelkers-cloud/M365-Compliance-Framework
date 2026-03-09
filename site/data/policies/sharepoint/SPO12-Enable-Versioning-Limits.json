@@ -1,0 +1,40 @@
+{
+  "_metadata": {
+    "id": "SPO12",
+    "title": "Enable Version Expiration with Major Version Limits",
+    "description": "Enables automatic version history trimming with a maximum of 500 major versions and expiration of versions older than 30 days. This balances data integrity and recovery capabilities with storage efficiency, preventing unbounded version accumulation that can consume significant tenant storage.",
+    "frameworks": [
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "NIS2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "Microsoft Cloud Security Benchmark",
+      "UK NCSC CAF v3.2",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate"
+    ],
+    "cisChecks": [],
+    "severity": "Low",
+    "category": "SharePoint Online",
+    "deploymentOrder": 12,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "_notes": "EnableAutoExpirationVersionTrim automatically removes older versions beyond the configured limits. MajorVersionLimit of 500 retains sufficient history for most business needs while preventing storage bloat. ExpireVersionsAfterDays of 30 removes versions older than 30 days that exceed the major version limit. These settings apply to new document libraries; existing libraries may require per-library configuration. Coordinate with records management to ensure retention policies are not conflicted."
+  },
+  "cmdlet": "Set-SPOTenant",
+  "parameters": {
+    "EnableAutoExpirationVersionTrim": true,
+    "MajorVersionLimit": 500,
+    "ExpireVersionsAfterDays": 30
+  },
+  "postDeployment": [
+    "Get-SPOTenant | Select-Object EnableAutoExpirationVersionTrim, MajorVersionLimit, ExpireVersionsAfterDays",
+    "Verify settings are applied by checking a sample document library: Get-SPOSite -Identity <site-url> | Select-Object EnableAutoExpirationVersionTrim",
+    "Review storage consumption trends in the SharePoint admin center to confirm version trimming is reducing storage over time",
+    "Communicate to content owners that older document versions beyond 30 days and 500 versions will be automatically removed",
+    "Ensure Microsoft Purview retention policies are configured separately if regulatory hold is required for specific content"
+  ]
+}

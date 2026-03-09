@@ -1,0 +1,62 @@
+{
+  "@odata.type": "#microsoft.graph.iosCompliancePolicy",
+  "displayName": "INT02 - iOS/iPadOS Device Compliance Baseline",
+  "description": "Enforces baseline compliance for iOS/iPadOS devices: minimum OS 16.0, no jailbreak, passcode required (min 6 characters, alphanumeric), 5-minute inactivity lock, and device encryption.",
+  "version": 1,
+  "passcodeBlockSimple": true,
+  "passcodeExpirationDays": null,
+  "passcodeMinimumLength": 6,
+  "passcodeMinutesOfInactivityBeforeLock": 5,
+  "passcodeMinutesOfInactivityBeforeScreenTimeout": 5,
+  "passcodePreviousPasscodeBlockCount": 5,
+  "passcodeMinimumCharacterSetCount": 1,
+  "passcodeRequiredType": "alphanumeric",
+  "passcodeRequired": true,
+  "osMinimumVersion": "16.0",
+  "osMaximumVersion": null,
+  "osMinimumBuildVersion": null,
+  "osMaximumBuildVersion": null,
+  "securityBlockJailbrokenDevices": true,
+  "deviceThreatProtectionEnabled": false,
+  "deviceThreatProtectionRequiredSecurityLevel": "unavailable",
+  "managedEmailProfileRequired": false,
+  "restrictedApps": [],
+  "scheduledActionsForRule": [
+    {
+      "ruleName": "PasswordRequired",
+      "scheduledActionConfigurations": [
+        {
+          "actionType": "block",
+          "gracePeriodHours": 72,
+          "notificationTemplateId": "",
+          "notificationMessageCCList": []
+        }
+      ]
+    }
+  ],
+  "roleScopeTagIds": [
+    "0"
+  ],
+  "_metadata": {
+    "policyId": "INT02",
+    "description": "iOS/iPadOS compliance baseline requiring minimum OS 16.0, jailbreak detection, alphanumeric passcode (minimum 6 characters), 5-minute inactivity lock, and device encryption. Noncompliant devices blocked after 72 hours.",
+    "graphEndpoint": "POST /deviceManagement/deviceCompliancePolicies",
+    "platform": "iOS/iPadOS",
+    "frameworks": [
+      "CIS Apple iOS/iPadOS Benchmark v1.0",
+      "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28",
+      "ISO 27001:2022 A.8.1",
+      "Essential Eight - Patch Operating Systems",
+      "Microsoft Cloud Security Benchmark - DP-4"
+    ],
+    "cisChecks": [
+      "CIS 2.1.1 - Ensure a passcode is required",
+      "CIS 2.1.2 - Ensure minimum passcode length is 6 or greater",
+      "CIS 2.1.3 - Ensure alphanumeric passcode is required",
+      "CIS 2.2.1 - Ensure auto-lock is 5 minutes or less",
+      "CIS 3.1.1 - Ensure jailbroken devices are detected and blocked"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  }
+}

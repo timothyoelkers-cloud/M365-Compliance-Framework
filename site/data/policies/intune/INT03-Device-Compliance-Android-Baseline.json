@@ -1,0 +1,68 @@
+{
+  "@odata.type": "#microsoft.graph.androidWorkProfileCompliancePolicy",
+  "displayName": "INT03 - Android Enterprise Device Compliance Baseline",
+  "description": "Enforces baseline compliance for Android Enterprise work profile devices: minimum OS 13.0, no root, numeric complex password (min 6), storage encryption, Google Play Services required, SafetyNet basic attestation.",
+  "version": 1,
+  "passwordRequired": true,
+  "passwordMinimumLength": 6,
+  "passwordRequiredType": "numericComplex",
+  "passwordMinutesOfInactivityBeforeLock": 5,
+  "passwordExpirationDays": null,
+  "passwordPreviousPasswordBlockCount": 5,
+  "passwordSignInFailureCountBeforeFactoryReset": 10,
+  "securityPreventInstallAppsFromUnknownSources": true,
+  "securityDisableUsbDebugging": true,
+  "securityRequireVerifyApps": true,
+  "deviceThreatProtectionEnabled": false,
+  "deviceThreatProtectionRequiredSecurityLevel": "unavailable",
+  "advancedThreatProtectionRequiredSecurityLevel": "unavailable",
+  "securityBlockJailbrokenDevices": true,
+  "osMinimumVersion": "13.0",
+  "osMaximumVersion": null,
+  "minAndroidSecurityPatchLevel": null,
+  "storageRequireEncryption": true,
+  "securityRequireSafetyNetAttestationBasicIntegrity": true,
+  "securityRequireSafetyNetAttestationCertifiedDevice": false,
+  "securityRequireGooglePlayServices": true,
+  "securityRequireUpToDateSecurityProviders": true,
+  "securityRequireCompanyPortalAppIntegrity": true,
+  "scheduledActionsForRule": [
+    {
+      "ruleName": "PasswordRequired",
+      "scheduledActionConfigurations": [
+        {
+          "actionType": "block",
+          "gracePeriodHours": 72,
+          "notificationTemplateId": "",
+          "notificationMessageCCList": []
+        }
+      ]
+    }
+  ],
+  "roleScopeTagIds": [
+    "0"
+  ],
+  "_metadata": {
+    "policyId": "INT03",
+    "description": "Android Enterprise work profile compliance baseline requiring minimum OS 13.0, root detection, numeric complex password (min 6 digits), storage encryption, Google Play Services, and SafetyNet basic integrity attestation.",
+    "graphEndpoint": "POST /deviceManagement/deviceCompliancePolicies",
+    "platform": "Android Enterprise (Work Profile)",
+    "frameworks": [
+      "CIS Google Android Benchmark v1.3",
+      "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28",
+      "ISO 27001:2022 A.8.1",
+      "Essential Eight - Patch Operating Systems",
+      "Microsoft Cloud Security Benchmark - DP-4"
+    ],
+    "cisChecks": [
+      "CIS 1.1 - Ensure device encryption is enabled",
+      "CIS 1.2 - Ensure screen lock is enabled",
+      "CIS 1.3 - Ensure minimum password length is 6",
+      "CIS 1.4 - Ensure root detection is enabled",
+      "CIS 2.1 - Ensure Google Play Protect is enabled",
+      "CIS 2.2 - Ensure SafetyNet attestation is required"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  }
+}

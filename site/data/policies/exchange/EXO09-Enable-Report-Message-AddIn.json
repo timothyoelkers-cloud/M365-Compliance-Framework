@@ -1,0 +1,107 @@
+{
+  "_metadata": {
+    "id": "EXO09",
+    "title": "Enable Report Message Add-In",
+    "description": "Deploys the Microsoft Report Message and Report Phishing add-ins organization-wide for all users. Enables users to report suspicious, phishing, and junk emails directly from Outlook. Reported messages are submitted to Microsoft for analysis and optionally to a security team mailbox.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "6.2.3"
+    ],
+    "severity": "Medium",
+    "category": "Exchange Online",
+    "deploymentOrder": 9,
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "The Report Message add-in provides both 'Report Phishing' and 'Report Junk' buttons in Outlook. The Report Phishing add-in provides only the phishing report button. Deploy both for maximum user flexibility. UserOverridable: false prevents users from removing the add-in. DefaultStateForUser: Enabled activates the add-in for all users without requiring individual installation. Also configure the user submission policy to route reported messages to your security team."
+  },
+  "_configFields": [
+    {
+      "id": "secOpsEmail",
+      "label": "SOC Mailbox for Reported Messages",
+      "description": "Mailbox where user-reported phishing/junk/not-junk messages are routed for review",
+      "type": "email",
+      "required": false,
+      "default": "",
+      "placeholder": "security-ops@contoso.com",
+      "jsonPaths": [
+        "steps[2].parameters.ReportJunkAddresses",
+        "steps[2].parameters.ReportNotJunkAddresses",
+        "steps[2].parameters.ReportPhishAddresses"
+      ]
+    },
+    {
+      "id": "enableCustomRouting",
+      "label": "Route Reports to SOC Mailbox",
+      "description": "Send reported messages to your SOC mailbox in addition to Microsoft (requires email above)",
+      "type": "toggle",
+      "required": false,
+      "default": false,
+      "jsonPaths": [
+        "steps[2].parameters.ReportJunkToCustomizedAddress",
+        "steps[2].parameters.ReportNotJunkToCustomizedAddress",
+        "steps[2].parameters.ReportPhishToCustomizedAddress"
+      ]
+    }
+  ],
+  "steps": [
+    {
+      "cmdlet": "New-App",
+      "parameters": {
+        "OrganizationApp": true,
+        "DefaultStateForUser": "Enabled",
+        "ProvidedTo": "Everyone",
+        "UserOverridable": false,
+        "Url": "https://appsource.microsoft.com/en-us/product/office/WA104381180"
+      },
+      "_notes": "Deploys the Report Message add-in (WA104381180) from the Microsoft AppSource marketplace. This add-in adds 'Report Junk', 'Report Phishing', and 'Report Not Junk' buttons to Outlook."
+    },
+    {
+      "cmdlet": "New-App",
+      "parameters": {
+        "OrganizationApp": true,
+        "DefaultStateForUser": "Enabled",
+        "ProvidedTo": "Everyone",
+        "UserOverridable": false,
+        "Url": "https://appsource.microsoft.com/en-us/product/office/WA200002469"
+      },
+      "_notes": "Deploys the Report Phishing add-in (WA200002469) for a streamlined phishing-only report button."
+    },
+    {
+      "cmdlet": "New-ReportSubmissionPolicy",
+      "parameters": {
+        "ReportJunkToCustomizedAddress": false,
+        "ReportNotJunkToCustomizedAddress": false,
+        "ReportPhishToCustomizedAddress": false,
+        "ReportJunkAddresses": [],
+        "ReportNotJunkAddresses": [],
+        "ReportPhishAddresses": [],
+        "EnableReportToMicrosoft": true,
+        "ReportChatMessageEnabled": false,
+        "ReportChatMessageToCustomizedAddressEnabled": false
+      },
+      "_postDeploymentNote": "To also route reports to your SOC mailbox: Set-ReportSubmissionPolicy -ReportJunkToCustomizedAddress $true -ReportNotJunkToCustomizedAddress $true -ReportPhishToCustomizedAddress $true -ReportJunkAddresses 'security-ops@yourdomain.com' -ReportNotJunkAddresses 'security-ops@yourdomain.com' -ReportPhishAddresses 'security-ops@yourdomain.com'",
+      "_notes": "Reports submitted to Microsoft for analysis by default. Enable custom addresses post-deployment to also route to your SOC mailbox."
+    }
+  ],
+  "postDeployment": [
+    "Get-App -OrganizationApp | Where-Object {$_.DisplayName -like '*Report*'} | Select-Object DisplayName, Enabled, DefaultStateForUser",
+    "Get-ReportSubmissionPolicy | Format-List",
+    "Verify the Report Message button appears in Outlook Web Access and Outlook desktop for test users",
+    "Configure SOC mailbox routing: Set-ReportSubmissionPolicy -ReportJunkToCustomizedAddress $true -ReportPhishToCustomizedAddress $true -ReportJunkAddresses 'security-ops@yourdomain.com' -ReportPhishAddresses 'security-ops@yourdomain.com'",
+    "Train users on when and how to use the Report Message and Report Phishing buttons",
+    "Marketplace URLs - Report Message: https://appsource.microsoft.com/en-us/product/office/WA104381180 | Report Phishing: https://appsource.microsoft.com/en-us/product/office/WA200002469"
+  ]
+}

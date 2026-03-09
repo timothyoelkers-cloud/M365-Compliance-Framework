@@ -1,0 +1,90 @@
+{
+  "displayName": "CA01 | Block Legacy Authentication",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "exchangeActiveSync",
+      "other"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "block"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA01",
+    "description": "Blocks all legacy authentication protocols including Exchange ActiveSync, SMTP AUTH, POP3, IMAP, and older Office clients that do not support modern authentication. Legacy auth cannot enforce MFA and is the primary vector for password-spray and credential-stuffing attacks.",
+    "cisControls": [
+      "CIS 5.2.2.3 - Ensure legacy authentication is not allowed",
+      "CIS 6.5.1 - Ensure modern authentication for Exchange Online is enabled"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "IA-2",
+        "IA-5",
+        "AC-17(2)"
+      ],
+      "CIS-Microsoft-365": [
+        "5.2.2.3",
+        "6.5.1"
+      ],
+      "ISO-27001-2022": [
+        "A.8.5 - Secure authentication"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078 - Valid Accounts",
+        "T1110 - Brute Force"
+      ],
+      "NIS2": [
+        "Article 21(2)(j) - Multi-factor authentication"
+      ],
+      "Essential-Eight": [
+        "Restrict administrative privileges"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "deploymentNotes": "Deploy in report-only first. Monitor sign-in logs under Entra > Monitoring > Sign-in logs, filter by Client App = 'Exchange ActiveSync' and 'Other clients' to identify remaining legacy auth usage before enforcing. Replace  with the Object ID of your break-glass exclusion security group."
+  },
+  "_configFields": [
+    {
+      "id": "caState",
+      "label": "Policy State",
+      "description": "Deploy in report-only mode first to assess impact before enforcing",
+      "type": "select",
+      "required": true,
+      "default": "enabledForReportingButNotEnforced",
+      "options": [
+        { "value": "enabledForReportingButNotEnforced", "label": "Report-only (Recommended)" },
+        { "value": "enabled", "label": "Enforce immediately" },
+        { "value": "disabled", "label": "Disabled" }
+      ],
+      "jsonPaths": ["state"]
+    },
+    {
+      "id": "breakGlassGroup",
+      "label": "Break-Glass Exclusion Group",
+      "description": "Entra ID Object ID of the security group containing emergency access accounts. Leave empty to skip.",
+      "type": "text",
+      "required": false,
+      "default": "",
+      "placeholder": "00000000-0000-0000-0000-000000000000",
+      "jsonPaths": ["conditions.users.excludeGroups[0]"]
+    }
+  ]
+}

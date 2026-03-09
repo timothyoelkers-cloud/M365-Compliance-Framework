@@ -1,0 +1,97 @@
+{
+  "displayName": "CA15 | Require MFA for Device Registration and Enrollment",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeUserActions": [
+        "urn:user:registerdevice"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "mfa"
+    ]
+  },
+  "sessionControls": {
+    "signInFrequency": {
+      "frequencyInterval": "everyTime",
+      "isEnabled": true
+    }
+  },
+  "_metadata": {
+    "policyNumber": "CA15",
+    "description": "Requires MFA for all Intune device enrollment and Azure AD device registration actions, with sign-in frequency set to 'every time' to ensure fresh authentication for each device enrollment. This prevents attackers from registering rogue devices to your tenant using compromised credentials.",
+    "targetUserAction": "urn:user:registerdevice",
+    "cisControls": [
+      "CIS 5.2.2.11 - Ensure that MFA is required to complete device registration or join"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "IA-2(1)",
+        "IA-3",
+        "CM-8"
+      ],
+      "CIS-Microsoft-365": [
+        "5.2.2.11"
+      ],
+      "ISO-27001-2022": [
+        "A.8.1 - User endpoint devices",
+        "A.8.5 - Secure authentication"
+      ],
+      "MITRE-ATT&CK": [
+        "T1098.005 - Device Registration",
+        "T1078 - Valid Accounts"
+      ],
+      "NIS2": [
+        "Article 21(2)(j) - Multi-factor authentication"
+      ],
+      "Essential-Eight": [
+        "Multi-factor authentication"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2",
+      "Microsoft Intune"
+    ],
+    "deploymentNotes": "This policy targets the user action 'Register or join devices' (urn:user:registerdevice) which covers both Intune enrollment and Azure AD device join/registration. The 'everyTime' sign-in frequency ensures that each device enrollment requires fresh authentication rather than reusing existing session tokens. Deploy in report-only first. Replace  with the Object ID of your break-glass exclusion security group."
+  },
+  "_configFields": [
+    {
+      "id": "caState",
+      "label": "Policy State",
+      "description": "Deploy in report-only mode first to assess impact before enforcing",
+      "type": "select",
+      "required": true,
+      "default": "enabledForReportingButNotEnforced",
+      "options": [
+        { "value": "enabledForReportingButNotEnforced", "label": "Report-only (Recommended)" },
+        { "value": "enabled", "label": "Enforce immediately" },
+        { "value": "disabled", "label": "Disabled" }
+      ],
+      "jsonPaths": ["state"]
+    },
+    {
+      "id": "breakGlassGroup",
+      "label": "Break-Glass Exclusion Group",
+      "description": "Entra ID Object ID of the security group containing emergency access accounts. Leave empty to skip.",
+      "type": "text",
+      "required": false,
+      "default": "",
+      "placeholder": "00000000-0000-0000-0000-000000000000",
+      "jsonPaths": ["conditions.users.excludeGroups[0]"]
+    }
+  ]
+}

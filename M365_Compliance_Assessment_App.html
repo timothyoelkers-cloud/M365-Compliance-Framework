@@ -1,0 +1,1244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M365 Compliance Gap Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Syne:wght@400;600;700;800&family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,500;1,7..72,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink:      #0d1117;
+  --ink2:     #161b22;
+  --ink3:     #21262d;
+  --ink4:     #30363d;
+  --rule:     #373e47;
+  --dim:      #6e7681;
+  --muted:    #8b949e;
+  --soft:     #c9d1d9;
+  --bright:   #e6edf3;
+  --amber:    #f0a500;
+  --amber2:   #e67e00;
+  --amber3:   #ffd166;
+  --teal:     #39d0c8;
+  --teal2:    #1a8a84;
+  --green:    #3fb950;
+  --green2:   #145c20;
+  --red:      #f85149;
+  --blue:     #58a6ff;
+  --purple:   #bc8cff;
+  --t1:       #39d0c8;
+  --t2:       #58a6ff;
+  --t3:       #f0a500;
+  --radius:   4px;
+  --radius2:  8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 14px; background: var(--ink); color: var(--bright); }
+body { font-family: 'Literata', Georgia, serif; min-height: 100vh; overflow-x: hidden; }
+
+/* ── GRID BACKGROUND ─────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed; inset: 0; z-index: -1;
+  background-image:
+    linear-gradient(var(--rule) 1px, transparent 1px),
+    linear-gradient(90deg, var(--rule) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.18;
+}
+
+/* ── TOPBAR ──────────────────────────────────────────────── */
+#topbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(13,17,23,0.95);
+  border-bottom: 1px solid var(--rule);
+  backdrop-filter: blur(12px);
+  display: flex; align-items: center; gap: 20px;
+  padding: 0 28px; height: 52px;
+}
+#topbar .logo {
+  font-family: 'Syne', sans-serif;
+  font-weight: 800; font-size: 1.05rem;
+  letter-spacing: -0.02em;
+  color: var(--bright);
+  display: flex; align-items: center; gap: 8px;
+}
+#topbar .logo .mark {
+  width: 22px; height: 22px;
+  background: var(--amber);
+  display: inline-block;
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+}
+#topbar .logo span { color: var(--amber); }
+#topbar .step-trail {
+  display: flex; align-items: center; gap: 0;
+  margin-left: auto;
+}
+.step-pill {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem; font-weight: 500;
+  padding: 4px 12px;
+  border: 1px solid var(--rule);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  color: var(--muted);
+  background: transparent;
+}
+.step-pill:first-child { border-radius: var(--radius) 0 0 var(--radius); }
+.step-pill:last-child  { border-radius: 0 var(--radius) var(--radius) 0; }
+.step-pill.active { background: var(--amber); color: var(--ink); border-color: var(--amber); font-weight: 700; }
+.step-pill.done   { background: var(--ink3); color: var(--soft); border-color: var(--rule); }
+
+/* ── LAYOUT ──────────────────────────────────────────────── */
+#app { display: flex; gap: 0; min-height: calc(100vh - 52px); }
+#sidebar {
+  width: 300px; min-width: 300px;
+  border-right: 1px solid var(--rule);
+  background: rgba(22,27,34,0.8);
+  padding: 20px 0;
+  position: sticky; top: 52px; height: calc(100vh - 52px);
+  overflow-y: auto;
+}
+#sidebar::-webkit-scrollbar { width: 4px; }
+#sidebar::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 2px; }
+#main { flex: 1; padding: 28px 32px; min-width: 0; }
+
+/* ── SIDEBAR SECTION ─────────────────────────────────────── */
+.sb-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.62rem; letter-spacing: 0.12em; font-weight: 500;
+  text-transform: uppercase; color: var(--dim);
+  padding: 8px 20px 4px;
+}
+.sb-group { margin-bottom: 4px; }
+.sb-group-hdr {
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 20px;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.75rem; font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.1s;
+}
+.sb-group-hdr:hover { color: var(--bright); }
+.sb-group-hdr .arrow { font-size: 0.6rem; transition: transform 0.15s; margin-left: auto; }
+.sb-group-hdr.open .arrow { transform: rotate(90deg); }
+.sb-group-body { display: none; padding: 0 10px 4px 20px; }
+.sb-group-body.open { display: block; }
+
+.fw-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 8px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: background 0.1s;
+  font-size: 0.82rem;
+  color: var(--soft);
+  user-select: none;
+}
+.fw-item:hover { background: var(--ink3); }
+.fw-item.selected { background: rgba(240,165,0,0.12); }
+.fw-item.selected .fw-name { color: var(--amber3); font-weight: 600; }
+.fw-item input[type=checkbox] {
+  width: 13px; height: 13px; accent-color: var(--amber);
+  cursor: pointer; flex-shrink: 0;
+}
+.fw-name { flex: 1; line-height: 1.3; }
+.fw-cnt {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.67rem; color: var(--dim);
+  background: var(--ink3); padding: 1px 5px;
+  border-radius: 10px;
+}
+.tier-badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.55rem; padding: 1px 4px;
+  border-radius: 2px; letter-spacing: 0.05em;
+  font-weight: 500; flex-shrink: 0;
+}
+.tier-T1_SOURCE { background: rgba(57,208,200,0.15); color: var(--t1); border: 1px solid rgba(57,208,200,0.3); }
+.tier-T2_CHAIN  { background: rgba(88,166,255,0.15); color: var(--t2); border: 1px solid rgba(88,166,255,0.3); }
+.tier-T3_METHOD { background: rgba(240,165,0,0.12);  color: var(--t3); border: 1px solid rgba(240,165,0,0.3); }
+
+/* Org profile buttons */
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; padding: 4px 12px 8px; }
+.profile-btn {
+  font-family: 'DM Mono', monospace; font-size: 0.65rem;
+  padding: 5px 6px; border-radius: var(--radius);
+  border: 1px solid var(--rule); background: transparent;
+  color: var(--muted); cursor: pointer; text-align: left;
+  transition: all 0.12s; line-height: 1.3;
+}
+.profile-btn:hover { background: var(--ink3); color: var(--soft); border-color: var(--dim); }
+.profile-btn.active { background: rgba(240,165,0,0.12); color: var(--amber3); border-color: var(--amber2); }
+
+/* Selection summary bar */
+#sel-bar {
+  display: flex; align-items: center; gap: 12px;
+  background: var(--ink3);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius2);
+  padding: 10px 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+#sel-bar .sel-count {
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 1.3rem; color: var(--amber);
+}
+#sel-bar .sel-label { font-size: 0.82rem; color: var(--muted); }
+.sel-tag {
+  font-family: 'DM Mono', monospace; font-size: 0.68rem;
+  background: rgba(240,165,0,0.1); color: var(--amber3);
+  border: 1px solid rgba(240,165,0,0.25);
+  border-radius: 3px; padding: 2px 7px;
+  display: flex; align-items: center; gap: 4px;
+}
+.sel-tag .remove { cursor: pointer; opacity: 0.6; transition: opacity 0.1s; }
+.sel-tag .remove:hover { opacity: 1; }
+#sel-bar .btn { margin-left: auto; }
+
+/* Buttons */
+.btn {
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 0.75rem; letter-spacing: 0.02em;
+  padding: 8px 18px; border-radius: var(--radius);
+  border: none; cursor: pointer; transition: all 0.15s;
+  white-space: nowrap;
+}
+.btn-amber { background: var(--amber); color: var(--ink); }
+.btn-amber:hover { background: var(--amber2); transform: translateY(-1px); }
+.btn-ghost { background: transparent; color: var(--soft); border: 1px solid var(--rule); }
+.btn-ghost:hover { border-color: var(--soft); }
+.btn-sm { padding: 5px 12px; font-size: 0.7rem; }
+
+/* Section heading */
+.sec-hdr {
+  display: flex; align-items: baseline; gap: 10px;
+  margin-bottom: 16px; border-bottom: 1px solid var(--rule);
+  padding-bottom: 8px;
+}
+.sec-hdr h2 {
+  font-family: 'Syne', sans-serif; font-weight: 700;
+  font-size: 1.1rem; color: var(--bright);
+}
+.sec-hdr .meta {
+  font-family: 'DM Mono', monospace;
+  font-size: 0.7rem; color: var(--dim);
+}
+
+/* ── STATS ROW ───────────────────────────────────────────── */
+.stats-row {
+  display: grid; grid-template-columns: repeat(4, 1fr);
+  gap: 12px; margin-bottom: 24px;
+}
+.stat-card {
+  background: var(--ink2); border: 1px solid var(--rule);
+  border-radius: var(--radius2); padding: 14px 16px;
+  position: relative; overflow: hidden;
+}
+.stat-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.stat-card.c-amber::before { background: var(--amber); }
+.stat-card.c-teal::before  { background: var(--teal); }
+.stat-card.c-blue::before  { background: var(--blue); }
+.stat-card.c-green::before { background: var(--green); }
+.stat-num {
+  font-family: 'Syne', sans-serif; font-weight: 800;
+  font-size: 2rem; line-height: 1; margin-bottom: 2px;
+}
+.stat-card.c-amber .stat-num { color: var(--amber); }
+.stat-card.c-teal  .stat-num { color: var(--teal); }
+.stat-card.c-blue  .stat-num { color: var(--blue); }
+.stat-card.c-green .stat-num { color: var(--green); }
+.stat-lbl { font-size: 0.75rem; color: var(--muted); }
+.stat-sub { font-family: 'DM Mono', monospace; font-size: 0.65rem; color: var(--dim); margin-top: 4px; }
+
+/* ── HEATMAP ─────────────────────────────────────────────── */
+#heatmap-wrap {
+  background: var(--ink2); border: 1px solid var(--rule);
+  border-radius: var(--radius2); padding: 16px;
+  margin-bottom: 24px; overflow-x: auto;
+}
+#heatmap-title {
+  font-family: 'Syne', sans-serif; font-weight: 600;
+  font-size: 0.85rem; color: var(--soft); margin-bottom: 12px;
+  display: flex; align-items: center; gap: 8px;
+}
+.heatmap-legend { margin-left: auto; display: flex; align-items: center; gap: 6px; font-family: 'DM Mono', monospace; font-size: 0.62rem; color: var(--dim); }
+.hm-swatch { width: 12px; height: 12px; border-radius: 2px; }
+
+#heatmap-grid {
+  display: grid;
+  gap: 2px;
+}
+.hm-row { display: contents; }
+.hm-cell {
+  width: 100%; aspect-ratio: 1;
+  min-width: 18px; min-height: 18px;
+  border-radius: 2px;
+  position: relative; cursor: default;
+  transition: transform 0.1s, box-shadow 0.1s;
+}
+.hm-cell:hover { transform: scale(1.3); z-index: 10; box-shadow: 0 0 0 1px var(--amber); }
+.hm-cat-label {
+  font-family: 'DM Mono', monospace; font-size: 0.6rem;
+  color: var(--dim); padding: 2px 0; display: flex;
+  align-items: center; white-space: nowrap;
+}
+.hm-fw-label {
+  font-family: 'DM Mono', monospace; font-size: 0.62rem;
+  color: var(--dim); writing-mode: vertical-rl;
+  transform: rotate(180deg); text-align: right;
+  padding: 2px 0; white-space: nowrap;
+  max-height: 90px; overflow: hidden;
+}
+
+/* ── CHECK TABLE ─────────────────────────────────────────── */
+#checks-panel {
+  background: var(--ink2); border: 1px solid var(--rule);
+  border-radius: var(--radius2); overflow: hidden;
+  margin-bottom: 24px;
+}
+.tbl-toolbar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--ink3);
+}
+.tbl-toolbar input {
+  flex: 1; background: var(--ink); border: 1px solid var(--rule);
+  color: var(--soft); font-family: 'DM Mono', monospace;
+  font-size: 0.75rem; padding: 5px 10px; border-radius: var(--radius);
+  outline: none; transition: border-color 0.15s;
+}
+.tbl-toolbar input:focus { border-color: var(--amber); }
+.filter-pill {
+  font-family: 'DM Mono', monospace; font-size: 0.68rem;
+  padding: 4px 8px; border-radius: 20px;
+  border: 1px solid var(--rule); background: transparent;
+  color: var(--muted); cursor: pointer; transition: all 0.1s;
+}
+.filter-pill.active { background: var(--amber); color: var(--ink); border-color: var(--amber); font-weight: 700; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  font-family: 'DM Mono', monospace; font-size: 0.67rem;
+  font-weight: 500; letter-spacing: 0.06em;
+  text-transform: uppercase; color: var(--dim);
+  padding: 8px 12px; text-align: left;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap; cursor: pointer;
+  user-select: none;
+}
+thead th:hover { color: var(--soft); }
+tbody tr {
+  border-bottom: 1px solid rgba(55,62,71,0.5);
+  transition: background 0.08s;
+}
+tbody tr:hover { background: rgba(255,255,255,0.02); }
+tbody td { padding: 7px 12px; font-size: 0.8rem; vertical-align: middle; }
+.td-id {
+  font-family: 'DM Mono', monospace; font-size: 0.72rem;
+  color: var(--amber); font-weight: 500; white-space: nowrap;
+}
+.td-name { color: var(--soft); max-width: 380px; line-height: 1.35; }
+.td-cat {
+  font-family: 'DM Mono', monospace; font-size: 0.65rem;
+  padding: 2px 6px; border-radius: 3px;
+  border: 1px solid var(--rule); color: var(--muted);
+  white-space: nowrap;
+}
+.td-level {
+  font-family: 'DM Mono', monospace; font-size: 0.7rem;
+  font-weight: 500; white-space: nowrap;
+}
+.level-L1 { color: var(--teal); }
+.level-L2 { color: var(--amber); }
+.td-fwcnt {
+  font-family: 'DM Mono', monospace; font-size: 0.72rem;
+  color: var(--soft); font-weight: 600; text-align: right;
+}
+.fw-pip {
+  display: inline-block; width: 8px; height: 8px;
+  border-radius: 1px; margin: 1px;
+  cursor: default;
+}
+.status-done   { background: var(--green2); border: 1px solid var(--green); }
+.status-gap    { background: rgba(248,81,73,0.15); border: 1px solid var(--red); }
+.status-skip   { background: var(--ink3); border: 1px solid var(--rule); opacity: 0.4; }
+.check-status {
+  display: flex; gap: 3px; align-items: center;
+  font-family: 'DM Mono', monospace; font-size: 0.65rem;
+}
+.cb-done, .cb-gap {
+  width: 16px; height: 16px; border-radius: 2px;
+  cursor: pointer; border: none; font-size: 0.65rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.1s;
+}
+.cb-done { background: rgba(63,185,80,0.15); color: var(--green); border: 1px solid rgba(63,185,80,0.3); }
+.cb-done:hover, .cb-done.on { background: var(--green2); color: #fff; border-color: var(--green); }
+.cb-gap  { background: rgba(248,81,73,0.1); color: var(--red); border: 1px solid rgba(248,81,73,0.2); }
+.cb-gap:hover, .cb-gap.on  { background: rgba(248,81,73,0.25); border-color: var(--red); }
+
+/* ── ROADMAP ─────────────────────────────────────────────── */
+#roadmap-panel {
+  background: var(--ink2); border: 1px solid var(--rule);
+  border-radius: var(--radius2); margin-bottom: 24px; overflow: hidden;
+}
+.road-tier {
+  border-bottom: 1px solid var(--rule);
+}
+.road-tier-hdr {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 16px;
+  background: var(--ink3); cursor: pointer;
+  font-family: 'Syne', sans-serif; font-weight: 600;
+  font-size: 0.82rem; color: var(--soft);
+}
+.road-tier-hdr:hover { background: rgba(255,255,255,0.03); }
+.road-tier-hdr .rt-num {
+  font-family: 'DM Mono', monospace; font-weight: 700;
+  font-size: 0.7rem; min-width: 24px; height: 24px;
+  display: flex; align-items: center; justify-content: center;
+  border-radius: 50%; border: 2px solid;
+}
+.rt1 { border-color: var(--red) !important; color: var(--red); }
+.rt2 { border-color: var(--amber) !important; color: var(--amber); }
+.rt3 { border-color: var(--blue) !important; color: var(--blue); }
+.road-tier-body { padding: 10px 16px; }
+.road-check-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 7px 8px; border-radius: var(--radius);
+  border-bottom: 1px solid rgba(55,62,71,0.4);
+  transition: background 0.08s;
+}
+.road-check-row:hover { background: rgba(255,255,255,0.02); }
+.road-check-row:last-child { border-bottom: none; }
+.road-id { font-family: 'DM Mono', monospace; font-size: 0.7rem; color: var(--amber); min-width: 44px; font-weight: 500; }
+.road-name { font-size: 0.78rem; color: var(--soft); flex: 1; line-height: 1.35; }
+.road-fw-tags { display: flex; flex-wrap: wrap; gap: 3px; }
+.road-fw-tag {
+  font-family: 'DM Mono', monospace; font-size: 0.58rem;
+  padding: 1px 5px; border-radius: 2px;
+  background: rgba(240,165,0,0.1);
+  color: var(--amber3); border: 1px solid rgba(240,165,0,0.2);
+}
+.road-impact {
+  display: flex; align-items: center; gap: 3px;
+  font-family: 'DM Mono', monospace; font-size: 0.65rem;
+  color: var(--muted); min-width: 60px;
+}
+.impact-bar {
+  width: 40px; height: 4px; background: var(--ink4);
+  border-radius: 2px; overflow: hidden;
+}
+.impact-fill { height: 100%; border-radius: 2px; background: var(--amber); }
+
+/* ── EMPTY STATE ─────────────────────────────────────────── */
+.empty-state {
+  text-align: center; padding: 60px 20px;
+  color: var(--dim); font-size: 0.85rem;
+}
+.empty-state .big { font-size: 3rem; margin-bottom: 12px; opacity: 0.3; }
+.empty-state h3 { font-family: 'Syne', sans-serif; font-size: 1rem; color: var(--muted); margin-bottom: 6px; }
+
+/* ── PROGRESS BAR ────────────────────────────────────────── */
+.progress-wrap { margin-bottom: 4px; }
+.progress-bar {
+  width: 100%; height: 4px; background: var(--ink4);
+  border-radius: 2px; overflow: hidden;
+}
+.progress-fill { height: 100%; border-radius: 2px; transition: width 0.4s ease; }
+.pf-amber  { background: var(--amber); }
+.pf-green  { background: var(--green); }
+.pf-red    { background: var(--red); }
+
+/* ── TOOLTIP ─────────────────────────────────────────────── */
+.tooltip {
+  position: fixed; z-index: 9999;
+  background: var(--ink); border: 1px solid var(--rule);
+  border-radius: var(--radius); padding: 6px 10px;
+  font-family: 'DM Mono', monospace; font-size: 0.68rem;
+  color: var(--soft); pointer-events: none;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.5);
+  max-width: 220px; line-height: 1.5;
+  transition: opacity 0.1s;
+}
+
+/* ── COVERAGE BARS ───────────────────────────────────────── */
+.fw-coverage-list { display: flex; flex-direction: column; gap: 8px; }
+.fw-cov-row {
+  display: grid; grid-template-columns: 180px 1fr 48px;
+  align-items: center; gap: 10px;
+}
+.fw-cov-name {
+  font-family: 'DM Mono', monospace; font-size: 0.7rem;
+  color: var(--soft); white-space: nowrap; overflow: hidden;
+  text-overflow: ellipsis;
+}
+.fw-cov-pct {
+  font-family: 'DM Mono', monospace; font-size: 0.68rem;
+  color: var(--dim); text-align: right;
+}
+.bar-track {
+  height: 6px; background: var(--ink4); border-radius: 3px; overflow: hidden;
+}
+.bar-fill { height: 100%; border-radius: 3px; transition: width 0.5s ease; }
+
+/* ── ANIMATIONS ──────────────────────────────────────────── */
+@keyframes fadeIn  { from { opacity:0; transform:translateY(8px); } to { opacity:1; transform:none; } }
+@keyframes pulse   { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+.fade-in { animation: fadeIn 0.25s ease forwards; }
+
+/* ── SECTION VIEWS ───────────────────────────────────────── */
+.view { display: none; }
+.view.active { display: block; animation: fadeIn 0.2s ease; }
+
+/* ── PRINT / PDF hint ────────────────────────────────────── */
+#print-btn {
+  position: fixed; bottom: 20px; right: 20px; z-index: 50;
+}
+@media print {
+  #topbar, #sidebar, #print-btn { display: none !important; }
+  #main { padding: 0; }
+  body { background: white; color: black; }
+  .stat-card, #heatmap-wrap, #checks-panel, #roadmap-panel { break-inside: avoid; }
+}
+
+/* ── SCROLLBAR ───────────────────────────────────────────── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--rule); border-radius: 3px; }
+
+/* ── SCOPE NOTICE ────────────────────────────────────────── */
+.scope-notice {
+  background: rgba(240,165,0,0.06);
+  border: 1px solid rgba(240,165,0,0.2);
+  border-radius: var(--radius); padding: 8px 14px;
+  font-size: 0.76rem; color: var(--muted);
+  margin-bottom: 18px; display: flex; gap: 8px; align-items: center;
+}
+.scope-notice .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--amber); flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div id="topbar">
+  <div class="logo"><span class="mark"></span>M365 <span>Compliance</span> Assessor</div>
+  <div style="font-family:'DM Mono',monospace;font-size:0.68rem;color:var(--dim);margin-left:16px;">
+    CIS M365 Benchmark v3 &nbsp;·&nbsp; 45 Frameworks &nbsp;·&nbsp; 140 Checks &nbsp;·&nbsp; v4
+  </div>
+  <div class="step-trail">
+    <div class="step-pill active" id="pill-1" onclick="goStep(1)">① Select Frameworks</div>
+    <div class="step-pill" id="pill-2" onclick="goStep(2)">② Review Checks</div>
+    <div class="step-pill" id="pill-3" onclick="goStep(3)">③ Mark Status</div>
+    <div class="step-pill" id="pill-4" onclick="goStep(4)">④ Dashboard & Report</div>
+  </div>
+</div>
+
+<div id="app">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sb-label">Org Profile — Quick Select</div>
+    <div class="profile-grid" id="profile-grid"></div>
+    <div class="sb-label" style="margin-top:8px;">Frameworks</div>
+    <div id="fw-groups"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- STEP 1: SELECT -->
+    <div class="view active" id="view-1">
+      <div class="sec-hdr">
+        <h2>Select Compliance Frameworks</h2>
+        <span class="meta">Choose the frameworks relevant to your client's regulatory obligations</span>
+      </div>
+      <div id="sel-bar">
+        <div class="sel-count" id="sel-count">0</div>
+        <div class="sel-label">frameworks selected</div>
+        <div id="sel-tags" style="display:flex;gap:6px;flex-wrap:wrap;flex:1;"></div>
+        <button class="btn btn-amber" onclick="goStep(2)" id="proceed-btn" disabled>
+          View Required Checks →
+        </button>
+      </div>
+      <div class="scope-notice">
+        <div class="dot"></div>
+        Selecting a framework shows <strong>all CIS M365 checks</strong> required for that framework's compliance scope. Overlap is automatically resolved — a check appearing in multiple frameworks is shown once.
+      </div>
+      <!-- Info cards per group -->
+      <div id="group-cards"></div>
+    </div>
+
+    <!-- STEP 2: CHECKS -->
+    <div class="view" id="view-2">
+      <div class="sec-hdr">
+        <h2>Required Checks</h2>
+        <span class="meta" id="checks-meta">—</span>
+      </div>
+      <div class="stats-row" id="stats-row-2">
+        <div class="stat-card c-amber">
+          <div class="stat-num" id="s-total">—</div>
+          <div class="stat-lbl">Total Checks Required</div>
+          <div class="stat-sub">for selected frameworks</div>
+        </div>
+        <div class="stat-card c-teal">
+          <div class="stat-num" id="s-l1">—</div>
+          <div class="stat-lbl">Level 1 (Essential)</div>
+          <div class="stat-sub">baseline hygiene</div>
+        </div>
+        <div class="stat-card c-blue">
+          <div class="stat-num" id="s-l2">—</div>
+          <div class="stat-lbl">Level 2 (Advanced)</div>
+          <div class="stat-sub">enhanced controls</div>
+        </div>
+        <div class="stat-card c-green">
+          <div class="stat-num" id="s-fwcount">—</div>
+          <div class="stat-lbl">Frameworks Covered</div>
+          <div class="stat-sub">by this check set</div>
+        </div>
+      </div>
+      <div id="heatmap-wrap">
+        <div id="heatmap-title">
+          <span>Coverage Heatmap — Checks × Frameworks</span>
+          <div class="heatmap-legend">
+            <div class="hm-swatch" style="background:rgba(57,208,200,0.9)"></div>Covered
+            <div class="hm-swatch" style="background:rgba(55,62,71,0.5);margin-left:6px"></div>Not required
+          </div>
+        </div>
+        <div id="heatmap"></div>
+      </div>
+      <div id="checks-panel">
+        <div class="tbl-toolbar">
+          <input type="text" id="tbl-search" placeholder="Search checks…" oninput="filterTable()">
+          <button class="filter-pill active" onclick="setCatFilter('all',this)">All</button>
+          <div id="cat-pills"></div>
+        </div>
+        <div id="tbl-wrap" style="overflow-x:auto;max-height:480px;overflow-y:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th onclick="sortTable('id')">ID ↕</th>
+                <th onclick="sortTable('name')">Check Name ↕</th>
+                <th>Category</th>
+                <th>Level</th>
+                <th style="text-align:right">Frameworks</th>
+              </tr>
+            </thead>
+            <tbody id="checks-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn btn-ghost btn-sm" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-amber btn-sm" onclick="goStep(3)">Mark Check Status →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3: STATUS -->
+    <div class="view" id="view-3">
+      <div class="sec-hdr">
+        <h2>Mark Implementation Status</h2>
+        <span class="meta">Tick each check as Implemented or flag as a Gap — drives the roadmap</span>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card c-green">
+          <div class="stat-num" id="s-done">0</div>
+          <div class="stat-lbl">Implemented</div>
+          <div class="stat-sub" id="s-done-pct">0% complete</div>
+        </div>
+        <div class="stat-card" style="border-top: 2px solid var(--red);">
+          <div class="stat-num" style="color:var(--red)" id="s-gap">0</div>
+          <div class="stat-lbl">Gaps Identified</div>
+          <div class="stat-sub" id="s-gap-pct">0% gap rate</div>
+        </div>
+        <div class="stat-card c-amber">
+          <div class="stat-num" id="s-unrev">—</div>
+          <div class="stat-lbl">Not Yet Reviewed</div>
+          <div class="stat-sub">awaiting input</div>
+        </div>
+        <div class="stat-card c-teal">
+          <div class="stat-num" id="s-compl">0%</div>
+          <div class="stat-lbl">Review Progress</div>
+          <div class="progress-wrap" style="margin-top:6px">
+            <div class="progress-bar"><div class="progress-fill pf-amber" id="prog-bar" style="width:0%"></div></div>
+          </div>
+        </div>
+      </div>
+      <div id="status-panel">
+        <div class="tbl-toolbar">
+          <input type="text" id="tbl-search2" placeholder="Search checks…" oninput="filterStatusTable()">
+          <button class="filter-pill active" onclick="setStatusFilter('all',this)" id="sf-all">All</button>
+          <button class="filter-pill" onclick="setStatusFilter('unrev',this)">Not Reviewed</button>
+          <button class="filter-pill" onclick="setStatusFilter('gap',this)">Gaps Only</button>
+          <button class="filter-pill" onclick="setStatusFilter('done',this)">Implemented</button>
+          <button class="btn btn-ghost btn-sm" style="margin-left:auto" onclick="markAllDone()">Mark All Done</button>
+        </div>
+        <div style="overflow-x:auto;max-height:500px;overflow-y:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th><th>Check</th><th>Cat</th><th>Lvl</th>
+                <th>Frameworks</th><th style="text-align:center">Status</th>
+              </tr>
+            </thead>
+            <tbody id="status-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+        <button class="btn btn-ghost btn-sm" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-amber btn-sm" onclick="goStep(4)">Generate Dashboard →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4: DASHBOARD -->
+    <div class="view" id="view-4">
+      <div class="sec-hdr">
+        <h2>Assessment Dashboard</h2>
+        <span class="meta" id="dash-meta">—</span>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card c-green">
+          <div class="stat-num" id="d-done">—</div>
+          <div class="stat-lbl">Implemented</div>
+          <div class="progress-bar" style="margin-top:6px"><div class="progress-fill pf-green" id="d-done-bar" style="width:0%"></div></div>
+        </div>
+        <div class="stat-card" style="border-top:2px solid var(--red)">
+          <div class="stat-num" style="color:var(--red)" id="d-gap">—</div>
+          <div class="stat-lbl">Gaps</div>
+          <div class="progress-bar" style="margin-top:6px"><div class="progress-fill pf-red" id="d-gap-bar" style="width:0%"></div></div>
+        </div>
+        <div class="stat-card c-amber">
+          <div class="stat-num" id="d-unrev">—</div>
+          <div class="stat-lbl">Not Reviewed</div>
+        </div>
+        <div class="stat-card c-teal">
+          <div class="stat-num" id="d-score">—%</div>
+          <div class="stat-lbl">Compliance Score</div>
+          <div class="stat-sub">(implemented / total)</div>
+        </div>
+      </div>
+
+      <!-- Per-framework coverage bars -->
+      <div id="heatmap-wrap" style="margin-bottom:24px">
+        <div id="heatmap-title">
+          <span>Per-Framework Compliance Coverage</span>
+        </div>
+        <div class="fw-coverage-list" id="fw-coverage-bars"></div>
+      </div>
+
+      <!-- Remediation roadmap -->
+      <div class="sec-hdr">
+        <h2>Prioritised Remediation Roadmap</h2>
+        <span class="meta">Sorted by framework impact — fixes highest cross-framework gaps first</span>
+      </div>
+      <div id="roadmap-panel">
+        <div class="road-tier" id="rt-critical">
+          <div class="road-tier-hdr" onclick="toggleRoadTier('rt-critical-body')">
+            <div class="rt-num rt1">!</div>
+            <span id="rt-critical-lbl">Critical Priority</span>
+            <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--dim)">▾</span>
+          </div>
+          <div class="road-tier-body" id="rt-critical-body"></div>
+        </div>
+        <div class="road-tier" id="rt-high">
+          <div class="road-tier-hdr" onclick="toggleRoadTier('rt-high-body')">
+            <div class="rt-num rt2">2</div>
+            <span id="rt-high-lbl">High Priority</span>
+            <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--dim)">▾</span>
+          </div>
+          <div class="road-tier-body" id="rt-high-body"></div>
+        </div>
+        <div class="road-tier" id="rt-std">
+          <div class="road-tier-hdr" onclick="toggleRoadTier('rt-std-body')">
+            <div class="rt-num rt3">3</div>
+            <span id="rt-std-lbl">Standard Priority</span>
+            <span style="margin-left:auto;font-family:'DM Mono',monospace;font-size:0.65rem;color:var(--dim)">▾</span>
+          </div>
+          <div class="road-tier-body" id="rt-std-body"></div>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:8px;justify-content:flex-end;">
+        <button class="btn btn-ghost btn-sm" onclick="goStep(3)">← Back</button>
+        <button class="btn btn-amber btn-sm" onclick="window.print()">⬇ Export PDF</button>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /app -->
+
+<div id="print-btn">
+  <button class="btn btn-ghost btn-sm" onclick="window.print()" title="Export to PDF">⬇ PDF</button>
+</div>
+
+<div class="tooltip" id="tooltip" style="opacity:0;"></div>
+
+<script>
+const APP_DATA = {"checks":[{"id":"1.1.1","name":"Ensure Security Defaults is disabled on Azure AD","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.1.2","name":"Ensure that Azure AD authentication methods policies are configured correctly","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.1.3","name":"Ensure that Microsoft Azure Management is limited to administrative users","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.1.4","name":"Ensure Sign-in to Active Directory accounts is limited to administrative users only","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.2.1","name":"Ensure Microsoft Authenticator is configured to protect against MFA fatigue","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.2.2","name":"Ensure that Identity Protection high-risk sign-ins policies are configured","cat":"Entra","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","CMMC v2.0","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.3.1","name":"Ensure a Conditional Access policy exists requiring MFA for all users","cat":"Entra","level":"L1","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","CJIS v6","GSMA FS.31","Cybersecure Canada","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.3.2","name":"Ensure a Conditional Access policy requires MFA for Azure Management","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","PCI DSS v4.0","HIPAA","FFIEC-CAT","CMMC v2.0","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","CSA CCM v4","CRI Profile v2.0","CJIS v6","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.3.3","name":"Ensure a Conditional Access policy requires MFA for risky sign-ins","cat":"Entra","level":"L1","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.3.4","name":"Ensure a Conditional Access policy exists for risky users","cat":"Entra","level":"L1","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.3.5","name":"Ensure a Conditional Access policy requires MFA for Windows Azure Service Management API","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.3.6","name":"Ensure a Managed Device is required for MFA registration","cat":"Entra","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","CMMC v2.0","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.3.7","name":"Ensure a Compliant Device is required for MFA via Conditional Access","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.3.8","name":"Ensure sign-in frequency is enabled and browser sessions are not persistent","cat":"Entra","level":"L1","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"1.3.9","name":"Ensure a Conditional Access policy blocks access from outside the country","cat":"Entra","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.1.1","name":"Ensure the Common Attachment Types Filter is enabled","cat":"Defender For Office 365","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.1.10","name":"Ensure DMARC Records for all Exchange Online domains are published","cat":"Defender For Office 365","level":"L1","fws":["NIS2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NZ ISM v3.8","CRI Profile v2.0","CJIS v6","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025"]},{"id":"2.1.11","name":"Ensure the Safe Links policy is enabled for Microsoft Teams","cat":"Defender For Office 365","level":"L1","fws":["NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","COBIT 19","CJIS v6","TSA Security Directive","GDPR (EU) 2016/679","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025"]},{"id":"2.1.12","name":"Ensure that Safe Attachments for SharePoint, OneDrive and Teams is enabled","cat":"Defender For Office 365","level":"L2","fws":["ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.1.13","name":"Ensure Microsoft Defender for Office 365 protection for SharePoint/OneDrive/Teams is enabled","cat":"Defender For Office 365","level":"L1","fws":["ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.1.14","name":"Ensure inbound anti-spam policies do not contain allowed domains","cat":"Defender For Office 365","level":"L1","fws":["ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.1.15","name":"Ensure outbound anti-spam message limits are in place","cat":"Defender For Office 365","level":"L1","fws":["ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.1.2","name":"Ensure Exchange Online Spam Policies are set to notify administrators","cat":"Defender For Office 365","level":"L2","fws":["NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","COBIT 19","CJIS v6","TSA Security Directive","GDPR (EU) 2016/679","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025"]},{"id":"2.1.3","name":"Ensure notifications for internal users sending malware is enabled","cat":"Defender For Office 365","level":"L1","fws":["ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","NZ ISM v3.8","CSA CCM v4","CRI Profile v2.0","CJIS v6","GSMA FS.31","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.1.4","name":"Ensure Safe Attachments policy is enabled","cat":"Defender For Office 365","level":"L1","fws":["ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.1.5","name":"Ensure Safe Links for Office Applications is Enabled","cat":"Defender For Office 365","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.1.6","name":"Ensure Exchange Online Spam Policies are set to notify administrators","cat":"Defender For Office 365","level":"L1","fws":["ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","NZ ISM v3.8","CSA CCM v4","CRI Profile v2.0","CJIS v6","GSMA FS.31","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.1.7","name":"Ensure that an anti-phishing policy has been created","cat":"Defender For Office 365","level":"L1","fws":["ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.1.8","name":"Ensure that DKIM is enabled for all Exchange Online Domains","cat":"Defender For Office 365","level":"L1","fws":["NIS2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NZ ISM v3.8","CRI Profile v2.0","CJIS v6","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025"]},{"id":"2.1.9","name":"Ensure that SPF records are published for all Exchange Domains","cat":"Defender For Office 365","level":"L1","fws":["NIS2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NZ ISM v3.8","CRI Profile v2.0","CJIS v6","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025"]},{"id":"2.2.1","name":"Ensure all forms of mail forwarding are blocked and/or disabled","cat":"Defender For Office 365","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-53 Rev.5","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.4.1","name":"Ensure Safe Links for Office Applications is Enabled","cat":"Defender For Office 365","level":"L1","fws":["ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.4.2","name":"Ensure the URL scanning for Links is enabled for Teams","cat":"Defender For Office 365","level":"L2","fws":["ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.4.3","name":"Ensure Safe Links click-through protection is enforced","cat":"Defender For Office 365","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"2.4.4","name":"Ensure Safe Links scanning of emails for malicious URLs is enabled","cat":"Defender For Office 365","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"3.1.1","name":"Ensure Administrative accounts do not have mailboxes","cat":"M365","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-53 Rev.5","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"3.2.1","name":"Ensure that between two and four global admins are designated","cat":"M365","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"3.2.2","name":"Ensure emergency access admin accounts are maintained","cat":"M365","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"3.3.1","name":"Ensure Sign-in to non-admin accounts is enabled and audited","cat":"M365","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","NZ ISM v3.8","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"4.1","name":"Ensure Microsoft 365 audit log search is Enabled","cat":"M365","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"4.2","name":"Ensure DLP policies are enabled for Microsoft Teams","cat":"M365","level":"L2","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.2.1","name":"Ensure user consent to apps is not allowed","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","NYDFS 23 NYCRR 500","FFIEC-CAT","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.2.2","name":"Ensure third party integrated applications are not allowed","cat":"Entra","level":"L1","fws":["ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.2.3","name":"Ensure collaboration invitations are sent to allowed domains only","cat":"Entra","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.2.4","name":"Ensure password hash sync is enabled for hybrid deployments","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.2.5","name":"Ensure the option to stay signed in is hidden","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","PCI DSS v4.0","HIPAA","FFIEC-CAT","CMMC v2.0","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","CSA CCM v4","CRI Profile v2.0","CJIS v6","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.2.6","name":"Ensure LinkedIn account connections are disabled","cat":"Entra","level":"L2","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.3.1","name":"Ensure that users cannot register devices","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.3.2","name":"Ensure users cannot create security groups","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.4.1","name":"Ensure Intune Device Management is enabled","cat":"Entra","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.4.2","name":"Ensure mobile device management policies require advanced security configurations","cat":"Entra","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.4.3","name":"Ensure the device platform for all devices is managed","cat":"Entra","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.4.4","name":"Ensure Bitlocker is enabled for all Windows and non-Mac devices","cat":"Entra","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.4.5","name":"Ensure Local Administrator Password Solution is enabled","cat":"Entra","level":"L2","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","CJIS v6","GSMA FS.31","Cybersecure Canada","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.4.6","name":"Ensure users are restricted from recovering BitLocker keys","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.5.1","name":"Ensure user consent to apps accessing company data on their behalf is not allowed","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.5.2","name":"Ensure the admin consent workflow is enabled","cat":"Entra","level":"L2","fws":["ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.6.1","name":"Ensure only organisationally managed/approved public groups exist","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.6.2","name":"Ensure that guest user access is restricted","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.6.3","name":"Ensure guest invites are only allowed from specific admin roles","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.1.8.1","name":"Ensure Privileged Identity Management is used to manage role assignments","cat":"Entra","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","NERC-CIP","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","HPH CPGs","Cybersecure Canada","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.1","name":"Ensure Microsoft Authenticator is used as authentication method","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.10","name":"Ensure a managed device is required to register security information","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","NYDFS 23 NYCRR 500","FFIEC-CAT","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.11","name":"Ensure sign-in frequency for Intune Enrollment is set to \"Every time\"","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","NYDFS 23 NYCRR 500","FFIEC-CAT","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.12","name":"Ensure a Conditional Access policy requires hybrid Azure AD joined device","cat":"Entra","level":"L2","fws":["ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GDPR (EU) 2016/679","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.2","name":"Ensure MFA is enabled for all users in administrative roles","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","NYDFS 23 NYCRR 500","FFIEC-CAT","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.3","name":"Enable Conditional Access policies to block legacy authentication","cat":"Entra","level":"L1","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.4","name":"Ensure Sign-in frequency is enabled and browser sessions are not persistent for Administrative users","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","PCI DSS v4.0","HIPAA","FFIEC-CAT","CMMC v2.0","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","CSA CCM v4","CRI Profile v2.0","CJIS v6","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.5","name":"Ensure the Entra ID Risky sign-ins policy is enabled","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.6","name":"Ensure user risk policy is enabled","cat":"Entra","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.7","name":"Ensure the Entra ID Authentication methods policy is configured","cat":"Entra","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.8","name":"Ensure Entra ID authentication methods are limited to MFA-capable authenticators","cat":"Entra","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.2.9","name":"Ensure a Conditional Access policy exists for registered and compliant devices","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","NYDFS 23 NYCRR 500","FFIEC-CAT","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.3.1","name":"Ensure that Entra ID MFA is enabled for all users","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025"]},{"id":"5.2.3.2","name":"Ensure custom banned passwords lists are used","cat":"Entra","level":"L2","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","CJIS v6","GSMA FS.31","Cybersecure Canada","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.3.3","name":"Ensure password protection is enabled for on-prem Active Directory","cat":"Entra","level":"L2","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","CJIS v6","GSMA FS.31","Cybersecure Canada","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.3.4","name":"Ensure that number matching is enabled for Microsoft Authenticator","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","NYDFS 23 NYCRR 500","FFIEC-CAT","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.3.5","name":"Ensure additional context is enabled for Microsoft Authenticator","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","NYDFS 23 NYCRR 500","FFIEC-CAT","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.3.6","name":"Ensure hardware OATH tokens or FIDO2 security keys are enabled","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","NYDFS 23 NYCRR 500","FFIEC-CAT","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.3.7","name":"Ensure temporary access pass is correctly configured","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","SOC 2","NYDFS 23 NYCRR 500","FFIEC-CAT","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.2.4.1","name":"Ensure Self-Service Password Reset is properly configured","cat":"Entra","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","CMMC v2.0","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.3.1","name":"Ensure MFA is enabled for all Global Administrators","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.3.2","name":"Ensure a minimum of two users are designated as Global Administrators","cat":"Entra","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.3.3","name":"Ensure Privileged Identity Management is used to manage access to Azure resources","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.3.4","name":"Ensure no Global Administrators are synced from on-premises Active Directory","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"5.3.5","name":"Ensure Emergency Access admin accounts are not assigned permanent roles","cat":"Entra","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"6.1.1","name":"Ensure the customer lockbox feature is enabled","cat":"Exchange","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-53 Rev.5","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"6.1.2","name":"Ensure Modern Authentication for Exchange Online is enabled","cat":"Exchange","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-53 Rev.5","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"6.1.3","name":"Ensure all mail transport rules do not whitelist specific domains","cat":"Exchange","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"6.2.1","name":"Ensure Calendar details sharing with external users is disabled","cat":"Exchange","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"6.2.2","name":"Ensure that DKIM is enabled for all Exchange Online Domains","cat":"Exchange","level":"L1","fws":["ISO 27001:2022","NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"6.2.3","name":"Ensure the report message feature is enabled","cat":"Exchange","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"6.3.1","name":"Ensure the Exchange Online Azure AD OAuth app is enabled","cat":"Exchange","level":"L2","fws":["NIST CSF 1.1","NIST SP 800-53 Rev.5","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","CJIS v6","HPH CPGs","GDPR (EU) 2016/679","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance"]},{"id":"6.5.1","name":"Ensure basic authentication for Exchange Online is disabled","cat":"Exchange","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"6.5.2","name":"Ensure Exchange Online email public folders are not used","cat":"Exchange","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","CMMC v2.0","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"6.5.3","name":"Ensure auto-forwarding rules are disabled or monitored","cat":"Exchange","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"6.5.4","name":"Ensure the connection filter IP allow list is empty","cat":"Exchange","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","FFIEC-CAT","CMMC v2.0","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","CJIS v6","Cybersecure Canada","GDPR (EU) 2016/679","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"6.5.5","name":"Ensure Exchange Online email junk filtering safe senders list does not allow bypass","cat":"Exchange","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","FFIEC-CAT","CMMC v2.0","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","CJIS v6","Cybersecure Canada","GDPR (EU) 2016/679","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.2.1","name":"Ensure SharePoint and OneDrive integration with Azure AD B2B is enabled","cat":"Sharepoint","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.2.10","name":"Ensure SharePoint and OneDrive require managed devices for syncing","cat":"Sharepoint","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","CMMC v2.0","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.2.11","name":"Ensure SharePoint Online access is restricted by IP address","cat":"Sharepoint","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","CMMC v2.0","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.2.2","name":"Ensure OneDrive content is not shared directly with external guests from unmanaged devices","cat":"Sharepoint","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.2.3","name":"Ensure external content sharing is restricted","cat":"Sharepoint","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.2.4","name":"Ensure SharePoint and OneDrive default sharing link type is set to internal","cat":"Sharepoint","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.2.5","name":"Ensure SharePoint online external user sharing is restricted","cat":"Sharepoint","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.2.6","name":"Ensure link sharing expiration is configured for anonymous links","cat":"Sharepoint","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.2.7","name":"Ensure SharePoint online external user sharing is restricted to guest accounts only","cat":"Sharepoint","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.2.8","name":"Ensure SharePoint infected files are disallowed for download","cat":"Sharepoint","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.2.9","name":"Ensure only organizational accounts are allowed to share content externally","cat":"Sharepoint","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.3.1","name":"Ensure modern authentication for SharePoint applications is required","cat":"Sharepoint","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"7.3.2","name":"Ensure SharePoint Online external user sharing is restricted","cat":"Sharepoint","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.1.1","name":"Ensure anonymous users cannot start meetings in Microsoft Teams","cat":"Teams","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.1.2","name":"Ensure only people in the same organisation can bypass the lobby","cat":"Teams","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.2.1","name":"Ensure meeting chat does not allow anonymous users","cat":"Teams","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.2.2","name":"Ensure screen sharing does not allow anonymous users","cat":"Teams","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.2.3","name":"Ensure external file sharing in Teams is enabled for only approved cloud storage services","cat":"Teams","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.2.4","name":"Ensure communication with unmanaged Teams accounts is disabled","cat":"Teams","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.4.1","name":"Ensure Microsoft Teams is configured to prevent external access","cat":"Teams","level":"L1","fws":["ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","FedRAMP Moderate","EU Cyber Resilience Act","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.5.1","name":"Ensure anonymous users and dial-in callers cannot start a meeting","cat":"Teams","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.5.2","name":"Ensure Teams is restricted from automatically granting guest access","cat":"Teams","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.5.3","name":"Ensure Teams meeting lobbies are enabled for all attendees","cat":"Teams","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.5.4","name":"Ensure Teams meeting \"Who can present?\" policy is configured properly","cat":"Teams","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.5.5","name":"Ensure Teams meeting recording is disabled for external participants","cat":"Teams","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.5.6","name":"Ensure users cannot send emails to a channel email address","cat":"Teams","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.5.7","name":"Ensure Teams is configured to restrict who can schedule meetings","cat":"Teams","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"8.5.8","name":"Ensure only organizers and co-organizers can present in Teams meetings","cat":"Teams","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31"]},{"id":"8.5.9","name":"Ensure dial-in users are placed in a lobby before joining meetings","cat":"Teams","level":"L1","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31"]},{"id":"8.6.1","name":"Ensure users with Teams messaging permissions cannot edit and delete sent messages","cat":"Teams","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST SP 800-53 Rev.5","SOC 2","UK NCSC CAF v3.2","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"9.1.1","name":"Ensure Microsoft 365 audit log search is enabled","cat":"Purview","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"9.1.10","name":"Ensure sensitivity labels are applied to M365 Groups and Teams","cat":"Purview","level":"L2","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"9.1.11","name":"Ensure sensitivity labels are configured for SharePoint Online","cat":"Purview","level":"L2","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"9.1.12","name":"Ensure retention policies are configured for sensitive data types","cat":"Purview","level":"L2","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"9.1.2","name":"Ensure DLP policies are created and used","cat":"Purview","level":"L1","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"9.1.3","name":"Ensure Data Loss Prevention policies are configured for sensitive data","cat":"Purview","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"9.1.4","name":"Ensure Microsoft Purview is used for insider risk management","cat":"Purview","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31"]},{"id":"9.1.5","name":"Ensure DLP policies are enabled for Microsoft Teams","cat":"Purview","level":"L2","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"9.1.6","name":"Ensure SharePoint Online Information Protection settings are enabled","cat":"Purview","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","NZ ISM v3.8","MITRE ATT&CK","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"9.1.7","name":"Ensure sensitivity labels are configured for Teams","cat":"Purview","level":"L2","fws":["NIS2","ISO 27001:2022","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"9.1.8","name":"Ensure communication compliance policies exist","cat":"Purview","level":"L2","fws":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]},{"id":"9.1.9","name":"Ensure the audit log retention is 180 days or greater","cat":"Purview","level":"L1","fws":["ISO 27001:2022","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CRI Profile v2.0","Microsoft Cloud Security Benchmark","CJIS v6","TSA Security Directive","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","BSI IT-Grundschutz","ENS (Spain) RD311/22"]}],"fw_meta":{"DORA":{"tier":"T1_SOURCE","count":36,"note":"CIS M365 Benchmark official mapping sheet"},"NIS2":{"tier":"T1_SOURCE","count":107,"note":"CIS M365 Benchmark official mapping sheet"},"ISO 27001:2022":{"tier":"T1_SOURCE","count":134,"note":"CIS M365 Benchmark official mapping sheet"},"NIST CSF 2.0":{"tier":"T1_SOURCE","count":69,"note":"CIS M365 Benchmark official mapping sheet (v8.1 safeguards only)"},"NIST CSF 1.1":{"tier":"T1_SOURCE","count":96,"note":"CIS M365 Benchmark official mapping sheet"},"NIST SP 800-171 Rev.3":{"tier":"T1_SOURCE","count":80,"note":"CIS M365 Benchmark official mapping sheet"},"NIST SP 800-171 Rev.2":{"tier":"T1_SOURCE","count":75,"note":"CIS M365 Benchmark official mapping sheet"},"NIST SP 800-53 Rev.5":{"tier":"T1_SOURCE","count":140,"note":"CIS M365 Benchmark official mapping sheet"},"SOC 2":{"tier":"T1_SOURCE","count":117,"note":"CIS M365 Benchmark official mapping sheet"},"PCI DSS v4.0":{"tier":"T1_SOURCE","count":101,"note":"CIS M365 Benchmark official mapping sheet"},"HIPAA":{"tier":"T1_SOURCE","count":54,"note":"CIS M365 Benchmark official mapping sheet"},"NYDFS 23 NYCRR 500":{"tier":"T1_SOURCE","count":60,"note":"CIS M365 Benchmark official mapping sheet"},"FFIEC-CAT":{"tier":"T1_SOURCE","count":90,"note":"CIS M365 Benchmark official mapping sheet"},"CMMC v2.0":{"tier":"T1_SOURCE","count":102,"note":"CIS M365 Benchmark official mapping sheet"},"NERC-CIP":{"tier":"T1_SOURCE","count":82,"note":"CIS M365 Benchmark official mapping sheet"},"UK NCSC CAF v3.2":{"tier":"T1_SOURCE","count":89,"note":"CIS M365 Benchmark official mapping sheet"},"UK NCSC CAF v3.1":{"tier":"T1_SOURCE","count":63,"note":"CIS M365 Benchmark official mapping sheet"},"UK NCSC Cyber Essentials v3.2":{"tier":"T1_SOURCE","count":80,"note":"CIS M365 Benchmark official mapping sheet"},"UK NCSC Cyber Essentials v2.2":{"tier":"T1_SOURCE","count":80,"note":"CIS M365 Benchmark official mapping sheet"},"ASD Essential Eight":{"tier":"T1_SOURCE","count":45,"note":"CIS M365 Benchmark official mapping sheet"},"NZ ISM v3.8":{"tier":"T1_SOURCE","count":112,"note":"CIS M365 Benchmark official mapping sheet"},"MITRE ATT&CK":{"tier":"T1_SOURCE","count":102,"note":"CIS M365 Benchmark official mapping sheet"},"CISA CPG":{"tier":"T1_SOURCE","count":45,"note":"CIS M365 Benchmark official mapping sheet"},"CSA CCM v4":{"tier":"T1_SOURCE","count":83,"note":"CIS M365 Benchmark official mapping sheet"},"CRI Profile v2.0":{"tier":"T1_SOURCE","count":114,"note":"CIS M365 Benchmark official mapping sheet"},"COBIT 19":{"tier":"T1_SOURCE","count":47,"note":"CIS M365 Benchmark official mapping sheet"},"Microsoft Cloud Security Benchmark":{"tier":"T1_SOURCE","count":88,"note":"CIS M365 Benchmark official mapping sheet"},"CJIS v6":{"tier":"T1_SOURCE","count":114,"note":"CIS M365 Benchmark official mapping sheet"},"GSMA FS.31":{"tier":"T1_SOURCE","count":77,"note":"CIS M365 Benchmark official mapping sheet"},"HPH CPGs":{"tier":"T1_SOURCE","count":40,"note":"CIS M365 Benchmark official mapping sheet"},"Cybersecure Canada":{"tier":"T1_SOURCE","count":30,"note":"CIS M365 Benchmark official mapping sheet"},"TSA Security Directive":{"tier":"T1_SOURCE","count":68,"note":"CIS M365 Benchmark official mapping sheet"},"GDPR (EU) 2016/679":{"tier":"T3_METHOD","count":120,"note":"CIS safeguard \u2192 ISO 27001:2022 Annex A chain \u2192 GDPR Art.32 technical/organisational measures. No official CIS\u2192GDPR mappi"},"ISO 27701:2019":{"tier":"T2_CHAIN","count":124,"note":"ISO 27001:2022 Annex A \u2192 ISO/IEC 27701:2019 Annex F chain (official ISO bridge doc). Covers cl.6 (privacy guidance for I"},"ISO 27017:2015":{"tier":"T2_CHAIN","count":110,"note":"ISO 27001:2022 Annex A \u2192 ISO/IEC 27017:2015 Annex A chain (official ISO bridge doc). Includes 37 modified controls + 7 n"},"FedRAMP Moderate":{"tier":"T3_METHOD","count":137,"note":"CIS safeguard \u2192 NIST SP 800-53 R5 (official CIS mapping) \u2192 FedRAMP Moderate baseline inclusion (FedRAMP Rev 5 control li"},"EU Cyber Resilience Act":{"tier":"T3_METHOD","count":96,"note":"CIS safeguard \u2192 Annex I CRA essential security requirements (Reg.(EU) 2024/2847). No official CIS\u2192CRA mapping; CRA enter"},"CIRCIA (US)":{"tier":"T3_METHOD","count":65,"note":"CIS safeguard \u2192 CISA CPG (official CIS mapping) as proxy for CIRCIA incident reporting goals. CIRCIA final rules not yet"},"SEC Cyber Rule":{"tier":"T3_METHOD","count":40,"note":"CIS safeguard \u2192 NIST CSF 2.0 chain (SEC 17 CFR 229.106 explicitly references NIST CSF). No official CIS\u2192SEC mapping publ"},"HITRUST CSF v11":{"tier":"T3_METHOD","count":137,"note":"CIS safeguard \u2192 ISO 27001 / NIST 800-53 / HIPAA chain \u2192 HITRUST CSF v11 control inheritance. HITRUST MyCSF crosswalk is "},"IASME Cyber Assurance":{"tier":"T3_METHOD","count":122,"note":"CIS safeguard \u2192 UK NCSC Cyber Essentials v3.2 chain (official CIS mapping) \u2192 IASME CA Level 2. IASME CA is a superset of"},"UK CS&R Bill 2025":{"tier":"T3_METHOD","count":129,"note":"CIS safeguard \u2192 NIS2 Article 21 chain (NIS2 mapping in CIS M365 source data) as proxy, since CS&R Bill is the UK transpo"},"ISO 22301:2019":{"tier":"T3_METHOD","count":58,"note":"CIS safeguard \u2192 ISO 27001 chain \u2192 ISO 22301 clause via shared management system overlap (clauses 6,8,9 common to both). "},"BSI IT-Grundschutz":{"tier":"T2_CHAIN","count":130,"note":"ISO 27001:2022 Annex A \u2192 BSI Grundschutz chain via official BSI Zuordnungstabelle (bsi.bund.de). 2022 Compendium edition"},"ENS (Spain) RD311/22":{"tier":"T2_CHAIN","count":130,"note":"ISO 27001:2022 Annex A \u2192 ENS Annex II chain via CCN-STIC-825 official mapping (Jan 2024 edition). RD 311/2022 measure re"}},"fw_groups":{"EU Regulatory":["DORA","NIS2","GDPR (EU) 2016/679","EU Cyber Resilience Act"],"ISO Standards":["ISO 27001:2022","ISO 27701:2019","ISO 27017:2015","ISO 22301:2019"],"NIST / US Federal":["NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-53 Rev.5","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","FedRAMP Moderate","CMMC v2.0","CISA CPG"],"US Sector":["HIPAA","HITRUST CSF v11","SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","CRI Profile v2.0","CIRCIA (US)","SEC Cyber Rule"],"UK & Ireland":["UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","IASME Cyber Assurance","UK CS&R Bill 2025"],"APAC & Other":["ASD Essential Eight","NZ ISM v3.8","Cybersecure Canada","GSMA FS.31"],"Regional":["BSI IT-Grundschutz","ENS (Spain) RD311/22"],"Sector Specific":["NERC-CIP","TSA Security Directive","CJIS v6","HPH CPGs"],"Cloud & Tech":["CSA CCM v4","Microsoft Cloud Security Benchmark","COBIT 19","MITRE ATT&CK"]},"org_profiles":{"EU Financial":["DORA","NIS2","GDPR (EU) 2016/679","EU Cyber Resilience Act","ISO 27001:2022","ISO 27701:2019","PCI DSS v4.0","IASME Cyber Assurance"],"EU General (NIS2)":["NIS2","GDPR (EU) 2016/679","ISO 27001:2022","EU Cyber Resilience Act"],"UK Organisation":["UK NCSC CAF v3.2","UK NCSC Cyber Essentials v3.2","IASME Cyber Assurance","UK CS&R Bill 2025","GDPR (EU) 2016/679","ISO 27001:2022"],"US Federal":["NIST SP 800-53 Rev.5","NIST CSF 2.0","FedRAMP Moderate","CMMC v2.0","CISA CPG"],"US Healthcare":["HIPAA","HITRUST CSF v11","NIST CSF 2.0","NIST SP 800-53 Rev.5","CRI Profile v2.0"],"US Financial":["SOC 2","PCI DSS v4.0","NYDFS 23 NYCRR 500","FFIEC-CAT","NIST CSF 2.0"],"US Listed/Public":["SEC Cyber Rule","CIRCIA (US)","SOC 2","NIST CSF 2.0"],"Critical Infrastructure":["NERC-CIP","NIST SP 800-53 Rev.5","NIST CSF 2.0","CISA CPG","TSA Security Directive"],"Defence / CMMC":["CMMC v2.0","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5"],"Germany (BSI)":["BSI IT-Grundschutz","NIS2","GDPR (EU) 2016/679","ISO 27001:2022"],"Spain (ENS)":["ENS (Spain) RD311/22","NIS2","GDPR (EU) 2016/679","ISO 27001:2022"],"Cloud/SaaS Vendor":["ISO 27001:2022","ISO 27017:2015","CSA CCM v4","SOC 2","GDPR (EU) 2016/679"]},"categories":["Defender For Office 365","Entra","Exchange","M365","Purview","Sharepoint","Teams"],"frameworks":["DORA","NIS2","ISO 27001:2022","NIST CSF 2.0","NIST CSF 1.1","NIST SP 800-171 Rev.3","NIST SP 800-171 Rev.2","NIST SP 800-53 Rev.5","SOC 2","PCI DSS v4.0","HIPAA","NYDFS 23 NYCRR 500","FFIEC-CAT","CMMC v2.0","NERC-CIP","UK NCSC CAF v3.2","UK NCSC CAF v3.1","UK NCSC Cyber Essentials v3.2","UK NCSC Cyber Essentials v2.2","ASD Essential Eight","NZ ISM v3.8","MITRE ATT&CK","CISA CPG","CSA CCM v4","CRI Profile v2.0","COBIT 19","Microsoft Cloud Security Benchmark","CJIS v6","GSMA FS.31","HPH CPGs","Cybersecure Canada","TSA Security Directive","GDPR (EU) 2016/679","ISO 27701:2019","ISO 27017:2015","FedRAMP Moderate","EU Cyber Resilience Act","CIRCIA (US)","SEC Cyber Rule","HITRUST CSF v11","IASME Cyber Assurance","UK CS&R Bill 2025","ISO 22301:2019","BSI IT-Grundschutz","ENS (Spain) RD311/22"]};
+
+// ── STATE ─────────────────────────────────────────────────
+const state = {
+  selectedFws: new Set(),
+  checkStatus: {}, // id -> 'done'|'gap'|null
+  currentStep: 1,
+  sortCol: 'id', sortDir: 1,
+  catFilter: 'all',
+  statusFilter: 'all',
+};
+
+const D = APP_DATA;
+const CHECKS = D.checks;
+const FW_META = D.fw_meta;
+const FW_GROUPS = D.fw_groups;
+const ORG_PROFILES = D.org_profiles;
+const CATS = D.categories;
+
+// ── INIT ──────────────────────────────────────────────────
+function init() {
+  renderProfiles();
+  renderFwGroups();
+  renderGroupCards();
+}
+
+// ── STEP NAV ──────────────────────────────────────────────
+function goStep(n) {
+  if (n > 1 && state.selectedFws.size === 0) return;
+  state.currentStep = n;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-'+n).classList.add('active');
+  document.querySelectorAll('.step-pill').forEach((p,i) => {
+    p.classList.remove('active','done');
+    if (i+1 === n) p.classList.add('active');
+    else if (i+1 < n) p.classList.add('done');
+  });
+  if (n === 2) renderStep2();
+  if (n === 3) renderStep3();
+  if (n === 4) renderStep4();
+}
+
+// ── PROFILES ──────────────────────────────────────────────
+function renderProfiles() {
+  const g = document.getElementById('profile-grid');
+  g.innerHTML = Object.keys(ORG_PROFILES).map(p =>
+    `<button class="profile-btn" onclick="applyProfile(this,'${p.replace(/'/g,"\'")}')">
+      ${p}
+    </button>`
+  ).join('');
+}
+function applyProfile(btn, name) {
+  document.querySelectorAll('.profile-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const fws = ORG_PROFILES[name];
+  state.selectedFws = new Set(fws.filter(fw => D.frameworks.includes(fw)));
+  syncFwCheckboxes();
+  updateSelBar();
+}
+
+// ── FW GROUPS SIDEBAR ─────────────────────────────────────
+function renderFwGroups() {
+  const container = document.getElementById('fw-groups');
+  container.innerHTML = Object.entries(FW_GROUPS).map(([grp, fws]) => {
+    const items = fws.filter(fw => D.frameworks.includes(fw)).map(fw => {
+      const meta = FW_META[fw] || {};
+      const tier = meta.tier || 'T3_METHOD';
+      const tierLabel = {T1_SOURCE:'✓',T2_CHAIN:'⊕',T3_METHOD:'★'}[tier];
+      return `<div class="fw-item" id="fwitem-${cssId(fw)}" onclick="toggleFw('${escQ(fw)}')">
+        <input type="checkbox" id="fwcb-${cssId(fw)}" onclick="event.stopPropagation();toggleFw('${escQ(fw)}')">
+        <span class="fw-name">${fw}</span>
+        <span class="tier-badge tier-${tier}" title="${meta.note||''}">${tierLabel}</span>
+        <span class="fw-cnt">${meta.count||0}</span>
+      </div>`;
+    }).join('');
+    return `<div class="sb-group">
+      <div class="sb-group-hdr open" onclick="toggleGrp(this)">
+        <span>${grp}</span>
+        <span class="arrow">▶</span>
+      </div>
+      <div class="sb-group-body open">${items}</div>
+    </div>`;
+  }).join('');
+}
+function toggleGrp(hdr) {
+  hdr.classList.toggle('open');
+  hdr.nextElementSibling.classList.toggle('open');
+}
+
+// ── FW TOGGLE ─────────────────────────────────────────────
+function toggleFw(fw) {
+  if (state.selectedFws.has(fw)) state.selectedFws.delete(fw);
+  else state.selectedFws.add(fw);
+  document.getElementById('fwcb-'+cssId(fw)).checked = state.selectedFws.has(fw);
+  document.getElementById('fwitem-'+cssId(fw)).classList.toggle('selected', state.selectedFws.has(fw));
+  updateSelBar();
+}
+function syncFwCheckboxes() {
+  D.frameworks.forEach(fw => {
+    const cb = document.getElementById('fwcb-'+cssId(fw));
+    const item = document.getElementById('fwitem-'+cssId(fw));
+    if (cb) cb.checked = state.selectedFws.has(fw);
+    if (item) item.classList.toggle('selected', state.selectedFws.has(fw));
+  });
+}
+function updateSelBar() {
+  const n = state.selectedFws.size;
+  document.getElementById('sel-count').textContent = n;
+  document.getElementById('proceed-btn').disabled = n === 0;
+  const tags = document.getElementById('sel-tags');
+  tags.innerHTML = [...state.selectedFws].slice(0,8).map(fw =>
+    `<div class="sel-tag">${fw}<span class="remove" onclick="toggleFw('${escQ(fw)}')">✕</span></div>`
+  ).join('') + (n > 8 ? `<div class="sel-tag">+${n-8} more</div>` : '');
+}
+
+// ── GROUP CARDS (step 1 content) ──────────────────────────
+function renderGroupCards() {
+  const el = document.getElementById('group-cards');
+  el.innerHTML = `<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+    ${Object.entries(FW_GROUPS).map(([grp, fws]) => {
+      const avail = fws.filter(fw => D.frameworks.includes(fw));
+      return `<div style="background:var(--ink2);border:1px solid var(--rule);border-radius:var(--radius2);padding:14px;">
+        <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:0.82rem;color:var(--soft);margin-bottom:8px;">${grp}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:4px;">
+          ${avail.map(fw => `<div class="road-fw-tag" style="cursor:pointer" onclick="toggleFw('${escQ(fw)}')">${fw}</div>`).join('')}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+// ── REQUIRED CHECKS ───────────────────────────────────────
+function getRequiredChecks() {
+  if (state.selectedFws.size === 0) return [];
+  return CHECKS.filter(c => c.fws.some(fw => state.selectedFws.has(fw)));
+}
+function getCheckFwsInScope(c) {
+  return c.fws.filter(fw => state.selectedFws.has(fw));
+}
+
+// ── STEP 2 ────────────────────────────────────────────────
+let tblSort = { col: 'id', dir: 1 };
+let tblCatFilter = 'all', tblSearch = '';
+function renderStep2() {
+  const checks = getRequiredChecks();
+  document.getElementById('checks-meta').textContent =
+    `${checks.length} checks required across ${state.selectedFws.size} frameworks`;
+  document.getElementById('s-total').textContent = checks.length;
+  document.getElementById('s-l1').textContent = checks.filter(c=>c.level==='L1').length;
+  document.getElementById('s-l2').textContent = checks.filter(c=>c.level==='L2').length;
+  document.getElementById('s-fwcount').textContent = state.selectedFws.size;
+  renderCatPills();
+  renderHeatmap(checks);
+  renderChecksTable(checks);
+}
+function renderCatPills() {
+  const checks = getRequiredChecks();
+  const cats = [...new Set(checks.map(c=>c.cat))].sort();
+  const el = document.getElementById('cat-pills');
+  el.innerHTML = cats.map(cat =>
+    `<button class="filter-pill" onclick="setCatFilter('${cat}',this)">${cat}</button>`
+  ).join('');
+}
+function setCatFilter(cat, btn) {
+  tblCatFilter = cat;
+  document.querySelectorAll('#checks-panel .filter-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  filterTable();
+}
+function filterTable() {
+  tblSearch = document.getElementById('tbl-search').value.toLowerCase();
+  let checks = getRequiredChecks();
+  if (tblCatFilter !== 'all') checks = checks.filter(c=>c.cat===tblCatFilter);
+  if (tblSearch) checks = checks.filter(c=>
+    c.name.toLowerCase().includes(tblSearch) || c.id.toLowerCase().includes(tblSearch)
+  );
+  // sort
+  checks.sort((a,b) => {
+    let va = tblSort.col==='id' ? a.id : (tblSort.col==='name'?a.name:a.fws.length);
+    let vb = tblSort.col==='id' ? b.id : (tblSort.col==='name'?b.name:b.fws.length);
+    if (typeof va === 'string') return va.localeCompare(vb)*tblSort.dir;
+    return (va-vb)*tblSort.dir;
+  });
+  renderTbody(checks);
+}
+function sortTable(col) {
+  if (tblSort.col === col) tblSort.dir *= -1; else { tblSort.col=col; tblSort.dir=1; }
+  filterTable();
+}
+function renderChecksTable(checks) {
+  renderTbody(checks);
+}
+function renderTbody(checks) {
+  const tbody = document.getElementById('checks-tbody');
+  tbody.innerHTML = checks.map((c,i) => {
+    const fwsInScope = getCheckFwsInScope(c);
+    return `<tr>
+      <td class="td-id">${c.id}</td>
+      <td class="td-name">${c.name}</td>
+      <td><span class="td-cat">${c.cat}</span></td>
+      <td class="td-level level-${c.level}">${c.level}</td>
+      <td class="td-fwcnt">${fwsInScope.length}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── HEATMAP ───────────────────────────────────────────────
+function renderHeatmap(checks) {
+  const fws = [...state.selectedFws];
+  const el = document.getElementById('heatmap');
+  if (!fws.length || !checks.length) { el.innerHTML=''; return; }
+
+  // Group checks by category
+  const catGroups = {};
+  CATS.forEach(cat => {
+    const catChecks = checks.filter(c=>c.cat===cat);
+    if (catChecks.length) catGroups[cat] = catChecks;
+  });
+  const allCats = Object.keys(catGroups);
+  const nFws = fws.length;
+  const cellSize = Math.max(14, Math.min(24, Math.floor(560/checks.length)));
+  const labelW = 80;
+  const headerH = 72;
+
+  // Build SVG heatmap
+  let totalW = labelW + checks.length*(cellSize+2) + 10;
+  let totalH = headerH + fws.length*(cellSize+2) + 10;
+
+  let cells = '';
+  let xOff = labelW;
+  let catLabels = '';
+  // column headers (check IDs rotated)
+  let colHdr = '';
+  let cx = labelW;
+  checks.forEach((c,ci) => {
+    colHdr += `<text x="${cx+cellSize/2}" y="${headerH-4}" 
+      font-family="DM Mono,monospace" font-size="7" fill="#6e7681"
+      transform="rotate(-60,${cx+cellSize/2},${headerH-4})"
+      text-anchor="start">${c.id}</text>`;
+    cx += cellSize+2;
+  });
+
+  // Row labels + cells
+  let cy = headerH;
+  fws.forEach((fw,fi) => {
+    const shortFw = fw.length > 20 ? fw.substring(0,18)+'…' : fw;
+    cells += `<text x="${labelW-4}" y="${cy+cellSize/2+4}"
+      font-family="DM Mono,monospace" font-size="8" fill="#8b949e"
+      text-anchor="end">${shortFw}</text>`;
+    let cx2 = labelW;
+    checks.forEach((c,ci) => {
+      const covered = c.fws.includes(fw);
+      const col = covered ? 'rgba(57,208,200,0.8)' : 'rgba(55,62,71,0.25)';
+      cells += `<rect x="${cx2}" y="${cy}" width="${cellSize}" height="${cellSize}"
+        rx="2" fill="${col}">
+        <title>${c.id}: ${c.name}\n${fw}: ${covered?'✓ Required':'Not required'}</title>
+      </rect>`;
+      cx2 += cellSize+2;
+    });
+    cy += cellSize+2;
+  });
+
+  el.innerHTML = `<svg width="${totalW}" height="${totalH}" viewBox="0 0 ${totalW} ${totalH}" style="display:block;max-width:100%">
+    ${colHdr}${cells}
+  </svg>`;
+}
+
+// ── STEP 3 ────────────────────────────────────────────────
+let statusSearch='', statusFilter='all';
+function renderStep3() {
+  updateStatusStats();
+  renderStatusTable();
+}
+function updateStatusStats() {
+  const checks = getRequiredChecks();
+  const n = checks.length;
+  const done = checks.filter(c=>state.checkStatus[c.id]==='done').length;
+  const gap  = checks.filter(c=>state.checkStatus[c.id]==='gap').length;
+  const unrev = n - done - gap;
+  const reviewed = done + gap;
+  const pct = n ? Math.round(reviewed/n*100) : 0;
+  document.getElementById('s-done').textContent = done;
+  document.getElementById('s-gap').textContent = gap;
+  document.getElementById('s-unrev').textContent = unrev;
+  document.getElementById('s-compl').textContent = pct+'%';
+  document.getElementById('s-done-pct').textContent = n?Math.round(done/n*100)+'% implemented':'';
+  document.getElementById('s-gap-pct').textContent = n?Math.round(gap/n*100)+'% gap rate':'';
+  document.getElementById('prog-bar').style.width = pct+'%';
+}
+function setStatus(id, status) {
+  state.checkStatus[id] = state.checkStatus[id]===status ? null : status;
+  updateStatusStats();
+  // update row buttons in place
+  const doneBtn = document.getElementById('cb-done-'+id);
+  const gapBtn  = document.getElementById('cb-gap-'+id);
+  if (doneBtn) { doneBtn.classList.toggle('on', state.checkStatus[id]==='done'); }
+  if (gapBtn)  { gapBtn.classList.toggle('on',  state.checkStatus[id]==='gap'); }
+}
+function setStatusFilter(f, btn) {
+  statusFilter = f;
+  document.querySelectorAll('#status-panel .filter-pill').forEach(p=>p.classList.remove('active'));
+  btn.classList.add('active');
+  filterStatusTable();
+}
+function filterStatusTable() {
+  statusSearch = (document.getElementById('tbl-search2').value||'').toLowerCase();
+  let checks = getRequiredChecks();
+  if (statusFilter==='done')  checks = checks.filter(c=>state.checkStatus[c.id]==='done');
+  if (statusFilter==='gap')   checks = checks.filter(c=>state.checkStatus[c.id]==='gap');
+  if (statusFilter==='unrev') checks = checks.filter(c=>!state.checkStatus[c.id]);
+  if (statusSearch) checks = checks.filter(c=>
+    c.name.toLowerCase().includes(statusSearch)||c.id.includes(statusSearch)
+  );
+  renderStatusTbody(checks);
+}
+function renderStatusTable() { filterStatusTable(); }
+function renderStatusTbody(checks) {
+  const tbody = document.getElementById('status-tbody');
+  tbody.innerHTML = checks.map((c,i) => {
+    const fwsInScope = getCheckFwsInScope(c);
+    const st = state.checkStatus[c.id];
+    const rowBg = st==='done' ? 'rgba(63,185,80,0.05)' : st==='gap' ? 'rgba(248,81,73,0.05)' : '';
+    return `<tr style="background:${rowBg}">
+      <td class="td-id">${c.id}</td>
+      <td class="td-name">${c.name}</td>
+      <td><span class="td-cat">${c.cat}</span></td>
+      <td class="td-level level-${c.level}">${c.level}</td>
+      <td>
+        <div style="display:flex;flex-wrap:wrap;gap:2px;max-width:220px;">
+          ${fwsInScope.slice(0,5).map(fw=>`<div class="road-fw-tag">${fw}</div>`).join('')}
+          ${fwsInScope.length>5?`<div class="road-fw-tag">+${fwsInScope.length-5}</div>`:''}
+        </div>
+      </td>
+      <td style="text-align:center">
+        <div class="check-status">
+          <button class="cb-done ${st==='done'?'on':''}" id="cb-done-${c.id}" onclick="setStatus('${c.id}','done')" title="Mark Implemented">✓</button>
+          <button class="cb-gap  ${st==='gap'?'on':''}"  id="cb-gap-${c.id}"  onclick="setStatus('${c.id}','gap')"  title="Mark Gap">✗</button>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+}
+function markAllDone() {
+  getRequiredChecks().forEach(c => { state.checkStatus[c.id] = 'done'; });
+  updateStatusStats(); renderStatusTable();
+}
+
+// ── STEP 4 ────────────────────────────────────────────────
+function renderStep4() {
+  const checks = getRequiredChecks();
+  const n = checks.length;
+  const done  = checks.filter(c=>state.checkStatus[c.id]==='done').length;
+  const gap   = checks.filter(c=>state.checkStatus[c.id]==='gap').length;
+  const unrev = n - done - gap;
+  const score = n ? Math.round(done/n*100) : 0;
+
+  document.getElementById('d-done').textContent = done;
+  document.getElementById('d-gap').textContent  = gap;
+  document.getElementById('d-unrev').textContent = unrev;
+  document.getElementById('d-score').textContent = score+'%';
+  document.getElementById('d-done-bar').style.width = score+'%';
+  document.getElementById('d-gap-bar').style.width  = (n?Math.round(gap/n*100):0)+'%';
+  document.getElementById('dash-meta').textContent =
+    `${state.selectedFws.size} frameworks · ${n} checks · ${done} implemented · ${gap} gaps identified`;
+
+  // Per-framework coverage bars
+  const barsEl = document.getElementById('fw-coverage-bars');
+  const fwBars = [...state.selectedFws].map(fw => {
+    const fwChecks = checks.filter(c=>c.fws.includes(fw));
+    const fwDone   = fwChecks.filter(c=>state.checkStatus[c.id]==='done').length;
+    const fwGap    = fwChecks.filter(c=>state.checkStatus[c.id]==='gap').length;
+    const pct = fwChecks.length ? Math.round(fwDone/fwChecks.length*100) : 0;
+    return { fw, total: fwChecks.length, done: fwDone, gap: fwGap, pct };
+  }).sort((a,b)=>a.pct-b.pct);
+
+  barsEl.innerHTML = fwBars.map(({fw,total,done,gap,pct}) => {
+    const barColor = pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
+    return `<div class="fw-cov-row">
+      <div class="fw-cov-name" title="${fw}">${fw}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${barColor}"></div></div>
+      <div class="fw-cov-pct">${done}/${total}</div>
+    </div>`;
+  }).join('');
+
+  // Roadmap — gap checks only, sorted by fw impact
+  const gapChecks = checks
+    .filter(c=>state.checkStatus[c.id]==='gap'||!state.checkStatus[c.id])
+    .map(c => {
+      const fwsInScope = getCheckFwsInScope(c);
+      return { ...c, impact: fwsInScope.length, isGap: state.checkStatus[c.id]==='gap' };
+    })
+    .filter(c=>c.isGap || !state.checkStatus[c.id])
+    .sort((a,b)=>b.impact-a.impact || (a.level==='L1'?-1:1));
+
+  const critical = gapChecks.filter(c=>c.level==='L1' && c.impact>=4);
+  const high     = gapChecks.filter(c=>c.level==='L1' && c.impact<4 || c.level==='L2' && c.impact>=4);
+  const std      = gapChecks.filter(c=>c.level==='L2' && c.impact<4);
+
+  const maxImpact = gapChecks.length ? gapChecks[0].impact : 1;
+  function roadRows(arr) {
+    if (!arr.length) return '<div style="padding:12px;color:var(--dim);font-size:0.78rem;font-family:'DM Mono',monospace;">None in this category</div>';
+    return arr.slice(0,30).map(c => {
+      const fwsInScope = getCheckFwsInScope(c);
+      const pct = Math.round(c.impact/maxImpact*100);
+      return `<div class="road-check-row">
+        <div class="road-id">${c.id}</div>
+        <div class="road-name">${c.name}</div>
+        <div class="road-fw-tags">
+          ${fwsInScope.slice(0,4).map(fw=>`<div class="road-fw-tag">${fw}</div>`).join('')}
+          ${fwsInScope.length>4?`<div class="road-fw-tag">+${fwsInScope.length-4}</div>`:''}
+        </div>
+        <div class="road-impact">
+          <div class="impact-bar"><div class="impact-fill" style="width:${pct}%"></div></div>
+          ${c.impact}fw
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  document.getElementById('rt-critical-lbl').textContent = `Critical Priority — L1 checks with 4+ framework impact (${critical.length})`;
+  document.getElementById('rt-high-lbl').textContent     = `High Priority — L1 wide-impact + L2 critical (${high.length})`;
+  document.getElementById('rt-std-lbl').textContent      = `Standard Priority — remaining gaps (${std.length})`;
+  document.getElementById('rt-critical-body').innerHTML  = roadRows(critical);
+  document.getElementById('rt-high-body').innerHTML      = roadRows(high);
+  document.getElementById('rt-std-body').innerHTML       = roadRows(std);
+}
+
+function toggleRoadTier(bodyId) {
+  const body = document.getElementById(bodyId);
+  body.style.display = body.style.display==='none' ? 'block' : 'none';
+}
+
+// ── UTILS ─────────────────────────────────────────────────
+function cssId(fw) { return fw.replace(/[^a-zA-Z0-9]/g,'_'); }
+function escQ(s)   { return s.replace(/'/g,"\'").replace(/"/g,'&quot;'); }
+
+// ── TOOLTIP ───────────────────────────────────────────────
+const tt = document.getElementById('tooltip');
+document.addEventListener('mouseover', e => {
+  const el = e.target.closest('[title]');
+  if (!el) return;
+  const txt = el.getAttribute('title');
+  if (!txt) return;
+  tt.textContent = txt;
+  tt.style.opacity = '1';
+});
+document.addEventListener('mousemove', e => {
+  tt.style.left = (e.clientX+12)+'px';
+  tt.style.top  = (e.clientY+12)+'px';
+});
+document.addEventListener('mouseout', e => {
+  if (!e.target.closest('[title]')) tt.style.opacity='0';
+});
+
+init();
+</script>
+</body>
+</html>

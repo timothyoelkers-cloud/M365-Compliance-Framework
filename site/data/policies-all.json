@@ -1,0 +1,4070 @@
+[
+  {
+    "id": "CA01",
+    "type": "conditional-access",
+    "file": "CA01-Block-Legacy-Authentication.json",
+    "displayName": "CA01 | Block Legacy Authentication",
+    "description": "Blocks all legacy authentication protocols including Exchange ActiveSync, SMTP AUTH, POP3, IMAP, and older Office clients that do not support modern authentication. Legacy auth cannot enforce MFA and is the primary vector for password-spray and credential-stuffing attacks.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "5.2.2.3",
+      "6.5.1"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA02",
+    "type": "conditional-access",
+    "file": "CA02-Require-MFA-All-Users.json",
+    "displayName": "CA02 | Require MFA for All Users",
+    "description": "Requires multi-factor authentication for all users across all cloud applications. This is the foundational MFA policy and the single most effective control against identity compromise, blocking over 99.9% of account compromise attacks.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight",
+      "SOC-2"
+    ],
+    "cisChecks": [
+      "1.3.1",
+      "5.2.2.2",
+      "5.3.1"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA03",
+    "type": "conditional-access",
+    "file": "CA03-Require-Phishing-Resistant-MFA-Admins.json",
+    "displayName": "CA03 | Require Phishing-Resistant MFA for Admins",
+    "description": "Requires phishing-resistant MFA (FIDO2 security keys, Windows Hello for Business, or X.509 certificate-based authentication) for all privileged administrator roles. Standard MFA methods like SMS, voice call, or Authenticator app push notifications are insufficient for admin accounts due to real-time phishing (AiTM) attacks and MFA fatigue exploitation.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.3.1",
+      "1.3.2",
+      "5.2.2.2",
+      "5.3.1"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA04",
+    "type": "conditional-access",
+    "file": "CA04-Block-High-Risk-Sign-Ins.json",
+    "displayName": "CA04 | Block High-Risk Sign-Ins",
+    "description": "Blocks sign-in attempts that Microsoft Entra ID Identity Protection classifies as high risk in real time. High-risk detections include sign-ins from anonymous IP addresses, malware-linked IP addresses, impossible travel, token anomalies, and password spray patterns.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.2.2",
+      "5.2.2.5"
+    ],
+    "requiredLicence": "Microsoft Entra ID P2 or Microsoft 365 E5",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA05",
+    "type": "conditional-access",
+    "file": "CA05-Require-Password-Change-High-Risk-Users.json",
+    "displayName": "CA05 | Require Password Change for High-Risk Users",
+    "description": "Requires both MFA verification and a secure password change when Microsoft Entra ID Identity Protection classifies a user account as high risk. High-risk users are those with confirmed compromised credentials detected via dark web intelligence, leaked credential databases, or confirmed malicious sign-in activity patterns.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.2.2",
+      "5.2.2.6"
+    ],
+    "requiredLicence": "Microsoft Entra ID P2 or Microsoft 365 E5",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA06",
+    "type": "conditional-access",
+    "file": "CA06-Require-Compliant-Device.json",
+    "displayName": "CA06 | Require Compliant or Hybrid Azure AD Joined Device",
+    "description": "Requires that the device accessing cloud resources is either marked as Intune-compliant or is Hybrid Azure AD Joined. This prevents access from unmanaged personal devices, kiosks, and attacker-controlled endpoints, ensuring only corporate-managed endpoints that meet compliance policies can access organisational data.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.3.7",
+      "5.1.4.1",
+      "5.2.2.9",
+      "5.2.2.12"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA07",
+    "type": "conditional-access",
+    "file": "CA07-Block-Non-Approved-Countries.json",
+    "displayName": "CA07 | Block Sign-Ins from Non-Approved Countries",
+    "description": "Blocks all sign-in attempts originating from countries not included in the approved Named Location. This is a geo-fencing control that significantly reduces the attack surface by preventing authentication from regions where the organisation has no legitimate users or operations.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.3.9"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA08",
+    "type": "conditional-access",
+    "file": "CA08-Require-MFA-Azure-Management.json",
+    "displayName": "CA08 | Require MFA for Azure Management",
+    "description": "Requires MFA for all access to Microsoft Azure Management, which covers the Azure Portal, Azure CLI, Azure PowerShell, and Azure Resource Manager API. This prevents unauthorised subscription and resource modifications even if credentials are compromised.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.3.2",
+      "1.3.5"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA09",
+    "type": "conditional-access",
+    "file": "CA09-Require-MFA-Windows-Azure-Service-Management.json",
+    "displayName": "CA09 | Require MFA for Windows Azure Service Management API",
+    "description": "Requires MFA for Windows Azure Service Management API access. This complements CA08 by explicitly targeting the Service Management API layer used by Azure classic deployment model operations, REST API calls, and programmatic Azure resource management. Both CA08 and CA09 use the same service principal ID as Microsoft consolidated the Azure Management endpoints.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.3.5"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA10",
+    "type": "conditional-access",
+    "file": "CA10-Require-Managed-Device-MFA-Registration.json",
+    "displayName": "CA10 | Require Managed Device for Security Info Registration",
+    "description": "Requires a managed, Intune-compliant device for users registering or modifying their security information (MFA methods, SSPR, passwordless credentials). This prevents attackers who have compromised a password from registering their own MFA device on an unmanaged endpoint, which is a critical step in account takeover attacks.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.3.6",
+      "5.2.2.10",
+      "5.2.2.11"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA11",
+    "type": "conditional-access",
+    "file": "CA11-Block-Guest-Access-All-Apps.json",
+    "displayName": "CA11 | Block All Guest and External User Access",
+    "description": "Blocks all access for guest and external users including B2B collaboration guests, B2B direct connect users, and other external users from all tenants. This is the most restrictive guest policy and should be used as a baseline when external collaboration is not required or when specific app-level exceptions via CA12 are preferred.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "GDPR"
+    ],
+    "cisChecks": [
+      "5.1.6.2",
+      "5.1.6.3",
+      "5.1.2.3"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA12",
+    "type": "conditional-access",
+    "file": "CA12-Require-MFA-Guest-External-Users.json",
+    "displayName": "CA12 | Require MFA for Guest and External Users",
+    "description": "Requires multi-factor authentication for all guest and external user types when accessing any cloud application. This is the recommended alternative to CA11 when external B2B collaboration is needed but must be secured. Covers B2B collaboration guests, B2B collaboration members, B2B direct connect users, other external users, and service provider users.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "GDPR"
+    ],
+    "cisChecks": [
+      "5.1.6.2",
+      "5.1.6.3"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA13",
+    "type": "conditional-access",
+    "file": "CA13-Enforce-Sign-In-Frequency-1-Hour.json",
+    "displayName": "CA13 | Enforce Sign-In Frequency 1 Hour",
+    "description": "Enforces a 1-hour sign-in frequency for all users across all cloud applications and disables persistent browser sessions. This limits the window of opportunity for session token theft and replay attacks by forcing re-authentication every hour. Persistent browser sessions are set to 'never' to prevent 'keep me signed in' tokens from persisting.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.3.8",
+      "5.2.2.4"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA14",
+    "type": "conditional-access",
+    "file": "CA14-Enforce-Sign-In-Frequency-Admins.json",
+    "displayName": "CA14 | Enforce Sign-In Frequency Every Time for Admins",
+    "description": "Enforces 'every time' sign-in frequency for all privileged administrator roles. This is the most restrictive session control, requiring fresh authentication for every single session. Combined with persistent browser mode 'never', this ensures no admin session tokens persist and every admin action requires fresh, verified authentication.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.3.8",
+      "5.2.2.4"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA15",
+    "type": "conditional-access",
+    "file": "CA15-Require-MFA-Intune-Enrollment.json",
+    "displayName": "CA15 | Require MFA for Device Registration and Enrollment",
+    "description": "Requires MFA for all Intune device enrollment and Azure AD device registration actions, with sign-in frequency set to 'every time' to ensure fresh authentication for each device enrollment. This prevents attackers from registering rogue devices to your tenant using compromised credentials.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "5.2.2.11"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA16",
+    "type": "conditional-access",
+    "file": "CA16-Block-Unregistered-Non-Compliant-Devices.json",
+    "displayName": "CA16 | Block Access from Unregistered or Non-Compliant Devices",
+    "description": "Blocks access from devices that are not registered with Entra ID or are not marked as Intune-compliant. Uses a device filter rule to explicitly identify non-compliant and unregistered devices. This is a more aggressive version of CA06 that uses device filters for granular device state evaluation.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.3.7",
+      "5.1.3.1",
+      "5.2.2.9"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA17",
+    "type": "conditional-access",
+    "file": "CA17-Require-MFA-Medium-Risk-Sign-Ins.json",
+    "displayName": "CA17 | Require MFA for Medium-Risk Sign-Ins",
+    "description": "Requires MFA step-up verification for sign-in attempts classified as medium risk by Microsoft Entra ID Identity Protection. Unlike CA04 which blocks high-risk sign-ins entirely, this policy allows medium-risk sign-ins to proceed after MFA verification, balancing security with usability. Medium-risk detections include atypical travel, anomalous token, and suspicious browser patterns.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "1.3.3",
+      "5.2.2.5"
+    ],
+    "requiredLicence": "Microsoft Entra ID P2 or Microsoft 365 E5",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "CA18",
+    "type": "conditional-access",
+    "file": "CA18-Block-Unsupported-Device-Platforms.json",
+    "displayName": "CA18 | Block Access from Unsupported Device Platforms",
+    "description": "Blocks access from unsupported device platforms by including all platforms and excluding only the approved ones (Android, iOS, Windows, macOS). This effectively blocks Linux, ChromeOS, and any other unrecognised or spoofed platform strings. Ensures only organisationally managed and supported operating systems can access corporate cloud resources.",
+    "frameworks": [
+      "NIST-800-53",
+      "CIS-Microsoft-365",
+      "ISO-27001-2022",
+      "MITRE-ATT&CK",
+      "NIS2",
+      "Essential-Eight"
+    ],
+    "cisChecks": [
+      "5.1.3.1",
+      "5.1.4.3"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2",
+    "importMethod": "",
+    "deployState": "enabledForReportingButNotEnforced",
+    "version": "1.0"
+  },
+  {
+    "id": "DEF01",
+    "type": "defender",
+    "file": "DEF01-Anti-Phishing-Strict.json",
+    "displayName": "Anti-Phishing Policy - Strict",
+    "description": "Deploys a strict anti-phishing policy with aggressive thresholds, mailbox intelligence, spoof intelligence, organization domain protection, and targeted user protection. All impersonation detections are routed to quarantine.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "MITRE ATT&CK T1566",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.1",
+      "2.1.2",
+      "2.1.3",
+      "2.1.4",
+      "2.1.7"
+    ],
+    "requiredLicence": "Microsoft Defender for Office 365 Plan 1 or Plan 2",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "DEF02",
+    "type": "defender",
+    "file": "DEF02-Safe-Links-All-Applications.json",
+    "displayName": "Safe Links - All Applications",
+    "description": "Enables Safe Links URL scanning and detonation for email, Microsoft Teams, and Office desktop/mobile apps. Blocks click-through to malicious URLs, rewrites URLs for tracking, and scans links at time of click.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "MITRE ATT&CK T1566.002",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.5",
+      "2.1.11",
+      "2.4.1",
+      "2.4.3",
+      "2.4.4"
+    ],
+    "requiredLicence": "Microsoft Defender for Office 365 Plan 1 or Plan 2",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "DEF03",
+    "type": "defender",
+    "file": "DEF03-Safe-Attachments-Strict.json",
+    "displayName": "Safe Attachments - Strict (Dynamic Delivery)",
+    "description": "Enables Safe Attachments with Dynamic Delivery mode. Email bodies are delivered immediately while attachments are sandboxed and scanned. Malicious attachments are blocked after detonation. ActionOnError ensures messages are not delivered if scanning fails.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "MITRE ATT&CK T1566.001",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.4",
+      "2.1.12",
+      "2.1.13"
+    ],
+    "requiredLicence": "Microsoft Defender for Office 365 Plan 1 or Plan 2",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "DEF04",
+    "type": "defender",
+    "file": "DEF04-Anti-Malware-Strict.json",
+    "displayName": "Anti-Malware Policy - Strict",
+    "description": "Strict anti-malware policy for Exchange Online. Enables the common attachment types filter to block 70+ dangerous file extensions. Enables ZAP for retroactive malware removal. Sends internal admin notifications for malware detections.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "MITRE ATT&CK T1204",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.1",
+      "2.1.3"
+    ],
+    "requiredLicence": "Exchange Online Protection (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "DEF05",
+    "type": "defender",
+    "file": "DEF05-Anti-Spam-Inbound-Strict.json",
+    "displayName": "Anti-Spam Inbound - Strict",
+    "description": "Strict inbound anti-spam policy. Routes all spam categories (spam, high-confidence spam, bulk, phish, high-confidence phish) to quarantine instead of junk mail folder. Enables ZAP for retroactive removal. Sets bulk complaint level threshold to 5.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.2",
+      "2.1.6"
+    ],
+    "requiredLicence": "Exchange Online Protection (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "DEF06",
+    "type": "defender",
+    "file": "DEF06-Anti-Spam-Outbound-Strict.json",
+    "displayName": "Anti-Spam Outbound - Strict",
+    "description": "Strict outbound spam filtering policy. Limits external recipients to 500/hour and internal to 1000/hour. Blocks users who exceed thresholds (indicates account compromise). Disables automatic external forwarding. Notifies security team of outbound spam detections.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.15",
+      "2.1.2"
+    ],
+    "requiredLicence": "Exchange Online Protection (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "DEF07",
+    "type": "defender",
+    "file": "DEF07-Defender-SharePoint-OneDrive-Teams.json",
+    "displayName": "Defender for SharePoint, OneDrive, and Teams",
+    "description": "Enables Microsoft Defender for Office 365 file scanning for SharePoint Online, OneDrive for Business, and Microsoft Teams. Enables Safe Documents for Office clients. Prevents users from opening files flagged as malicious in Safe Documents.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "MITRE ATT&CK T1080",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.12",
+      "2.1.13"
+    ],
+    "requiredLicence": "Microsoft Defender for Office 365 Plan 1 or Plan 2 (Safe Documents requires E5 or Defender P2)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "DEF08",
+    "type": "defender",
+    "file": "DEF08-Common-Attachment-Filter.json",
+    "displayName": "Common Attachment Types Filter - Default Policy",
+    "description": "Updates the default malware filter policy to enable the common attachment types filter. Blocks 50+ dangerous file extensions at the transport layer. Uses the default policy so all recipients are covered without needing a rule.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "MITRE ATT&CK T1204.002",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "UK NCSC Cyber Essentials v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.1"
+    ],
+    "requiredLicence": "Exchange Online Protection (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "ENT01",
+    "type": "entra",
+    "file": "ENT01-Disable-User-Consent-Third-Party-Apps.json",
+    "displayName": "Disable User Consent to Third-Party Apps",
+    "description": "Disables the ability for users to consent to third-party OAuth applications accessing corporate data. Removes the legacy default user consent policy, requiring admin approval for all application permission grants. Prevents OAuth phishing and illicit consent grant attacks.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "ASD Essential Eight",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "5.1.2.1",
+      "5.1.5.1"
+    ],
+    "requiredLicence": "Microsoft Entra ID Free (included with any M365 plan)",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "ENT02",
+    "type": "entra",
+    "file": "ENT02-Enable-Admin-Consent-Workflow.json",
+    "displayName": "Enable Admin Consent Workflow",
+    "description": "Enables the admin consent request workflow so that users who need access to applications that require organizational permissions can submit a request for admin review. Provides a governed process to complement ENT01 (disabled user consent).",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "ASD Essential Eight",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "5.1.5.2"
+    ],
+    "requiredLicence": "Microsoft Entra ID Free (included with any M365 plan)",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "ENT03",
+    "type": "entra",
+    "file": "ENT03-Block-Third-Party-Application-Integration.json",
+    "displayName": "Block Users from Creating App Registrations",
+    "description": "Disables the ability for non-admin users to register new applications (app registrations) in Entra ID. Prevents shadow IT and unapproved SaaS integrations with corporate M365 data.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "CMMC v2.0",
+      "ASD Essential Eight",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "5.1.2.2"
+    ],
+    "requiredLicence": "Microsoft Entra ID Free (included with any M365 plan)",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "ENT04",
+    "type": "entra",
+    "file": "ENT04-Configure-Custom-Banned-Password-List.json",
+    "displayName": "Configure Custom Banned Password List",
+    "description": "Configures Entra ID Password Protection with a custom banned password list containing organisation-specific terms (company name, product names, common weak passwords). Enforces the banned list for both cloud and on-premises Active Directory password changes.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "ASD Essential Eight",
+      "MITRE ATT&CK",
+      "CJIS v6",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "5.2.3.2",
+      "5.2.3.3"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2 (for custom banned password list)",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "ENT05",
+    "type": "entra",
+    "file": "ENT05-Restrict-User-Device-Registration.json",
+    "displayName": "Restrict User Device Registration",
+    "description": "Restricts Azure AD / Entra ID device registration to a managed group or admins only, preventing users from silently registering personal devices and obtaining device-based Conditional Access tokens. Sets a device quota of 5 per user.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "5.1.3.1"
+    ],
+    "requiredLicence": "Microsoft Entra ID Free (included with any M365 plan)",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "ENT06",
+    "type": "entra",
+    "file": "ENT06-Disable-Guest-Invite-Non-Admins.json",
+    "displayName": "Restrict Guest Invitations to Admins and Guest Inviters",
+    "description": "Restricts the ability to invite external guest users to Entra ID to administrators and users in the Guest Inviter role only. Prevents regular users and existing guests from inviting additional external users without IT oversight.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "5.1.6.2",
+      "5.1.6.3"
+    ],
+    "requiredLicence": "Microsoft Entra ID Free (included with any M365 plan)",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "ENT07",
+    "type": "entra",
+    "file": "ENT07-Configure-SSPR-Two-Methods.json",
+    "displayName": "Configure Self-Service Password Reset with Two Methods Required",
+    "description": "Enables Self-Service Password Reset (SSPR) for all users and requires two authentication methods for password reset. Prevents account takeover via single-method SSPR while reducing helpdesk burden for password resets.",
+    "frameworks": [
+      "DORA",
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "CMMC v2.0",
+      "UK NCSC CAF v3.2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "5.2.4.1"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 or P2 (for SSPR)",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "ENT08",
+    "type": "entra",
+    "file": "ENT08-Disable-LinkedIn-Account-Connection.json",
+    "displayName": "Disable LinkedIn Account Connection",
+    "description": "Disables the LinkedIn account connection feature in Microsoft 365, preventing users from linking their M365 work account with LinkedIn. Mitigates data leakage risk and reduces social engineering exposure by preventing M365 profile data correlation with LinkedIn profiles.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "5.1.2.6"
+    ],
+    "requiredLicence": "Microsoft Entra ID Free (included with any M365 plan)",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "ENT09",
+    "type": "entra",
+    "file": "ENT09-Hide-Stay-Signed-In-Prompt.json",
+    "displayName": "Hide Stay Signed In Prompt (KMSI)",
+    "description": "Disables the 'Stay signed in?' (Keep Me Signed In / KMSI) prompt on the Entra ID sign-in page. Prevents persistent browser sessions on shared or unmanaged devices, reducing the risk of session hijacking. Complements Conditional Access sign-in frequency policies (CA13).",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "CMMC v2.0",
+      "NIST CSF 1.1",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "5.1.2.5"
+    ],
+    "requiredLicence": "Microsoft Entra ID Free (included with any M365 plan)",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "ENT10",
+    "type": "entra",
+    "file": "ENT10-Configure-Authenticator-Number-Matching.json",
+    "displayName": "Configure Microsoft Authenticator Number Matching and Additional Context",
+    "description": "Enables number matching and additional context (application name and geographic location) for Microsoft Authenticator push notifications. Prevents MFA fatigue attacks by requiring users to type the number displayed at the sign-in screen into the Authenticator app, rather than simply approving a push notification.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "CMMC v2.0",
+      "NIST CSF 1.1",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "EU Cyber Resilience Act",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "1.2.1",
+      "5.2.3.4",
+      "5.2.3.5"
+    ],
+    "requiredLicence": "Microsoft Entra ID Free (number matching is available on all plans)",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "EXO01",
+    "type": "exchange",
+    "file": "EXO01-DKIM-Enable-All-Domains.json",
+    "displayName": "DKIM - Enable for All Domains",
+    "description": "Enables DomainKeys Identified Mail (DKIM) signing for all accepted domains in Exchange Online. Creates DKIM signing configurations and enables them. DKIM cryptographically signs outbound email to prove domain authenticity and detect message tampering.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.8",
+      "6.2.2"
+    ],
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "EXO02",
+    "type": "exchange",
+    "file": "EXO02-DMARC-Policy-Enforcement.json",
+    "displayName": "DMARC Policy Enforcement",
+    "description": "Configures Domain-based Message Authentication, Reporting, and Conformance (DMARC) via DNS TXT records. DMARC builds on SPF and DKIM to prevent domain spoofing. Includes a staged rollout plan from monitoring (p=none) through quarantine to full reject enforcement.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "UK NCSC Cyber Essentials v3.2",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.10"
+    ],
+    "requiredLicence": "None (DNS configuration only)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "EXO03",
+    "type": "exchange",
+    "file": "EXO03-Block-External-Auto-Forwarding.json",
+    "displayName": "Block External Auto-Forwarding",
+    "description": "Blocks automatic email forwarding to external domains using both the Remote Domain default setting and a transport rule. This is a critical anti-data-exfiltration control that prevents compromised accounts or malicious insiders from silently forwarding email externally.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK T1114.003"
+    ],
+    "cisChecks": [
+      "2.2.1",
+      "6.5.3"
+    ],
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "EXO04",
+    "type": "exchange",
+    "file": "EXO04-Disable-Basic-Authentication.json",
+    "displayName": "Disable Basic Authentication",
+    "description": "Creates an authentication policy that disables basic authentication for all Exchange Online protocols (POP3, IMAP, SMTP, MAPI, ActiveSync, EWS, Autodiscover, Offline Address Book, RPC, PowerShell) and assigns it as the organization default. Basic auth transmits credentials in clear text and cannot enforce MFA.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK T1078"
+    ],
+    "cisChecks": [
+      "6.5.1",
+      "6.1.2"
+    ],
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "EXO05",
+    "type": "exchange",
+    "file": "EXO05-Enable-Modern-Authentication.json",
+    "displayName": "Enable Modern Authentication (OAuth 2.0)",
+    "description": "Explicitly enables Modern Authentication (OAuth 2.0) for Exchange Online via Set-OrganizationConfig. Modern auth supports MFA, certificate-based auth, conditional access, and token-based authentication. This must be enabled before disabling basic auth (EXO04).",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "6.1.2"
+    ],
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "EXO06",
+    "type": "exchange",
+    "file": "EXO06-Block-Mail-Transport-Whitelist-Rules.json",
+    "displayName": "Block and Audit Mail Transport Whitelist Rules",
+    "description": "Audits and removes transport rules that set SCL to -1 (whitelist), which bypasses all spam filtering for matched senders. These rules are a common attack surface as they allow phishing and malware to bypass all email security scanning for whitelisted domains.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK T1562.001"
+    ],
+    "cisChecks": [
+      "2.1.14",
+      "6.1.3"
+    ],
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "EXO07",
+    "type": "exchange",
+    "file": "EXO07-Disable-Calendar-External-Sharing.json",
+    "displayName": "Disable Calendar External Sharing",
+    "description": "Restricts Exchange Online calendar sharing to prevent detailed availability and appointment data from being shared with external or anonymous users. Limits the default sharing policy to free/busy time only (no subject or location details). Also restricts public folder connections.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "6.2.1"
+    ],
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "EXO08",
+    "type": "exchange",
+    "file": "EXO08-Configure-Connection-Filter-Clear-Safelist.json",
+    "displayName": "Configure Connection Filter - Clear Safe List",
+    "description": "Clears the IP Allow List in the connection filter policy and disables the Safe List. IP allow lists bypass all spam filtering for messages from listed IPs, creating a significant security gap. The Safe List is a Microsoft-maintained list of trusted third-party sources that also bypasses filtering.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "FFIEC-CAT",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "2.1.14",
+      "6.5.4",
+      "6.5.5"
+    ],
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "EXO09",
+    "type": "exchange",
+    "file": "EXO09-Enable-Report-Message-AddIn.json",
+    "displayName": "Enable Report Message Add-In",
+    "description": "Deploys the Microsoft Report Message and Report Phishing add-ins organization-wide for all users. Enables users to report suspicious, phishing, and junk emails directly from Outlook. Reported messages are submitted to Microsoft for analysis and optionally to a security team mailbox.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "6.2.3"
+    ],
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "EXO10",
+    "type": "exchange",
+    "file": "EXO10-Disable-Public-Folders-Email.json",
+    "displayName": "Disable Public Folder Email Addresses",
+    "description": "Disables mail-enabled public folders in Exchange Online. Mail-enabled public folders can receive email from external senders but bypass DLP policies, message trace, and audit logging. This policy removes email addresses from existing mail-enabled public folders and disables mail functionality.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "6.5.2"
+    ],
+    "requiredLicence": "Exchange Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "INT01-Device-Compliance-Windows-Baseline",
+    "type": "intune",
+    "file": "INT01-Device-Compliance-Windows-Baseline.json",
+    "displayName": "INT01 - Windows 10/11 Device Compliance Baseline",
+    "description": "Enforces baseline compliance for Windows 10/11 devices: BitLocker, Secure Boot, TPM 2.0, Defender real-time protection with current definitions, firewall, and minimum OS build 10.0.19045 (22H2). Noncompliant devices marked after 3 days, blocked after 7 days.",
+    "frameworks": [
+      "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
+      "NIST SP 800-171 Rev 2",
+      "NIST SP 800-53 Rev 5 - CM-6, SI-3, SC-28",
+      "ISO 27001:2022 A.8.1",
+      "Essential Eight - Patch Applications, Configure Microsoft Office Macro Settings",
+      "Microsoft Cloud Security Benchmark - DP-4, PV-6"
+    ],
+    "cisChecks": [
+      "1.1.1",
+      "1.1.2",
+      "1.1.3",
+      "2.3.1",
+      "2.3.2",
+      "9.1.1"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT02-Device-Compliance-iOS-Baseline",
+    "type": "intune",
+    "file": "INT02-Device-Compliance-iOS-Baseline.json",
+    "displayName": "INT02 - iOS/iPadOS Device Compliance Baseline",
+    "description": "Enforces baseline compliance for iOS/iPadOS devices: minimum OS 16.0, no jailbreak, passcode required (min 6 characters, alphanumeric), 5-minute inactivity lock, and device encryption.",
+    "frameworks": [
+      "CIS Apple iOS/iPadOS Benchmark v1.0",
+      "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28",
+      "ISO 27001:2022 A.8.1",
+      "Essential Eight - Patch Operating Systems",
+      "Microsoft Cloud Security Benchmark - DP-4"
+    ],
+    "cisChecks": [
+      "2.1.1",
+      "2.1.2",
+      "2.1.3",
+      "2.2.1",
+      "3.1.1"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT03-Device-Compliance-Android-Baseline",
+    "type": "intune",
+    "file": "INT03-Device-Compliance-Android-Baseline.json",
+    "displayName": "INT03 - Android Enterprise Device Compliance Baseline",
+    "description": "Enforces baseline compliance for Android Enterprise work profile devices: minimum OS 13.0, no root, numeric complex password (min 6), storage encryption, Google Play Services required, SafetyNet basic attestation.",
+    "frameworks": [
+      "CIS Google Android Benchmark v1.3",
+      "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28",
+      "ISO 27001:2022 A.8.1",
+      "Essential Eight - Patch Operating Systems",
+      "Microsoft Cloud Security Benchmark - DP-4"
+    ],
+    "cisChecks": [
+      "1.1",
+      "1.2",
+      "1.3",
+      "1.4",
+      "2.1",
+      "2.2"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT04-Device-Compliance-macOS-Baseline",
+    "type": "intune",
+    "file": "INT04-Device-Compliance-macOS-Baseline.json",
+    "displayName": "INT04 - macOS Device Compliance Baseline",
+    "description": "Enforces baseline compliance for macOS devices: minimum OS 14.0, FileVault encryption required, Gatekeeper enabled, System Integrity Protection enabled, passcode required (min 6), firewall enabled.",
+    "frameworks": [
+      "CIS Apple macOS Benchmark v3.0",
+      "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28, SI-7",
+      "ISO 27001:2022 A.8.1",
+      "Essential Eight - Patch Operating Systems",
+      "Microsoft Cloud Security Benchmark - DP-4, ES-1"
+    ],
+    "cisChecks": [
+      "2.5.1.1",
+      "2.6.1.1",
+      "2.6.1.2",
+      "2.6.4",
+      "5.2.1",
+      "5.2.3"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT05-BitLocker-Encryption-Policy",
+    "type": "intune",
+    "file": "INT05-BitLocker-Encryption-Policy.json",
+    "displayName": "INT05 - BitLocker Drive Encryption Policy",
+    "description": "Enforces BitLocker encryption on OS drives (TPM+PIN, XTS-AES 256-bit) and fixed data drives. Recovery keys stored in Azure AD. Compatible TPM startup configuration.",
+    "frameworks": [
+      "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
+      "NIST SP 800-53 Rev 5 - SC-28(1)",
+      "NIST SP 800-171 Rev 2 - 3.13.11",
+      "ISO 27001:2022 A.8.24",
+      "PCI DSS v4.0 - Req 3.4",
+      "Essential Eight - Restrict Administrative Privileges",
+      "HIPAA - 164.312(a)(2)(iv)"
+    ],
+    "cisChecks": [
+      "1.1.1",
+      "1.1.2",
+      "1.1.3",
+      "1.1.4"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT06-Windows-LAPS-Local-Admin-Password",
+    "type": "intune",
+    "file": "INT06-Windows-LAPS-Local-Admin-Password.json",
+    "displayName": "INT06 - Windows LAPS Local Admin Password Solution",
+    "description": "Configures Windows LAPS to automatically rotate local administrator passwords. Passwords backed up to Azure AD, rotated every 30 days, 14-character complexity with upper, lower, numbers, and special characters.",
+    "frameworks": [
+      "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
+      "NIST SP 800-53 Rev 5 - AC-2, IA-5",
+      "NIST SP 800-171 Rev 2 - 3.5.7, 3.5.8",
+      "ISO 27001:2022 A.5.17",
+      "Essential Eight - Restrict Administrative Privileges",
+      "MITRE ATT&CK - T1078.003 (Local Accounts)"
+    ],
+    "cisChecks": [
+      "1.1.5",
+      "1.1.6",
+      "1.1.7"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT07-Defender-AV-Configuration-Windows",
+    "type": "intune",
+    "file": "INT07-Defender-AV-Configuration-Windows.json",
+    "displayName": "INT07 - Microsoft Defender Antivirus Configuration",
+    "description": "Configures Defender AV via Intune: real-time protection, cloud-delivered protection (high level), automatic sample submission (safe), PUA protection, scan downloads, network files, and archives.",
+    "frameworks": [
+      "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
+      "NIST SP 800-53 Rev 5 - SI-3, SI-4",
+      "NIST SP 800-171 Rev 2 - 3.14.1, 3.14.2",
+      "ISO 27001:2022 A.8.7",
+      "Essential Eight - Application Control, Configure Microsoft Office Macro Settings",
+      "Microsoft Cloud Security Benchmark - ES-1, ES-2"
+    ],
+    "cisChecks": [
+      "2.3.1",
+      "2.3.2",
+      "2.3.3",
+      "2.3.4",
+      "2.3.5"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT08-Windows-Update-Ring-Policy",
+    "type": "intune",
+    "file": "INT08-Windows-Update-Ring-Policy.json",
+    "displayName": "INT08 - Windows Update for Business Ring Policy",
+    "description": "Windows Update ring: quality update deferral 7 days, feature update deferral 30 days, auto-install at maintenance time, active hours 8:00-17:00, deadline compliance enabled.",
+    "frameworks": [
+      "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
+      "NIST SP 800-53 Rev 5 - SI-2, CM-3",
+      "NIST SP 800-171 Rev 2 - 3.14.1",
+      "ISO 27001:2022 A.8.8",
+      "Essential Eight - Patch Operating Systems (Maturity Level 2)",
+      "Microsoft Cloud Security Benchmark - PV-6, PV-7"
+    ],
+    "cisChecks": [
+      "18.9.102.1",
+      "18.9.102.2",
+      "18.9.102.3",
+      "18.9.102.4"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT09-App-Protection-Policy-iOS-Android",
+    "type": "intune",
+    "file": "INT09-App-Protection-Policy-iOS-Android.json",
+    "displayName": "INT09 - App Protection Policy (MAM) - iOS/Android",
+    "description": "Mobile Application Management policy: prevents cut/copy/paste to unmanaged apps, blocks save to personal storage, requires 6-digit numeric PIN, blocks screenshots, enforces minimum OS, wipes after 90 days offline.",
+    "frameworks": [
+      "CIS Microsoft 365 Foundations Benchmark v3.1",
+      "NIST SP 800-53 Rev 5 - AC-19, MP-7, SC-28",
+      "NIST SP 800-171 Rev 2 - 3.1.18, 3.1.19",
+      "ISO 27001:2022 A.8.10",
+      "Essential Eight - Restrict Administrative Privileges",
+      "HIPAA - 164.312(d)"
+    ],
+    "cisChecks": [
+      "2.6.1",
+      "2.6.2",
+      "2.6.3",
+      "2.6.4"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT10-Device-Enrollment-Restrictions",
+    "type": "intune",
+    "file": "INT10-Device-Enrollment-Restrictions.json",
+    "displayName": "INT10 - Device Enrollment Restrictions - Corporate Only",
+    "description": "Restricts Intune enrollment to corporate-owned devices only. Blocks personal enrollment, blocks Linux platform, limits per-user device count to 5.",
+    "frameworks": [
+      "CIS Microsoft 365 Foundations Benchmark v3.1",
+      "NIST SP 800-53 Rev 5 - AC-19, CM-8",
+      "ISO 27001:2022 A.8.1",
+      "Essential Eight - Restrict Administrative Privileges",
+      "Microsoft Cloud Security Benchmark - AM-1, AM-2"
+    ],
+    "cisChecks": [
+      "5.1.3.1",
+      "5.1.4.1",
+      "5.1.4.3"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT11-Windows-Security-Baseline-CIS",
+    "type": "intune",
+    "file": "INT11-Windows-Security-Baseline-CIS.json",
+    "displayName": "INT11 - Windows Security Baseline (CIS-Aligned)",
+    "description": "Windows security baseline aligned with CIS benchmarks: SMB signing required, NTLM restricted, LM hash storage disabled, audit logon events, credential caching limited to 1, screen lock after 15 minutes inactivity.",
+    "frameworks": [
+      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0 - Level 1",
+      "NIST SP 800-53 Rev 5 - AC-3, AU-2, AU-3, IA-2, SC-8",
+      "NIST SP 800-171 Rev 2 - 3.1.1, 3.3.1, 3.5.1",
+      "ISO 27001:2022 A.8.3, A.8.15",
+      "Essential Eight - Restrict Administrative Privileges",
+      "MITRE ATT&CK - T1557 (Man-in-the-Middle), T1003 (OS Credential Dumping)"
+    ],
+    "cisChecks": [
+      "2.3.8.1",
+      "2.3.8.2",
+      "2.3.11.7",
+      "2.3.11.5",
+      "9.1.8",
+      "2.3.7.4",
+      "2.3.7.3"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT12-Microsoft-Edge-Security-Baseline",
+    "type": "intune",
+    "file": "INT12-Microsoft-Edge-Security-Baseline.json",
+    "displayName": "INT12 - Microsoft Edge Security Baseline",
+    "description": "Edge browser security settings: SmartScreen enabled, strict tracking prevention, password manager and monitor enabled, block potentially unwanted apps, block malicious downloads.",
+    "frameworks": [
+      "CIS Microsoft Edge Benchmark v2.0",
+      "NIST SP 800-53 Rev 5 - SC-18, SI-3, SI-8",
+      "ISO 27001:2022 A.8.23",
+      "Essential Eight - Application Control",
+      "Microsoft Cloud Security Benchmark - NS-8"
+    ],
+    "cisChecks": [
+      "1.1",
+      "1.2",
+      "1.3",
+      "1.4",
+      "1.5",
+      "1.6"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT13-Windows-Hello-For-Business",
+    "type": "intune",
+    "file": "INT13-Windows-Hello-For-Business.json",
+    "displayName": "INT13 - Windows Hello for Business Configuration",
+    "description": "Enables Windows Hello for Business for all users: PIN required (min 6, max 127 digits), biometric allowed, TPM required, PIN recovery enabled. Phishing-resistant passwordless authentication.",
+    "frameworks": [
+      "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
+      "NIST SP 800-53 Rev 5 - IA-2, IA-5, IA-12",
+      "NIST SP 800-63B - AAL2",
+      "NIST SP 800-171 Rev 2 - 3.5.3",
+      "ISO 27001:2022 A.8.5",
+      "Essential Eight - Multi-Factor Authentication",
+      "MITRE ATT&CK - T1110 (Brute Force), T1078 (Valid Accounts)"
+    ],
+    "cisChecks": [
+      "5.2.2.2",
+      "5.3.1",
+      "5.3.2",
+      "5.3.3"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT14-Firewall-Policy-Windows",
+    "type": "intune",
+    "file": "INT14-Firewall-Policy-Windows.json",
+    "displayName": "INT14 - Windows Firewall Policy (All Profiles)",
+    "description": "Enforces Windows Firewall on all profiles (Domain, Private, Public): block inbound on public, allow outbound, enable logging of dropped packets.",
+    "frameworks": [
+      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
+      "NIST SP 800-53 Rev 5 - SC-7, AU-3",
+      "NIST SP 800-171 Rev 2 - 3.13.1, 3.13.6",
+      "ISO 27001:2022 A.8.20, A.8.21",
+      "Essential Eight - Patch Operating Systems",
+      "Microsoft Cloud Security Benchmark - NS-1, NS-4"
+    ],
+    "cisChecks": [
+      "9.1.1",
+      "9.2.1",
+      "9.3.1",
+      "9.3.2",
+      "9.1.5",
+      "9.2.5",
+      "9.3.5"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT15-Attack-Surface-Reduction-Rules",
+    "type": "intune",
+    "file": "INT15-Attack-Surface-Reduction-Rules.json",
+    "displayName": "INT15 - Attack Surface Reduction Rules (All 16 in Block Mode)",
+    "description": "Deploys all 16 ASR rules in Block mode via OMA-URI. Blocks Office macro abuse, credential theft from LSASS, untrusted USB processes, executable email content, obfuscated scripts, and more.",
+    "frameworks": [
+      "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
+      "NIST SP 800-53 Rev 5 - SI-3, SI-4, SI-7",
+      "NIST SP 800-171 Rev 2 - 3.14.2, 3.14.6",
+      "ISO 27001:2022 A.8.7, A.8.8",
+      "Essential Eight - Application Control (Maturity Level 2)",
+      "Essential Eight - Configure Microsoft Office Macro Settings (Maturity Level 2)",
+      "MITRE ATT&CK - T1059 (Command and Scripting Interpreter), T1566 (Phishing), T1003 (OS Credential Dumping), T1091 (Replication Through Removable Media)"
+    ],
+    "cisChecks": [
+      "18.9.47.5.1.1",
+      "18.9.47.5.1.2",
+      "18.9.47.5.1.3"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT16-Credential-Guard-Windows",
+    "type": "intune",
+    "file": "INT16-Credential-Guard-Windows.json",
+    "displayName": "INT16 - Windows Credential Guard and Device Guard",
+    "description": "Enables Credential Guard with UEFI lock to protect domain credentials via virtualisation-based security (VBS). Enables Device Guard for code integrity. Mitigates pass-the-hash and pass-the-ticket attacks.",
+    "frameworks": [
+      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
+      "NIST SP 800-53 Rev 5 - AC-25, SC-39",
+      "NIST SP 800-171 Rev 2 - 3.13.4",
+      "ISO 27001:2022 A.8.6",
+      "Essential Eight - Restrict Administrative Privileges",
+      "MITRE ATT&CK - T1003.001 (LSASS Memory), T1550 (Use Alternate Authentication Material)"
+    ],
+    "cisChecks": [
+      "18.8.5.1",
+      "18.8.5.2",
+      "18.8.5.3"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT17-Removable-Storage-Control",
+    "type": "intune",
+    "file": "INT17-Removable-Storage-Control.json",
+    "displayName": "INT17 - Removable Storage Device Control Policy",
+    "description": "Blocks USB removable storage read and write access. Allows specific approved USB vendor IDs via exception list. Prevents data exfiltration via removable media.",
+    "frameworks": [
+      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
+      "NIST SP 800-53 Rev 5 - MP-7, SC-41",
+      "NIST SP 800-171 Rev 2 - 3.8.7",
+      "ISO 27001:2022 A.7.10, A.8.12",
+      "Essential Eight - Restrict Administrative Privileges",
+      "PCI DSS v4.0 - Req 12.3.10",
+      "MITRE ATT&CK - T1052 (Exfiltration Over Physical Medium), T1091 (Replication Through Removable Media)"
+    ],
+    "cisChecks": [
+      "18.8.37.1",
+      "18.8.37.2"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT18-Windows-Diagnostic-Data-Limit",
+    "type": "intune",
+    "file": "INT18-Windows-Diagnostic-Data-Limit.json",
+    "displayName": "INT18 - Windows Diagnostic Data - Required/Security Level",
+    "description": "Restricts Windows diagnostic data collection to the Required (Security) level. Disables optional telemetry. Supports GDPR and data minimisation compliance.",
+    "frameworks": [
+      "GDPR (EU) 2016/679 - Article 5(1)(c) Data Minimisation",
+      "NIST SP 800-53 Rev 5 - SI-12",
+      "ISO 27001:2022 A.5.33, A.8.11",
+      "ISO 27701:2019 - 7.4.1",
+      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
+      "BSI IT-Grundschutz - APP.1.1.A18"
+    ],
+    "cisChecks": [
+      "18.9.17.1",
+      "18.9.17.2",
+      "18.9.17.3"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT19-Exploit-Protection-Policy",
+    "type": "intune",
+    "file": "INT19-Exploit-Protection-Policy.json",
+    "displayName": "INT19 - Windows Exploit Protection (System-Wide Mitigations)",
+    "description": "Enables system-wide exploit mitigations: DEP always on, SEHOP enabled, mandatory ASLR, Control Flow Guard (CFG) enabled. Hardens all processes against memory exploitation techniques.",
+    "frameworks": [
+      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
+      "NIST SP 800-53 Rev 5 - SI-16, SC-39",
+      "NIST SP 800-171 Rev 2 - 3.14.2",
+      "ISO 27001:2022 A.8.6",
+      "Essential Eight - Application Control",
+      "MITRE ATT&CK - T1203 (Exploitation for Client Execution), T1068 (Exploitation for Privilege Escalation)"
+    ],
+    "cisChecks": [
+      "18.9.47.1",
+      "18.9.47.2",
+      "18.9.47.3",
+      "18.9.47.4"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "INT20-Controlled-Folder-Access",
+    "type": "intune",
+    "file": "INT20-Controlled-Folder-Access.json",
+    "displayName": "INT20 - Controlled Folder Access (Ransomware Protection)",
+    "description": "Enables Controlled Folder Access in Block mode to protect Documents, Desktop, Pictures, and Videos folders from unauthorised modifications. Provides ransomware protection by blocking untrusted app access to protected folders.",
+    "frameworks": [
+      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
+      "NIST SP 800-53 Rev 5 - SI-3, SI-4, SC-7",
+      "NIST SP 800-171 Rev 2 - 3.14.2",
+      "ISO 27001:2022 A.8.7",
+      "Essential Eight - Application Control",
+      "MITRE ATT&CK - T1486 (Data Encrypted for Impact), T1490 (Inhibit System Recovery)"
+    ],
+    "cisChecks": [
+      "18.9.47.5.3.1",
+      "18.9.47.5.3.2",
+      "18.9.47.5.3.3"
+    ],
+    "requiredLicence": "",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0.0"
+  },
+  {
+    "id": "MDE01",
+    "type": "defender-endpoint",
+    "file": "MDE01-Onboard-Windows-Devices.json",
+    "displayName": "Onboard Windows Devices to Defender for Endpoint",
+    "description": "Intune EDR onboarding configuration that enables automatic onboarding of Windows devices to Microsoft Defender for Endpoint via the Intune connector. Configures sample sharing and telemetry reporting frequency.",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "CJIS v6",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P1 or P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "MDE02",
+    "type": "defender-endpoint",
+    "file": "MDE02-Onboard-macOS-Devices.json",
+    "displayName": "Onboard macOS Devices to Defender for Endpoint",
+    "description": "Intune configuration profile for deploying Microsoft Defender for Endpoint on macOS. Enables real-time protection, cloud-delivered protection, automatic sample submission, and ensures active (non-passive) mode.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "DORA",
+      "CMMC v2.0",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P1 or P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "MDE03",
+    "type": "defender-endpoint",
+    "file": "MDE03-Onboard-iOS-Android-Devices.json",
+    "displayName": "Onboard iOS and Android Devices to Defender for Endpoint",
+    "description": "Intune App Configuration policy for Microsoft Defender for Endpoint on iOS and Android. Enables web protection, VPN-based network protection, anti-phishing, and jailbreak/root detection for mobile devices.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "DORA",
+      "CMMC v2.0",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2",
+      "5.1.4.3"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P1 or P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "MDE04",
+    "type": "defender-endpoint",
+    "file": "MDE04-EDR-Block-Mode-Enable.json",
+    "displayName": "Enable EDR in Block Mode",
+    "description": "Enables EDR in Block Mode so that Microsoft Defender for Endpoint can block malicious artefacts even when a third-party antivirus is the primary protection engine. This provides a post-breach behavioural blocking layer on top of the existing AV.",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "PCI DSS v4.0",
+      "HIPAA"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "MDE05",
+    "type": "defender-endpoint",
+    "file": "MDE05-Automated-Investigation-Remediation.json",
+    "displayName": "Automated Investigation and Remediation (AIR)",
+    "description": "Configures Automated Investigation and Remediation to Full Automation level. MDE will automatically investigate alerts and remediate confirmed threats without requiring analyst approval, reducing mean-time-to-respond (MTTR).",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "ISO 22301:2019",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CJIS v6",
+      "TSA Security Directive"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "MDE06",
+    "type": "defender-endpoint",
+    "file": "MDE06-Vulnerability-Management-Enable.json",
+    "displayName": "Enable Defender Vulnerability Management",
+    "description": "Enables Microsoft Defender Vulnerability Management (TVM) for continuous vulnerability assessment, software inventory, security recommendations, and risk-based prioritisation across all onboarded endpoints.",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "MDE07",
+    "type": "defender-endpoint",
+    "file": "MDE07-Network-Protection-Block.json",
+    "displayName": "Network Protection in Block Mode",
+    "description": "Enables Network Protection in Block mode to prevent outbound connections to known malicious or dangerous domains and IP addresses. Uses SmartScreen intelligence at the network stack level, applying to all processes, not just browsers.",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P1 or P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "MDE08",
+    "type": "defender-endpoint",
+    "file": "MDE08-Web-Content-Filtering.json",
+    "displayName": "Web Content Filtering",
+    "description": "Configures MDE Web Content Filtering to block access to web categories including Adult content, Gambling, Hacking tools, Malware hosting, Phishing, and Violence. Uses SmartScreen at the OS level so no proxy or agent is required.",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CMMC v2.0",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P1 or P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "MDE09",
+    "type": "defender-endpoint",
+    "file": "MDE09-Tamper-Protection-Enable.json",
+    "displayName": "Enable Tamper Protection",
+    "description": "Enables Tamper Protection to prevent users, local admins, and malware from disabling Microsoft Defender Antivirus, real-time protection, cloud-delivered protection, and other security settings. Managed centrally via Intune and cannot be overridden locally.",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P1 or P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "MDE10",
+    "type": "defender-endpoint",
+    "file": "MDE10-MDE-Alert-Notification-Rules.json",
+    "displayName": "MDE Alert Notification Rules",
+    "description": "Configures email alert notification rules to ensure the security operations team is notified immediately when High and Medium severity alerts are generated in Microsoft Defender for Endpoint.",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "ISO 22301:2019",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "CJIS v6",
+      "TSA Security Directive",
+      "CIRCIA (US)",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P1 or P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "MDE11",
+    "type": "defender-endpoint",
+    "file": "MDE11-Deception-Technology-Enable.json",
+    "displayName": "Enable MDE Deception Technology",
+    "description": "Enables Microsoft Defender for Endpoint deception capabilities including honeytoken accounts, decoy files, and lure components. Detects adversary lateral movement and credential theft with high-fidelity alerts.",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "CJIS v6",
+      "TSA Security Directive",
+      "CIRCIA (US)",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "MDE12",
+    "type": "defender-endpoint",
+    "file": "MDE12-Threat-Intelligence-Integration.json",
+    "displayName": "Threat Intelligence Integration - Custom Indicators",
+    "description": "Configures custom Indicators of Compromise (IoCs) in Microsoft Defender for Endpoint to block, alert, or allow specific file hashes, IP addresses, URLs, and certificates. Provides a template for custom threat intelligence integration via the MDE tiIndicators API.",
+    "frameworks": [
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "NIST CSF 2.0",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "CJIS v6",
+      "TSA Security Directive",
+      "CIRCIA (US)",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "5.1.4.1",
+      "5.1.4.2"
+    ],
+    "requiredLicence": "Microsoft Defender for Endpoint P2",
+    "importMethod": "powershell-graph",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV01",
+    "type": "purview",
+    "file": "PV01-DLP-Block-Credit-Card-External.json",
+    "displayName": "DLP - Block Credit Card Numbers Shared Externally",
+    "description": "Data Loss Prevention policy that detects and blocks credit card numbers (Visa, Mastercard, Amex, Discover, and other major card types) from being shared with external recipients across Exchange, SharePoint, OneDrive, and Teams.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "ISO 27701:2019",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "DORA",
+      "HIPAA",
+      "CMMC v2.0",
+      "NYDFS 23 NYCRR 500",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK"
+    ],
+    "cisChecks": [
+      "9.1.1",
+      "9.1.2",
+      "9.1.3",
+      "9.1.5"
+    ],
+    "requiredLicence": "Microsoft 365 E3 (basic DLP)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV02",
+    "type": "purview",
+    "file": "PV02-DLP-Block-PII-UK-EU-External.json",
+    "displayName": "DLP - Block UK/EU PII Shared Externally",
+    "description": "Data Loss Prevention policy that detects and blocks UK and EU personally identifiable information from being shared with external recipients. Covers UK NI Number, NHS Number, UK Passport, UK Driving Licence, EU National ID, EU Passport, EU SSN, and EU Tax ID.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "ISO 27701:2019",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "UK NCSC CAF v3.2",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ENS (Spain) RD311/22",
+      "DORA",
+      "HIPAA",
+      "EU Cyber Resilience Act",
+      "CMMC v2.0",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500"
+    ],
+    "cisChecks": [
+      "9.1.1",
+      "9.1.2",
+      "9.1.3",
+      "9.1.5"
+    ],
+    "requiredLicence": "Microsoft 365 E3 (basic DLP)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV03",
+    "type": "purview",
+    "file": "PV03-DLP-Block-PHI-HIPAA.json",
+    "displayName": "DLP - Block Protected Health Information (HIPAA)",
+    "description": "Data Loss Prevention policy based on the HIPAA U.S. template that detects and blocks Protected Health Information (PHI) including SSNs, DEA numbers, ICD-9/10 codes, health insurance information, and Medicare beneficiary identifiers from external sharing. Includes a business justification override for low-volume matches.",
+    "frameworks": [
+      "HIPAA",
+      "HITRUST CSF v11",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "NYDFS 23 NYCRR 500",
+      "CRI Profile v2.0",
+      "HPH CPGs",
+      "CJIS v6",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "9.1.1",
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV04",
+    "type": "purview",
+    "file": "PV04-DLP-Block-Financial-Data-PCI.json",
+    "displayName": "DLP - Block Financial Data (PCI DSS)",
+    "description": "Data Loss Prevention policy that detects and blocks financial account data including credit card numbers, bank account numbers (US, UK, EU), IBAN, SWIFT/BIC codes, and routing numbers from being shared externally. Satisfies PCI DSS Requirement 3 and 4.",
+    "frameworks": [
+      "PCI DSS v4.0",
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "NERC-CIP",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E3 (basic DLP)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV05",
+    "type": "purview",
+    "file": "PV05-DLP-Insider-Risk-Bulk-Download-Detection.json",
+    "displayName": "DLP - Insider Risk Bulk Download Detection",
+    "description": "DLP policy that detects unusual bulk file download and access activity exceeding 50 files, indicative of insider data theft or exfiltration. Integrates with Purview Insider Risk Management for correlated risk scoring.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "PCI DSS v4.0",
+      "NYDFS 23 NYCRR 500",
+      "CMMC v2.0",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "9.1.4"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV06",
+    "type": "purview",
+    "file": "PV06-DLP-Block-Source-Code-Credentials-External.json",
+    "displayName": "DLP - Block Source Code and Credentials External Sharing",
+    "description": "Data Loss Prevention policy that detects and blocks source code credentials, API keys, cloud storage keys, GitHub tokens, private keys, and connection strings from being shared externally. Uses built-in SITs and custom regex patterns.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "NYDFS 23 NYCRR 500",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "SEC Cyber Rule",
+      "EU Cyber Resilience Act"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV07",
+    "type": "purview",
+    "file": "PV07-DLP-Block-Password-Credential-Sharing.json",
+    "displayName": "DLP - Block Password and Credential Sharing",
+    "description": "Data Loss Prevention policy using custom Sensitive Information Types and keyword lists to detect and block the sharing of passwords, API keys, bearer tokens, and secret keys in emails, documents, and chat messages across all M365 workloads.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "DORA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "PCI DSS v4.0",
+      "NYDFS 23 NYCRR 500",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance (for custom SITs)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV08",
+    "type": "purview",
+    "file": "PV08-DLP-GDPR-Special-Category-Data.json",
+    "displayName": "DLP - GDPR Article 9 Special Category Data",
+    "description": "Data Loss Prevention policy for GDPR Article 9 special category data including health data, racial/ethnic origin, political opinions, religious beliefs, trade union membership, biometric data, and genetic data. Blocks external sharing and requires business justification for internal sharing overrides.",
+    "frameworks": [
+      "GDPR (EU) 2016/679",
+      "NIS2",
+      "ISO 27001:2022",
+      "ISO 27701:2019",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "DORA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "BSI IT-Grundschutz",
+      "ENS (Spain) RD311/22",
+      "HIPAA",
+      "EU Cyber Resilience Act",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV09",
+    "type": "purview",
+    "file": "PV09-DLP-Teams-Block-Sensitive-External.json",
+    "displayName": "DLP - Teams Block Sensitive Data to External Participants",
+    "description": "DLP policy scoped exclusively to Microsoft Teams that detects and blocks credit card numbers, Social Security numbers, UK National Insurance numbers, and passport numbers from being shared in Teams chat and channel messages with external participants.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "4.2",
+      "9.1.5"
+    ],
+    "requiredLicence": "Microsoft 365 E3 (basic DLP for Teams)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV10",
+    "type": "purview",
+    "file": "PV10-Sensitivity-Labels-Deploy-All-Workloads.json",
+    "displayName": "Sensitivity Labels - Deploy Across All Workloads",
+    "description": "Deploys a four-tier sensitivity label taxonomy (Public, Internal, Confidential, Highly Confidential) with encryption for Confidential and above, watermarking for Highly Confidential, and auto-labelling rules for known sensitive content patterns.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "ISO 27701:2019",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "ASD Essential Eight",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6"
+    ],
+    "cisChecks": [
+      "9.1.7",
+      "9.1.10",
+      "9.1.11"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV11",
+    "type": "purview",
+    "file": "PV11-Audit-Log-Retention-1-Year.json",
+    "displayName": "Unified Audit Log Retention - 1 Year",
+    "description": "Configures Microsoft Purview unified audit log retention to 12 months (TwelveMonths) for all record types and all users, extending beyond the default 180-day retention. Required for regulatory compliance and incident investigation timelines.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "ASD Essential Eight",
+      "NZ ISM v3.8",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "TSA Security Directive",
+      "CIRCIA (US)",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "9.1.1",
+      "9.1.9"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance (for 1-year retention)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV12",
+    "type": "purview",
+    "file": "PV12-Insider-Risk-Management-Policy.json",
+    "displayName": "Insider Risk Management Policy",
+    "description": "Configures Microsoft Purview Insider Risk Management policies for detecting departing employee data theft, general data leaks, and security policy violations. Uses HR connector signals, DLP policy matches, and behavioural indicators to identify insider threats.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "HITRUST CSF v11",
+      "CMMC v2.0",
+      "NERC-CIP",
+      "NYDFS 23 NYCRR 500",
+      "ASD Essential Eight",
+      "MITRE ATT&CK",
+      "Microsoft Cloud Security Benchmark",
+      "CJIS v6",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "9.1.4"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO01",
+    "type": "sharepoint",
+    "file": "SPO01-Restrict-External-Sharing-Existing-Guests.json",
+    "displayName": "Restrict External Sharing - Existing Guests Only",
+    "description": "Restricts SharePoint Online and OneDrive for Business external sharing to existing authenticated guest users only. No anonymous links permitted, no new external invitations. Only users already in the directory as guest accounts can access shared content.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.3",
+      "7.2.5",
+      "7.2.7",
+      "7.3.2"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "SPO02",
+    "type": "sharepoint",
+    "file": "SPO02-Set-Default-Sharing-Link-Internal.json",
+    "displayName": "Set Default Sharing Link - Internal Only",
+    "description": "Changes the default sharing link type from 'Anyone with the link' to 'People in your organization'. Sets the default permission to View-only. Users can still choose other link types, but the default prevents accidental oversharing.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.4"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "SPO03",
+    "type": "sharepoint",
+    "file": "SPO03-Enable-Anonymous-Link-Expiry-30-Days.json",
+    "displayName": "Enable Anonymous Link Expiry - 30 Days",
+    "description": "Sets anonymous (Anyone) sharing links to automatically expire after 30 days. Prevents indefinite anonymous access to shared files and folders. If anonymous sharing is permitted, this ensures temporary shares do not persist forever.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.6"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "SPO04",
+    "type": "sharepoint",
+    "file": "SPO04-Block-Download-Unmanaged-Devices.json",
+    "displayName": "Block Download on Unmanaged Devices",
+    "description": "Configures SharePoint Online to allow limited (browser-only, view-only) access from unmanaged devices while blocking downloads, print, and sync. Prevents corporate data from being saved to personal or unmanaged devices. Full enforcement requires a complementary Conditional Access policy.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.2",
+      "7.2.10"
+    ],
+    "requiredLicence": "Microsoft Entra ID P1 (for Conditional Access) + SharePoint Online",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "SPO05",
+    "type": "sharepoint",
+    "file": "SPO05-Disable-Infected-File-Download.json",
+    "displayName": "Disable Infected File Download",
+    "description": "Prevents users from downloading files that have been flagged as infected by Microsoft Defender for Office 365 in SharePoint Online and OneDrive for Business. Users will see a warning that the file is infected and cannot download it.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK T1080"
+    ],
+    "cisChecks": [
+      "7.2.8"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365). Defender for Office 365 enhances scanning.",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "SPO06",
+    "type": "sharepoint",
+    "file": "SPO06-Enable-AAD-B2B-Integration.json",
+    "displayName": "Enable Entra ID B2B Integration",
+    "description": "Enables SharePoint and OneDrive integration with Entra ID (Azure AD) B2B. When enabled, all external sharing creates Entra ID guest accounts, making external users subject to Conditional Access policies, access reviews, and centralized identity governance.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.1"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365) + Entra ID P1 for Conditional Access enforcement",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "SPO07",
+    "type": "sharepoint",
+    "file": "SPO07-Restrict-External-Sharing-Org-Accounts.json",
+    "displayName": "Restrict External Sharing - Organization Accounts Only",
+    "description": "Restricts SharePoint Online external sharing to authenticated external users with organizational accounts only (no anonymous links, no personal Microsoft accounts). Requires the invited email address to match the accepting account, preventing invitation forwarding.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.9"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "SPO08",
+    "type": "sharepoint",
+    "file": "SPO08-Require-Managed-Device-OneDrive-Sync.json",
+    "displayName": "Require Managed Device for OneDrive Sync",
+    "description": "Restricts OneDrive and SharePoint file sync to devices that are domain-joined to specific Active Directory domains or Intune-compliant. Prevents the OneDrive sync client from syncing corporate data to unmanaged personal devices.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.10"
+    ],
+    "requiredLicence": "SharePoint Online + Entra ID P1 (for device management)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "SPO09",
+    "type": "sharepoint",
+    "file": "SPO09-Enable-Modern-Authentication-SPO.json",
+    "displayName": "Enable Modern Authentication for SharePoint Online",
+    "description": "Disables legacy authentication protocols for SharePoint Online by setting LegacyAuthProtocolsEnabled to false. This forces all SharePoint Online connections to use Modern Authentication (OAuth 2.0), which supports MFA, Conditional Access, and token-based authentication.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK T1078"
+    ],
+    "cisChecks": [
+      "7.3.1"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "SPO10",
+    "type": "sharepoint",
+    "file": "SPO10-Restrict-SPO-Access-By-IP.json",
+    "displayName": "Restrict SharePoint Online Access by IP Range",
+    "description": "Configures IP-based access restrictions for SharePoint Online. Only allows access from specified corporate IP ranges (e.g., office egress IPs, VPN endpoints). All access from non-listed IP addresses is blocked.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "NERC-CIP",
+      "TSA Security Directive",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.11"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "TEA01",
+    "type": "teams",
+    "file": "TEA01-Disable-Anonymous-Meeting-Join.json",
+    "displayName": "Disable Anonymous Meeting Join",
+    "description": "Prevents anonymous (unauthenticated) users from joining Microsoft Teams meetings. All meeting participants must authenticate with a valid identity. This prevents unauthorized access to meetings containing sensitive discussions.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "8.1.1",
+      "8.5.1",
+      "8.5.9"
+    ],
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "TEA02",
+    "type": "teams",
+    "file": "TEA02-Enable-Meeting-Lobby-All-Users.json",
+    "displayName": "Enable Meeting Lobby for All External Users",
+    "description": "Configures Teams meetings so that only internal users (same organization, excluding guests) can bypass the lobby. All external participants including guests, federated users, and PSTN dial-in callers must wait in the lobby until admitted by the meeting organizer.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "8.1.2",
+      "8.5.3",
+      "8.5.9"
+    ],
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "TEA03",
+    "type": "teams",
+    "file": "TEA03-Restrict-Internal-Only-Lobby-Bypass.json",
+    "displayName": "Restrict Lobby Bypass to Internal Users Only",
+    "description": "Configures the Global Teams meeting policy so only users within the same organization (excluding guests) can bypass the meeting lobby. All external users, guest accounts, and federated users must wait in the lobby. This is the most restrictive lobby setting that still allows internal users to join seamlessly.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "8.1.2",
+      "8.5.3"
+    ],
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "TEA04",
+    "type": "teams",
+    "file": "TEA04-Disable-External-File-Sharing-Unapproved-Storage.json",
+    "displayName": "Disable External File Sharing via Unapproved Cloud Storage",
+    "description": "Disables all third-party cloud storage provider integrations in Microsoft Teams. Blocks Dropbox, Box, Google Drive, ShareFile, and Egnyte. File sharing in Teams is restricted to SharePoint Online and OneDrive for Business only, ensuring all files remain within managed Microsoft 365 storage.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "8.2.3"
+    ],
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "TEA05",
+    "type": "teams",
+    "file": "TEA05-Disable-Unmanaged-Teams-Communication.json",
+    "displayName": "Disable Unmanaged (Personal) Teams Communication",
+    "description": "Blocks communication with external users on unmanaged (personal/free) Teams accounts. Prevents both outbound and inbound communication with Teams consumer accounts. Only managed organizational Teams accounts can communicate with your users.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "8.2.4"
+    ],
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "TEA06",
+    "type": "teams",
+    "file": "TEA06-Restrict-External-Access-Federation.json",
+    "displayName": "Restrict External Access / Federation",
+    "description": "Restricts or disables Teams federation (external access) to prevent communication with users in other Microsoft 365 tenants. Provides two options: fully disable federation, or use an allow-list to permit only specific approved partner domains.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK T1199"
+    ],
+    "cisChecks": [
+      "8.4.1"
+    ],
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "TEA07",
+    "type": "teams",
+    "file": "TEA07-Disable-Auto-Guest-Access-Teams.json",
+    "displayName": "Disable Automatic Guest Access in Teams",
+    "description": "Restricts guest access in Microsoft Teams to prevent automatic guest user creation. When disabled, external users cannot be directly added as guests to Teams. Guest access must be explicitly managed through Entra ID B2B invitation workflows with appropriate approval processes.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "8.5.2"
+    ],
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "TEA08",
+    "type": "teams",
+    "file": "TEA08-Restrict-Meeting-Presenters-Organiser-Only.json",
+    "displayName": "Restrict Meeting Presenters - Organizer Only (User Override)",
+    "description": "Sets the default presenter role in Teams meetings to 'Organizer Only' with user override permitted. Only the meeting organizer and co-organizers can present (share screen, control slides) by default. Other participants must be promoted to presenter by the organizer. Meeting organizers can change this setting per-meeting if needed.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "NYDFS 23 NYCRR 500",
+      "FFIEC-CAT",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "8.5.4",
+      "8.5.8"
+    ],
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "TEA09",
+    "type": "teams",
+    "file": "TEA09-Disable-Meeting-Recording-External-Participants.json",
+    "displayName": "Restrict Meeting Recording - Internal Organizers Only",
+    "description": "Configures Teams meeting recording so that only internal meeting organizers and co-organizers can initiate recordings. Cloud recording is enabled for internal use but restricted to prevent external participants from recording meetings. Recording storage remains within the organization's OneDrive/SharePoint.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "8.5.5"
+    ],
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "TEA10",
+    "type": "teams",
+    "file": "TEA10-Disable-Teams-Channel-Email-Addresses.json",
+    "displayName": "Disable Teams Channel Email Addresses",
+    "description": "Disables the ability to send email to Teams channel email addresses. Channel email bypasses Exchange Online Protection (anti-spam, anti-malware, Safe Attachments, Safe Links, transport rules, DLP) because messages are delivered directly to the Teams channel without passing through the email security stack.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "8.5.6"
+    ],
+    "requiredLicence": "Microsoft Teams (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "2.0"
+  },
+  {
+    "id": "PV13",
+    "type": "purview",
+    "file": "PV13-Auto-Labeling-Service-Side-Classification.json",
+    "displayName": "Auto-Labeling - Service-Side Classification",
+    "description": "Automatically applies sensitivity labels to content at rest in SharePoint Online, OneDrive for Business, and Exchange Online based on sensitive information type detection. Service-side auto-labelling scans existing and new content to ensure consistent classification without relying on client-side user interaction.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "SOC 2",
+      "DORA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.6",
+      "9.1.7",
+      "9.1.10",
+      "9.1.11"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV14",
+    "type": "purview",
+    "file": "PV14-Sensitivity-Labels-Containers-Teams-Groups-Sites.json",
+    "displayName": "Sensitivity Labels - Containers (Teams, Groups & Sites)",
+    "description": "Applies sensitivity labels to Microsoft 365 Groups, Teams, and SharePoint Online sites to control guest access, privacy settings, and unmanaged device access at the container level. Container labels enforce governance boundaries without affecting individual document labelling.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "DORA",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "UK NCSC CAF v3.2",
+      "FedRAMP Moderate",
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.10",
+      "9.1.11"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV15",
+    "type": "purview",
+    "file": "PV15-Default-Label-SharePoint-Libraries.json",
+    "displayName": "Default Sensitivity Label for SharePoint Document Libraries",
+    "description": "Configures default sensitivity labels for SharePoint Online document libraries so that all new and uploaded documents automatically inherit the library-level default label. This ensures baseline classification for content stored in SharePoint without relying on user-applied labels.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "Microsoft Cloud Security Benchmark",
+      "UK NCSC CAF v3.2",
+      "DORA"
+    ],
+    "cisChecks": [
+      "9.1.6",
+      "9.1.11"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-sharepoint-online",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV16",
+    "type": "purview",
+    "file": "PV16-DLP-Block-Australian-PII-External.json",
+    "displayName": "DLP - Block Australian PII Shared Externally",
+    "description": "Data Loss Prevention policy that detects and blocks Australian Personally Identifiable Information (Tax File Numbers, Medicare Numbers, and Driver Licence Numbers) from being shared with external recipients across Exchange, SharePoint, OneDrive, and Teams.",
+    "frameworks": [
+      "ASD Essential Eight",
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "Microsoft Cloud Security Benchmark",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E3 (basic DLP)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV17",
+    "type": "purview",
+    "file": "PV17-DLP-Block-US-SSN-External.json",
+    "displayName": "DLP - Block U.S. Social Security Numbers Shared Externally",
+    "description": "Data Loss Prevention policy that detects and blocks U.S. Social Security Numbers (SSN) from being shared with external recipients across Exchange, SharePoint, OneDrive, and Teams. Protects against accidental or intentional disclosure of one of the most sensitive U.S. personal identifiers.",
+    "frameworks": [
+      "HIPAA",
+      "NIST SP 800-53 Rev.5",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "SOC 2",
+      "NYDFS 23 NYCRR 500",
+      "HITRUST CSF v11",
+      "NIS2",
+      "ISO 27001:2022",
+      "GDPR (EU) 2016/679",
+      "PCI DSS v4.0",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E3 (basic DLP)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV18",
+    "type": "purview",
+    "file": "PV18-DLP-Endpoint-Device-Restrictions.json",
+    "displayName": "DLP - Endpoint Device Restrictions",
+    "description": "Extends Data Loss Prevention to endpoint devices using Microsoft Defender for Endpoint integration. Blocks copying sensitive data to USB removable media, printing sensitive documents, copying to clipboard, and uploading to unauthorised cloud services from managed endpoints.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "SOC 2",
+      "DORA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "ASD Essential Eight",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or Microsoft 365 E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV19",
+    "type": "purview",
+    "file": "PV19-DLP-PowerBI-Sensitive-Data.json",
+    "displayName": "DLP - Power BI Sensitive Data Protection",
+    "description": "Data Loss Prevention policy that detects credit card numbers and U.S. Social Security Numbers in Power BI workspaces and datasets. Prevents sensitive data from being exposed through dashboards, reports, and datasets in the Power BI service.",
+    "frameworks": [
+      "PCI DSS v4.0",
+      "GDPR (EU) 2016/679",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "SOC 2",
+      "NIS2",
+      "HIPAA",
+      "DORA",
+      "Microsoft Cloud Security Benchmark",
+      "CMMC v2.0"
+    ],
+    "cisChecks": [
+      "9.1.2",
+      "9.1.3"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or Microsoft 365 E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV20",
+    "type": "purview",
+    "file": "PV20-Information-Barriers-Segments.json",
+    "displayName": "Information Barriers - Organizational Segments",
+    "description": "Creates organizational segments for Microsoft Purview Information Barriers based on department attributes. Segments define logical user groups (Research, Trading, Compliance, Board) that can then be used in Information Barrier policies to restrict or allow communication and collaboration between groups.",
+    "frameworks": [
+      "DORA",
+      "NIS2",
+      "NYDFS 23 NYCRR 500",
+      "SOC 2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "Microsoft Cloud Security Benchmark",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.6"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV21",
+    "type": "purview",
+    "file": "PV21-Information-Barriers-Policies.json",
+    "displayName": "Information Barriers - Policies",
+    "description": "Creates Information Barrier policies that block communication and collaboration between defined organizational segments. Prevents Research from communicating with Trading (Chinese wall), and Trading from communicating with Board members to comply with insider trading regulations and conflict of interest requirements.",
+    "frameworks": [
+      "DORA",
+      "NIS2",
+      "NYDFS 23 NYCRR 500",
+      "SOC 2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "Microsoft Cloud Security Benchmark",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.6"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV22",
+    "type": "purview",
+    "file": "PV22-Retention-Policy-All-Workloads-7-Years.json",
+    "displayName": "Retention Policy - All Workloads 7-Year Retention",
+    "description": "Organisation-wide retention policy that retains content for 7 years (2555 days) then deletes across Exchange Online, SharePoint Online, OneDrive for Business, Teams channels, and Teams chats. Provides baseline data governance and regulatory compliance for records retention obligations.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "SOC 2",
+      "DORA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz",
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight",
+      "NERC-CIP",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "requiredLicence": "Microsoft 365 E3 or E5",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV23",
+    "type": "purview",
+    "file": "PV23-Retention-Policy-Regulatory-Hold-Financial.json",
+    "displayName": "Retention Policy - Regulatory Hold for Financial Services",
+    "description": "Immutable retention policy for financial services organisations to comply with SEC Rule 17a-4, FINRA 4511, and MiFID II record-keeping requirements. Applies Preservation Lock to prevent any modification or deletion of the retention policy.",
+    "frameworks": [
+      "DORA",
+      "NYDFS 23 NYCRR 500",
+      "SEC Cyber Rule",
+      "NIS2",
+      "SOC 2",
+      "ISO 27001:2022",
+      "PCI DSS v4.0",
+      "NIST SP 800-53 Rev.5",
+      "FedRAMP Moderate",
+      "CMMC v2.0"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV24",
+    "type": "purview",
+    "file": "PV24-Retention-Labels-Classification.json",
+    "displayName": "Retention Labels - Classification-Based Retention",
+    "description": "Creates a four-tier retention label taxonomy for classification-based data retention: Business General (3 years), Financial Records (7 years), Legal Hold (10 years), and Regulatory (7 years immutable). Labels are published via a label policy to all users across Exchange, SharePoint, and OneDrive.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "SOC 2",
+      "DORA",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "UK NCSC CAF v3.2",
+      "FedRAMP Moderate",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "requiredLicence": "Microsoft 365 E3 or E5",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV25",
+    "type": "purview",
+    "file": "PV25-Records-Management-Regulatory-Records.json",
+    "displayName": "Records Management - Regulatory Records Declaration",
+    "description": "Configures retention labels with record declaration and regulatory lock for formal records management. Creates Official Business Record (7-year, record label) and Regulatory Record (7-year, regulatory lock) labels that prevent content modification or deletion once applied.",
+    "frameworks": [
+      "DORA",
+      "SEC Cyber Rule",
+      "HIPAA",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "NIS2",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "NYDFS 23 NYCRR 500"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV26",
+    "type": "purview",
+    "file": "PV26-Records-Management-Disposition-Review.json",
+    "displayName": "Records Management - Disposition Review Labels",
+    "description": "Creates retention labels with disposition review at the end of the retention period. Instead of automatic deletion, content is routed to designated reviewers who decide whether to permanently delete, extend retention, or apply a different label.",
+    "frameworks": [
+      "GDPR (EU) 2016/679",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "NIS2",
+      "HIPAA",
+      "DORA",
+      "PCI DSS v4.0",
+      "UK NCSC CAF v3.2",
+      "FedRAMP Moderate"
+    ],
+    "cisChecks": [
+      "9.1.12"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV27",
+    "type": "purview",
+    "file": "PV27-Communication-Compliance-Offensive-Language.json",
+    "displayName": "Communication Compliance - Offensive Language Detection",
+    "description": "Configures Microsoft Purview Communication Compliance to monitor Exchange, Teams, and Viva Engage for offensive language, harassment, threats, and discrimination. Uses built-in machine learning classifiers to detect policy violations and routes flagged communications to designated reviewers.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "DORA",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz",
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight",
+      "SEC Cyber Rule",
+      "NERC-CIP",
+      "MITRE ATT&CK"
+    ],
+    "cisChecks": [
+      "9.1.8"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV28",
+    "type": "purview",
+    "file": "PV28-Communication-Compliance-Regulatory-Violations.json",
+    "displayName": "Communication Compliance - Financial Regulatory Violations",
+    "description": "Configures Microsoft Purview Communication Compliance to monitor for financial regulatory violations including insider trading signals, conflict-of-interest discussions, and unauthorised disclosures of material non-public information (MNPI).",
+    "frameworks": [
+      "DORA",
+      "SEC Cyber Rule",
+      "NYDFS 23 NYCRR 500",
+      "NIS2",
+      "SOC 2",
+      "ISO 27001:2022",
+      "PCI DSS v4.0",
+      "NIST SP 800-53 Rev.5",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "UK NCSC CAF v3.2",
+      "HIPAA",
+      "Microsoft Cloud Security Benchmark",
+      "BSI IT-Grundschutz",
+      "HITRUST CSF v11"
+    ],
+    "cisChecks": [
+      "9.1.8"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV29",
+    "type": "purview",
+    "file": "PV29-Adaptive-Protection-Dynamic-DLP.json",
+    "displayName": "Adaptive Protection - Dynamic DLP Based on Insider Risk Levels",
+    "description": "Configures Microsoft Purview Adaptive Protection to dynamically adjust Data Loss Prevention policies based on user insider risk levels. Users classified as elevated, moderate, or minor risk by Insider Risk Management automatically receive stricter DLP controls.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "DORA",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "CMMC v2.0",
+      "Microsoft Cloud Security Benchmark",
+      "MITRE ATT&CK",
+      "UK NCSC CAF v3.2"
+    ],
+    "cisChecks": [
+      "9.1.4"
+    ],
+    "requiredLicence": "Microsoft 365 E5 or E5 Compliance",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "PV30",
+    "type": "purview",
+    "file": "PV30-eDiscovery-Standard-Case-Template.json",
+    "displayName": "eDiscovery - Standard Case Templates",
+    "description": "Provides templates for standard eDiscovery cases with predefined search queries for common investigation scenarios: data breach investigation, HR investigation, and regulatory inquiry.",
+    "frameworks": [
+      "GDPR (EU) 2016/679",
+      "HIPAA",
+      "NIS2",
+      "DORA",
+      "SOC 2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "9.1.1"
+    ],
+    "requiredLicence": "Microsoft 365 E3 (eDiscovery Standard)",
+    "importMethod": "powershell-security-compliance",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO11",
+    "type": "sharepoint",
+    "file": "SPO11-Enable-Site-Classification.json",
+    "displayName": "Enable Site Classification Labels",
+    "description": "Configures SharePoint site classification labels to categorise sites by business impact level (Low, Medium, High). Sets the default classification to Medium Business Impact.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "SOC 2",
+      "GDPR (EU) 2016/679",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "UK NCSC CAF v3.2",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.4"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO12",
+    "type": "sharepoint",
+    "file": "SPO12-Enable-Versioning-Limits.json",
+    "displayName": "Enable Version Expiration with Major Version Limits",
+    "description": "Enables automatic version history trimming with a maximum of 500 major versions and expiration of versions older than 30 days.",
+    "frameworks": [
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "NIS2",
+      "GDPR (EU) 2016/679",
+      "DORA",
+      "Microsoft Cloud Security Benchmark",
+      "UK NCSC CAF v3.2",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate"
+    ],
+    "cisChecks": [],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO13",
+    "type": "sharepoint",
+    "file": "SPO13-Restrict-Sharing-Domain-Allowlist.json",
+    "displayName": "Restrict External Sharing to Allowed Domains Only",
+    "description": "Limits external sharing to a specific allowlist of approved partner domains. Only users from the specified domains can receive sharing invitations or access shared content.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "DORA",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "ASD Essential Eight",
+      "UK NCSC CAF v3.2",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500"
+    ],
+    "cisChecks": [
+      "7.2.3",
+      "7.2.5",
+      "7.2.7",
+      "7.2.9"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO14",
+    "type": "sharepoint",
+    "file": "SPO14-Block-Apps-No-Device-Enforcement.json",
+    "displayName": "Block Access from Apps Without Device-Based Restrictions",
+    "description": "Restricts access from applications that cannot enforce device-based conditional access policies. Limits unmanaged device access to web-only preview without editing or download capabilities.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "HIPAA",
+      "UK NCSC CAF v3.2",
+      "DORA",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.2",
+      "7.2.10"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO15",
+    "type": "sharepoint",
+    "file": "SPO15-Configure-Idle-Session-Timeout.json",
+    "displayName": "Configure Idle Session Sign-Out Timeout",
+    "description": "Configures automatic sign-out for inactive SharePoint Online and OneDrive for Business browser sessions after 60 minutes of inactivity.",
+    "frameworks": [
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "ISO 27001:2022",
+      "SOC 2",
+      "HIPAA",
+      "PCI DSS v4.0",
+      "FedRAMP Moderate",
+      "DORA",
+      "CMMC v2.0",
+      "UK NCSC CAF v3.2",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO16",
+    "type": "sharepoint",
+    "file": "SPO16-Disable-Custom-Script.json",
+    "displayName": "Disable Custom Script Execution on SharePoint Sites",
+    "description": "Prevents execution of custom scripts on SharePoint Online sites to mitigate cross-site scripting (XSS), script injection, and other code-based attacks.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "UK NCSC CAF v3.2",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO17",
+    "type": "sharepoint",
+    "file": "SPO17-Enable-DLP-Integration-SharePoint.json",
+    "displayName": "Enable DLP Integration for SharePoint Content Protection",
+    "description": "Enables SharePoint-specific Data Loss Prevention integration by marking newly uploaded files as sensitive by default until scanned by the DLP engine.",
+    "frameworks": [
+      "GDPR (EU) 2016/679",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "DORA",
+      "SOC 2",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "Microsoft Cloud Security Benchmark",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.6"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO18",
+    "type": "sharepoint",
+    "file": "SPO18-Advanced-Access-Control-Sensitive-Sites.json",
+    "displayName": "Enable Restricted Access Control for Sensitive Sites",
+    "description": "Enables restricted access control on sensitive SharePoint site collections, limiting access to members of a specified Entra ID security group.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "GDPR (EU) 2016/679",
+      "FedRAMP Moderate",
+      "DORA",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "UK NCSC CAF v3.2",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.2",
+      "7.2.10"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO19",
+    "type": "sharepoint",
+    "file": "SPO19-Block-Guest-Resharing.json",
+    "displayName": "Block Guest Users from Resharing Content",
+    "description": "Prevents external guest users from resharing content they have been given access to with additional external users.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "DORA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "UK NCSC CAF v3.2",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.3",
+      "7.2.5"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  },
+  {
+    "id": "SPO20",
+    "type": "sharepoint",
+    "file": "SPO20-Enable-SharePoint-Audit-Events.json",
+    "displayName": "Enable Comprehensive SharePoint Audit Events",
+    "description": "Configures comprehensive audit logging for SharePoint Online activities. Ensures complete visibility into user activities, sharing events, administrative changes, and application access across all SharePoint sites.",
+    "frameworks": [
+      "NIS2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev 5",
+      "GDPR (EU) 2016/679",
+      "SOC 2",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "DORA",
+      "CMMC v2.0",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "UK NCSC CAF v3.2",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark",
+      "BSI IT-Grundschutz",
+      "NERC-CIP",
+      "SEC Cyber Rule"
+    ],
+    "cisChecks": [
+      "9.1.1"
+    ],
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "importMethod": "",
+    "deployState": "",
+    "version": "1.0"
+  }
+]

@@ -1,0 +1,62 @@
+{
+  "_metadata": {
+    "id": "SPO10",
+    "title": "Restrict SharePoint Online Access by IP Range",
+    "description": "Configures IP-based access restrictions for SharePoint Online. Only allows access from specified corporate IP ranges (e.g., office egress IPs, VPN endpoints). All access from non-listed IP addresses is blocked.",
+    "frameworks": [
+      "CIS Microsoft 365 v3.1.0",
+      "NIST SP 800-53 Rev 5",
+      "NIS2",
+      "DORA",
+      "ISO 27001:2022",
+      "UK NCSC CAF v3.2",
+      "SOC 2",
+      "CMMC v2.0",
+      "FedRAMP Moderate",
+      "GDPR (EU) 2016/679",
+      "HITRUST CSF v11",
+      "NYDFS 23 NYCRR 500",
+      "NERC-CIP",
+      "TSA Security Directive",
+      "Microsoft Cloud Security Benchmark"
+    ],
+    "cisChecks": [
+      "7.2.11"
+    ],
+    "severity": "High",
+    "category": "SharePoint Online",
+    "deploymentOrder": 10,
+    "requiredLicence": "SharePoint Online (included with Microsoft 365)",
+    "version": "2.0",
+    "lastUpdated": "2026-02-27",
+    "_notes": "CAUTION: IP-based restrictions can lock out users working remotely unless VPN egress IPs are included. Before enabling IPAddressEnforcement, ensure ALL corporate egress IP addresses, VPN endpoints, and any required third-party service IPs are listed in IPAddressAllowList. Consider using Entra ID Conditional Access with Named Locations as a more flexible alternative. IPAddressAllowList supports IPv4 CIDR notation (e.g., 203.0.113.0/24). Test thoroughly with IPAddressEnforcement: false first (logging only) before setting to true."
+  },
+  "_configFields": [
+    {
+      "id": "ipAllowList",
+      "label": "Allowed IP Ranges",
+      "description": "Corporate IP ranges in CIDR notation that are permitted to access SharePoint Online. Include office egress IPs, VPN endpoints, and any required third-party service IPs. One CIDR range per line.",
+      "type": "textarea",
+      "required": true,
+      "default": "",
+      "placeholder": "203.0.113.0/24\n198.51.100.0/24",
+      "jsonPaths": ["parameters.IPAddressAllowList"],
+      "transform": "splitLines"
+    }
+  ],
+  "cmdlet": "Set-SPOTenant",
+  "parameters": {
+    "IPAddressAllowList": "",
+    "IPAddressEnforcement": true,
+    "IPAddressWACTokenLifetime": 15
+  },
+  "postDeployment": [
+    "Get-SPOTenant | Select-Object IPAddressAllowList, IPAddressEnforcement, IPAddressWACTokenLifetime",
+    "Replace  with actual CIDR ranges, e.g., '203.0.113.0/24,198.51.100.0/24'",
+    "IMPORTANT: Test with IPAddressEnforcement: $false first to verify your IP list is complete",
+    "Include all: office egress IPs, VPN concentrator public IPs, remote office IPs, any third-party service IPs that need SPO access",
+    "IPAddressWACTokenLifetime: 15 means Office Online sessions expire after 15 minutes when accessed from allowed IPs",
+    "If remote workers without VPN need access, consider Entra ID Conditional Access with Named Locations instead of SPO IP restrictions",
+    "Monitor access failures after enabling enforcement to identify missing IP ranges"
+  ]
+}

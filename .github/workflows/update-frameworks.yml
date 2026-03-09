@@ -1,0 +1,103 @@
+name: Framework Version Check
+
+on:
+  schedule:
+    # Weekly Monday 06:00 UTC
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+    inputs:
+      framework:
+        description: 'Single framework to check (leave empty for all)'
+        required: false
+        default: ''
+      dry_run:
+        description: 'Dry run (no changes committed)'
+        required: false
+        default: 'false'
+        type: boolean
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  check-versions:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Dry-run version check
+        id: dry-run
+        run: |
+          ARGS="--dry-run --verbose"
+          if [ -n "${{ github.event.inputs.framework }}" ]; then
+            ARGS="$ARGS --framework '${{ github.event.inputs.framework }}'"
+          fi
+          node update-frameworks.js $ARGS 2>&1 | tee dry-run-output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
+
+          # Extract summary for PR body
+          if [ -f site/data/changelogs/*.md ]; then
+            LATEST=$(ls -t site/data/changelogs/*.md | head -1)
+            echo "changelog=$LATEST" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Apply updates (if any detected and not dry-run)
+        if: steps.dry-run.outputs.exit_code == '2' && github.event.inputs.dry_run != 'true'
+        id: apply
+        run: |
+          ARGS="--verbose"
+          if [ -n "${{ github.event.inputs.framework }}" ]; then
+            ARGS="$ARGS --framework '${{ github.event.inputs.framework }}'"
+          fi
+          node update-frameworks.js $ARGS
+
+      - name: Create Pull Request
+        if: steps.dry-run.outputs.exit_code == '2' && github.event.inputs.dry_run != 'true'
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: 'chore: update framework versions [automated]'
+          title: 'chore: framework version updates detected'
+          body: |
+            ## Automated Framework Version Check
+
+            The weekly version checker detected updates for one or more compliance frameworks.
+
+            ### Changes
+            See the changelog in `site/data/changelogs/` for full details.
+
+            ### Dry-run output
+            ```
+            $(cat dry-run-output.txt | tail -30)
+            ```
+
+            ---
+            *This PR was created automatically by the framework version checker.*
+          branch: auto/framework-updates
+          delete-branch: true
+          labels: |
+            automated
+            frameworks
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "### Framework Version Check" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          if [ "${{ steps.dry-run.outputs.exit_code }}" == "0" ]; then
+            echo "All frameworks are up to date." >> $GITHUB_STEP_SUMMARY
+          elif [ "${{ steps.dry-run.outputs.exit_code }}" == "2" ]; then
+            echo "Updates detected! A PR has been created." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Check completed with warnings. Review the logs." >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "$(cat dry-run-output.txt | tail -20)" >> $GITHUB_STEP_SUMMARY

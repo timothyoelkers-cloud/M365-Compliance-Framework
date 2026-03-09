@@ -1,0 +1,82 @@
+{
+  "@odata.type": "#microsoft.graph.windows10EndpointProtectionConfiguration",
+  "displayName": "INT07 - Microsoft Defender Antivirus Configuration",
+  "description": "Configures Defender AV via Intune: real-time protection, cloud-delivered protection (high level), automatic sample submission (safe), PUA protection, scan downloads, network files, and archives.",
+  "version": 1,
+  "defenderAdditionalGuardedFolders": [],
+  "defenderAdobeReaderLaunchChildProcess": "enable",
+  "defenderAdvancedRansomewareProtectionType": "enable",
+  "defenderBlockEndUserAccess": false,
+  "defenderBlockPersistenceThroughWmiType": "block",
+  "defenderCheckForSignaturesBeforeRunningScan": true,
+  "defenderCloudBlockLevel": "high",
+  "defenderCloudExtendedTimeout": 50,
+  "defenderCloudExtendedTimeoutInSeconds": 50,
+  "defenderDaysBeforeDeletingQuarantinedMalware": 14,
+  "defenderDetectedMalwareActions": {
+    "lowSeverity": "quarantine",
+    "moderateSeverity": "quarantine",
+    "highSeverity": "quarantine",
+    "severeSeverity": "remove"
+  },
+  "defenderDisableCatchupFullScan": false,
+  "defenderDisableCatchupQuickScan": false,
+  "defenderEnableLowCpuPriority": false,
+  "defenderEnableScanDownloads": true,
+  "defenderEnableScanIncomingMail": true,
+  "defenderEnableScanMappedNetworkDrivesDuringFullScan": true,
+  "defenderEnableScanNetworkFiles": true,
+  "defenderFileExtensionsToExclude": [],
+  "defenderFilesAndFoldersToExclude": [],
+  "defenderGuardMyFoldersType": "auditMode",
+  "defenderNetworkProtectionType": "enable",
+  "defenderPotentiallyUnwantedAppAction": "block",
+  "defenderProcessesToExclude": [],
+  "defenderPromptForSampleSubmission": "sendSafeSamplesAutomatically",
+  "defenderRealTimeMonitorAllowed": true,
+  "defenderScanArchiveFiles": true,
+  "defenderScanDirection": "monitorAllFiles",
+  "defenderScanDownloads": true,
+  "defenderScanIncomingMail": true,
+  "defenderScanMappedNetworkDrivesDuringFullScan": true,
+  "defenderScanMaxCpu": 50,
+  "defenderScanNetworkFiles": true,
+  "defenderScanRemovableDrivesDuringFullScan": true,
+  "defenderScanScriptsLoadedInInternetExplorer": true,
+  "defenderScanType": "quick",
+  "defenderScheduledQuickScanTime": "12:00:00.0000000",
+  "defenderScheduledScanTime": "02:00:00.0000000",
+  "defenderScheduleScanDay": "everyday",
+  "defenderSignatureUpdateIntervalInHours": 4,
+  "defenderSubmitSamplesConsentType": "sendSafeSamplesAutomatically",
+  "defenderSystemScanSchedule": "everyday",
+  "roleScopeTagIds": [
+    "0"
+  ],
+  "_metadata": {
+    "policyId": "INT07",
+    "description": "Microsoft Defender Antivirus configuration enabling real-time monitoring, high-level cloud-delivered protection with 50-second extended timeout, automatic safe sample submission, PUA blocking, network protection, and comprehensive scan coverage including downloads, network files, archives, and mapped drives.",
+    "graphEndpoint": "POST /deviceManagement/deviceConfigurations",
+    "platform": "Windows 10/11",
+    "frameworks": [
+      "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
+      "NIST SP 800-53 Rev 5 - SI-3, SI-4",
+      "NIST SP 800-171 Rev 2 - 3.14.1, 3.14.2",
+      "ISO 27001:2022 A.8.7",
+      "Essential Eight - Application Control, Configure Microsoft Office Macro Settings",
+      "Microsoft Cloud Security Benchmark - ES-1, ES-2"
+    ],
+    "cisChecks": [
+      "CIS 2.3.1 - Ensure Windows Defender real-time protection is enabled",
+      "CIS 2.3.2 - Ensure cloud-delivered protection is enabled",
+      "CIS 2.3.3 - Ensure PUA protection is enabled",
+      "CIS 2.3.4 - Ensure automatic sample submission is configured",
+      "CIS 2.3.5 - Ensure scan all downloaded files and attachments"
+    ],
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-27"
+  },
+  "_dependencies": {
+    "recommendsBefore": ["MDE01"]
+  }
+}

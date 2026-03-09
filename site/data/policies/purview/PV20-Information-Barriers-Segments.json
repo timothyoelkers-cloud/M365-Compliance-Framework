@@ -1,0 +1,138 @@
+{
+  "_metadata": {
+    "id": "PV20",
+    "title": "Information Barriers - Organizational Segments",
+    "description": "Creates organizational segments for Microsoft Purview Information Barriers based on department attributes. Segments define logical user groups (Research, Trading, Compliance, Board) that can then be used in Information Barrier policies to restrict or allow communication and collaboration between groups.",
+    "version": "1.0",
+    "lastUpdated": "2026-02-28",
+    "frameworks": [
+      "DORA",
+      "NIS2",
+      "NYDFS 23 NYCRR 500",
+      "SOC 2",
+      "ISO 27001:2022",
+      "NIST SP 800-53 Rev.5",
+      "PCI DSS v4.0",
+      "HIPAA",
+      "FedRAMP Moderate",
+      "CMMC v2.0",
+      "Microsoft Cloud Security Benchmark",
+      "BSI IT-Grundschutz"
+    ],
+    "cisChecks": [
+      "9.1.6"
+    ],
+    "mitreMappings": [
+      "T1530",
+      "T1199",
+      "T1534"
+    ],
+    "requiredLicences": [
+      "Microsoft 365 E5 or E5 Compliance",
+      "Microsoft Purview Information Barriers",
+      "Office 365 E5 (includes Information Barriers)"
+    ],
+    "requiredRoles": [
+      "Compliance Administrator",
+      "Information Barriers Administrator"
+    ],
+    "deploymentOrder": 20,
+    "importMethod": "powershell-security-compliance",
+    "importScript": "scripts/Import-PurviewPolicies.ps1"
+  },
+  "_notes": {
+    "prerequisites": [
+      "Connect to Security & Compliance PowerShell: Connect-IPPSSession",
+      "Information Barriers must be enabled for the tenant",
+      "Azure AD user accounts must have the Department attribute populated for segment filtering",
+      "Scoped directory search must be enabled in Exchange Online: Set-OrganizationConfig -InformationBarrierMode Enabled",
+      "Audit logging must be enabled (PV11)",
+      "Plan segment definitions with Legal and Compliance teams before deployment",
+      "Deploy PV20 (segments) before PV21 (policies)"
+    ],
+    "deploymentSteps": [
+      "1. Verify Azure AD Department attributes are populated for all in-scope users",
+      "2. Enable Information Barriers mode: Set-OrganizationConfig -InformationBarrierMode Enabled",
+      "3. Connect to Security & Compliance PowerShell",
+      "4. Create each organizational segment using New-OrganizationSegment",
+      "5. Verify segments using Get-OrganizationSegment",
+      "6. Proceed to PV21 to create Information Barrier policies between segments"
+    ],
+    "rollbackProcedure": "Remove-OrganizationSegment -Identity '<SegmentName>' for each segment. Note: segments that are referenced by active Information Barrier policies cannot be removed until the policies are removed first."
+  },
+  "powershellCommands": {
+    "enableInformationBarriers": {
+      "cmdlet": "Set-OrganizationConfig",
+      "parameters": {
+        "InformationBarrierMode": "Enabled"
+      },
+      "_note": "One-time configuration to enable Information Barriers for the tenant"
+    },
+    "createSegments": [
+      {
+        "cmdlet": "New-OrganizationSegment",
+        "parameters": {
+          "Name": "Research",
+          "UserGroupFilter": "Department -eq 'Research'",
+          "Description": "Organizational segment for the Research department. Used in Information Barrier policies to control communication with other sensitive departments."
+        }
+      },
+      {
+        "cmdlet": "New-OrganizationSegment",
+        "parameters": {
+          "Name": "Trading",
+          "UserGroupFilter": "Department -eq 'Trading'",
+          "Description": "Organizational segment for the Trading department. Used in Information Barrier policies to prevent communication with Research and Board segments."
+        }
+      },
+      {
+        "cmdlet": "New-OrganizationSegment",
+        "parameters": {
+          "Name": "Compliance",
+          "UserGroupFilter": "Department -eq 'Compliance'",
+          "Description": "Organizational segment for the Compliance department. Compliance may communicate with all segments for oversight and regulatory purposes."
+        }
+      },
+      {
+        "cmdlet": "New-OrganizationSegment",
+        "parameters": {
+          "Name": "Board",
+          "UserGroupFilter": "Department -eq 'Board'",
+          "Description": "Organizational segment for the Board of Directors. Used in Information Barrier policies to restrict communication with Trading segment to prevent insider trading."
+        }
+      }
+    ]
+  },
+  "segments": [
+    {
+      "name": "Research",
+      "filter": "Department -eq 'Research'",
+      "description": "Research department analysts and staff"
+    },
+    {
+      "name": "Trading",
+      "filter": "Department -eq 'Trading'",
+      "description": "Trading desk and execution teams"
+    },
+    {
+      "name": "Compliance",
+      "filter": "Department -eq 'Compliance'",
+      "description": "Compliance officers and regulatory affairs team"
+    },
+    {
+      "name": "Board",
+      "filter": "Department -eq 'Board'",
+      "description": "Board of Directors and executive leadership"
+    }
+  ],
+  "policySettings": {
+    "mode": "Active",
+    "_note": "Segments are created as active definitions. They have no enforcement effect until Information Barrier policies (PV21) are created and applied.",
+    "workloads": {
+      "exchangeOnline": true,
+      "microsoftTeams": true,
+      "sharePointOnline": true,
+      "oneDriveForBusiness": true
+    }
+  }
+}

@@ -1,0 +1,109 @@
+{
+  "displayName": "CA16 | Block Access from Unregistered or Non-Compliant Devices",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "All"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ],
+    "devices": {
+      "deviceFilter": {
+        "mode": "include",
+        "rule": "device.isCompliant -ne True -or device.trustType -ne \"AzureAD\" -and device.trustType -ne \"ServerAD\" -and device.trustType -ne \"Workplace\""
+      }
+    }
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "block"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA16",
+    "description": "Blocks access from devices that are not registered with Entra ID or are not marked as Intune-compliant. Uses a device filter rule to explicitly identify non-compliant and unregistered devices. This is a more aggressive version of CA06 that uses device filters for granular device state evaluation.",
+    "deviceFilterRule": "device.isCompliant -ne True -or device.trustType -ne 'AzureAD' -and device.trustType -ne 'ServerAD' -and device.trustType -ne 'Workplace'",
+    "deviceFilterExplanation": {
+      "device.isCompliant -ne True": "Matches devices not marked as compliant in Intune",
+      "device.trustType -ne AzureAD": "Matches devices not Azure AD Joined",
+      "device.trustType -ne ServerAD": "Matches devices not Hybrid Azure AD Joined",
+      "device.trustType -ne Workplace": "Matches devices not Azure AD Registered (Workplace Join)"
+    },
+    "cisControls": [
+      "CIS 1.3.7 - Ensure Conditional Access policies require compliant or hybrid joined devices",
+      "CIS 5.1.3.1 - Ensure that device code flow is restricted",
+      "CIS 5.2.2.9 - Ensure access is restricted to compliant devices"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "AC-19",
+        "CM-8",
+        "IA-3",
+        "SC-43"
+      ],
+      "CIS-Microsoft-365": [
+        "1.3.7",
+        "5.1.3.1",
+        "5.2.2.9"
+      ],
+      "ISO-27001-2022": [
+        "A.8.1 - User endpoint devices",
+        "A.8.9 - Configuration management"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078 - Valid Accounts",
+        "T1199 - Trusted Relationship",
+        "T1098.005 - Device Registration"
+      ],
+      "NIS2": [
+        "Article 21(2)(d) - Supply chain security"
+      ],
+      "Essential-Eight": [
+        "Application control"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2",
+      "Microsoft Intune"
+    ],
+    "deploymentNotes": "This policy uses device filters which are more granular than the built-in grant controls in CA06. Ensure all corporate devices are enrolled and compliant in Intune before enforcing. The device filter expression blocks devices that fail compliance OR are not of a recognised trust type. Deploy in report-only first and carefully monitor for false positives on newly enrolled devices. Replace  with the Object ID of your break-glass exclusion security group."
+  },
+  "_configFields": [
+    {
+      "id": "caState",
+      "label": "Policy State",
+      "description": "Deploy in report-only mode first to assess impact before enforcing",
+      "type": "select",
+      "required": true,
+      "default": "enabledForReportingButNotEnforced",
+      "options": [
+        { "value": "enabledForReportingButNotEnforced", "label": "Report-only (Recommended)" },
+        { "value": "enabled", "label": "Enforce immediately" },
+        { "value": "disabled", "label": "Disabled" }
+      ],
+      "jsonPaths": ["state"]
+    },
+    {
+      "id": "breakGlassGroup",
+      "label": "Break-Glass Exclusion Group",
+      "description": "Entra ID Object ID of the security group containing emergency access accounts. Leave empty to skip.",
+      "type": "text",
+      "required": false,
+      "default": "",
+      "placeholder": "00000000-0000-0000-0000-000000000000",
+      "jsonPaths": ["conditions.users.excludeGroups[0]"]
+    }
+  ]
+}

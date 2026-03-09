@@ -1,0 +1,96 @@
+{
+  "displayName": "CA08 | Require MFA for Azure Management",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeUsers": [
+        "All"
+      ],
+      "excludeUsers": [],
+      "excludeGroups": []
+    },
+    "applications": {
+      "includeApplications": [
+        "797f4846-ba00-4fd7-ba43-dac1f8f63013"
+      ]
+    },
+    "clientAppTypes": [
+      "browser",
+      "mobileAppsAndDesktopClients"
+    ]
+  },
+  "grantControls": {
+    "operator": "OR",
+    "builtInControls": [
+      "mfa"
+    ]
+  },
+  "_metadata": {
+    "policyNumber": "CA08",
+    "description": "Requires MFA for all access to Microsoft Azure Management, which covers the Azure Portal, Azure CLI, Azure PowerShell, and Azure Resource Manager API. This prevents unauthorised subscription and resource modifications even if credentials are compromised.",
+    "targetApplication": {
+      "appId": "797f4846-ba00-4fd7-ba43-dac1f8f63013",
+      "displayName": "Microsoft Azure Management",
+      "scope": "Azure Portal, Azure CLI, Azure PowerShell, Azure Resource Manager API"
+    },
+    "cisControls": [
+      "CIS 1.3.2 - Ensure phishing-resistant MFA strength is required for Administrators",
+      "CIS 1.3.5 - Ensure MFA is required for Azure management"
+    ],
+    "frameworkMappings": {
+      "NIST-800-53": [
+        "IA-2(1)",
+        "AC-6(5)",
+        "AC-17(2)"
+      ],
+      "CIS-Microsoft-365": [
+        "1.3.2",
+        "1.3.5"
+      ],
+      "ISO-27001-2022": [
+        "A.8.2 - Privileged access rights"
+      ],
+      "MITRE-ATT&CK": [
+        "T1078.004 - Cloud Accounts",
+        "T1580 - Cloud Infrastructure Discovery"
+      ],
+      "NIS2": [
+        "Article 21(2)(i) - Access control policies"
+      ],
+      "Essential-Eight": [
+        "Restrict administrative privileges",
+        "Multi-factor authentication"
+      ]
+    },
+    "requiredLicenses": [
+      "Microsoft Entra ID P1 or P2"
+    ],
+    "deploymentNotes": "The application ID 797f4846-ba00-4fd7-ba43-dac1f8f63013 is the well-known Microsoft Azure Management service principal that covers Azure Portal, CLI, PowerShell, and ARM API access. Deploy in report-only first. Replace  with the Object ID of your break-glass exclusion security group."
+  },
+  "_configFields": [
+    {
+      "id": "caState",
+      "label": "Policy State",
+      "description": "Deploy in report-only mode first to assess impact before enforcing",
+      "type": "select",
+      "required": true,
+      "default": "enabledForReportingButNotEnforced",
+      "options": [
+        { "value": "enabledForReportingButNotEnforced", "label": "Report-only (Recommended)" },
+        { "value": "enabled", "label": "Enforce immediately" },
+        { "value": "disabled", "label": "Disabled" }
+      ],
+      "jsonPaths": ["state"]
+    },
+    {
+      "id": "breakGlassGroup",
+      "label": "Break-Glass Exclusion Group",
+      "description": "Entra ID Object ID of the security group containing emergency access accounts. Leave empty to skip.",
+      "type": "text",
+      "required": false,
+      "default": "",
+      "placeholder": "00000000-0000-0000-0000-000000000000",
+      "jsonPaths": ["conditions.users.excludeGroups[0]"]
+    }
+  ]
+}
