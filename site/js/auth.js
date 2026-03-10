@@ -8,9 +8,13 @@ const TenantAuth = (() => {
 
   // ─── App Registration: Framework-Assessment-Deployment ───
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
-  // Normalise redirect URI to directory path (strip index.html) to match Azure AD app registration
-  const REDIRECT_URI = window.location.origin + window.location.pathname.replace(/index\.html$/i, '');
-  console.log('[Auth] Redirect URI:', REDIRECT_URI, '— register this exact URI in Azure AD > App registrations > Authentication > SPA');
+  // On GitHub Pages the registered redirect URI is the project root (before the app moved to /site/)
+  // On localhost, use the current page path for local dev flexibility
+  const _parts = window.location.pathname.split('/');
+  const REDIRECT_URI = window.location.hostname.endsWith('.github.io') && _parts.length > 2
+    ? window.location.origin + '/' + _parts[1] + '/'
+    : window.location.origin + window.location.pathname.replace(/index\.html$/i, '');
+  console.log('[Auth] Redirect URI:', REDIRECT_URI);
 
   // ─── Token Scopes (per-resource) ───
   // .default returns ALL admin-consented permissions for that resource
