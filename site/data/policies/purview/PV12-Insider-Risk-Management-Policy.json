@@ -48,7 +48,9 @@
     ],
     "deploymentOrder": 12,
     "importMethod": "powershell-security-compliance",
-    "importScript": "scripts/Import-PurviewPolicies.ps1"
+    "importScript": "scripts/Import-PurviewPolicies.ps1",
+    "_deploymentMethod": "portal",
+    "_portalUrl": "compliance.microsoft.com/insiderriskmanagement"
   },
   "_notes": {
     "prerequisites": [

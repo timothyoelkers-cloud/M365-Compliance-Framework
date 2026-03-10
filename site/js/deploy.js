@@ -154,6 +154,10 @@ const DeployEngine = (() => {
   }
 
   function extractDefenderEndpointPayload(raw) {
+    // Portal-only policies cannot be deployed via Graph
+    if (raw._metadata && raw._metadata._deploymentMethod === 'portal') {
+      return { calls: [] };
+    }
     const calls = [];
     if (raw.endpointSecurityPolicy) {
       const body = JSON.parse(JSON.stringify(raw.endpointSecurityPolicy));
@@ -186,6 +190,14 @@ const DeployEngine = (() => {
         method: 'POST',
         body: body,
         description: 'Create endpoint security policy: ' + (body.name || ''),
+      });
+    } else if (raw.appConfigPolicy) {
+      const body = JSON.parse(JSON.stringify(raw.appConfigPolicy));
+      calls.push({
+        endpoint: '/v1.0/deviceAppManagement/mobileAppConfigurations',
+        method: 'POST',
+        body: body,
+        description: 'Create app config policy: ' + (body.displayName || ''),
       });
     }
     return { calls };
@@ -611,6 +623,12 @@ const DeployEngine = (() => {
     const method = getDeployMethod(pol.type, pol.id);
     if (method === DEPLOY_METHOD.PS_ONLY) {
       return { success: false, error: 'PowerShell-only policy — use Generate Script' };
+    }
+
+    // Check for portal-only policies (configured in security portal, not via API)
+    if (rawPolicy._metadata && rawPolicy._metadata._deploymentMethod === 'portal') {
+      var portalUrl = rawPolicy._metadata._portalUrl || 'security.microsoft.com';
+      return { success: false, error: 'Portal-only — configure in ' + portalUrl };
     }
 
     // Run preflight for this deployment method

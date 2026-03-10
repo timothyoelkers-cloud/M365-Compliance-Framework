@@ -1,6 +1,6 @@
 # M365 Compliance Framework
 
-Open-source Microsoft 365 compliance toolkit that maps **46 global regulatory frameworks** to **140+ CIS Microsoft 365 Benchmark v3 controls**, with **110 deployment-ready JSON policies** across 10 policy types.
+Open-source Microsoft 365 compliance toolkit that maps **46 global regulatory frameworks** to **140+ CIS Microsoft 365 Benchmark v3 controls**, with **143 deployment-ready JSON policies** across 10 policy types.
 
 Built as a single-page application (SPA) — no build tools, no frameworks, pure vanilla JavaScript.
 
@@ -11,7 +11,7 @@ Built as a single-page application (SPA) — no build tools, no frameworks, pure
 ### Core Platform
 - **Compliance Assessment Wizard** — Step-by-step workflow: select frameworks, review applicable CIS controls, mark compliance status, generate score
 - **Compliance Dashboard** — Real-time score, framework coverage bars, gap register with prioritisation, executive summary KPIs
-- **Policy Library** — 110 policies across 10 types (Conditional Access, Defender, Intune, Entra, Exchange, SharePoint, Teams, Purview, Governance, Defender for Endpoint), filterable and downloadable
+- **Policy Library** — 143 policies across 10 types (Conditional Access, Defender, Intune, Entra, Exchange, SharePoint, Teams, Purview, Governance, Defender for Endpoint), filterable and downloadable
 - **Report Generator** — Branded PDF/HTML/Excel compliance reports with configurable sections, cover page, and framework breakdown
 
 ### Tenant Integration (Microsoft Graph API)
@@ -86,7 +86,7 @@ site/
 └── data/
     ├── checks.json         # 140+ CIS Benchmark v3 checks
     ├── frameworks.json     # 46 frameworks, groups, org profiles
-    ├── policies-all.json   # All 110 policies combined
+    ├── policies-all.json   # All 143 policies combined
     └── policies/           # Individual policy JSON files
         ├── conditional-access/
         ├── defender/

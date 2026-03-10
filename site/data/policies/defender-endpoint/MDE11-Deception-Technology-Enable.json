@@ -45,7 +45,9 @@
     ],
     "deploymentOrder": 11,
     "importMethod": "powershell-graph",
-    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
+    "_deploymentMethod": "portal",
+    "_deploymentNote": "Deception technology is configured in the Microsoft 365 Defender portal (security.microsoft.com > Settings > Endpoints > Advanced features > Deception). It cannot be deployed via Intune endpoint security policies."
   },
   "_notes": {
     "prerequisites": [

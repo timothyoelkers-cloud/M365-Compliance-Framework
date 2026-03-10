@@ -102,6 +102,43 @@
       "liveResponseUnsignedScriptExecution": false
     }
   },
+  "intuneEndpointSecurityPolicy": {
+    "@odata.type": "#microsoft.graph.deviceManagementConfigurationPolicy",
+    "name": "MDE05 - Automated Investigation and Remediation",
+    "description": "Configure Automated Investigation and Remediation level to Full Automation via endpoint detection and response policy",
+    "platforms": "windows10",
+    "technologies": "mdm,microsoftSense",
+    "templateReference": {
+      "templateId": "0385b795-0f2f-44ac-8602-9f65bf6adede_1",
+      "templateFamily": "endpointSecurityEndpointDetectionAndResponse",
+      "templateDisplayName": "Endpoint detection and response",
+      "templateDisplayVersion": "Version 2"
+    },
+    "settings": [
+      {
+        "settingInstance": {
+          "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+          "settingDefinitionId": "device_vendor_msft_windowsadvancedthreatprotection_configuration_samplesharing",
+          "choiceSettingValue": {
+            "value": "device_vendor_msft_windowsadvancedthreatprotection_configuration_samplesharing_1",
+            "children": [],
+            "_valueDescription": "1 = All (enables sample sharing required for full AIR)"
+          }
+        }
+      },
+      {
+        "settingInstance": {
+          "@odata.type": "#microsoft.graph.deviceManagementConfigurationChoiceSettingInstance",
+          "settingDefinitionId": "device_vendor_msft_windowsadvancedthreatprotection_configuration_telemetryreportingfrequency",
+          "choiceSettingValue": {
+            "value": "device_vendor_msft_windowsadvancedthreatprotection_configuration_telemetryreportingfrequency_1",
+            "children": [],
+            "_valueDescription": "1 = Expedite telemetry reporting for faster automated investigation"
+          }
+        }
+      }
+    ]
+  },
   "intuneIntegration": {
     "graphApiEndpoint": "https://graph.microsoft.com/beta/deviceManagement/advancedThreatProtection",
     "advancedThreatProtectionSettings": {

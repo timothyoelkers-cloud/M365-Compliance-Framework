@@ -1,0 +1,41 @@
+{
+  "_metadata": {
+    "id": "GOV02",
+    "title": "Require MFA Registration for All Administrators",
+    "description": "Creates a Conditional Access policy requiring all users with admin roles to register for multi-factor authentication within 14 days.",
+    "frameworks": ["CIS Microsoft 365 v3.1.0", "NIST SP 800-53 Rev 5", "NIS2", "ISO 27001:2022", "SOC 2", "PCI DSS v4.0", "HIPAA", "FedRAMP Moderate", "CMMC v2.0", "DORA", "UK NCSC CAF v3.2"],
+    "cisChecks": ["1.1.1", "5.1.2.1"],
+    "severity": "Critical",
+    "category": "Identity Governance",
+    "deploymentOrder": 2,
+    "requiredLicence": "Entra ID P1 or P2",
+    "version": "1.0",
+    "lastUpdated": "2026-03-10"
+  },
+  "displayName": "GOV02 | Require MFA Registration for Admins",
+  "state": "enabledForReportingButNotEnforced",
+  "conditions": {
+    "users": {
+      "includeRoles": [
+        "62e90394-69f5-4237-9190-012177145e10",
+        "194ae4cb-b126-40b2-bd5b-6091b380977d",
+        "f28a1f50-f6e7-4571-818b-6a12f2af6b6c",
+        "29232cdf-9323-42fd-ade2-1d097af3e4de",
+        "b1be1c3e-b65d-4f19-8427-f6fa0d97feb9",
+        "729827e3-9c14-49f7-bb1b-9608f156bbb8",
+        "b0f54661-2d74-4c50-afa3-1ec803f12efe",
+        "fe930be7-5e62-47db-91af-98c3a49a38b1"
+      ]
+    },
+    "applications": { "includeApplications": ["All"] }
+  },
+  "grantControls": {
+    "operator": "OR",
+    "authenticationStrength": { "id": "00000000-0000-0000-0000-000000000002" }
+  },
+  "postDeployment": [
+    "Review policy in Report-Only mode for 7 days before enabling",
+    "Ensure all admins have registered for MFA before switching to Enabled",
+    "Check Conditional Access insights for any blocked sign-ins"
+  ]
+}

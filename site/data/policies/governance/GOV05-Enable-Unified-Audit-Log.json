@@ -1,0 +1,28 @@
+{
+  "_metadata": {
+    "id": "GOV05",
+    "title": "Enable Unified Audit Log",
+    "description": "Ensures the Microsoft 365 Unified Audit Log is enabled for the organisation. Required for security investigations, compliance monitoring, and forensic analysis.",
+    "frameworks": ["CIS Microsoft 365 v3.1.0", "NIST SP 800-53 Rev 5", "NIS2", "ISO 27001:2022", "SOC 2", "PCI DSS v4.0", "HIPAA", "FedRAMP Moderate", "CMMC v2.0", "DORA", "GDPR (EU) 2016/679", "UK NCSC CAF v3.2"],
+    "cisChecks": ["3.1.1"],
+    "severity": "Critical",
+    "category": "Audit & Compliance",
+    "deploymentOrder": 5,
+    "requiredLicence": "Any Microsoft 365 plan",
+    "version": "1.0",
+    "lastUpdated": "2026-03-10"
+  },
+  "steps": [
+    {
+      "cmdlet": "Set-AdminAuditLogConfig",
+      "parameters": {
+        "UnifiedAuditLogIngestionEnabled": true
+      }
+    }
+  ],
+  "postDeployment": [
+    "Get-AdminAuditLogConfig | Select UnifiedAuditLogIngestionEnabled",
+    "Wait 24 hours for audit data to begin populating",
+    "Search-UnifiedAuditLog -StartDate (Get-Date).AddDays(-1) -EndDate (Get-Date) -RecordType ExchangeAdmin -ResultSize 5"
+  ]
+}

@@ -105,7 +105,33 @@
         "Monitor device compliance in Intune > Devices > Monitor > Device compliance",
         "Once validated: expand assignment to All Devices / All Users"
       ]
+    },
+    "defender-endpoint": {
+      "label": "Microsoft Defender for Endpoint",
+      "importMethod": "Intune Endpoint Security / Portal",
+      "script": "scripts/Import-DefenderEndpointPolicies.ps1",
+      "colour": "red",
+      "requiredLicence": "Microsoft Defender for Endpoint P1 or P2",
+      "guideSteps": [
+        "Ensure devices are onboarded to Microsoft Defender for Endpoint",
+        "For Intune-managed policies: deploy via Endpoint Security in Intune admin centre",
+        "For portal-only policies: configure directly in security.microsoft.com",
+        "Review security recommendations in Microsoft Defender portal",
+        "Monitor device health in Defender > Device inventory"
+      ]
+    },
+    "governance": {
+      "label": "Identity Governance & Audit",
+      "importMethod": "Graph API / PowerShell",
+      "colour": "blue",
+      "guideSteps": [
+        "Ensure Entra ID P2 or Governance licence is available for access reviews",
+        "GOV02/GOV03 deploy as Conditional Access policies in Report-Only mode",
+        "GOV04 updates tenant authorization policy — review current guest settings first",
+        "GOV05 enables Unified Audit Log — allow 24 hours for data to populate",
+        "Review all governance settings in Entra admin centre after deployment"
+      ]
     }
   },
-  "totalPolicies": 138
+  "totalPolicies": 143
 }

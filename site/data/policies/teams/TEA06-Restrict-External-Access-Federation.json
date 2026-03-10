@@ -59,6 +59,17 @@
       }
     }
   },
+  "steps": [
+    {
+      "cmdlet": "Set-CsTenantFederationConfiguration",
+      "parameters": {
+        "AllowFederatedUsers": false,
+        "AllowTeamsConsumer": false,
+        "AllowTeamsConsumerInbound": false,
+        "AllowPublicUsers": false
+      }
+    }
+  ],
   "postDeployment": [
     "Get-CsTenantFederationConfiguration | Format-List",
     "If using Option B, verify allowed domains: (Get-CsTenantFederationConfiguration).AllowedDomains",

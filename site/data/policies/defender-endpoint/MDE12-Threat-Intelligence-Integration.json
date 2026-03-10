@@ -47,7 +47,9 @@
     ],
     "deploymentOrder": 12,
     "importMethod": "powershell-graph",
-    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1"
+    "importScript": "scripts/Import-DefenderEndpointPolicies.ps1",
+    "_deploymentMethod": "portal",
+    "_deploymentNote": "Custom threat intelligence indicators are managed via the Microsoft 365 Defender portal (security.microsoft.com > Settings > Endpoints > Indicators) or the MDE tiIndicators API. They cannot be deployed via Intune endpoint security policies."
   },
   "_notes": {
     "prerequisites": [

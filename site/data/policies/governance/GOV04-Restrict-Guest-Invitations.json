@@ -1,0 +1,32 @@
+{
+  "_metadata": {
+    "id": "GOV04",
+    "title": "Restrict Guest User Invitations",
+    "description": "Restricts guest invitation permissions so that only admins and users with the Guest Inviter role can invite external guests. Prevents unrestricted guest sprawl.",
+    "frameworks": ["CIS Microsoft 365 v3.1.0", "NIST SP 800-53 Rev 5", "NIS2", "ISO 27001:2022", "SOC 2", "GDPR (EU) 2016/679", "FedRAMP Moderate", "UK NCSC CAF v3.2"],
+    "cisChecks": ["5.1.2.3"],
+    "severity": "High",
+    "category": "Identity Governance",
+    "deploymentOrder": 4,
+    "requiredLicence": "Entra ID P1",
+    "version": "1.0",
+    "lastUpdated": "2026-03-10"
+  },
+  "graphApiCalls": [
+    {
+      "stepOrder": 1,
+      "method": "PATCH",
+      "endpoint": "https://graph.microsoft.com/v1.0/policies/authorizationPolicy",
+      "description": "Restrict guest invitation to admins and Guest Inviter role only",
+      "body": {
+        "allowInvitesFrom": "adminsAndGuestInviters",
+        "guestUserRoleId": "2af84b1e-32c8-42b7-82bc-daa82404023b"
+      }
+    }
+  ],
+  "postDeployment": [
+    "Verify: Get-MgPolicyAuthorizationPolicy | Select AllowInvitesFrom",
+    "Assign Guest Inviter role to specific users who need to invite guests",
+    "Review existing guest accounts and remove stale ones"
+  ]
+}
