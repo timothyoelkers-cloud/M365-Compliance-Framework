@@ -5,7 +5,7 @@
 ═══════════════════════════════════════════ */
 const ScanHistory = (() => {
   const DB_NAME = 'm365-compliance';
-  const DB_VERSION = 1;
+  const DB_VERSION = 2;
   const MAX_SCANS_PER_TENANT = 50;
 
   let db = null;
@@ -19,30 +19,45 @@ const ScanHistory = (() => {
 
       request.onupgradeneeded = function (event) {
         var d = event.target.result;
+        var oldVersion = event.oldVersion;
 
-        // Scan snapshots
-        if (!d.objectStoreNames.contains('scans')) {
-          var store = d.createObjectStore('scans', { keyPath: 'id' });
-          store.createIndex('tenantId', 'tenantId', { unique: false });
-          store.createIndex('timestamp', 'timestamp', { unique: false });
-          store.createIndex('tenantTimestamp', ['tenantId', 'timestamp'], { unique: false });
+        // ── v1 stores ──
+        if (oldVersion < 1) {
+          // Scan snapshots
+          if (!d.objectStoreNames.contains('scans')) {
+            var store = d.createObjectStore('scans', { keyPath: 'id' });
+            store.createIndex('tenantId', 'tenantId', { unique: false });
+            store.createIndex('timestamp', 'timestamp', { unique: false });
+            store.createIndex('tenantTimestamp', ['tenantId', 'timestamp'], { unique: false });
+          }
+
+          // Offline policy JSON cache
+          if (!d.objectStoreNames.contains('policyCache')) {
+            d.createObjectStore('policyCache', { keyPath: 'key' });
+          }
+
+          // Compliance evidence attachments
+          if (!d.objectStoreNames.contains('evidence')) {
+            var evStore = d.createObjectStore('evidence', { keyPath: 'id' });
+            evStore.createIndex('tenantId', 'tenantId', { unique: false });
+            evStore.createIndex('timestamp', 'timestamp', { unique: false });
+          }
+
+          // Per-tenant assessment state (for multi-tenant)
+          if (!d.objectStoreNames.contains('tenantState')) {
+            d.createObjectStore('tenantState', { keyPath: 'tenantId' });
+          }
         }
 
-        // Offline policy JSON cache
-        if (!d.objectStoreNames.contains('policyCache')) {
-          d.createObjectStore('policyCache', { keyPath: 'key' });
-        }
-
-        // Compliance evidence attachments
-        if (!d.objectStoreNames.contains('evidence')) {
-          var evStore = d.createObjectStore('evidence', { keyPath: 'id' });
-          evStore.createIndex('tenantId', 'tenantId', { unique: false });
-          evStore.createIndex('timestamp', 'timestamp', { unique: false });
-        }
-
-        // Per-tenant assessment state (for multi-tenant)
-        if (!d.objectStoreNames.contains('tenantState')) {
-          d.createObjectStore('tenantState', { keyPath: 'tenantId' });
+        // ── v2 stores ──
+        if (oldVersion < 2) {
+          // Audit trail log
+          if (!d.objectStoreNames.contains('auditLog')) {
+            var auditStore = d.createObjectStore('auditLog', { keyPath: 'id', autoIncrement: true });
+            auditStore.createIndex('timestamp', 'timestamp', { unique: false });
+            auditStore.createIndex('action', 'action', { unique: false });
+            auditStore.createIndex('userId', 'userId', { unique: false });
+          }
         }
       };
 

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>M365 Compliance Framework</title>
 <meta name="description" content="Open-source M365 compliance toolkit: 46 frameworks, 140 CIS checks, 110 deployment-ready policies.">
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://alcdn.msauth.net https://cdn.sheetjs.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://graph.microsoft.com https://login.microsoftonline.com https://outlook.office365.com https://ps.compliance.protection.outlook.com https://*.webhook.office.com; img-src 'self' data: blob:; worker-src 'self';">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://alcdn.msauth.net https://cdn.sheetjs.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://graph.microsoft.com https://login.microsoftonline.com https://outlook.office365.com https://ps.compliance.protection.outlook.com https://*.webhook.office.com https://api.github.com https://dev.azure.com; img-src 'self' data: blob:; worker-src 'self';">
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/design-system.css">
 <link rel="stylesheet" href="css/layout.css">
@@ -139,6 +139,9 @@
 </head>
 <body>
 
+<!-- ═══ SKIP LINK (Accessibility) ═══ -->
+<a href="#main" class="skip-link">Skip to main content</a>
+
 <!-- ═══ ACCESS GATE ═══ -->
 <div id="access-gate" class="access-gate">
   <div class="gate-card">
@@ -157,14 +160,14 @@
 </div>
 
 <!-- ═══ TOPBAR ═══ -->
-<header id="topbar">
+<header id="topbar" role="banner">
   <a class="logo" onclick="Router.navigate('home')" title="Home">
     <div class="logo-mark"></div>
     <div class="logo-text">M365 Compliance<br><span>Framework</span></div>
   </a>
   <div class="topbar-meta">v2.0 &middot; CIS M365 v3</div>
   <button class="nav-toggle" onclick="document.querySelector('.topbar-nav').classList.toggle('open')" aria-label="Menu">&#9776;</button>
-  <nav class="topbar-nav">
+  <nav class="topbar-nav" role="navigation" aria-label="Main">
     <a class="nav-link active" data-page="home" onclick="Router.navigate('home')">Home</a>
     <a class="nav-link" data-page="assessment" onclick="Router.navigate('assessment')">Assessment</a>
     <a class="nav-link" data-page="dashboard" onclick="Router.navigate('dashboard')">Dashboard</a>
@@ -178,6 +181,7 @@
     <span id="offline-indicator" style="display:none;align-items:center;font-size:.58rem;color:var(--red);margin-right:4px"></span>
     <span id="scan-schedule-indicator" style="display:none;align-items:center;font-size:.55rem;color:var(--ink4);margin-right:4px"></span>
   </div>
+  <button id="theme-toggle-btn" class="btn btn-dark btn-sm" onclick="if(typeof ThemeToggle!=='undefined')ThemeToggle.toggle()" title="Toggle dark/light theme (T)" aria-label="Toggle theme" style="margin-right:4px;font-size:.72rem">&#9790;</button>
   <div class="topbar-auth" id="topbar-auth">
     <button class="btn btn-dark btn-sm" id="btn-connect-tenant" onclick="handleConnectTenant()">
       <span class="auth-dot" id="auth-dot"></span>
@@ -188,8 +192,8 @@
 
 <!-- ═══ APP ═══ -->
 <div id="app">
-  <aside id="sidebar"></aside>
-  <main id="main">
+  <aside id="sidebar" role="complementary"></aside>
+  <main id="main" role="main">
 
     <!-- ── HOME PAGE ─────────────────────── -->
     <section id="page-home" class="page active">
@@ -314,6 +318,7 @@
 
 <!-- ═══ TOAST ═══ -->
 <div id="toast" class="toast"></div>
+<div id="sr-announce" role="status" aria-live="polite" class="sr-only"></div>
 
 <!-- ═══ SCRIPTS ═══ -->
 <!-- CDN Libraries -->
@@ -344,6 +349,15 @@
 <script src="js/notifications.js"></script>
 <script src="js/evidence.js"></script>
 <script src="js/tenant-manager.js"></script>
+<!-- Enhancement modules -->
+<script src="js/audit-trail.js"></script>
+<script src="js/theme-toggle.js"></script>
+<script src="js/keyboard-shortcuts.js"></script>
+<script src="js/forecasting.js"></script>
+<script src="js/overlap-matrix.js"></script>
+<script src="js/change-tracker.js"></script>
+<script src="js/dep-viz.js"></script>
+<script src="js/integrations.js"></script>
 <!-- Pages -->
 <script src="js/assessment.js"></script>
 <script src="js/dashboard.js"></script>
@@ -362,6 +376,9 @@ function showToast(msg) {
   el.textContent = msg;
   el.classList.add('show');
   setTimeout(() => el.classList.remove('show'), 2500);
+  // Screen reader announcement
+  const sr = document.getElementById('sr-announce');
+  if (sr) sr.textContent = msg;
 }
 
 // ── Tenant Connection ──
@@ -488,6 +505,10 @@ async function bootstrap() {
     if (savedInterval && typeof ScanScheduler !== 'undefined') {
       ScanScheduler.start(savedInterval);
     }
+
+    // Theme toggle + keyboard shortcuts
+    if (typeof ThemeToggle !== 'undefined') ThemeToggle.init();
+    if (typeof KeyboardShortcuts !== 'undefined') KeyboardShortcuts.init();
 
     // Listen for deployment progress
     AppState.on('deploymentProgress', (progress) => {

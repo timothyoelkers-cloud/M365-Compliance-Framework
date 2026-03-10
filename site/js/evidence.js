@@ -142,6 +142,7 @@ const EvidenceCollector = (() => {
       URL.revokeObjectURL(url);
 
       showToast('Evidence package exported');
+      if (typeof AuditTrail !== 'undefined') AuditTrail.log('export.evidence', 'Evidence package exported');
 
       // Save evidence record to IndexedDB
       if (typeof ScanHistory !== 'undefined') {

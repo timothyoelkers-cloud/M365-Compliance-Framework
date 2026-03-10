@@ -205,12 +205,73 @@ const Remediation = (() => {
     }
 
     // Actions
-    html += '<div style="display:flex;gap:8px;margin-top:8px">';
+    html += '<div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;align-items:center">';
     html += '<button class="btn btn-sm btn-primary" onclick="Router.navigate(\'policies\');setTimeout(function(){Policies.viewDetail(\'' + escHtml(rem.policyId) + '\')},300)">View Policy</button>';
+
+    // One-click deploy button (if Graph-deployable and tenant connected)
+    if (typeof DeployEngine !== 'undefined' && typeof TenantAuth !== 'undefined') {
+      var policies = AppState.get('policies') || [];
+      var polSummary2 = policies.find(function (p) { return p.id === rem.policyId; });
+      if (polSummary2 && DeployEngine.isDeployable && DeployEngine.isDeployable(polSummary2.type)) {
+        if (TenantAuth.isAuthenticated()) {
+          var deployStatus = DeployEngine.getDeploymentStatus ? DeployEngine.getDeploymentStatus(rem.policyId) : null;
+          if (deployStatus && deployStatus.status === 'success') {
+            html += '<span class="badge badge-green" style="font-size:.56rem">Deployed</span>';
+          } else {
+            html += '<button class="btn btn-sm btn-amber" id="rem-deploy-btn-' + escHtml(rem.policyId) + '" onclick="Remediation.deployFromCard(\'' + escHtml(rem.policyId) + '\')" style="font-size:.6rem">Deploy Now</button>';
+          }
+        } else {
+          html += '<span style="font-size:.58rem;color:var(--ink4)">Connect tenant to deploy</span>';
+        }
+      }
+    }
+
+    html += '<span id="rem-deploy-result-' + escHtml(rem.policyId) + '" style="font-size:.6rem"></span>';
     html += '</div>';
 
     html += '</div>';
     return html;
+  }
+
+  /**
+   * Deploy a policy directly from the remediation card.
+   */
+  async function deployFromCard(policyId) {
+    var btn = document.getElementById('rem-deploy-btn-' + policyId);
+    var result = document.getElementById('rem-deploy-result-' + policyId);
+    if (btn) { btn.disabled = true; btn.textContent = 'Deploying...'; }
+    if (result) result.innerHTML = '<span style="color:var(--amber2)">&#9881; Deploying...</span>';
+
+    try {
+      // Check for pre-deploy config
+      if (typeof PreDeployConfig !== 'undefined' && PreDeployConfig.hasConfigFields && PreDeployConfig.hasConfigFields(policyId)) {
+        PreDeployConfig.showConfigModal(policyId);
+        if (btn) { btn.disabled = false; btn.textContent = 'Deploy Now'; }
+        if (result) result.innerHTML = '';
+        return;
+      }
+
+      var deployResult = await DeployEngine.deploySinglePolicy(policyId);
+      if (deployResult && (deployResult.status === 'success' || deployResult.status === 'exists')) {
+        if (result) result.innerHTML = '<span style="color:var(--green)">&#10003; ' + (deployResult.status === 'exists' ? 'Already exists' : 'Deployed') + '</span>';
+        if (btn) btn.style.display = 'none';
+      } else {
+        var errMsg = (deployResult && deployResult.detail) || 'Deployment failed';
+        if (result) result.innerHTML = '<span style="color:var(--red)">&#10007; ' + escHtml(errMsg) + '</span>';
+        if (btn) { btn.disabled = false; btn.textContent = 'Retry'; }
+      }
+
+      // Audit trail
+      if (typeof AuditTrail !== 'undefined') {
+        AuditTrail.log('deploy.single', 'Deployed ' + policyId + ' from remediation card', {
+          policyId: policyId,
+          status: deployResult ? deployResult.status : 'unknown',
+        });
+      }
+    } catch (e) {
+      if (result) result.innerHTML = '<span style="color:var(--red)">&#10007; ' + escHtml(e.message) + '</span>';
+      if (btn) { btn.disabled = false; btn.textContent = 'Retry'; }
+    }
   }
 
   /** Clear the remediation cache. */
@@ -220,6 +281,7 @@ const Remediation = (() => {
     getRemediation: getRemediation,
     getRemediationsForGaps: getRemediationsForGaps,
     renderCard: renderCard,
+    deployFromCard: deployFromCard,
     clearCache: clearCache,
   };
 })();

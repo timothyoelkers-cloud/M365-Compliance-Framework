@@ -27,10 +27,12 @@ const WebhookNotifier = (() => {
     if (!settings || !settings.enabled || !settings.url) return false;
 
     var body;
-    if (settings.type === 'teams') {
-      body = buildTeamsAdaptiveCard(payload);
-    } else {
-      body = buildGenericWebhook(payload);
+    switch (settings.type) {
+      case 'teams':    body = buildTeamsAdaptiveCard(payload); break;
+      case 'splunk':   body = buildSplunkHEC(payload); break;
+      case 'sentinel': body = buildSentinelFormat(payload); break;
+      case 'cef':      body = buildCEFFormat(payload); break;
+      default:         body = buildGenericWebhook(payload); break;
     }
 
     try {
@@ -152,6 +154,62 @@ const WebhookNotifier = (() => {
     }
   }
 
+  // ─── SIEM Formats ───
+
+  function buildSplunkHEC(payload) {
+    return {
+      event: {
+        sourcetype: 'm365_compliance',
+        source: 'M365ComplianceFramework',
+        host: window.location.hostname || 'localhost',
+        time: Math.floor((payload.timestamp || Date.now()) / 1000),
+        event: {
+          action: payload.event || 'compliance_alert',
+          message: payload.message || '',
+          tenantId: payload.tenantId || AppState.get('authTenantId') || '',
+          score: payload.score || null,
+          severity: payload.severity || 'info',
+          facts: payload.facts || [],
+        },
+      },
+    };
+  }
+
+  function buildSentinelFormat(payload) {
+    return [{
+      TimeGenerated: new Date(payload.timestamp || Date.now()).toISOString(),
+      Source_s: 'M365ComplianceFramework',
+      Action_s: payload.event || 'compliance_alert',
+      Message_s: payload.message || '',
+      TenantId_g: payload.tenantId || AppState.get('authTenantId') || '',
+      Score_d: payload.score || 0,
+      Severity_s: payload.severity || 'Informational',
+      Details_s: JSON.stringify(payload.facts || payload.data || {}),
+      Computer_s: window.location.hostname || 'localhost',
+    }];
+  }
+
+  function buildCEFFormat(payload) {
+    var severity = payload.severity || 5;
+    var sevNum = typeof severity === 'string' ?
+      ({ low: 3, medium: 5, high: 7, critical: 9, info: 1 }[severity.toLowerCase()] || 5) :
+      severity;
+    var tenantId = payload.tenantId || AppState.get('authTenantId') || '';
+    var score = payload.score || 0;
+    var rt = payload.timestamp || Date.now();
+
+    var cef = 'CEF:0|M365ComplianceFramework|ComplianceMonitor|1.0|' +
+      (payload.event || 'COMPLIANCE_ALERT') + '|' +
+      (payload.message || '').replace(/\|/g, '\\|') + '|' +
+      sevNum + '|' +
+      'tenantId=' + tenantId +
+      ' score=' + score +
+      ' rt=' + rt +
+      ' src=' + (window.location.hostname || 'localhost');
+
+    return { message: cef };
+  }
+
   // ─── Settings UI ───
 
   function renderSettingsModal() {
@@ -180,6 +238,9 @@ const WebhookNotifier = (() => {
     html += '<select id="webhook-type" style="font-size:.72rem;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--ink1)">';
     html += '<option value="teams" ' + (settings.type === 'teams' ? 'selected' : '') + '>Microsoft Teams</option>';
     html += '<option value="generic" ' + (settings.type === 'generic' ? 'selected' : '') + '>Generic Webhook</option>';
+    html += '<option value="splunk" ' + (settings.type === 'splunk' ? 'selected' : '') + '>Splunk HEC</option>';
+    html += '<option value="sentinel" ' + (settings.type === 'sentinel' ? 'selected' : '') + '>Microsoft Sentinel</option>';
+    html += '<option value="cef" ' + (settings.type === 'cef' ? 'selected' : '') + '>CEF (Syslog)</option>';
     html += '</select>';
     html += '</div>';
     html += '<div>';

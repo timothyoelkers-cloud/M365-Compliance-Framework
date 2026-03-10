@@ -154,8 +154,13 @@ const DependencyGraph = (() => {
     return html;
   }
 
+  function getAdjacency() {
+    buildGraph();
+    return adjacency;
+  }
+
   return {
-    buildGraph, invalidate, getDeps,
+    buildGraph, invalidate, getDeps, getAdjacency,
     checkPrerequisites, suggestOrder,
     renderDependencyView, renderPrereqWarning,
   };

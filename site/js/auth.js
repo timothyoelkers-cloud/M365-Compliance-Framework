@@ -138,6 +138,11 @@ const TenantAuth = (() => {
         if (typeof TenantManager !== 'undefined' && currentAccount.tenantId) {
           TenantManager.addTenant(currentAccount.tenantId, currentAccount.name || currentAccount.username || currentAccount.tenantId);
         }
+
+        // Step 6: Audit trail
+        if (typeof AuditTrail !== 'undefined') {
+          AuditTrail.log('auth.login', 'User logged in', { tenantId: currentAccount.tenantId });
+        }
       }
       return loginResponse;
     } catch (err) {
@@ -149,6 +154,7 @@ const TenantAuth = (() => {
 
   async function logout() {
     if (!msalInstance) return;
+    if (typeof AuditTrail !== 'undefined') AuditTrail.log('auth.logout', 'User logged out');
     currentAccount = null;
     updateAuthState();
     try {

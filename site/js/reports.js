@@ -90,8 +90,9 @@ const Reports = (() => {
         <button class="btn btn-amber" onclick="Reports.exportHTML()">Export HTML</button>
         <button class="btn" onclick="Reports.exportExcel()">Export Excel</button>
       </div>
-      <div style="display:flex;gap:8px;margin-top:8px">
+      <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
         ${typeof EvidenceCollector !== 'undefined' ? EvidenceCollector.renderExportButton() : ''}
+        ${typeof PowerBIExport !== 'undefined' ? PowerBIExport.renderExportPanel() : ''}
       </div>
     </div>`;
 
@@ -386,6 +387,7 @@ const Reports = (() => {
   }
 
   function exportPDF() {
+    if (typeof AuditTrail !== 'undefined') AuditTrail.log('export.pdf', 'PDF report exported');
     window.print();
   }
 
@@ -417,6 +419,7 @@ ${canvas.innerHTML}
     a.click();
     URL.revokeObjectURL(url);
     showToast('Report exported as HTML');
+    if (typeof AuditTrail !== 'undefined') AuditTrail.log('export.html', 'HTML report exported');
   }
 
   function shadeColour(hex, amt) {
@@ -525,6 +528,7 @@ ${canvas.innerHTML}
     var filename = 'M365-Compliance-' + orgName.replace(/[^a-z0-9]/gi, '_') + '-' + new Date().toISOString().slice(0, 10) + '.xlsx';
     XLSX.writeFile(wb, filename);
     showToast('Excel report exported');
+    if (typeof AuditTrail !== 'undefined') AuditTrail.log('export.excel', 'Excel report exported');
   }
 
   return { init, render, preview, exportPDF, exportHTML, exportExcel, handleLogo };

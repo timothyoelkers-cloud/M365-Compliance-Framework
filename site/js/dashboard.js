@@ -57,6 +57,9 @@ const Dashboard = (() => {
     if (typeof WebhookNotifier !== 'undefined') {
       html += '<button class="btn btn-sm" onclick="WebhookNotifier.renderSettingsModal()" style="font-size:.62rem" title="Webhook Settings">&#128276;</button>';
     }
+    if (typeof AuditTrail !== 'undefined') {
+      html += '<button class="btn btn-sm" onclick="AuditTrail.renderViewer()" style="font-size:.62rem" title="Audit Trail">&#128221;</button>';
+    }
     html += '</div></div>';
 
     // Executive mode — simplified board-level view
@@ -85,6 +88,9 @@ const Dashboard = (() => {
         <div class="kpi-label">Frameworks Assessed</div>
       </div>
     </div>`;
+
+    // Change Alerts
+    html += '<div id="dashboard-change-alerts"></div>';
 
     // ── Tenant Policy Compliance (from scan results) ──
     html += renderTenantComplianceSection();
@@ -166,8 +172,21 @@ const Dashboard = (() => {
         </div>`;
     }
 
+    // Work Item Integration button below gap register
+    if (typeof WorkItemIntegration !== 'undefined' && gaps.length > 0) {
+      html += WorkItemIntegration.renderCreateButton(gaps);
+    }
+
+    // Framework Overlap Matrix
+    if (sel.size >= 2) {
+      html += '<div id="dashboard-overlap"></div>';
+    }
+
     // Scan History Timeline
     html += '<div id="dashboard-scan-history"></div>';
+
+    // Dependency Map
+    html += '<div id="dashboard-dep-viz"></div>';
 
     // RBAC Summary
     if (typeof RBACCheck !== 'undefined' && RBACCheck.hasFetched()) {
@@ -187,6 +206,28 @@ const Dashboard = (() => {
     // Render scan history timeline
     if (typeof ScanHistory !== 'undefined') {
       ScanHistory.renderTimeline('dashboard-scan-history').catch(function () {});
+    }
+
+    // Score forecast chart
+    if (typeof ScoreForecaster !== 'undefined') {
+      ScoreForecaster.renderForecastChart('dashboard-scan-history', 30);
+    }
+
+    // Change alerts
+    if (typeof ChangeTracker !== 'undefined') {
+      ChangeTracker.renderChangeAlerts('dashboard-change-alerts').catch(function () {});
+    }
+
+    // Framework overlap matrix
+    if (typeof OverlapMatrix !== 'undefined' && sel.size >= 2) {
+      var checks = AppState.get('checks') || [];
+      var overlapData = OverlapMatrix.computeOverlap(checks, sel);
+      if (overlapData) OverlapMatrix.renderHeatmap('dashboard-overlap', overlapData);
+    }
+
+    // Dependency graph visualization
+    if (typeof DepViz !== 'undefined') {
+      DepViz.renderSVG('dashboard-dep-viz');
     }
   }
 

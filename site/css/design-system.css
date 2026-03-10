@@ -226,3 +226,118 @@ a:hover { text-decoration: underline; }
   background: var(--accent-lt2);
   color: var(--accent2);
 }
+
+/* ═══════════════════════════════════════════
+   DARK THEME OVERRIDES
+═══════════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg:           #0d1117;
+  --bg2:          #161b22;
+  --surface:      #1c2128;
+  --surface2:     #21262d;
+  --border:       #30363d;
+  --border2:      #3d444d;
+  --ink:          #e6edf3;
+  --ink2:         #c9d1d9;
+  --ink3:         #8b949e;
+  --ink4:         #6e7681;
+
+  --accent-lt:    rgba(22,163,74,.12);
+  --accent-lt2:   rgba(22,163,74,.2);
+  --green-lt:     rgba(22,163,74,.12);
+  --green-lt2:    rgba(22,163,74,.2);
+  --red-lt:       rgba(220,38,38,.12);
+  --red-lt2:      rgba(220,38,38,.2);
+  --amber-lt:     rgba(202,138,4,.12);
+  --amber-lt2:    rgba(202,138,4,.2);
+  --blue-lt:      rgba(29,78,216,.12);
+  --blue-lt2:     rgba(29,78,216,.2);
+  --teal-lt:      rgba(8,145,178,.12);
+  --purple-lt:    rgba(124,58,237,.12);
+
+  --glass-bg:     rgba(22,27,34,0.65);
+  --glass-bg2:    rgba(22,27,34,0.45);
+  --glass-border: rgba(255,255,255,0.08);
+
+  --shadow:       0 1px 3px rgba(0,0,0,.3), 0 1px 2px rgba(0,0,0,.2);
+  --shadow2:      0 4px 12px rgba(0,0,0,.4), 0 2px 4px rgba(0,0,0,.2);
+  --shadow3:      0 10px 30px rgba(0,0,0,.4);
+  --shadow-glass: 0 8px 32px rgba(0,0,0,.3);
+  --shadow-glass-lg: 0 16px 48px rgba(0,0,0,.4);
+}
+
+[data-theme="dark"] body {
+  background: linear-gradient(135deg, #0d1117 0%, #161b22 50%, #0d1117 100%);
+  background-attachment: fixed;
+}
+
+[data-theme="dark"] .card,
+[data-theme="dark"] .kpi {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .data-table th {
+  background: var(--surface2);
+}
+
+[data-theme="dark"] .data-table tr:nth-child(even) {
+  background: rgba(255,255,255,.02);
+}
+
+[data-theme="dark"] .scan-summary-bar {
+  background: var(--surface);
+  border-color: var(--border);
+}
+
+/* ═══════════════════════════════════════════
+   ACCESSIBILITY
+═══════════════════════════════════════════ */
+
+/* Skip link */
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: auto;
+  z-index: 10000;
+  padding: 8px 16px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+  font-size: .82rem;
+  border-radius: 0 0 var(--r) 0;
+  text-decoration: none;
+}
+.skip-link:focus {
+  left: 0;
+  top: 0;
+}
+
+/* Focus-visible for keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+button:focus-visible,
+.btn:focus-visible,
+a:focus-visible,
+select:focus-visible,
+input:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(22,163,74,.15);
+}
+
+/* Keyboard shortcut keys */
+kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: .68rem;
+  font-weight: 600;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  box-shadow: 0 1px 1px rgba(0,0,0,.08);
+}

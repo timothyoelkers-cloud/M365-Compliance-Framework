@@ -113,10 +113,102 @@ const TenantScanner = (() => {
     }
   }
 
+  // ─── Batch API Support ───
+
+  const BATCH_ENDPOINT = GRAPH_BASE + '/v1.0/$batch';
+  const MAX_BATCH_SIZE = 20;
+
+  /**
+   * Execute a $batch request against the Graph API.
+   * Groups up to 20 requests per batch call.
+   */
+  async function executeBatch(endpointKeys, token) {
+    var requests = [];
+    for (var i = 0; i < endpointKeys.length; i++) {
+      var key = endpointKeys[i];
+      var def = SCAN_ENDPOINTS[key];
+      requests.push({
+        id: key,
+        method: 'GET',
+        url: def.url,
+      });
+    }
+
+    var controller = new AbortController();
+    var timerId = setTimeout(function () { controller.abort(); }, REQUEST_TIMEOUT_MS * 2);
+
+    try {
+      var response = await fetch(BATCH_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ requests: requests }),
+        signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error('Batch HTTP ' + response.status);
+      }
+
+      var body = await response.json();
+      var resultMap = {};
+
+      var responses = body.responses || [];
+      for (var j = 0; j < responses.length; j++) {
+        var r = responses[j];
+        var endpointKey = r.id;
+        var def2 = SCAN_ENDPOINTS[endpointKey];
+
+        if (r.status >= 200 && r.status < 300) {
+          if (def2 && !def2.isList) {
+            resultMap[endpointKey] = { success: true, data: r.body };
+          } else {
+            var items = (r.body && Array.isArray(r.body.value)) ? r.body.value : [];
+            var nextLink = r.body ? r.body['@odata.nextLink'] : null;
+            resultMap[endpointKey] = { success: true, data: items, nextLink: nextLink };
+          }
+        } else {
+          var errMsg = (r.body && r.body.error && r.body.error.message) || ('HTTP ' + r.status);
+          resultMap[endpointKey] = { success: false, error: errMsg };
+        }
+      }
+
+      return resultMap;
+    } finally {
+      clearTimeout(timerId);
+    }
+  }
+
+  /**
+   * Follow @odata.nextLink pagination for list endpoints that returned more data.
+   */
+  async function followPagination(endpointKey, items, nextLink, token) {
+    var allItems = items.slice();
+    var page = 1;
+    var link = nextLink;
+
+    while (link && page < MAX_PAGES) {
+      try {
+        var body = await graphGet(link, token);
+        var pageItems = Array.isArray(body.value) ? body.value : [];
+        allItems = allItems.concat(pageItems);
+        link = body['@odata.nextLink'] || null;
+        page++;
+      } catch (e) {
+        break;
+      }
+    }
+
+    return allItems;
+  }
+
   // ─── Main Scan ───
 
   /**
    * Scan the connected tenant by querying all configured Graph endpoints.
+   * Uses $batch API by default for efficiency (1 request instead of 15+).
    *
    * @returns {{ success: boolean, data: object|null, errors: string[], scanTime: number }}
    */
@@ -157,39 +249,82 @@ const TenantScanner = (() => {
 
     AppState.set('scanProgress', { total, completed: 0, current: 'Initializing scan...' });
 
+    // Audit trail
+    if (typeof AuditTrail !== 'undefined') {
+      AuditTrail.log('scan.start', 'Tenant scan initiated', { endpointCount: total });
+    }
+
     try {
-      // Launch all requests in parallel; track individual progress
-      const promises = endpointKeys.map(key => {
-        const def = SCAN_ENDPOINTS[key];
-        return fetchEndpoint(key, def, token).then(result => {
+      const data = {};
+      const errors = [];
+
+      // ── Try $batch first for efficiency ──
+      let usedBatch = false;
+      try {
+        AppState.set('scanProgress', { total, completed: 0, current: 'Batch request...' });
+        var batchResults = await executeBatch(endpointKeys, token);
+        usedBatch = true;
+
+        // Process batch results
+        for (var bi = 0; bi < endpointKeys.length; bi++) {
+          var bKey = endpointKeys[bi];
+          var bResult = batchResults[bKey];
+
+          if (!bResult) {
+            data[bKey] = null;
+            errors.push(bKey + ': No response from batch');
+          } else if (bResult.success) {
+            // Follow pagination if needed
+            if (bResult.nextLink) {
+              data[bKey] = await followPagination(bKey, bResult.data, bResult.nextLink, token);
+            } else {
+              data[bKey] = bResult.data;
+            }
+          } else {
+            data[bKey] = null;
+            errors.push(bKey + ': ' + bResult.error);
+          }
+
           completed++;
           AppState.set('scanProgress', {
             total,
             completed,
-            current: key + (completed < total ? '' : ' (finalizing)'),
+            current: bKey + (completed < total ? '' : ' (finalizing)'),
           });
-          return { key, result };
+        }
+      } catch (batchErr) {
+        // $batch failed entirely — fall back to individual parallel requests
+        console.warn('[TenantScanner] Batch failed, falling back to parallel:', batchErr.message);
+        usedBatch = false;
+        completed = 0;
+
+        const promises = endpointKeys.map(key => {
+          const def = SCAN_ENDPOINTS[key];
+          return fetchEndpoint(key, def, token).then(result => {
+            completed++;
+            AppState.set('scanProgress', {
+              total,
+              completed,
+              current: key + (completed < total ? '' : ' (finalizing)'),
+            });
+            return { key, result };
+          });
         });
-      });
 
-      const settled = await Promise.allSettled(promises);
+        const settled = await Promise.allSettled(promises);
 
-      // ── Assemble results ──
-      const data = {};
-      const errors = [];
-
-      for (const entry of settled) {
-        if (entry.status === 'fulfilled') {
-          const { key, result } = entry.value;
-          if (result.success) {
-            data[key] = result.data;
+        for (const entry of settled) {
+          if (entry.status === 'fulfilled') {
+            const { key, result } = entry.value;
+            if (result.success) {
+              data[key] = result.data;
+            } else {
+              data[key] = null;
+              errors.push(key + ': ' + result.error);
+            }
           } else {
-            data[key] = null;
-            errors.push(key + ': ' + result.error);
+            errors.push('Unexpected rejection: ' + (entry.reason || 'unknown'));
           }
-        } else {
-          // Promise itself rejected (should not happen, but guard anyway)
-          errors.push('Unexpected rejection: ' + (entry.reason || 'unknown'));
         }
       }
 
@@ -219,6 +354,17 @@ const TenantScanner = (() => {
       // Update tenant manager last scan time
       if (typeof TenantManager !== 'undefined' && scanCache.tenantId) {
         TenantManager.updateLastScan(scanCache.tenantId);
+      }
+
+      // Audit trail
+      if (typeof AuditTrail !== 'undefined') {
+        AuditTrail.log('scan.complete', 'Scan finished in ' + (scanTime / 1000).toFixed(1) + 's', {
+          scanTime: scanTime,
+          endpointCount: total,
+          successCount: total - errors.length,
+          errorCount: errors.length,
+          usedBatch: usedBatch,
+        });
       }
 
       // Notify user
