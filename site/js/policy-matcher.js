@@ -1464,7 +1464,8 @@ const PolicyMatcher = (() => {
    * @returns {Object} map of policyId -> match result
    */
   function matchAll(policies) {
-    const scanData = typeof TenantScanner !== 'undefined' ? TenantScanner.getScanResults() : null;
+    const scanCache = typeof TenantScanner !== 'undefined' ? TenantScanner.getScanResults() : null;
+    const scanData = scanCache && scanCache.data ? scanCache.data : null;
 
     if (!scanData) {
       // If no scan data, mark Graph-deployable policies as not_scanned and PS-only as manual
