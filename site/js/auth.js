@@ -8,7 +8,8 @@ const TenantAuth = (() => {
 
   // ─── App Registration: Framework-Assessment-Deployment ───
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
-  const REDIRECT_URI = window.location.origin + window.location.pathname;
+  // Normalise redirect URI to directory path (strip index.html) to match Azure AD app registration
+  const REDIRECT_URI = window.location.origin + window.location.pathname.replace(/index\.html$/i, '');
 
   // ─── Token Scopes (per-resource) ───
   // .default returns ALL admin-consented permissions for that resource
