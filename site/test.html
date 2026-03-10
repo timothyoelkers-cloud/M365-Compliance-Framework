@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>M365 Compliance Framework — Tests</title>
+<style>
+  body { margin: 0; padding: 0; background: #f4f6f9; font-family: -apple-system, 'Segoe UI', sans-serif; }
+  h1 { text-align: center; color: #1a1a2e; margin: 24px 0 8px; font-size: 1.3rem; }
+  #test-status { text-align: center; color: #666; font-size: .8rem; margin-bottom: 16px; }
+  #test-results { min-height: 200px; }
+</style>
+</head>
+<body>
+<h1>M365 Compliance Framework — Test Suite</h1>
+<div id="test-status">Loading modules...</div>
+<div id="test-results"></div>
+
+<!-- Load all modules under test (same order as index.html) -->
+<script src="js/data.js"></script>
+<script src="js/state.js"></script>
+<script src="js/scan-history.js"></script>
+<script>
+  /* Stub modules not needed for testing */
+  if (typeof TenantAuth === 'undefined') {
+    window.TenantAuth = { getAccount: function () { return null; }, getGraphToken: function () { return Promise.resolve(null); }, isAuthenticated: function () { return false; } };
+  }
+  if (typeof Router === 'undefined') {
+    window.Router = { navigate: function () {}, register: function () {} };
+  }
+  if (typeof escHtml === 'undefined') {
+    window.escHtml = function (s) { var d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+  }
+  if (typeof showToast === 'undefined') {
+    window.showToast = function () {};
+  }
+</script>
+<script src="js/policy-matcher.js"></script>
+<script src="js/remediation.js"></script>
+<script src="js/assessment.js"></script>
+<script src="js/test-runner.js"></script>
+<script>
+  (async function () {
+    var statusEl = document.getElementById('test-status');
+    try {
+      statusEl.textContent = 'Loading data files...';
+      if (typeof DataStore !== 'undefined') {
+        var checks = await DataStore.fetchJSON('data/checks.json');
+        var policiesAll = await DataStore.fetchJSON('data/policies-all.json');
+        var frameworks = await DataStore.fetchJSON('data/frameworks.json');
+        AppState.state.checks = checks || [];
+        AppState.state.policies = policiesAll || [];
+        AppState.state.frameworks = frameworks || [];
+      }
+      statusEl.textContent = 'Running tests...';
+      if (typeof ScanHistory !== 'undefined') await ScanHistory.openDB();
+      var results = TestRunner.runAll();
+      statusEl.textContent =
+        results.passed + ' passed, ' + results.failed + ' failed — ' +
+        (results.failed === 0 ? 'All good!' : 'Some failures detected');
+    } catch (e) {
+      statusEl.textContent = 'Error: ' + e.message;
+      console.error(e);
+    }
+  })();
+</script>
+</body>
+</html>

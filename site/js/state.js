@@ -48,6 +48,9 @@ const AppState = (() => {
 
     // Deployment history (persisted)
     deploymentHistory: [],
+
+    // Scan scheduling (persisted)
+    scanScheduleInterval: null,
   };
 
   function get(key) {
@@ -89,6 +92,7 @@ const AppState = (() => {
         assessmentStep: state.assessmentStep,
         selectedPolicies: [...state.selectedPolicies],
         deploymentHistory: state.deploymentHistory.slice(0, 200),
+        scanScheduleInterval: state.scanScheduleInterval,
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
     } catch (e) { /* storage full or unavailable */ }
@@ -103,6 +107,7 @@ const AppState = (() => {
       if (saved.assessmentStep) state.assessmentStep = saved.assessmentStep;
       if (saved.selectedPolicies) state.selectedPolicies = new Set(saved.selectedPolicies);
       if (saved.deploymentHistory) state.deploymentHistory = saved.deploymentHistory;
+      if (saved.scanScheduleInterval) state.scanScheduleInterval = saved.scanScheduleInterval;
     } catch (e) { /* corrupt data */ }
   }
 

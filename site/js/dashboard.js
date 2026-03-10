@@ -3,6 +3,7 @@
 ═══════════════════════════════════════════ */
 const Dashboard = (() => {
   let remediationLoaded = false;
+  let executiveMode = false;
 
   function init() {
     render();
@@ -13,6 +14,11 @@ const Dashboard = (() => {
         render();
       }
     });
+  }
+
+  function toggleExecutiveMode() {
+    executiveMode = !executiveMode;
+    render();
   }
 
   function render() {
@@ -33,7 +39,32 @@ const Dashboard = (() => {
     const fwCoverage = AppState.getFrameworkCoverage();
     const gaps = AppState.getGaps().slice(0, 25);
 
-    let html = '';
+    // View toggle + action buttons
+    let html = '<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:8px">';
+    html += '<div style="display:flex;gap:6px">';
+    html += '<button class="btn btn-sm' + (executiveMode ? '' : ' btn-primary') + '" onclick="Dashboard.toggleExecutiveMode()" style="font-size:.62rem">' + (executiveMode ? 'Detailed View' : 'Executive View') + '</button>';
+    if (typeof ScanScheduler !== 'undefined') {
+      html += ScanScheduler.renderSettingsUI();
+    }
+    html += '</div>';
+    html += '<div style="display:flex;gap:6px">';
+    if (typeof PSDeploy !== 'undefined') {
+      html += '<button class="btn btn-sm" onclick="PSDeploy.showDeployModal()" style="font-size:.62rem">Deploy Scripts</button>';
+    }
+    if (typeof EvidenceCollector !== 'undefined') {
+      html += EvidenceCollector.renderExportButton();
+    }
+    if (typeof WebhookNotifier !== 'undefined') {
+      html += '<button class="btn btn-sm" onclick="WebhookNotifier.renderSettingsModal()" style="font-size:.62rem" title="Webhook Settings">&#128276;</button>';
+    }
+    html += '</div></div>';
+
+    // Executive mode — simplified board-level view
+    if (executiveMode) {
+      html += renderExecutiveSummary(stats, fwCoverage);
+      container.innerHTML = html;
+      return;
+    }
 
     // KPI Row
     html += `<div class="kpi-row">
@@ -135,6 +166,14 @@ const Dashboard = (() => {
         </div>`;
     }
 
+    // Scan History Timeline
+    html += '<div id="dashboard-scan-history"></div>';
+
+    // RBAC Summary
+    if (typeof RBACCheck !== 'undefined' && RBACCheck.hasFetched()) {
+      html += RBACCheck.renderPermissionSummary();
+    }
+
     // Remediation Priorities placeholder
     html += '<div id="dashboard-remediation"></div>';
 
@@ -144,6 +183,56 @@ const Dashboard = (() => {
     if (!remediationLoaded) {
       loadRemediationPriorities();
     }
+
+    // Render scan history timeline
+    if (typeof ScanHistory !== 'undefined') {
+      ScanHistory.renderTimeline('dashboard-scan-history').catch(function () {});
+    }
+  }
+
+  // ── Executive Summary ──
+  function renderExecutiveSummary(stats, fwCoverage) {
+    var html = '<div class="exec-summary">';
+
+    // Large donut
+    html += '<div style="display:flex;justify-content:center;align-items:center;gap:40px;margin-bottom:32px;flex-wrap:wrap">';
+    html += '<div class="donut-wrap" style="width:200px;height:200px">' + buildDonut(stats, 100) + '</div>';
+    html += '<div class="exec-kpi-row">';
+    html += '<div class="exec-kpi"><div class="exec-kpi-num" style="color:' + (stats.score >= 80 ? 'var(--green)' : stats.score >= 50 ? 'var(--amber2)' : 'var(--red)') + '">' + stats.score + '%</div><div class="exec-kpi-label">Compliance Score</div></div>';
+    html += '<div class="exec-kpi"><div class="exec-kpi-num" style="color:var(--green)">' + stats.done + '</div><div class="exec-kpi-label">Implemented</div></div>';
+    html += '<div class="exec-kpi"><div class="exec-kpi-num" style="color:var(--red)">' + stats.gap + '</div><div class="exec-kpi-label">Gaps</div></div>';
+    html += '<div class="exec-kpi"><div class="exec-kpi-num" style="color:var(--blue)">' + AppState.get('selectedFrameworks').size + '</div><div class="exec-kpi-label">Frameworks</div></div>';
+    html += '</div></div>';
+
+    // Last scan indicator
+    var scanResults = AppState.get('tenantScanResults');
+    if (scanResults && Object.keys(scanResults).length > 0 && typeof TenantScanner !== 'undefined') {
+      var scanCache = TenantScanner.getScanResults ? TenantScanner.getScanResults() : null;
+      if (scanCache && scanCache.timestamp) {
+        var ago = Date.now() - scanCache.timestamp;
+        var agoStr = ago < 60000 ? 'just now' : ago < 3600000 ? Math.round(ago / 60000) + 'm ago' : Math.round(ago / 3600000) + 'h ago';
+        html += '<div style="text-align:center;font-size:.72rem;color:var(--ink4);margin-bottom:20px">Last scanned: ' + agoStr + '</div>';
+      }
+    }
+
+    // Traffic-light framework grid
+    if (fwCoverage.length > 0) {
+      html += '<div class="section-hdr">Framework Status</div>';
+      html += '<div class="exec-fw-grid">';
+      for (var i = 0; i < fwCoverage.length; i++) {
+        var fw = fwCoverage[i];
+        var cls = fw.pct >= 80 ? 'exec-green' : fw.pct >= 50 ? 'exec-amber' : 'exec-red';
+        html += '<div class="exec-fw-card ' + cls + '">';
+        html += '<div class="exec-fw-pct">' + fw.pct + '%</div>';
+        html += '<div class="exec-fw-name">' + escHtml(fw.fw.length > 30 ? fw.fw.slice(0, 28) + '...' : fw.fw) + '</div>';
+        html += '<div class="exec-fw-detail">' + fw.done + '/' + fw.total + ' controls</div>';
+        html += '</div>';
+      }
+      html += '</div>';
+    }
+
+    html += '</div>';
+    return html;
   }
 
   // ── Tenant Policy Compliance ──
@@ -305,5 +394,5 @@ const Dashboard = (() => {
     </div>`;
   }
 
-  return { init, render };
+  return { init: init, render: render, toggleExecutiveMode: toggleExecutiveMode };
 })();

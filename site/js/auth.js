@@ -126,6 +126,18 @@ const TenantAuth = (() => {
           await msalInstance.acquireTokenSilent({ scopes: COMPLIANCE_TOKEN_SCOPE, account: currentAccount });
           console.log('[Auth] Compliance token pre-acquired');
         } catch (e) { /* will acquire on demand */ }
+
+        // Step 4: RBAC role fetch
+        if (typeof RBACCheck !== 'undefined') {
+          RBACCheck.fetchUserRoles().catch(function (e) {
+            console.warn('[Auth] RBAC fetch failed:', e);
+          });
+        }
+
+        // Step 5: Auto-register tenant
+        if (typeof TenantManager !== 'undefined' && currentAccount.tenantId) {
+          TenantManager.addTenant(currentAccount.tenantId, currentAccount.name || currentAccount.username || currentAccount.tenantId);
+        }
       }
       return loginResponse;
     } catch (err) {

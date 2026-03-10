@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>M365 Compliance Framework</title>
 <meta name="description" content="Open-source M365 compliance toolkit: 46 frameworks, 140 CIS checks, 110 deployment-ready policies.">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://alcdn.msauth.net https://cdn.sheetjs.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://graph.microsoft.com https://login.microsoftonline.com https://outlook.office365.com https://ps.compliance.protection.outlook.com https://*.webhook.office.com; img-src 'self' data: blob:; worker-src 'self';">
+<link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/design-system.css">
 <link rel="stylesheet" href="css/layout.css">
 <link rel="stylesheet" href="css/components.css">
@@ -171,6 +173,11 @@
     </a>
     <a class="nav-link" data-page="reports" onclick="Router.navigate('reports')">Reports</a>
   </nav>
+  <div style="display:flex;align-items:center;gap:6px">
+    <span id="tenant-switcher" style="display:none"></span>
+    <span id="offline-indicator" style="display:none;align-items:center;font-size:.58rem;color:var(--red);margin-right:4px"></span>
+    <span id="scan-schedule-indicator" style="display:none;align-items:center;font-size:.55rem;color:var(--ink4);margin-right:4px"></span>
+  </div>
   <div class="topbar-auth" id="topbar-auth">
     <button class="btn btn-dark btn-sm" id="btn-connect-tenant" onclick="handleConnectTenant()">
       <span class="auth-dot" id="auth-dot"></span>
@@ -309,11 +316,18 @@
 <div id="toast" class="toast"></div>
 
 <!-- ═══ SCRIPTS ═══ -->
+<!-- CDN Libraries -->
 <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<!-- Core -->
 <script src="js/data.js"></script>
 <script src="js/state.js"></script>
 <script src="js/auth.js"></script>
 <script src="js/router.js"></script>
+<!-- Infrastructure -->
+<script src="js/scan-history.js"></script>
+<script src="js/offline.js"></script>
 <script src="js/deploy.js"></script>
 <script src="js/pre-deploy-config.js"></script>
 <script src="js/dependency-graph.js"></script>
@@ -323,7 +337,14 @@
 <script src="js/policy-matcher.js"></script>
 <script src="js/scan-diff.js"></script>
 <script src="js/ps-verify.js"></script>
+<script src="js/ps-deploy.js"></script>
 <script src="js/remediation.js"></script>
+<script src="js/rbac.js"></script>
+<script src="js/scheduler.js"></script>
+<script src="js/notifications.js"></script>
+<script src="js/evidence.js"></script>
+<script src="js/tenant-manager.js"></script>
+<!-- Pages -->
 <script src="js/assessment.js"></script>
 <script src="js/dashboard.js"></script>
 <script src="js/policies.js"></script>
@@ -440,6 +461,33 @@ async function bootstrap() {
       updateAuthUI();
       if (AppState.get('currentPage') === 'policies') Policies.render();
     });
+
+    // ── Initialize new modules ──
+
+    // IndexedDB for scan history, offline cache, multi-tenant
+    if (typeof ScanHistory !== 'undefined') {
+      await ScanHistory.openDB().catch(function (e) { console.warn('IndexedDB init failed:', e); });
+    }
+
+    // Offline mode detection
+    if (typeof OfflineManager !== 'undefined') OfflineManager.init();
+
+    // Service Worker registration (PWA)
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js').catch(function (e) { console.warn('SW registration failed:', e); });
+    }
+
+    // Multi-tenant switcher
+    if (typeof TenantManager !== 'undefined') {
+      TenantManager.initFromAuth();
+      TenantManager.renderSwitcher();
+    }
+
+    // Restore scheduled scan interval
+    var savedInterval = AppState.get('scanScheduleInterval');
+    if (savedInterval && typeof ScanScheduler !== 'undefined') {
+      ScanScheduler.start(savedInterval);
+    }
 
     // Listen for deployment progress
     AppState.on('deploymentProgress', (progress) => {

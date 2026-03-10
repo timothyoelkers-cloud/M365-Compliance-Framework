@@ -7,11 +7,29 @@ const DataStore = (() => {
 
   async function fetchJSON(path) {
     if (cache[path]) return cache[path];
-    const res = await fetch(BASE + path);
-    if (!res.ok) throw new Error(`Failed to load ${path}: ${res.status}`);
-    const data = await res.json();
-    cache[path] = data;
-    return data;
+    var fullUrl = BASE + path;
+
+    try {
+      var res = await fetch(fullUrl);
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      var data = await res.json();
+      cache[path] = data;
+      // Cache to IndexedDB for offline use
+      if (typeof OfflineManager !== 'undefined') {
+        OfflineManager.cachePolicyData(fullUrl, data).catch(function () {});
+      }
+      return data;
+    } catch (e) {
+      // Try IndexedDB cache as fallback
+      if (typeof OfflineManager !== 'undefined') {
+        var cached = await OfflineManager.getCachedData(fullUrl);
+        if (cached) {
+          cache[path] = cached;
+          return cached;
+        }
+      }
+      throw new Error('Failed to load ' + path + ': ' + e.message);
+    }
   }
 
   async function loadAll() {

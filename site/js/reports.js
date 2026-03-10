@@ -85,9 +85,13 @@ const Reports = (() => {
         <textarea id="rpt-disclaimer" rows="2" placeholder="Footer disclaimer text..." oninput="Reports.preview()"></textarea>
       </div>
 
-      <div style="display:flex;gap:8px;margin-top:16px">
+      <div style="display:flex;gap:8px;margin-top:16px;flex-wrap:wrap">
         <button class="btn btn-primary" onclick="Reports.exportPDF()">Export PDF</button>
         <button class="btn btn-amber" onclick="Reports.exportHTML()">Export HTML</button>
+        <button class="btn" onclick="Reports.exportExcel()">Export Excel</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        ${typeof EvidenceCollector !== 'undefined' ? EvidenceCollector.renderExportButton() : ''}
       </div>
     </div>`;
 
@@ -423,5 +427,105 @@ ${canvas.innerHTML}
     return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
   }
 
-  return { init, render, preview, exportPDF, exportHTML, handleLogo };
+  // ── Excel Export ──
+  function exportExcel() {
+    if (typeof XLSX === 'undefined') {
+      showToast('SheetJS library not loaded — Excel export unavailable');
+      return;
+    }
+
+    var orgName = val('rpt-org-name') || 'Organisation';
+    var wb = XLSX.utils.book_new();
+
+    // Sheet 1: Summary
+    var stats = AppState.getScoreStats();
+    var summaryData = [
+      ['M365 Compliance Assessment Report'],
+      ['Organisation', orgName],
+      ['Date', new Date().toLocaleDateString()],
+      [''],
+      ['Compliance Score', stats.score + '%'],
+      ['Controls Implemented', stats.done],
+      ['Gaps Identified', stats.gap],
+      ['Not Reviewed', stats.unrev],
+      ['Total Controls', stats.total],
+      ['Frameworks Assessed', AppState.get('selectedFrameworks').size],
+    ];
+
+    // Add scan summary if available
+    var scanResults = AppState.get('tenantScanResults') || {};
+    var scanKeys = Object.keys(scanResults);
+    if (scanKeys.length > 0) {
+      var scanSummary = { configured: 0, missing: 0, manual: 0, total: scanKeys.length };
+      scanKeys.forEach(function (id) {
+        var s = scanResults[id].status;
+        if (s === 'configured') scanSummary.configured++;
+        else if (s === 'missing') scanSummary.missing++;
+        else if (s === 'manual') scanSummary.manual++;
+      });
+      summaryData.push(['']);
+      summaryData.push(['Tenant Scan Results']);
+      summaryData.push(['Policies Configured', scanSummary.configured]);
+      summaryData.push(['Policies Missing', scanSummary.missing]);
+      summaryData.push(['Manual Verification', scanSummary.manual]);
+      summaryData.push(['Total Policies', scanSummary.total]);
+    }
+
+    var ws1 = XLSX.utils.aoa_to_sheet(summaryData);
+    ws1['!cols'] = [{ wch: 25 }, { wch: 20 }];
+    XLSX.utils.book_append_sheet(wb, ws1, 'Summary');
+
+    // Sheet 2: Gap Register
+    var gaps = AppState.getGaps();
+    var gapData = [['Check ID', 'Control', 'Category', 'Level', 'Priority', 'Impact (Frameworks)']];
+    gaps.forEach(function (g) {
+      gapData.push([g.id, g.name, g.cat, g.level, g.tier, g.impact]);
+    });
+    var ws2 = XLSX.utils.aoa_to_sheet(gapData);
+    ws2['!cols'] = [{ wch: 12 }, { wch: 50 }, { wch: 15 }, { wch: 8 }, { wch: 10 }, { wch: 18 }];
+    XLSX.utils.book_append_sheet(wb, ws2, 'Gap Register');
+
+    // Sheet 3: Framework Coverage
+    var fwCoverage = AppState.getFrameworkCoverage();
+    var fwData = [['Framework', 'Done', 'Total', 'Coverage %']];
+    fwCoverage.forEach(function (fw) {
+      fwData.push([fw.fw, fw.done, fw.total, fw.pct]);
+    });
+    var ws3 = XLSX.utils.aoa_to_sheet(fwData);
+    ws3['!cols'] = [{ wch: 40 }, { wch: 8 }, { wch: 8 }, { wch: 12 }];
+    XLSX.utils.book_append_sheet(wb, ws3, 'Framework Coverage');
+
+    // Sheet 4: Scan Results (if available)
+    if (scanKeys.length > 0) {
+      var policies = AppState.get('policies') || [];
+      var scanData = [['Policy ID', 'Type', 'Status', 'Source', 'Detail']];
+      scanKeys.sort().forEach(function (id) {
+        var r = scanResults[id];
+        var pol = policies.find(function (p) { return p.id === id; });
+        scanData.push([id, pol ? pol.type : '', r.status, r.source || '', r.detail || '']);
+      });
+      var ws4 = XLSX.utils.aoa_to_sheet(scanData);
+      ws4['!cols'] = [{ wch: 10 }, { wch: 20 }, { wch: 12 }, { wch: 15 }, { wch: 50 }];
+      XLSX.utils.book_append_sheet(wb, ws4, 'Scan Results');
+    }
+
+    // Sheet 5: Scan History (from IndexedDB — async, so write what's available)
+    var historyData = [['Date', 'Score %', 'Configured', 'Missing', 'Manual', 'Total']];
+    var deployHistory = AppState.getDeploymentHistory();
+    if (deployHistory.length > 0) {
+      var deployData = [['Timestamp', 'Policy ID', 'Status', 'Type', 'Detail']];
+      deployHistory.slice(0, 50).forEach(function (h) {
+        deployData.push([new Date(h.timestamp).toLocaleString(), h.policyId, h.status, h.type, h.detail]);
+      });
+      var ws5 = XLSX.utils.aoa_to_sheet(deployData);
+      ws5['!cols'] = [{ wch: 22 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 40 }];
+      XLSX.utils.book_append_sheet(wb, ws5, 'Deployment History');
+    }
+
+    var filename = 'M365-Compliance-' + orgName.replace(/[^a-z0-9]/gi, '_') + '-' + new Date().toISOString().slice(0, 10) + '.xlsx';
+    XLSX.writeFile(wb, filename);
+    showToast('Excel report exported');
+  }
+
+  return { init, render, preview, exportPDF, exportHTML, exportExcel, handleLogo };
 })();

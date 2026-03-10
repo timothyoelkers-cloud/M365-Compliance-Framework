@@ -1006,8 +1006,81 @@
   box-shadow: var(--shadow-glass);
 }
 
+/* ── EXECUTIVE SUMMARY ──────────────── */
+.exec-summary { padding: 8px 0; }
+.exec-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  text-align: center;
+}
+.exec-kpi-num {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.exec-kpi-label {
+  font-size: .68rem;
+  color: var(--ink4);
+  margin-top: 4px;
+  text-transform: uppercase;
+  letter-spacing: .03em;
+}
+.exec-fw-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px;
+  margin-top: 12px;
+}
+.exec-fw-card {
+  border-radius: var(--r);
+  padding: 14px;
+  text-align: center;
+  border: 1px solid var(--border);
+  background: var(--glass-bg);
+}
+.exec-fw-pct {
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 1.6rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.exec-fw-name {
+  font-size: .68rem;
+  color: var(--ink2);
+  margin-top: 6px;
+  line-height: 1.2;
+}
+.exec-fw-detail {
+  font-size: .58rem;
+  color: var(--ink4);
+  margin-top: 2px;
+}
+.exec-green { border-color: var(--green); }
+.exec-green .exec-fw-pct { color: var(--green); }
+.exec-amber { border-color: var(--amber2); }
+.exec-amber .exec-fw-pct { color: var(--amber2); }
+.exec-red { border-color: var(--red); }
+.exec-red .exec-fw-pct { color: var(--red); }
+
+/* ── SCAN TIMELINE ─────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: .4; }
+}
+
+/* ── PRINT ENHANCEMENTS ────────────── */
+@media print {
+  .exec-fw-grid { grid-template-columns: repeat(3, 1fr); }
+  .exec-fw-card { page-break-inside: avoid; }
+  .section-hdr { page-break-after: avoid; }
+}
+
 /* ── RESPONSIVE AUTH ─────────────────── */
 @media (max-width: 768px) {
   .topbar-auth { padding: 0 8px; }
   .topbar-auth .btn { font-size: .6rem; padding: 3px 8px; }
+  .exec-kpi-row { grid-template-columns: repeat(2, 1fr); }
+  .exec-kpi-num { font-size: 1.4rem; }
 }

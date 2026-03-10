@@ -210,6 +210,17 @@ const TenantScanner = (() => {
       AppState.set('tenantScan', scanCache);
       AppState.set('scanProgress', { total, completed: total, current: 'Complete' });
 
+      // Save to IndexedDB for history/drift detection
+      if (typeof ScanHistory !== 'undefined') {
+        ScanHistory.saveScan(scanCache).catch(function (e) {
+          console.warn('[TenantScanner] Failed to save scan to history:', e);
+        });
+      }
+      // Update tenant manager last scan time
+      if (typeof TenantManager !== 'undefined' && scanCache.tenantId) {
+        TenantManager.updateLastScan(scanCache.tenantId);
+      }
+
       // Notify user
       if (errors.length === 0) {
         if (typeof showToast === 'function') showToast('Tenant scan completed successfully (' + (scanTime / 1000).toFixed(1) + 's)');
@@ -255,10 +266,16 @@ const TenantScanner = (() => {
     AppState.set('scanProgress', null);
   }
 
+  /** Return the raw scan cache object (for evidence export). */
+  function getScanCache() {
+    return scanCache;
+  }
+
   // ─── Public API ───
   return {
     scanTenant,
     getScanResults,
+    getScanCache,
     isScanAvailable,
     isScanning,
     clearCache,
