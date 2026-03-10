@@ -1,7 +1,7 @@
 /* ═══════════════════════════════════════════
    SERVICE WORKER — PWA + offline caching
 ═══════════════════════════════════════════ */
-var CACHE_NAME = 'm365-compliance-v1';
+var CACHE_NAME = 'm365-compliance-v2';
 
 var STATIC_ASSETS = [
   './',
@@ -11,7 +11,7 @@ var STATIC_ASSETS = [
   './css/components.css',
   './js/data.js',
   './js/state.js',
-  './js/auth.js',
+  './js/auth.js?v=3',
   './js/router.js',
   './js/scan-history.js',
   './js/offline.js',
@@ -35,6 +35,14 @@ var STATIC_ASSETS = [
   './js/dashboard.js',
   './js/policies.js',
   './js/reports.js',
+  './js/audit-trail.js',
+  './js/theme-toggle.js',
+  './js/keyboard-shortcuts.js',
+  './js/forecasting.js',
+  './js/overlap-matrix.js',
+  './js/change-tracker.js',
+  './js/dep-viz.js',
+  './js/integrations.js',
   './data/index.json',
   './data/checks.json',
   './data/frameworks.json',
