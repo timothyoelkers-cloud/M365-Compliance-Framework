@@ -10,6 +10,7 @@ const TenantAuth = (() => {
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
   // Normalise redirect URI to directory path (strip index.html) to match Azure AD app registration
   const REDIRECT_URI = window.location.origin + window.location.pathname.replace(/index\.html$/i, '');
+  console.log('[Auth] Redirect URI:', REDIRECT_URI, '— register this exact URI in Azure AD > App registrations > Authentication > SPA');
 
   // ─── Token Scopes (per-resource) ───
   // .default returns ALL admin-consented permissions for that resource
@@ -148,7 +149,12 @@ const TenantAuth = (() => {
       return loginResponse;
     } catch (err) {
       console.error('Login failed:', err);
-      if (typeof showToast === 'function') showToast('Login failed: ' + err.message);
+      if (err.message && err.message.indexOf('AADSTS50011') !== -1) {
+        console.error('[Auth] REDIRECT URI MISMATCH — Add this exact URI as a SPA redirect in Azure AD:', REDIRECT_URI);
+        if (typeof showToast === 'function') showToast('Redirect URI mismatch. Add "' + REDIRECT_URI + '" to your Azure AD app registration (Authentication > SPA).');
+      } else {
+        if (typeof showToast === 'function') showToast('Login failed: ' + err.message);
+      }
       return null;
     }
   }
