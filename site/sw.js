@@ -33,7 +33,7 @@ var STATIC_ASSETS = [
   './js/tenant-manager.js',
   './js/assessment.js',
   './js/dashboard.js',
-  './js/policies.js',
+  './js/policies.js?v=2',
   './js/reports.js',
   './js/audit-trail.js',
   './js/theme-toggle.js',
