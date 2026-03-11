@@ -4,7 +4,7 @@
     "title": "Restrict Lobby Bypass to Internal Users Only",
     "description": "Configures the Global Teams meeting policy so only users within the same organization (excluding guests) can bypass the meeting lobby. All external users, guest accounts, and federated users must wait in the lobby. This is the most restrictive lobby setting that still allows internal users to join seamlessly.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

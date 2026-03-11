@@ -4,7 +4,7 @@
     "title": "Restrict SharePoint Online Access by IP Range",
     "description": "Configures IP-based access restrictions for SharePoint Online. Only allows access from specified corporate IP ranges (e.g., office egress IPs, VPN endpoints). All access from non-listed IP addresses is blocked.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

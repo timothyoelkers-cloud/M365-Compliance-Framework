@@ -4,7 +4,7 @@
     "title": "Disable External File Sharing via Unapproved Cloud Storage",
     "description": "Disables all third-party cloud storage provider integrations in Microsoft Teams. Blocks Dropbox, Box, Google Drive, ShareFile, and Egnyte. File sharing in Teams is restricted to SharePoint Online and OneDrive for Business only, ensuring all files remain within managed Microsoft 365 storage.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

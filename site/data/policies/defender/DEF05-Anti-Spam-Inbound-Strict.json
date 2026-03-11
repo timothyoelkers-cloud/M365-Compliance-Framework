@@ -4,7 +4,7 @@
     "title": "Anti-Spam Inbound - Strict",
     "description": "Strict inbound anti-spam policy. Routes all spam categories (spam, high-confidence spam, bulk, phish, high-confidence phish) to quarantine instead of junk mail folder. Enables ZAP for retroactive removal. Sets bulk complaint level threshold to 5.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "ISO 27001:2022",

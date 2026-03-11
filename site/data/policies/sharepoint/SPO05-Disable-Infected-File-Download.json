@@ -4,7 +4,7 @@
     "title": "Disable Infected File Download",
     "description": "Prevents users from downloading files that have been flagged as infected by Microsoft Defender for Office 365 in SharePoint Online and OneDrive for Business. Users will see a warning that the file is infected and cannot download it.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

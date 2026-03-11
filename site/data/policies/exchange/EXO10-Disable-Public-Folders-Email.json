@@ -4,7 +4,7 @@
     "title": "Disable Public Folder Email Addresses",
     "description": "Disables mail-enabled public folders in Exchange Online. Mail-enabled public folders can receive email from external senders but bypass DLP policies, message trace, and audit logging. This policy removes email addresses from existing mail-enabled public folders and disables mail functionality.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

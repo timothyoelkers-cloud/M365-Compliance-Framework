@@ -4,7 +4,7 @@
     "title": "Disable Unmanaged (Personal) Teams Communication",
     "description": "Blocks communication with external users on unmanaged (personal/free) Teams accounts. Prevents both outbound and inbound communication with Teams consumer accounts. Only managed organizational Teams accounts can communicate with your users.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

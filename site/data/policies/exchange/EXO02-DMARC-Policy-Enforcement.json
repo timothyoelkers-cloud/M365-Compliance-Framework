@@ -4,7 +4,7 @@
     "title": "DMARC Policy Enforcement",
     "description": "Configures Domain-based Message Authentication, Reporting, and Conformance (DMARC) via DNS TXT records. DMARC builds on SPF and DKIM to prevent domain spoofing. Includes a staged rollout plan from monitoring (p=none) through quarantine to full reject enforcement.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

@@ -4,7 +4,7 @@
     "title": "Block Download on Unmanaged Devices",
     "description": "Configures SharePoint Online to allow limited (browser-only, view-only) access from unmanaged devices while blocking downloads, print, and sync. Prevents corporate data from being saved to personal or unmanaged devices. Full enforcement requires a complementary Conditional Access policy.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

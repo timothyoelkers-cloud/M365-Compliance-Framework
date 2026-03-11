@@ -3,7 +3,7 @@
     "id": "GOV02",
     "title": "Require MFA Registration for All Administrators",
     "description": "Creates a Conditional Access policy requiring all users with admin roles to register for multi-factor authentication within 14 days.",
-    "frameworks": ["CIS Microsoft 365 v3.1.0", "NIST SP 800-53 Rev 5", "NIS2", "ISO 27001:2022", "SOC 2", "PCI DSS v4.0", "HIPAA", "FedRAMP Moderate", "CMMC v2.0", "DORA", "UK NCSC CAF v3.2"],
+    "frameworks": ["CIS Microsoft 365 Foundations Benchmark v6.0.1", "NIST SP 800-53 Rev 5", "NIS2", "ISO 27001:2022", "SOC 2", "PCI DSS v4.0", "HIPAA", "FedRAMP Moderate", "CMMC v2.0", "DORA", "UK NCSC CAF v3.2"],
     "cisChecks": ["1.1.1", "5.1.2.1"],
     "severity": "Critical",
     "category": "Identity Governance",

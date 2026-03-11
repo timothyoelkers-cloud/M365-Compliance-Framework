@@ -4,7 +4,7 @@
     "title": "Restrict External Sharing - Existing Guests Only",
     "description": "Restricts SharePoint Online and OneDrive for Business external sharing to existing authenticated guest users only. No anonymous links permitted, no new external invitations. Only users already in the directory as guest accounts can access shared content.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

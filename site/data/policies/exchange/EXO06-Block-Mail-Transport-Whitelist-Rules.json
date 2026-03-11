@@ -4,7 +4,7 @@
     "title": "Block and Audit Mail Transport Whitelist Rules",
     "description": "Audits and removes transport rules that set SCL to -1 (whitelist), which bypasses all spam filtering for matched senders. These rules are a common attack surface as they allow phishing and malware to bypass all email security scanning for whitelisted domains.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "ISO 27001:2022",

@@ -4,7 +4,7 @@
     "title": "Disable Automatic Guest Access in Teams",
     "description": "Restricts guest access in Microsoft Teams to prevent automatic guest user creation. When disabled, external users cannot be directly added as guests to Teams. Guest access must be explicitly managed through Entra ID B2B invitation workflows with appropriate approval processes.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

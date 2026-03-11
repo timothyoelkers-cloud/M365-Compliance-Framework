@@ -4,7 +4,7 @@
     "title": "Enable Modern Authentication for SharePoint Online",
     "description": "Disables legacy authentication protocols for SharePoint Online by setting LegacyAuthProtocolsEnabled to false. This forces all SharePoint Online connections to use Modern Authentication (OAuth 2.0), which supports MFA, Conditional Access, and token-based authentication.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

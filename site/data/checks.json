@@ -5,6 +5,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -50,6 +51,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -91,6 +93,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -132,6 +135,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -177,6 +181,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -221,6 +226,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -245,6 +251,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -284,6 +291,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -316,6 +324,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -352,6 +361,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -388,6 +398,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -436,6 +447,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -460,6 +472,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -504,6 +517,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -540,6 +554,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -589,6 +604,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -637,6 +653,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "NIST SP 800-53 Rev.5",
       "SOC 2",
@@ -662,6 +679,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
       "PCI DSS v4.0",
@@ -690,6 +708,7 @@
     "cat": "Defender For Office 365",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
@@ -726,6 +745,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
@@ -762,6 +782,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
@@ -798,6 +819,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
@@ -834,6 +856,7 @@
     "cat": "Defender For Office 365",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
       "PCI DSS v4.0",
@@ -862,6 +885,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
@@ -896,6 +920,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
@@ -932,6 +957,7 @@
     "cat": "Defender For Office 365",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -981,6 +1007,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
@@ -1015,6 +1042,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
@@ -1051,6 +1079,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "NIST SP 800-53 Rev.5",
       "SOC 2",
@@ -1076,6 +1105,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "NIST SP 800-53 Rev.5",
       "SOC 2",
@@ -1101,6 +1131,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -1142,6 +1173,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
@@ -1178,6 +1210,7 @@
     "cat": "Defender For Office 365",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 2.0",
       "NIST CSF 1.1",
@@ -1217,6 +1250,7 @@
     "cat": "Defender For Office 365",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -1265,6 +1299,7 @@
     "cat": "Defender For Office 365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -1313,6 +1348,7 @@
     "cat": "M365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -1354,6 +1390,7 @@
     "cat": "M365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -1400,6 +1437,7 @@
     "cat": "M365",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -1446,6 +1484,7 @@
     "cat": "M365",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -1485,6 +1524,7 @@
     "cat": "M365",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -1512,6 +1552,7 @@
     "cat": "M365",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -1545,11 +1586,43 @@
     ]
   },
   {
+    "id": "4.1",
+    "name": "Ensure devices without a compliance policy are marked not compliant",
+    "cat": "Intune",
+    "level": "L2",
+    "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark",
+      "CMMC v2.0",
+      "HIPAA",
+      "PCI DSS v4.0"
+    ]
+  },
+  {
+    "id": "4.2",
+    "name": "Ensure device enrollment for personally owned devices is blocked",
+    "cat": "Intune",
+    "level": "L2",
+    "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "ASD Essential Eight",
+      "Microsoft Cloud Security Benchmark",
+      "CMMC v2.0",
+      "PCI DSS v4.0"
+    ]
+  },
+  {
     "id": "5.1.2.1",
     "name": "Ensure user consent to apps is not allowed",
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -1587,6 +1660,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 2.0",
       "NIST CSF 1.1",
@@ -1625,6 +1699,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -1648,6 +1723,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -1669,6 +1745,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -1701,6 +1778,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -1737,6 +1815,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -1781,6 +1860,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -1825,6 +1905,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -1874,6 +1955,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -1923,6 +2005,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -1972,6 +2055,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -2021,6 +2105,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -2060,6 +2145,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2104,6 +2190,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2148,6 +2235,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 2.0",
       "NIST CSF 1.1",
@@ -2186,6 +2274,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -2230,6 +2319,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -2274,6 +2364,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -2318,6 +2409,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -2346,6 +2438,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2391,6 +2484,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2428,6 +2522,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2465,6 +2560,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
@@ -2490,6 +2586,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2527,6 +2624,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -2563,6 +2661,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2595,6 +2694,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2640,6 +2740,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -2677,6 +2778,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -2714,6 +2816,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -2751,6 +2854,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2788,6 +2892,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2827,6 +2932,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -2866,6 +2972,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -2905,6 +3012,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2942,6 +3050,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -2979,6 +3088,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -3016,6 +3126,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -3053,6 +3164,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -3077,6 +3189,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -3122,6 +3235,7 @@
     "cat": "Entra",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -3167,6 +3281,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -3212,6 +3327,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -3257,6 +3373,7 @@
     "cat": "Entra",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -3302,6 +3419,7 @@
     "cat": "Exchange",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -3343,6 +3461,7 @@
     "cat": "Exchange",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -3384,6 +3503,7 @@
     "cat": "Exchange",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -3424,6 +3544,7 @@
     "cat": "Exchange",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -3447,6 +3568,7 @@
     "cat": "Exchange",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
@@ -3483,6 +3605,7 @@
     "cat": "Exchange",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -3507,6 +3630,7 @@
     "cat": "Exchange",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST CSF 1.1",
       "NIST SP 800-53 Rev.5",
       "PCI DSS v4.0",
@@ -3530,6 +3654,7 @@
     "cat": "Exchange",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -3576,6 +3701,7 @@
     "cat": "Exchange",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -3599,6 +3725,7 @@
     "cat": "Exchange",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -3643,6 +3770,7 @@
     "cat": "Exchange",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -3672,6 +3800,7 @@
     "cat": "Exchange",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -3701,6 +3830,7 @@
     "cat": "Sharepoint",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -3747,6 +3877,7 @@
     "cat": "Sharepoint",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -3772,6 +3903,7 @@
     "cat": "Sharepoint",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -3797,6 +3929,7 @@
     "cat": "Sharepoint",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -3820,6 +3953,7 @@
     "cat": "Sharepoint",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -3864,6 +3998,7 @@
     "cat": "Sharepoint",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -3908,6 +4043,7 @@
     "cat": "Sharepoint",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -3952,6 +4088,7 @@
     "cat": "Sharepoint",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -3996,6 +4133,7 @@
     "cat": "Sharepoint",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -4040,6 +4178,7 @@
     "cat": "Sharepoint",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4089,6 +4228,7 @@
     "cat": "Sharepoint",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -4111,6 +4251,7 @@
     "cat": "Sharepoint",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -4159,6 +4300,7 @@
     "cat": "Sharepoint",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -4182,6 +4324,7 @@
     "cat": "Teams",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -4226,6 +4369,7 @@
     "cat": "Teams",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4249,6 +4393,7 @@
     "cat": "Teams",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4272,6 +4417,7 @@
     "cat": "Teams",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4295,6 +4441,7 @@
     "cat": "Teams",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4319,6 +4466,7 @@
     "cat": "Teams",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4343,6 +4491,7 @@
     "cat": "Teams",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST CSF 2.0",
       "NIST CSF 1.1",
@@ -4381,6 +4530,7 @@
     "cat": "Teams",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4404,6 +4554,7 @@
     "cat": "Teams",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4428,6 +4579,7 @@
     "cat": "Teams",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4477,6 +4629,7 @@
     "cat": "Teams",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -4499,6 +4652,7 @@
     "cat": "Teams",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -4521,6 +4675,7 @@
     "cat": "Teams",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -4543,6 +4698,7 @@
     "cat": "Teams",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -4565,6 +4721,7 @@
     "cat": "Teams",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -4596,6 +4753,7 @@
     "cat": "Teams",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -4627,6 +4785,7 @@
     "cat": "Teams",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4651,6 +4810,7 @@
     "cat": "Purview",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4702,6 +4862,7 @@
     "cat": "Purview",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -4738,6 +4899,7 @@
     "cat": "Purview",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -4774,6 +4936,7 @@
     "cat": "Purview",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -4810,6 +4973,7 @@
     "cat": "Purview",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -4859,6 +5023,7 @@
     "cat": "Purview",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -4903,6 +5068,7 @@
     "cat": "Purview",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 2.0",
@@ -4934,6 +5100,7 @@
     "cat": "Purview",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",
@@ -4970,6 +5137,7 @@
     "cat": "Purview",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -5012,6 +5180,7 @@
     "cat": "Purview",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIS2",
       "ISO 27001:2022",
       "NIST CSF 1.1",
@@ -5056,6 +5225,7 @@
     "cat": "Purview",
     "level": "L2",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "DORA",
       "NIS2",
       "ISO 27001:2022",
@@ -5107,6 +5277,7 @@
     "cat": "Purview",
     "level": "L1",
     "fws": [
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "ISO 27001:2022",
       "NIST SP 800-171 Rev.3",
       "NIST SP 800-171 Rev.2",

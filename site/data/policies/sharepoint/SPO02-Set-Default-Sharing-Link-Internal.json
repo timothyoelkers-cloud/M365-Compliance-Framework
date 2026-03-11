@@ -4,7 +4,7 @@
     "title": "Set Default Sharing Link - Internal Only",
     "description": "Changes the default sharing link type from 'Anyone with the link' to 'People in your organization'. Sets the default permission to View-only. Users can still choose other link types, but the default prevents accidental oversharing.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "ISO 27001:2022",

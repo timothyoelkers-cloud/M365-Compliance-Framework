@@ -4,7 +4,7 @@
     "title": "Anti-Phishing Policy - Strict",
     "description": "Deploys a strict anti-phishing policy with aggressive thresholds, mailbox intelligence, spoof intelligence, organization domain protection, and targeted user protection. All impersonation detections are routed to quarantine.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "MITRE ATT&CK T1566",
       "NIS2",

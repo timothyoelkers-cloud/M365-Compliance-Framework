@@ -4,7 +4,7 @@
     "title": "Disable Anonymous Meeting Join",
     "description": "Prevents anonymous (unauthenticated) users from joining Microsoft Teams meetings. All meeting participants must authenticate with a valid identity. This prevents unauthorized access to meetings containing sensitive discussions.",
     "frameworks": [
-      "CIS Microsoft 365 v3.1.0",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",
