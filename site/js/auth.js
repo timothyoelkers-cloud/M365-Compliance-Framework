@@ -8,12 +8,9 @@ const TenantAuth = (() => {
 
   // ─── App Registration: Framework-Assessment-Deployment ───
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
-  // On GitHub Pages the registered redirect URI is the project root (before the app moved to /site/)
-  // On localhost, use the current page path for local dev flexibility
-  const _parts = window.location.pathname.split('/');
-  const REDIRECT_URI = window.location.hostname.endsWith('.github.io') && _parts.length > 2
-    ? window.location.origin + '/' + _parts[1] + '/'
-    : window.location.origin + window.location.pathname.replace(/index\.html$/i, '');
+  // Redirect URI must point to the page where MSAL.js is loaded (this page).
+  // Strip index.html if present, keep the directory path.
+  const REDIRECT_URI = window.location.origin + window.location.pathname.replace(/index\.html$/i, '');
   console.log('[Auth] Redirect URI:', REDIRECT_URI);
 
   // ─── Token Scopes (per-resource) ───
