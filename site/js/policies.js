@@ -375,43 +375,50 @@ const Policies = (() => {
     render();
   }
 
-  function downloadSingle(id) {
+  async function downloadSingle(id) {
     const pol = AppState.get('policies').find(p => p.id === id);
     if (!pol) return;
-    const json = JSON.stringify({
-      _meta: {
-        source: 'M365 Compliance Framework',
-        version: AppState.get('manifest').version,
-        exportDate: new Date().toISOString().split('T')[0],
-      },
-      ...pol,
-    }, null, 2);
-    downloadFile(json, `${pol.file}`, 'application/json');
-    showToast(`Downloaded ${pol.id}`);
+    try {
+      // Load the full policy JSON with deployment payload
+      const rawPolicy = await DataStore.loadPolicy(pol.type, pol.file);
+      downloadFile(JSON.stringify(rawPolicy, null, 2), `${pol.file}`, 'application/json');
+      showToast(`Downloaded ${pol.id} (deployment-ready)`);
+    } catch (err) {
+      console.error('Failed to load full policy for download:', err);
+      showToast(`Download failed for ${pol.id}: ${err.message}`);
+    }
   }
 
-  function downloadBundle() {
+  async function downloadBundle() {
     const sel = AppState.get('selectedPolicies');
     const policies = AppState.get('policies').filter(p => sel.has(p.id));
     if (policies.length === 0) return;
+
+    showToast(`Preparing ${policies.length} policies for download...`);
+
+    // Load full policy JSONs with deployment payloads
+    const fullPolicies = [];
+    for (const pol of policies) {
+      try {
+        const rawPolicy = await DataStore.loadPolicy(pol.type, pol.file);
+        fullPolicies.push(rawPolicy);
+      } catch (err) {
+        console.warn(`Failed to load ${pol.id}:`, err);
+        fullPolicies.push({ _error: `Failed to load: ${err.message}`, id: pol.id, type: pol.type });
+      }
+    }
 
     const bundle = {
       _meta: {
         source: 'M365 Compliance Framework',
         version: AppState.get('manifest').version,
         exportDate: new Date().toISOString().split('T')[0],
-        totalPolicies: policies.length,
+        totalPolicies: fullPolicies.length,
       },
-      policies: policies.map(p => ({
-        id: p.id, file: p.file, type: p.type,
-        displayName: p.displayName, description: p.description,
-        frameworks: p.frameworks, cisChecks: p.cisChecks,
-        importMethod: p.importMethod, deployState: p.deployState,
-        requiredLicence: p.requiredLicence,
-      })),
+      policies: fullPolicies,
     };
     downloadFile(JSON.stringify(bundle, null, 2), `M365-Policy-Bundle-${policies.length}policies.json`, 'application/json');
-    showToast(`Downloaded bundle: ${policies.length} policies`);
+    showToast(`Downloaded bundle: ${policies.length} deployment-ready policies`);
   }
 
   function viewDetail(id) {
