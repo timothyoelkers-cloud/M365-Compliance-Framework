@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════
-   TEST RUNNER — Lightweight browser test framework
+   TEST RUNNER v1.1 — Lightweight browser test framework
    for PolicyMatcher, Remediation, AppState,
    and scan aggregation logic.
    300+ tests covering every MATCH_RULE.
