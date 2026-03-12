@@ -5,10 +5,16 @@ on:
     branches: [main]
     paths:
       - 'site/**'
+      - 'run-tests.js'
+      - 'package.json'
+      - 'package-lock.json'
   pull_request:
     branches: [main]
     paths:
       - 'site/**'
+      - 'run-tests.js'
+      - 'package.json'
+      - 'package-lock.json'
   workflow_dispatch:
 
 jobs:
