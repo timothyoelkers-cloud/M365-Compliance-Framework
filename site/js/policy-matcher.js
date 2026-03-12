@@ -521,8 +521,9 @@ const PolicyMatcher = (() => {
       scanSource: 'deviceConfigurations',
       matchMode: 'any',
       conditions: [
-        { path: '@odata.type', op: 'contains', value: 'windows10' },
+        { path: 'displayName', op: 'containsAny', values: ['LAPS', 'Local Admin Password', 'local administrator'] },
       ],
+      detail: 'Windows LAPS (Local Administrator Password Solution) configuration profile',
     },
 
     'INT07-Defender-AV-Configuration-Windows': {
@@ -530,7 +531,9 @@ const PolicyMatcher = (() => {
       matchMode: 'any',
       conditions: [
         { path: '@odata.type', op: 'contains', value: 'windows10' },
+        { path: 'defenderMonitorFileActions', op: 'exists' },
       ],
+      detail: 'Windows Defender Antivirus configuration with real-time monitoring',
     },
 
     'INT08-Windows-Update-Ring-Policy': {
@@ -545,32 +548,36 @@ const PolicyMatcher = (() => {
       scanSource: 'deviceConfigurations',
       matchMode: 'any',
       conditions: [
-        { path: '@odata.type', op: 'containsAny', values: ['ios', 'android'] },
+        { path: '@odata.type', op: 'containsAny', values: ['iosManagedApp', 'androidManagedApp', 'managedAppProtection'] },
       ],
+      detail: 'Intune App Protection Policy for iOS/Android managed apps',
     },
 
     'INT10-Device-Enrollment-Restrictions': {
       scanSource: 'deviceConfigurations',
       matchMode: 'any',
       conditions: [
-        { path: '@odata.type', op: 'contains', value: 'deviceEnrollment' },
+        { path: '@odata.type', op: 'containsAny', values: ['deviceEnrollmentLimit', 'deviceEnrollmentPlatformRestrictions'] },
       ],
+      detail: 'Device enrollment restrictions limiting platform/type/count',
     },
 
     'INT11-Windows-Security-Baseline-CIS': {
       scanSource: 'deviceConfigurations',
       matchMode: 'any',
       conditions: [
-        { path: '@odata.type', op: 'contains', value: 'windows10' },
+        { path: 'displayName', op: 'containsAny', values: ['Security Baseline', 'CIS Baseline', 'security baseline'] },
       ],
+      detail: 'Windows 10/11 security baseline profile (CIS or Microsoft)',
     },
 
     'INT12-Microsoft-Edge-Security-Baseline': {
       scanSource: 'deviceConfigurations',
       matchMode: 'any',
       conditions: [
-        { path: '@odata.type', op: 'contains', value: 'windows10' },
+        { path: 'displayName', op: 'containsAny', values: ['Edge', 'edge baseline', 'Browser'] },
       ],
+      detail: 'Microsoft Edge browser security baseline configuration',
     },
 
     'INT13-Windows-Hello-For-Business': {
@@ -586,7 +593,9 @@ const PolicyMatcher = (() => {
       matchMode: 'any',
       conditions: [
         { path: '@odata.type', op: 'contains', value: 'windows10' },
+        { path: 'firewallBlockAllIncoming', op: 'exists' },
       ],
+      detail: 'Windows Firewall configuration with inbound rules',
     },
 
     'INT15-Attack-Surface-Reduction-Rules': {
@@ -594,7 +603,9 @@ const PolicyMatcher = (() => {
       matchMode: 'any',
       conditions: [
         { path: '@odata.type', op: 'contains', value: 'windows10' },
+        { path: 'defenderAttackSurfaceReductionRules', op: 'exists' },
       ],
+      detail: 'Attack Surface Reduction rules configured via Defender settings',
     },
 
     'INT16-Credential-Guard-Windows': {
@@ -602,7 +613,9 @@ const PolicyMatcher = (() => {
       matchMode: 'any',
       conditions: [
         { path: '@odata.type', op: 'contains', value: 'windows10' },
+        { path: 'deviceGuardEnableVirtualizationBasedSecurity', op: 'exists' },
       ],
+      detail: 'Credential Guard / Virtualization Based Security enabled',
     },
 
     'INT17-Removable-Storage-Control': {
@@ -610,7 +623,9 @@ const PolicyMatcher = (() => {
       matchMode: 'any',
       conditions: [
         { path: '@odata.type', op: 'contains', value: 'windows10' },
+        { path: 'storageBlockRemovableStorage', op: 'exists' },
       ],
+      detail: 'Removable storage access control policy',
     },
 
     'INT18-Windows-Diagnostic-Data-Limit': {
@@ -618,7 +633,9 @@ const PolicyMatcher = (() => {
       matchMode: 'any',
       conditions: [
         { path: '@odata.type', op: 'contains', value: 'windows10' },
+        { path: 'diagnosticsDataSubmissionMode', op: 'exists' },
       ],
+      detail: 'Windows diagnostic/telemetry data collection restricted',
     },
 
     'INT19-Exploit-Protection-Policy': {
@@ -626,7 +643,9 @@ const PolicyMatcher = (() => {
       matchMode: 'any',
       conditions: [
         { path: '@odata.type', op: 'contains', value: 'windows10' },
+        { path: 'defenderExploitProtectionXml', op: 'exists' },
       ],
+      detail: 'Windows Exploit Protection policy with XML configuration',
     },
 
     'INT20-Controlled-Folder-Access': {
@@ -634,7 +653,9 @@ const PolicyMatcher = (() => {
       matchMode: 'any',
       conditions: [
         { path: '@odata.type', op: 'contains', value: 'windows10' },
+        { path: 'defenderGuardedFoldersEnableControlledFolderAccess', op: 'exists' },
       ],
+      detail: 'Controlled Folder Access enabled for ransomware protection',
     },
 
     // ─────────────────────────────────────────────────────────
@@ -1260,6 +1281,42 @@ const PolicyMatcher = (() => {
       detail: 'Requires PowerShell verification',
       verifyCommand: 'Connect-IPPSSession; Get-ComplianceCase | Format-List Name, Status, CaseType',
     },
+
+    // ── Governance ──
+
+    GOV01: {
+      status: 'manual',
+      detail: 'Requires Entra admin center or PowerShell verification — check access reviews are enabled for privileged roles',
+      verifyCommand: 'Connect-MgGraph -Scopes AccessReview.Read.All; Get-MgIdentityGovernanceAccessReviewDefinition | Format-List DisplayName, Status, Scope',
+    },
+    GOV02: {
+      status: 'manual',
+      detail: 'Requires Entra admin center verification — check authentication method registration campaign is enabled for admins',
+      verifyCommand: 'Connect-MgGraph -Scopes Policy.Read.All; Get-MgPolicyAuthenticationMethodPolicy | Select-Object -ExpandProperty RegistrationEnforcement | Format-List',
+    },
+    GOV03: {
+      scanSource: 'conditionalAccess',
+      matchMode: 'any',
+      conditions: [
+        { path: 'sessionControls.persistentBrowser.isEnabled', op: 'equals', value: true },
+        { path: 'sessionControls.persistentBrowser.mode', op: 'equals', value: 'never' },
+        { path: 'state', op: 'equals', value: 'enabled' },
+      ],
+      detail: 'Conditional Access policy blocking persistent browser sessions on unmanaged devices',
+    },
+    GOV04: {
+      scanSource: 'authorizationPolicy',
+      matchMode: 'all',
+      conditions: [
+        { path: 'allowInvitesFrom', op: 'equalsAny', values: ['adminsAndGuestInviters', 'none'] },
+      ],
+      detail: 'Guest invitation settings should restrict who can invite external users',
+    },
+    GOV05: {
+      status: 'manual',
+      detail: 'Requires PowerShell verification — check unified audit log is enabled',
+      verifyCommand: 'Connect-ExchangeOnline; Get-AdminAuditLogConfig | Select-Object UnifiedAuditLogIngestionEnabled',
+    },
   };
 
   // ─── Secure Score Mapping ────────────────────────────────
@@ -1351,6 +1408,9 @@ const PolicyMatcher = (() => {
     PV28: 'CommunicationComplianceRegulatory',
     PV29: 'AdaptiveProtection',
     PV30: 'eDiscoveryCase',
+    // Governance
+    GOV01: 'AccessReviews',
+    GOV05: 'UnifiedAuditLog',
   };
 
   /**

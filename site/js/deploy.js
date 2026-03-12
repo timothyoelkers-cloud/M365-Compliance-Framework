@@ -15,7 +15,7 @@ const DeployEngine = (() => {
 
   // Backward-compat arrays
   const GRAPH_TYPES = ['conditional-access', 'intune', 'entra', 'defender-endpoint'];
-  const PS_TYPES = ['defender', 'exchange', 'sharepoint', 'teams', 'purview'];
+  const PS_TYPES = ['defender', 'exchange', 'sharepoint', 'teams', 'purview', 'governance'];
 
   // Type → default deployment method
   // Note: InvokeCommand code is ready for DEF/EXO/PV but both endpoints
@@ -31,6 +31,7 @@ const DeployEngine = (() => {
     'purview':            DEPLOY_METHOD.PS_ONLY,    // InvokeCommand ready, CORS-blocked from SPA
     'sharepoint':         DEPLOY_METHOD.PS_ONLY,
     'teams':              DEPLOY_METHOD.PS_ONLY,
+    'governance':         DEPLOY_METHOD.PS_ONLY,
   };
 
   // Per-policy overrides (SPO Graph subset — these 5 have Graph API support)

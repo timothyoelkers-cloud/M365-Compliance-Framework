@@ -3,7 +3,7 @@
     "id": "GOV05",
     "title": "Enable Unified Audit Log",
     "description": "Ensures the Microsoft 365 Unified Audit Log is enabled for the organisation. Required for security investigations, compliance monitoring, and forensic analysis.",
-    "frameworks": ["CIS Microsoft 365 Foundations Benchmark v6.0.1", "NIST SP 800-53 Rev 5", "NIS2", "ISO 27001:2022", "SOC 2", "PCI DSS v4.0", "HIPAA", "FedRAMP Moderate", "CMMC v2.0", "DORA", "GDPR (EU) 2016/679", "UK NCSC CAF v3.2"],
+    "frameworks": ["CIS Microsoft 365 Foundations Benchmark v6.0.0", "NIST SP 800-53 Rev 5", "NIS2", "ISO 27001:2022", "SOC 2", "PCI DSS v4.0", "HIPAA", "FedRAMP Moderate", "CMMC v2.0", "DORA", "GDPR (EU) 2016/679", "UK NCSC CAF v3.2"],
     "cisChecks": ["3.1.1"],
     "severity": "Critical",
     "category": "Audit & Compliance",

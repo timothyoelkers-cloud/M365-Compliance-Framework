@@ -6,6 +6,8 @@ const TenantScanner = (() => {
   const GRAPH_BASE = 'https://graph.microsoft.com';
   const MAX_PAGES = 3;
   const REQUEST_TIMEOUT_MS = 15000;
+  const MAX_RETRIES = 2;
+  const RETRY_DELAYS = [1000, 3000]; // ms backoff per retry
 
   let scanCache = null;
   let scanning = false;
@@ -70,6 +72,47 @@ const TenantScanner = (() => {
   }
 
   /**
+   * Retry wrapper for graphGet. Retries on 429 (throttling), 5xx, and timeouts.
+   * Respects Retry-After header on 429 responses.
+   */
+  async function graphGetWithRetry(url, token) {
+    for (var attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+      try {
+        return await graphGet(url, token);
+      } catch (err) {
+        if (attempt === MAX_RETRIES) throw err;
+        var msg = err.message || '';
+        var is429 = msg.indexOf('HTTP 429') !== -1;
+        var is5xx = /HTTP 5\d\d/.test(msg);
+        var isTimeout = err.name === 'AbortError';
+        if (!is429 && !is5xx && !isTimeout) throw err; // non-retryable
+        // Extract Retry-After if present (seconds)
+        var retryMatch = msg.match(/Retry-After:\s*(\d+)/i);
+        var delay = retryMatch ? parseInt(retryMatch[1], 10) * 1000 : RETRY_DELAYS[attempt];
+        console.warn('[TenantScanner] Retry ' + (attempt + 1) + '/' + MAX_RETRIES + ' for ' + url + ' after ' + delay + 'ms');
+        await new Promise(function (r) { setTimeout(r, delay); });
+      }
+    }
+  }
+
+  /**
+   * Categorize a scan error for user-friendly display.
+   */
+  function categorizeError(errorMsg, endpointKey) {
+    if (/403|Authorization_RequestDenied|Forbidden/.test(errorMsg))
+      return { category: 'permission', message: endpointKey + ': Insufficient permissions — grant the required Graph API permission in Azure AD' };
+    if (/401|InvalidAuthenticationToken|Unauthorized/.test(errorMsg))
+      return { category: 'auth', message: endpointKey + ': Authentication expired — please re-connect the tenant' };
+    if (/429|throttl/i.test(errorMsg))
+      return { category: 'throttling', message: endpointKey + ': Rate limited by Microsoft Graph (retries exhausted)' };
+    if (/timeout|AbortError/i.test(errorMsg))
+      return { category: 'timeout', message: endpointKey + ': Request timed out after ' + (REQUEST_TIMEOUT_MS / 1000) + 's' };
+    if (/404|NotFound/i.test(errorMsg))
+      return { category: 'not_found', message: endpointKey + ': Endpoint not available (feature may not be licensed)' };
+    return { category: 'unknown', message: endpointKey + ': ' + errorMsg };
+  }
+
+  /**
    * Fetch a single endpoint (list or singleton).
    * For list endpoints, follows @odata.nextLink up to MAX_PAGES pages.
    * Returns { success: true, data } or { success: false, error }.
@@ -80,7 +123,7 @@ const TenantScanner = (() => {
     try {
       if (!endpointDef.isList) {
         // ── Singleton endpoint ──
-        const body = await graphGet(fullUrl, token);
+        const body = await graphGetWithRetry(fullUrl, token);
         return { success: true, data: body };
       }
 
@@ -90,7 +133,7 @@ const TenantScanner = (() => {
       let page = 0;
 
       while (nextLink && page < MAX_PAGES) {
-        const body = await graphGet(nextLink, token);
+        const body = await graphGetWithRetry(nextLink, token);
         const items = Array.isArray(body.value) ? body.value : [];
         allItems = allItems.concat(items);
         nextLink = body['@odata.nextLink'] || null;
@@ -104,12 +147,10 @@ const TenantScanner = (() => {
         hasMore: nextLink !== null,
       };
     } catch (err) {
-      const message = err.name === 'AbortError'
-        ? 'Request timed out after ' + (REQUEST_TIMEOUT_MS / 1000) + 's'
-        : err.message || String(err);
-
-      console.warn('[TenantScanner] ' + endpointKey + ' failed:', message);
-      return { success: false, error: message };
+      const raw = err.message || String(err);
+      const categorized = categorizeError(raw, endpointKey);
+      console.warn('[TenantScanner] ' + categorized.message);
+      return { success: false, error: categorized.message, category: categorized.category };
     }
   }
 

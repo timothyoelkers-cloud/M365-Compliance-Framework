@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>M365 Compliance Framework</title>
-<meta name="description" content="Open-source M365 compliance toolkit: 47 frameworks, 142 CIS checks, 143 deployment-ready policies.">
+<meta name="description" content="Open-source M365 compliance toolkit: 47 frameworks, 140 CIS checks, 143 deployment-ready policies.">
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://alcdn.msauth.net https://cdn.sheetjs.com https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://graph.microsoft.com https://login.microsoftonline.com https://outlook.office365.com https://ps.compliance.protection.outlook.com https://*.webhook.office.com https://api.github.com https://dev.azure.com; img-src 'self' data: blob:; worker-src 'self';">
 <link rel="manifest" href="manifest.json">
 <link rel="stylesheet" href="css/design-system.css">
@@ -199,10 +199,10 @@
     <section id="page-home" class="page active">
       <div class="hero">
         <h1>M365 Compliance<br><span>Framework</span></h1>
-        <p class="subtitle">Open-source compliance toolkit mapping 47 global frameworks to CIS Microsoft 365 Foundations Benchmark v6.0.1 controls, with 143 deployment-ready JSON policies.</p>
+        <p class="subtitle">Open-source compliance toolkit mapping 47 global frameworks to CIS Microsoft 365 Foundations Benchmark v6.0.0 controls, with 143 deployment-ready JSON policies.</p>
         <div class="hero-stats">
           <div class="hero-stat"><div class="num" id="stat-frameworks">47</div><div class="lbl">Frameworks</div></div>
-          <div class="hero-stat"><div class="num" id="stat-checks">142</div><div class="lbl">CIS Checks</div></div>
+          <div class="hero-stat"><div class="num" id="stat-checks">140</div><div class="lbl">CIS Checks</div></div>
           <div class="hero-stat"><div class="num" id="stat-policies">143</div><div class="lbl">Policies</div></div>
           <div class="hero-stat"><div class="num">10</div><div class="lbl">Policy Types</div></div>
         </div>
@@ -328,7 +328,7 @@
 <!-- Core -->
 <script src="js/data.js"></script>
 <script src="js/state.js"></script>
-<script src="js/auth.js?v=4"></script>
+<script src="js/auth.js"></script>
 <script src="js/router.js"></script>
 <!-- Infrastructure -->
 <script src="js/scan-history.js"></script>
@@ -361,7 +361,7 @@
 <!-- Pages -->
 <script src="js/assessment.js"></script>
 <script src="js/dashboard.js"></script>
-<script src="js/policies.js?v=2"></script>
+<script src="js/policies.js"></script>
 <script src="js/reports.js"></script>
 <script>
 // ── Utility functions ──
@@ -489,9 +489,14 @@ async function bootstrap() {
     // Offline mode detection
     if (typeof OfflineManager !== 'undefined') OfflineManager.init();
 
-    // Service Worker registration (PWA)
+    // Service Worker registration (PWA) + update notification
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js').catch(function (e) { console.warn('SW registration failed:', e); });
+      navigator.serviceWorker.addEventListener('message', function (event) {
+        if (event.data && event.data.type === 'SW_UPDATED') {
+          showToast('App updated — refresh for latest version', 'info', 8000);
+        }
+      });
     }
 
     // Multi-tenant switcher

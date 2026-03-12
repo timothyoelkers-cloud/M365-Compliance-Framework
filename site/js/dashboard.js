@@ -4,8 +4,34 @@
 const Dashboard = (() => {
   let remediationLoaded = false;
   let executiveMode = false;
+  var checkPolicyMap = null;
+
+  // Load curated check→policy mapping
+  function loadCheckPolicyMap() {
+    fetch('./data/check-policy-map.json')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (data && data._meta) {
+          checkPolicyMap = data;
+        }
+      })
+      .catch(function () {});
+  }
+
+  function getGapPolicyIds(checkId) {
+    if (checkPolicyMap && checkPolicyMap[checkId]) return checkPolicyMap[checkId];
+    // Fallback: derive from policy cisChecks fields
+    var policies = AppState.get('policies') || [];
+    var ids = [];
+    for (var i = 0; i < policies.length; i++) {
+      var pol = policies[i];
+      if (pol.cisChecks && pol.cisChecks.indexOf(checkId) !== -1) ids.push(pol.id);
+    }
+    return ids;
+  }
 
   function init() {
+    loadCheckPolicyMap();
     render();
     // Re-render when scan results change
     AppState.on('tenantScanResults', function () {
@@ -139,7 +165,10 @@ const Dashboard = (() => {
       }
     }
 
-    // Gap Register
+    // Gap Register — with scan verification indicators
+    var scanResults = AppState.get('tenantScanResults') || {};
+    var hasScanData = Object.keys(scanResults).length > 0;
+
     if (gaps.length > 0) {
       html += `<div class="section-hdr" style="margin-top:28px">Gap Register (Top ${gaps.length})</div>
       <table class="data-table">
@@ -150,10 +179,23 @@ const Dashboard = (() => {
           <th style="width:50px">Level</th>
           <th style="width:80px">Priority</th>
           <th style="width:70px">Impact</th>
+          ${hasScanData ? '<th style="width:100px">Verification</th>' : ''}
         </tr></thead>
         <tbody>`;
       for (const g of gaps) {
         const tierBadge = g.tier === 'critical' ? 'badge-red' : g.tier === 'high' ? 'badge-amber' : 'badge-blue';
+        var verifyHtml = '';
+        if (hasScanData) {
+          var relatedPolicies = getGapPolicyIds(g.id);
+          var hasScannedPolicies = relatedPolicies.some(function (pid) { return scanResults[pid]; });
+          if (hasScannedPolicies) {
+            verifyHtml = '<td><span class="badge badge-green" style="font-size:.56rem">Verified by scan</span></td>';
+          } else if (relatedPolicies.length > 0) {
+            verifyHtml = '<td><span class="badge badge-amber" style="font-size:.56rem">Manual review</span></td>';
+          } else {
+            verifyHtml = '<td><span style="color:var(--ink4);font-size:.56rem">&mdash;</span></td>';
+          }
+        }
         html += `<tr>
           <td class="text-mono" style="font-size:.67rem;color:var(--blue);font-weight:600">${g.id}</td>
           <td style="font-size:.74rem;max-width:300px">${g.name}</td>
@@ -161,6 +203,7 @@ const Dashboard = (() => {
           <td><span class="text-mono" style="font-weight:600;color:${g.level === 'L1' ? 'var(--green)' : 'var(--amber)'}">${g.level}</span></td>
           <td><span class="badge ${tierBadge}">${g.tier}</span></td>
           <td class="text-mono" style="font-size:.67rem">${g.impact} fw</td>
+          ${verifyHtml}
         </tr>`;
       }
       html += `</tbody></table>`;

@@ -4,7 +4,7 @@
     "title": "Enable Entra ID B2B Integration",
     "description": "Enables SharePoint and OneDrive integration with Entra ID (Azure AD) B2B. When enabled, all external sharing creates Entra ID guest accounts, making external users subject to Conditional Access policies, access reviews, and centralized identity governance.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

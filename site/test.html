@@ -34,7 +34,18 @@
   if (typeof showToast === 'undefined') {
     window.showToast = function () {};
   }
+  if (typeof DeployEngine === 'undefined') {
+    var PS_TYPES = ['exchange', 'sharepoint', 'teams', 'defender', 'purview'];
+    window.DeployEngine = {
+      isPowerShellOnly: function (type) { return PS_TYPES.indexOf(type) !== -1; },
+      isGraphDeployable: function (type) { return PS_TYPES.indexOf(type) === -1; },
+      isDeployable: function () { return true; },
+      hasScript: function () { return false; },
+      getDeployMethod: function () { return 'graph'; },
+    };
+  }
 </script>
+<script src="test-fixtures/graph-fixtures.js"></script>
 <script src="js/policy-matcher.js"></script>
 <script src="js/remediation.js"></script>
 <script src="js/assessment.js"></script>

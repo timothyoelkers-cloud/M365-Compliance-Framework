@@ -4,7 +4,7 @@
     "title": "Restrict Meeting Presenters - Organizer Only (User Override)",
     "description": "Sets the default presenter role in Teams meetings to 'Organizer Only' with user override permitted. Only the meeting organizer and co-organizers can present (share screen, control slides) by default. Other participants must be promoted to presenter by the organizer. Meeting organizers can change this setting per-meeting if needed.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "ISO 27001:2022",

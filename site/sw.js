@@ -1,7 +1,10 @@
 /* ═══════════════════════════════════════════
    SERVICE WORKER — PWA + offline caching
+   Strategy: network-first for JS/CSS,
+   stale-while-revalidate for data JSON,
+   network-only for auth/Graph API
 ═══════════════════════════════════════════ */
-var CACHE_NAME = 'm365-compliance-v4';
+var CACHE_NAME = 'm365-compliance-v5';
 
 var STATIC_ASSETS = [
   './',
@@ -11,7 +14,7 @@ var STATIC_ASSETS = [
   './css/components.css',
   './js/data.js',
   './js/state.js',
-  './js/auth.js?v=4',
+  './js/auth.js',
   './js/router.js',
   './js/scan-history.js',
   './js/offline.js',
@@ -33,7 +36,7 @@ var STATIC_ASSETS = [
   './js/tenant-manager.js',
   './js/assessment.js',
   './js/dashboard.js',
-  './js/policies.js?v=2',
+  './js/policies.js',
   './js/reports.js',
   './js/audit-trail.js',
   './js/theme-toggle.js',
@@ -48,6 +51,7 @@ var STATIC_ASSETS = [
   './data/frameworks.json',
   './data/policies-all.json',
   './data/policies/index.json',
+  './data/check-policy-map.json',
 ];
 
 // Network-only hosts (auth + live data)
@@ -71,7 +75,7 @@ self.addEventListener('install', function (event) {
   );
 });
 
-// Activate — clean old caches
+// Activate — clean old caches, notify clients of update
 self.addEventListener('activate', function (event) {
   event.waitUntil(
     caches.keys().then(function (keys) {
@@ -79,6 +83,13 @@ self.addEventListener('activate', function (event) {
         keys.filter(function (k) { return k !== CACHE_NAME; })
             .map(function (k) { return caches.delete(k); })
       );
+    }).then(function () {
+      // Notify all clients that a new version is active
+      return self.clients.matchAll().then(function (clients) {
+        clients.forEach(function (client) {
+          client.postMessage({ type: 'SW_UPDATED', version: CACHE_NAME });
+        });
+      });
     }).then(function () {
       return self.clients.claim();
     })
@@ -111,7 +122,23 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  // Cache-first for static assets
+  // Network-first for JS and CSS (prevents stale code issues)
+  if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+    event.respondWith(
+      fetch(event.request).then(function (response) {
+        if (response.ok) {
+          var clone = response.clone();
+          caches.open(CACHE_NAME).then(function (cache) { cache.put(event.request, clone); });
+        }
+        return response;
+      }).catch(function () {
+        return caches.match(event.request);
+      })
+    );
+    return;
+  }
+
+  // Cache-first for everything else (HTML, images, fonts, manifest)
   event.respondWith(
     caches.match(event.request).then(function (cached) {
       return cached || fetch(event.request).then(function (response) {

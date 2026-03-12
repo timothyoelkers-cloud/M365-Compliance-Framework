@@ -4,7 +4,7 @@
     "title": "Common Attachment Types Filter - Default Policy",
     "description": "Updates the default malware filter policy to enable the common attachment types filter. Blocks 50+ dangerous file extensions at the transport layer. Uses the default policy so all recipients are covered without needing a rule.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "MITRE ATT&CK T1204.002",
       "NIS2",

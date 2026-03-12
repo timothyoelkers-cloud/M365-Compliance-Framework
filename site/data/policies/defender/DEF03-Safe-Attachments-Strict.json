@@ -4,7 +4,7 @@
     "title": "Safe Attachments - Strict (Dynamic Delivery)",
     "description": "Enables Safe Attachments with Dynamic Delivery mode. Email bodies are delivered immediately while attachments are sandboxed and scanned. Malicious attachments are blocked after detonation. ActionOnError ensures messages are not delivered if scanning fails.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "MITRE ATT&CK T1566.001",
       "NIS2",

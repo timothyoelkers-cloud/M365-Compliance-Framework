@@ -4,7 +4,7 @@
     "title": "Disable Basic Authentication",
     "description": "Creates an authentication policy that disables basic authentication for all Exchange Online protocols (POP3, IMAP, SMTP, MAPI, ActiveSync, EWS, Autodiscover, Offline Address Book, RPC, PowerShell) and assigns it as the organization default. Basic auth transmits credentials in clear text and cannot enforce MFA.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

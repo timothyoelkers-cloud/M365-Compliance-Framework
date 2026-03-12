@@ -4,7 +4,7 @@
     "title": "Require Managed Device for OneDrive Sync",
     "description": "Restricts OneDrive and SharePoint file sync to devices that are domain-joined to specific Active Directory domains or Intune-compliant. Prevents the OneDrive sync client from syncing corporate data to unmanaged personal devices.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

@@ -4,7 +4,7 @@
     "title": "DKIM - Enable for All Domains",
     "description": "Enables DomainKeys Identified Mail (DKIM) signing for all accepted domains in Exchange Online. Creates DKIM signing configurations and enables them. DKIM cryptographically signs outbound email to prove domain authenticity and detect message tampering.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

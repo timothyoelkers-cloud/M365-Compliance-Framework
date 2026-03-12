@@ -4,7 +4,7 @@
     "title": "Enable Meeting Lobby for All External Users",
     "description": "Configures Teams meetings so that only internal users (same organization, excluding guests) can bypass the lobby. All external participants including guests, federated users, and PSTN dial-in callers must wait in the lobby until admitted by the meeting organizer.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

@@ -8,6 +8,8 @@ const Assessment = (() => {
   let autoSuggestDismissed = false;
 
   // ─── Check-to-Policy Mapping ───
+  // Load curated mapping from check-policy-map.json (preferred),
+  // fallback to deriving from policy cisChecks fields
   function buildCheckToPolicyMap() {
     var policies = AppState.get('policies') || [];
     var map = {};
@@ -21,6 +23,23 @@ const Assessment = (() => {
     }
     checkToPolicyMap = map;
     return map;
+  }
+
+  function loadCuratedMap() {
+    return fetch('./data/check-policy-map.json')
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (data) {
+        if (!data || !data._meta) return buildCheckToPolicyMap();
+        var map = {};
+        var keys = Object.keys(data);
+        for (var i = 0; i < keys.length; i++) {
+          if (keys[i] === '_meta') continue;
+          map[keys[i]] = data[keys[i]];
+        }
+        checkToPolicyMap = map;
+        return map;
+      })
+      .catch(function () { return buildCheckToPolicyMap(); });
   }
 
   function getCheckToPolicyMap() {
@@ -58,6 +77,7 @@ const Assessment = (() => {
   function init() {
     if (!initialized) {
       initialized = true;
+      loadCuratedMap(); // load curated check→policy map from JSON
       AppState.on('selectedFrameworks', () => {
         if (AppState.get('currentPage') === 'assessment') renderCurrentStep();
       });

@@ -4,7 +4,7 @@
     "title": "Disable Teams Channel Email Addresses",
     "description": "Disables the ability to send email to Teams channel email addresses. Channel email bypasses Exchange Online Protection (anti-spam, anti-malware, Safe Attachments, Safe Links, transport rules, DLP) because messages are delivered directly to the Teams channel without passing through the email security stack.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

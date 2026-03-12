@@ -4,7 +4,7 @@
     "title": "Block External Auto-Forwarding",
     "description": "Blocks automatic email forwarding to external domains using both the Remote Domain default setting and a transport rule. This is a critical anti-data-exfiltration control that prevents compromised accounts or malicious insiders from silently forwarding email externally.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

@@ -4,7 +4,7 @@
     "title": "Safe Links - All Applications",
     "description": "Enables Safe Links URL scanning and detonation for email, Microsoft Teams, and Office desktop/mobile apps. Blocks click-through to malicious URLs, rewrites URLs for tracking, and scans links at time of click.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "MITRE ATT&CK T1566.002",
       "NIS2",

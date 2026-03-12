@@ -4,7 +4,7 @@
     "title": "Restrict Meeting Recording - Internal Organizers Only",
     "description": "Configures Teams meeting recording so that only internal meeting organizers and co-organizers can initiate recordings. Cloud recording is enabled for internal use but restricted to prevent external participants from recording meetings. Recording storage remains within the organization's OneDrive/SharePoint.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

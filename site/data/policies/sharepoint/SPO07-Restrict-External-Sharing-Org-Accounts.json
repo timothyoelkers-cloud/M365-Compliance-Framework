@@ -4,7 +4,7 @@
     "title": "Restrict External Sharing - Organization Accounts Only",
     "description": "Restricts SharePoint Online external sharing to authenticated external users with organizational accounts only (no anonymous links, no personal Microsoft accounts). Requires the invited email address to match the accepting account, preventing invitation forwarding.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

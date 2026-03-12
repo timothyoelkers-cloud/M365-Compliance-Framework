@@ -4,7 +4,7 @@
     "title": "Enable Modern Authentication (OAuth 2.0)",
     "description": "Explicitly enables Modern Authentication (OAuth 2.0) for Exchange Online via Set-OrganizationConfig. Modern auth supports MFA, certificate-based auth, conditional access, and token-based authentication. This must be enabled before disabling basic auth (EXO04).",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

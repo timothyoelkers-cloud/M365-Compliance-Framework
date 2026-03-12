@@ -4,7 +4,7 @@
     "title": "Enable Anonymous Link Expiry - 30 Days",
     "description": "Sets anonymous (Anyone) sharing links to automatically expire after 30 days. Prevents indefinite anonymous access to shared files and folders. If anonymous sharing is permitted, this ensures temporary shares do not persist forever.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "ISO 27001:2022",

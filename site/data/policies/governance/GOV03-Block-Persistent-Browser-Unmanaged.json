@@ -3,7 +3,7 @@
     "id": "GOV03",
     "title": "Block Persistent Browser Sessions on Unmanaged Devices",
     "description": "Prevents persistent browser sessions on unmanaged devices to reduce the risk of credential theft via shared or public computers.",
-    "frameworks": ["CIS Microsoft 365 Foundations Benchmark v6.0.1", "NIST SP 800-53 Rev 5", "NIS2", "ISO 27001:2022", "SOC 2", "PCI DSS v4.0", "HIPAA", "FedRAMP Moderate", "CMMC v2.0", "DORA"],
+    "frameworks": ["CIS Microsoft 365 Foundations Benchmark v6.0.0", "NIST SP 800-53 Rev 5", "NIS2", "ISO 27001:2022", "SOC 2", "PCI DSS v4.0", "HIPAA", "FedRAMP Moderate", "CMMC v2.0", "DORA"],
     "cisChecks": ["5.1.2.2"],
     "severity": "High",
     "category": "Identity Governance",

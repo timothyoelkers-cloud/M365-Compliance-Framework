@@ -4,7 +4,7 @@
     "title": "Enable Report Message Add-In",
     "description": "Deploys the Microsoft Report Message and Report Phishing add-ins organization-wide for all users. Enables users to report suspicious, phishing, and junk emails directly from Outlook. Reported messages are submitted to Microsoft for analysis and optionally to a security team mailbox.",
     "frameworks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "NIST SP 800-53 Rev 5",
       "NIS2",
       "DORA",

@@ -1,6 +1,6 @@
 {
   "frameworks": [
-    "CIS Microsoft 365 Foundations Benchmark v6.0.1",
+    "CIS Microsoft 365 Foundations Benchmark v6.0.0",
     "DORA",
     "NIS2",
     "ISO 27001:2022",
@@ -112,7 +112,7 @@
       "MITRE ATT&CK"
     ],
     "CIS Benchmarks": [
-      "CIS Microsoft 365 Foundations Benchmark v6.0.1"
+      "CIS Microsoft 365 Foundations Benchmark v6.0.0"
     ]
   },
   "org_profiles": {
@@ -201,7 +201,7 @@
     ]
   },
   "frameworkMeta": {
-    "CIS Microsoft 365 Foundations Benchmark v6.0.1": {
+    "CIS Microsoft 365 Foundations Benchmark v6.0.0": {
       "fullName": "CIS Microsoft 365 Foundations Benchmark",
       "type": "benchmark",
       "version": "6.0.1",
