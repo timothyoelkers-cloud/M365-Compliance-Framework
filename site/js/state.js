@@ -162,9 +162,9 @@ const AppState = (() => {
       .sort((a, b) => b.impact - a.impact);
   }
 
-  // Essential Eight strategy stats
-  function getE8StrategyStats() {
-    var strategies = state.e8Strategies;
+  // Generic strategy stats for any framework with hasStrategies
+  function getStrategyStats(stateKey) {
+    var strategies = state[stateKey];
     if (!strategies || !strategies.length) return null;
     var scanResults = state.scanResults || {};
     var policies = state.policies || [];
@@ -173,7 +173,6 @@ const AppState = (() => {
     var polIdMap = {};
     policies.forEach(function (p) {
       polIdMap[p.id] = p.id;
-      // Also map short prefix (e.g. INT01 -> INT01-Device-Compliance-Windows-Baseline)
       var dash = p.id.indexOf('-');
       if (dash > 0) polIdMap[p.id.substring(0, dash)] = p.id;
     });
@@ -203,7 +202,6 @@ const AppState = (() => {
         };
       });
 
-      // Achieved maturity: highest ML where cumulative is 100%
       var achieved = 0;
       if (levels.ML1.total > 0 && levels.ML1.pct === 100) achieved = 1;
       if (achieved === 1 && levels.ML2.total > 0 && levels.ML2.pct === 100) achieved = 2;
@@ -212,6 +210,7 @@ const AppState = (() => {
       return {
         id: strat.id,
         name: strat.name,
+        article: strat.article || null,
         description: strat.description,
         order: strat.order,
         levels: levels,
@@ -219,6 +218,9 @@ const AppState = (() => {
       };
     });
   }
+
+  // Backward-compat wrapper
+  function getE8StrategyStats() { return getStrategyStats('e8Strategies'); }
 
   // Deployment history
   function addDeploymentRecord(record) {
@@ -255,7 +257,7 @@ const AppState = (() => {
   return {
     get, set, toggleInSet, on, notify,
     resetAssessment, getRequiredChecks, getCheckFwsInScope,
-    getScoreStats, getFrameworkCoverage, getGaps, getE8StrategyStats,
+    getScoreStats, getFrameworkCoverage, getGaps, getStrategyStats, getE8StrategyStats,
     addDeploymentRecord, getDeploymentHistory, exportDeploymentLog,
     state,
   };

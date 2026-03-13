@@ -465,15 +465,29 @@ async function bootstrap() {
       AppState.set('frameworkMeta', frameworks.frameworkMeta);
     }
 
-    // Lazy-load Essential Eight strategy data when selected
+    // Lazy-load strategy data for any framework with hasStrategies
+    var strategyFrameworks = {
+      'ASD Essential Eight': { slug: 'asd-essential-eight', stateKey: 'e8Strategies' },
+      'NIS2': { slug: 'nis2', stateKey: 'nis2Strategies' }
+    };
     AppState.on('selectedFrameworks', async function (fws) {
-      if (fws.has('ASD Essential Eight') && !AppState.get('e8Strategies')) {
-        try {
-          var e8Data = await DataStore.loadFramework('asd-essential-eight');
-          if (e8Data && e8Data.strategies) {
-            AppState.set('e8Strategies', e8Data.strategies);
-          }
-        } catch (e) { console.warn('[E8] Failed to load strategy data:', e.message); }
+      for (var fwName in strategyFrameworks) {
+        var cfg = strategyFrameworks[fwName];
+        if (fws.has(fwName) && !AppState.get(cfg.stateKey)) {
+          try {
+            var fwData = await DataStore.loadFramework(cfg.slug);
+            if (fwData && fwData.strategies) {
+              AppState.set(cfg.stateKey, fwData.strategies);
+              var meta = AppState.get('frameworkMeta') || {};
+              if (meta[fwName]) {
+                meta[fwName].hasStrategies = true;
+                meta[fwName].stateKey = cfg.stateKey;
+                if (fwData.levelLabels) meta[fwName].levelLabels = fwData.levelLabels;
+              }
+              AppState.set('frameworkMeta', meta);
+            }
+          } catch (e) { console.warn('[' + fwName + '] Failed to load strategy data:', e.message); }
+        }
       }
     });
     AppState.set('categories', manifest.categories);

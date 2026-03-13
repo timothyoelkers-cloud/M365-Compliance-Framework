@@ -2,260 +2,285 @@
   "name": "NIS2",
   "slug": "nis2",
   "group": "EU Regulatory",
+  "hasStrategies": true,
+  "levelLabels": { "ML1": "Essential", "ML2": "Enhanced", "ML3": "Advanced" },
+  "strategies": [
+    {
+      "id": "risk-analysis",
+      "name": "Risk Analysis & Information Security Policies",
+      "article": "Art. 21(2)(a)",
+      "order": 1,
+      "description": "Policies on the analysis of risks and on the security of information systems, including risk assessments, information classification, and governance controls.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish foundational governance controls: enable audit logging, restrict third-party application consent, and enforce admin consent workflows.",
+          "policies": ["GOV03", "GOV05", "ENT01", "ENT02", "ENT03"],
+          "checks": ["4.1", "5.1.2.1", "5.1.5.1", "9.1.1"]
+        },
+        "ML2": {
+          "summary": "Deploy sensitivity labels across all workloads, configure auto-labeling, implement DLP policies for regulated data types, and enable access reviews.",
+          "policies": ["PV01", "PV02", "PV04", "PV08", "PV10", "PV13", "PV14", "PV15", "PV16", "PV17", "GOV01", "SPO17", "SPO20"],
+          "checks": ["5.1.8.1", "9.1.6", "9.1.7"]
+        },
+        "ML3": {
+          "summary": "Enable insider risk management, adaptive protection, endpoint DLP, information barriers, and Power BI DLP for comprehensive risk coverage.",
+          "policies": ["PV12", "PV18", "PV19", "PV20", "PV21", "PV29"],
+          "checks": ["9.1.4"]
+        }
+      }
+    },
+    {
+      "id": "incident-handling",
+      "name": "Incident Handling",
+      "article": "Art. 21(2)(b)",
+      "order": 2,
+      "description": "Incident detection, classification, response, and recovery procedures to meet NIS2 reporting obligations (24h early warning, 72h notification, 1-month final report).",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Onboard all device types to Defender for Endpoint, enable tamper protection, configure alert notifications, and retain audit logs for at least one year.",
+          "policies": ["MDE01", "MDE02", "MDE03", "MDE09", "MDE10", "GOV05", "PV11"],
+          "checks": ["9.1.1", "6.2.3"]
+        },
+        "ML2": {
+          "summary": "Enable EDR in block mode, automated investigation and remediation, deception technology, threat intelligence indicators, and DLP incident detection.",
+          "policies": ["MDE04", "MDE05", "MDE11", "MDE12", "PV05", "PV09", "PV30"],
+          "checks": ["9.1.2", "9.1.3"]
+        },
+        "ML3": {
+          "summary": "Deploy communication compliance policies for detecting regulatory violations and offensive language to identify insider threats.",
+          "policies": ["PV27", "PV28"],
+          "checks": ["9.1.8"]
+        }
+      }
+    },
+    {
+      "id": "business-continuity",
+      "name": "Business Continuity & Crisis Management",
+      "article": "Art. 21(2)(c)",
+      "order": 3,
+      "description": "Business continuity, backup management, disaster recovery, and crisis management including data retention and recovery capabilities.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Configure retention policies across all workloads with long-term retention, retain audit logs, and block infected file downloads to protect data integrity.",
+          "policies": ["PV11", "PV22", "SPO05"],
+          "checks": ["9.1.1", "7.2.8"]
+        },
+        "ML2": {
+          "summary": "Deploy classification-based retention labels and records management with disposition review for structured data lifecycle management.",
+          "policies": ["PV24", "PV25", "PV26"],
+          "checks": ["9.1.6"]
+        },
+        "ML3": {
+          "summary": "Enable regulatory hold capabilities for financial services and critical sector compliance.",
+          "policies": ["PV23"],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "supply-chain",
+      "name": "Supply Chain Security",
+      "article": "Art. 21(2)(d)",
+      "order": 4,
+      "description": "Security measures for relationships between entities and their direct suppliers or service providers, including third-party access controls and data sharing governance.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Restrict third-party app consent, control guest invitations, restrict external sharing to existing guests, enable B2B integration, block external mail forwarding, and restrict Teams federation.",
+          "policies": ["ENT01", "ENT02", "ENT06", "SPO01", "SPO06", "TEA06", "TEA07", "EXO03", "EXO06"],
+          "checks": ["5.1.2.1", "5.1.2.3", "5.1.6.1", "5.1.6.2", "5.1.6.3", "6.5.3"]
+        },
+        "ML2": {
+          "summary": "Restrict external sharing to allowed domains, enforce anonymous link expiry, require MFA for guests, block external file sharing in Teams to unapproved storage, and control guest resharing.",
+          "policies": ["CA11", "CA12", "SPO02", "SPO03", "SPO07", "SPO13", "SPO19", "TEA04", "TEA05", "GOV04"],
+          "checks": ["7.2.1", "7.2.3", "7.2.4", "7.2.5", "7.2.6", "7.2.7", "7.2.9", "7.3.2"]
+        },
+        "ML3": {
+          "summary": "Disable calendar sharing externally, block Teams channel email addresses, and enforce restricted access control on sensitive sites.",
+          "policies": ["EXO07", "TEA10", "SPO18"],
+          "checks": ["6.2.1"]
+        }
+      }
+    },
+    {
+      "id": "secure-development",
+      "name": "Secure Acquisition, Development & Vulnerability Handling",
+      "article": "Art. 21(2)(e)",
+      "order": 5,
+      "description": "Security in network and information systems acquisition, development and maintenance, including vulnerability handling, disclosure, and patch management.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Configure automated patching via Windows Update rings, enable vulnerability management scanning, enforce modern authentication, and disable custom scripts on SharePoint.",
+          "policies": ["INT08", "MDE06", "SPO09", "SPO16", "EXO05"],
+          "checks": ["5.1.4.2", "5.1.4.3", "6.1.2", "7.3.1"]
+        },
+        "ML2": {
+          "summary": "Deploy exploit protection system-wide mitigations, network protection in block mode, and CIS-aligned security baselines for Windows and Edge.",
+          "policies": ["INT11", "INT12", "INT19", "MDE07"],
+          "checks": ["5.1.4.1", "5.1.4.6"]
+        },
+        "ML3": {
+          "summary": "Enable all 16 ASR rules in block mode, Credential Guard and Device Guard, and controlled folder access for ransomware protection.",
+          "policies": ["INT15", "INT16", "INT20"],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "effectiveness-assessment",
+      "name": "Effectiveness Assessment",
+      "article": "Art. 21(2)(f)",
+      "order": 6,
+      "description": "Policies and procedures to assess the effectiveness of cybersecurity risk-management measures through testing, monitoring, and auditing.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enable unified audit logging with comprehensive SharePoint audit events and minimum one-year log retention as the foundation for effectiveness measurement.",
+          "policies": ["GOV05", "PV11", "SPO20"],
+          "checks": ["9.1.1"]
+        },
+        "ML2": {
+          "summary": "Conduct periodic access reviews for privileged roles, continuous vulnerability assessment, and insider risk behavioural analysis.",
+          "policies": ["GOV01", "MDE06", "PV12"],
+          "checks": ["5.1.8.1", "9.1.4"]
+        },
+        "ML3": {
+          "summary": "Deploy deception technology for proactive security testing and adaptive protection that dynamically adjusts DLP policies based on risk signals.",
+          "policies": ["MDE11", "PV29"],
+          "checks": ["9.1.8"]
+        }
+      }
+    },
+    {
+      "id": "cyber-hygiene",
+      "name": "Cyber Hygiene Practices & Training",
+      "article": "Art. 21(2)(g)",
+      "order": 7,
+      "description": "Basic cyber hygiene practices and cybersecurity training, including password management, endpoint protection, email security, and security awareness.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enforce custom banned password lists, enable self-service password reset, block legacy and basic authentication, deploy anti-phishing policies, and configure Defender Antivirus.",
+          "policies": ["ENT04", "ENT07", "CA01", "EXO04", "DEF01", "INT07"],
+          "checks": ["5.2.2.3", "5.2.2.7", "5.2.2.8", "5.2.4.1", "6.5.1"]
+        },
+        "ML2": {
+          "summary": "Deploy the full Defender for Office 365 suite (Safe Links, Safe Attachments, anti-malware, auto-purge, common attachment filter), enable user reporting, and mobile app protection policies.",
+          "policies": ["DEF02", "DEF03", "DEF04", "DEF05", "DEF06", "DEF07", "DEF08", "EXO08", "EXO09", "EXO10", "INT09"],
+          "checks": ["2.1.1", "2.1.5", "2.2.1", "2.4.3", "2.4.4", "6.5.2", "6.5.4", "6.5.5"]
+        },
+        "ML3": {
+          "summary": "Enable web content filtering, disable LinkedIn connections, hide KMSI prompt, and limit Windows diagnostic data collection.",
+          "policies": ["MDE08", "ENT08", "ENT09", "INT18"],
+          "checks": ["5.1.2.5"]
+        }
+      }
+    },
+    {
+      "id": "cryptography",
+      "name": "Cryptography & Encryption",
+      "article": "Art. 21(2)(h)",
+      "order": 8,
+      "description": "Policies and procedures regarding the use of cryptography and, where appropriate, encryption to protect data at rest and in transit.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enforce BitLocker drive encryption, configure DKIM and DMARC for email authentication, and require modern authentication for all services.",
+          "policies": ["INT05", "EXO01", "EXO02", "SPO09"],
+          "checks": ["5.1.4.4", "2.1.8", "2.1.9", "2.1.10", "7.3.1"]
+        },
+        "ML2": {
+          "summary": "Deploy sensitivity labels with encryption across workloads, configure Windows Hello for Business for cryptographic authentication, and enforce OAuth 2.0.",
+          "policies": ["PV10", "INT13", "EXO05"],
+          "checks": ["5.1.4.6", "6.1.2"]
+        },
+        "ML3": {
+          "summary": "Enable Credential Guard for credential protection, and DLP policies to block source code, credentials, and password sharing externally.",
+          "policies": ["INT16", "PV06", "PV07"],
+          "checks": ["6.1.1"]
+        }
+      }
+    },
+    {
+      "id": "access-control",
+      "name": "Human Resources Security, Access Control & Asset Management",
+      "article": "Art. 21(2)(i)",
+      "order": 9,
+      "description": "Human resources security including access control policies, privileged access management, device management, and asset lifecycle controls.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Require MFA for all users, block legacy authentication, restrict guest invitations and device registration, enable access reviews, and restrict device enrollment to corporate devices.",
+          "policies": ["CA02", "CA01", "ENT05", "ENT06", "GOV01", "GOV02", "INT10"],
+          "checks": ["1.1.1", "1.1.4", "5.1.2.1", "5.1.3.1", "5.1.3.2", "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5"]
+        },
+        "ML2": {
+          "summary": "Block high-risk and medium-risk sign-ins, enforce geo-blocking, sign-in frequency, compliant devices, and deploy device compliance baselines across all platforms.",
+          "policies": ["CA04", "CA05", "CA07", "CA13", "CA16", "CA17", "INT01", "INT02", "INT03", "INT04", "SPO04", "SPO08"],
+          "checks": ["1.2.2", "1.3.9", "5.1.4.1", "5.1.4.2", "5.1.4.3", "5.2.2.5", "5.2.2.9", "7.2.10"]
+        },
+        "ML3": {
+          "summary": "Block unsupported platforms, enable LAPS, enforce firewall policies, control removable storage, restrict SharePoint by IP range, and configure idle session timeouts.",
+          "policies": ["CA14", "CA18", "INT06", "INT14", "INT17", "SPO10", "SPO14", "SPO15"],
+          "checks": ["3.1.1", "3.2.1", "3.2.2", "3.3.1", "7.2.11"]
+        }
+      }
+    },
+    {
+      "id": "mfa-auth",
+      "name": "Multi-Factor Authentication & Secured Communications",
+      "article": "Art. 21(2)(j)",
+      "order": 10,
+      "description": "Use of multi-factor authentication or continuous authentication solutions, and secured voice, video and text communications including secured emergency communications.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Require MFA for all users, block legacy authentication, configure Authenticator with number matching and additional context, and require MFA for Azure management.",
+          "policies": ["CA02", "CA01", "ENT10", "CA08", "GOV02"],
+          "checks": ["1.1.1", "1.1.2", "1.1.3", "1.2.1", "5.2.2.1", "5.2.2.2", "5.2.3.1", "5.2.3.4", "5.2.3.5"]
+        },
+        "ML2": {
+          "summary": "Require phishing-resistant MFA for admins, MFA for Azure Service Management API, managed device for security info registration, MFA for device enrollment, and compliant devices.",
+          "policies": ["CA03", "CA06", "CA09", "CA10", "CA15", "CA17"],
+          "checks": ["1.3.2", "1.3.5", "1.3.6", "1.3.7", "5.2.2.10", "5.2.2.11", "5.2.3.7"]
+        },
+        "ML3": {
+          "summary": "Enforce sign-in frequency for all users and every-time for admins, deploy Windows Hello for Business, and secure Teams communications (lobby, anonymous join, presenters, recording).",
+          "policies": ["CA13", "CA14", "INT13", "TEA01", "TEA02", "TEA03", "TEA08", "TEA09"],
+          "checks": ["1.3.8", "5.2.3.6", "8.1.1", "8.1.2", "8.2.1", "8.2.2", "8.2.3", "8.2.4", "8.5.1", "8.5.2", "8.5.3", "8.5.4", "8.5.5", "8.5.6", "8.5.7", "8.5.8", "8.5.9", "8.6.1"]
+        }
+      }
+    }
+  ],
   "checks": [
-    "1.1.1",
-    "1.1.2",
-    "1.1.3",
-    "1.1.4",
-    "1.2.1",
-    "1.2.2",
-    "1.3.2",
-    "1.3.5",
-    "1.3.6",
-    "1.3.7",
-    "1.3.9",
-    "2.1.1",
-    "2.1.10",
-    "2.1.5",
-    "2.1.8",
-    "2.1.9",
-    "2.2.1",
-    "2.4.3",
-    "2.4.4",
-    "3.1.1",
-    "3.2.1",
-    "3.2.2",
-    "3.3.1",
+    "1.1.1", "1.1.2", "1.1.3", "1.1.4", "1.2.1", "1.2.2",
+    "1.3.2", "1.3.5", "1.3.6", "1.3.7", "1.3.8", "1.3.9",
+    "2.1.1", "2.1.5", "2.1.8", "2.1.9", "2.1.10", "2.2.1", "2.4.3", "2.4.4",
+    "3.1.1", "3.2.1", "3.2.2", "3.3.1",
     "4.1",
-    "5.1.2.1",
-    "5.1.2.3",
-    "5.1.2.4",
-    "5.1.2.5",
-    "5.1.3.1",
-    "5.1.3.2",
-    "5.1.4.1",
-    "5.1.4.2",
-    "5.1.4.3",
-    "5.1.4.4",
-    "5.1.4.6",
-    "5.1.5.1",
-    "5.1.6.1",
-    "5.1.6.2",
-    "5.1.6.3",
-    "5.1.8.1",
-    "5.2.2.1",
-    "5.2.2.10",
-    "5.2.2.11",
-    "5.2.2.2",
-    "5.2.2.4",
-    "5.2.2.5",
-    "5.2.2.6",
-    "5.2.2.7",
-    "5.2.2.8",
-    "5.2.2.9",
-    "5.2.3.1",
-    "5.2.3.4",
-    "5.2.3.5",
-    "5.2.3.6",
-    "5.2.3.7",
+    "5.1.2.1", "5.1.2.3", "5.1.2.5", "5.1.3.1", "5.1.3.2",
+    "5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.4", "5.1.4.6",
+    "5.1.5.1", "5.1.6.1", "5.1.6.2", "5.1.6.3", "5.1.8.1",
+    "5.2.2.1", "5.2.2.2", "5.2.2.3", "5.2.2.5", "5.2.2.7", "5.2.2.8", "5.2.2.9", "5.2.2.10", "5.2.2.11",
+    "5.2.3.1", "5.2.3.4", "5.2.3.5", "5.2.3.6", "5.2.3.7",
     "5.2.4.1",
-    "5.3.1",
-    "5.3.2",
-    "5.3.3",
-    "5.3.4",
-    "5.3.5",
-    "6.1.1",
-    "6.1.2",
-    "6.1.3",
-    "6.2.1",
-    "6.2.3",
-    "6.5.1",
-    "6.5.2",
-    "6.5.3",
-    "6.5.4",
-    "6.5.5",
-    "7.2.1",
-    "7.2.10",
-    "7.2.11",
-    "7.2.2",
-    "7.2.3",
-    "7.2.4",
-    "7.2.5",
-    "7.2.6",
-    "7.2.7",
-    "7.2.8",
-    "7.2.9",
-    "7.3.1",
-    "7.3.2",
-    "8.1.1",
-    "8.1.2",
-    "8.2.1",
-    "8.2.2",
-    "8.2.3",
-    "8.2.4",
-    "8.5.1",
-    "8.5.2",
-    "8.5.3",
-    "8.5.4",
-    "8.5.5",
-    "8.5.6",
-    "8.5.7",
-    "8.5.8",
-    "8.5.9",
+    "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5",
+    "6.1.1", "6.1.2", "6.2.1", "6.2.3",
+    "6.5.1", "6.5.2", "6.5.3", "6.5.4", "6.5.5",
+    "7.2.1", "7.2.3", "7.2.4", "7.2.5", "7.2.6", "7.2.7", "7.2.8", "7.2.9", "7.2.10", "7.2.11",
+    "7.3.1", "7.3.2",
+    "8.1.1", "8.1.2", "8.2.1", "8.2.2", "8.2.3", "8.2.4",
+    "8.5.1", "8.5.2", "8.5.3", "8.5.4", "8.5.5", "8.5.6", "8.5.7", "8.5.8", "8.5.9",
     "8.6.1",
-    "9.1.1",
-    "9.1.2",
-    "9.1.3",
-    "9.1.4",
-    "9.1.6",
-    "9.1.7",
-    "9.1.8"
+    "9.1.1", "9.1.2", "9.1.3", "9.1.4", "9.1.6", "9.1.7", "9.1.8"
   ],
-  "checkCount": 107,
+  "checkCount": 91,
   "policies": [
-    "CA01",
-    "CA02",
-    "CA03",
-    "CA04",
-    "CA05",
-    "CA06",
-    "CA07",
-    "CA08",
-    "CA09",
-    "CA10",
-    "CA11",
-    "CA12",
-    "CA13",
-    "CA14",
-    "CA16",
-    "CA17",
-    "CA18",
-    "DEF01",
-    "DEF02",
-    "DEF03",
-    "DEF04",
-    "DEF05",
-    "DEF06",
-    "DEF07",
-    "DEF08",
-    "ENT01",
-    "ENT02",
-    "ENT03",
-    "ENT04",
-    "ENT05",
-    "ENT06",
-    "ENT07",
-    "ENT08",
-    "ENT09",
-    "ENT10",
-    "EXO01",
-    "EXO02",
-    "EXO03",
-    "EXO04",
-    "EXO05",
-    "EXO06",
-    "EXO07",
-    "EXO08",
-    "EXO09",
-    "EXO10",
-    "INT01",
-    "INT02",
-    "INT03",
-    "INT04",
-    "INT05",
-    "INT06",
-    "INT07",
-    "INT08",
-    "INT09",
-    "INT10",
-    "INT11",
-    "INT12",
-    "INT13",
-    "INT14",
-    "INT15",
-    "INT16",
-    "INT17",
-    "INT18",
-    "INT19",
-    "INT20",
-    "MDE01",
-    "MDE02",
-    "MDE03",
-    "MDE04",
-    "MDE05",
-    "MDE06",
-    "MDE07",
-    "MDE08",
-    "MDE09",
-    "MDE10",
-    "MDE11",
-    "MDE12",
-    "PV01",
-    "PV02",
-    "PV03",
-    "PV04",
-    "PV05",
-    "PV06",
-    "PV07",
-    "PV08",
-    "PV09",
-    "PV10",
-    "PV11",
-    "PV12",
-    "PV13",
-    "PV14",
-    "PV15",
-    "PV16",
-    "PV17",
-    "PV18",
-    "PV19",
-    "PV20",
-    "PV21",
-    "PV22",
-    "PV23",
-    "PV24",
-    "PV25",
-    "PV26",
-    "PV27",
-    "PV28",
-    "PV29",
-    "PV30",
-    "SPO01",
-    "SPO02",
-    "SPO03",
-    "SPO04",
-    "SPO05",
-    "SPO06",
-    "SPO07",
-    "SPO08",
-    "SPO09",
-    "SPO10",
-    "SPO11",
-    "SPO12",
-    "SPO13",
-    "SPO14",
-    "SPO15",
-    "SPO16",
-    "SPO17",
-    "SPO18",
-    "SPO19",
-    "SPO20",
-    "TEA01",
-    "TEA02",
-    "TEA03",
-    "TEA04",
-    "TEA05",
-    "TEA06",
-    "TEA07",
-    "TEA08",
-    "TEA09",
-    "TEA10"
+    "CA01", "CA02", "CA03", "CA04", "CA05", "CA06", "CA07", "CA08", "CA09", "CA10", "CA11", "CA12", "CA13", "CA14", "CA15", "CA16", "CA17", "CA18",
+    "DEF01", "DEF02", "DEF03", "DEF04", "DEF05", "DEF06", "DEF07", "DEF08",
+    "ENT01", "ENT02", "ENT03", "ENT04", "ENT05", "ENT06", "ENT07", "ENT08", "ENT09", "ENT10",
+    "EXO01", "EXO02", "EXO03", "EXO04", "EXO05", "EXO06", "EXO07", "EXO08", "EXO09", "EXO10",
+    "GOV01", "GOV02", "GOV03", "GOV04", "GOV05",
+    "INT01", "INT02", "INT03", "INT04", "INT05", "INT06", "INT07", "INT08", "INT09", "INT10", "INT11", "INT12", "INT13", "INT14", "INT15", "INT16", "INT17", "INT18", "INT19", "INT20",
+    "MDE01", "MDE02", "MDE03", "MDE04", "MDE05", "MDE06", "MDE07", "MDE08", "MDE09", "MDE10", "MDE11", "MDE12",
+    "PV01", "PV02", "PV04", "PV05", "PV06", "PV07", "PV08", "PV09", "PV10", "PV11", "PV12", "PV13", "PV14", "PV15", "PV16", "PV17", "PV18", "PV19", "PV20", "PV21", "PV22", "PV23", "PV24", "PV25", "PV26", "PV27", "PV28", "PV29", "PV30",
+    "SPO01", "SPO02", "SPO03", "SPO04", "SPO05", "SPO06", "SPO07", "SPO08", "SPO09", "SPO10", "SPO13", "SPO14", "SPO15", "SPO16", "SPO17", "SPO18", "SPO19", "SPO20",
+    "TEA01", "TEA02", "TEA03", "TEA04", "TEA05", "TEA06", "TEA07", "TEA08", "TEA09", "TEA10"
   ],
-  "policyCount": 137,
-  "orgProfiles": [
-    "EU Financial",
-    "EU General (NIS2)",
-    "Germany (BSI)",
-    "Spain (ENS)"
-  ]
+  "policyCount": 140,
+  "orgProfiles": ["EU Financial", "EU General (NIS2)", "Germany (BSI)", "Spain (ENS)"]
 }

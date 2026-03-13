@@ -165,60 +165,65 @@ const Dashboard = (() => {
       }
     }
 
-    // Essential Eight Maturity Dashboard
-    if (sel.has('ASD Essential Eight')) {
-      var e8Stats = AppState.getE8StrategyStats();
-      if (e8Stats && e8Stats.length > 0) {
-        html += '<div class="section-hdr" style="margin-top:28px">Essential Eight — Maturity Assessment</div>';
-        html += '<div class="card" style="padding:0;overflow:auto">';
-        html += '<table class="data-table" style="margin:0">';
-        html += '<thead><tr>' +
-          '<th style="min-width:200px">Strategy</th>' +
-          '<th style="width:120px;text-align:center">ML1</th>' +
-          '<th style="width:120px;text-align:center">ML2</th>' +
-          '<th style="width:120px;text-align:center">ML3</th>' +
-          '<th style="width:100px;text-align:center">Achieved</th>' +
-          '</tr></thead><tbody>';
+    // Strategy Maturity Dashboard (generic for any hasStrategies framework)
+    var fwMeta2 = AppState.get('frameworkMeta') || {};
+    sel.forEach(function (fwName) {
+      var meta2 = fwMeta2[fwName];
+      if (!meta2 || !meta2.hasStrategies || !meta2.stateKey) return;
+      var stratStats = AppState.getStrategyStats(meta2.stateKey);
+      if (!stratStats || stratStats.length === 0) return;
+      var labels = meta2.levelLabels || { ML1: 'ML1', ML2: 'ML2', ML3: 'ML3' };
 
-        for (var si = 0; si < e8Stats.length; si++) {
-          var s = e8Stats[si];
-          html += '<tr>';
-          html += '<td style="font-size:.78rem;font-weight:600">' + s.name + '</td>';
-          ['ML1', 'ML2', 'ML3'].forEach(function (ml) {
-            var lv = s.levels[ml];
-            var bg, fg;
-            if (lv.total === 0) {
-              bg = 'var(--bg2)'; fg = 'var(--ink4)';
-            } else if (lv.pct === 100) {
-              bg = 'var(--green-lt, rgba(22,163,74,.1))'; fg = 'var(--green)';
-            } else if (lv.pct > 0) {
-              bg = 'var(--amber-lt, rgba(245,158,11,.1))'; fg = 'var(--amber)';
-            } else {
-              bg = 'var(--red-lt, rgba(220,38,38,.1))'; fg = 'var(--red)';
-            }
-            html += '<td style="text-align:center">';
-            if (lv.total > 0) {
-              html += '<span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:.72rem;font-weight:600;background:' + bg + ';color:' + fg + '">' +
-                lv.configured + '/' + lv.total + ' (' + lv.pct + '%)</span>';
-            } else {
-              html += '<span style="font-size:.7rem;color:var(--ink4)">N/A</span>';
-            }
-            html += '</td>';
-          });
+      html += '<div class="section-hdr" style="margin-top:28px">' + escHtml(fwName) + ' — Maturity Assessment</div>';
+      html += '<div class="card" style="padding:0;overflow:auto">';
+      html += '<table class="data-table" style="margin:0">';
+      html += '<thead><tr>' +
+        '<th style="min-width:200px">Strategy</th>' +
+        '<th style="width:120px;text-align:center">' + escHtml(labels.ML1) + '</th>' +
+        '<th style="width:120px;text-align:center">' + escHtml(labels.ML2) + '</th>' +
+        '<th style="width:120px;text-align:center">' + escHtml(labels.ML3) + '</th>' +
+        '<th style="width:100px;text-align:center">Achieved</th>' +
+        '</tr></thead><tbody>';
 
-          // Achieved maturity level
-          var achievedBadge;
-          if (s.achieved === 0) achievedBadge = '<span class="badge" style="background:var(--red-lt, rgba(220,38,38,.1));color:var(--red)">Not Met</span>';
-          else if (s.achieved === 1) achievedBadge = '<span class="badge badge-amber">ML1</span>';
-          else if (s.achieved === 2) achievedBadge = '<span class="badge badge-blue">ML2</span>';
-          else achievedBadge = '<span class="badge badge-green">ML3</span>';
-          html += '<td style="text-align:center">' + achievedBadge + '</td>';
-          html += '</tr>';
-        }
+      for (var si = 0; si < stratStats.length; si++) {
+        var s = stratStats[si];
+        html += '<tr>';
+        html += '<td style="font-size:.78rem;font-weight:600">' + (s.article ? '<span style="color:var(--ink4);font-size:.66rem">' + escHtml(s.article) + '</span> ' : '') + escHtml(s.name) + '</td>';
+        ['ML1', 'ML2', 'ML3'].forEach(function (ml) {
+          var lv = s.levels[ml];
+          var bg, fg;
+          if (lv.total === 0) {
+            bg = 'var(--bg2)'; fg = 'var(--ink4)';
+          } else if (lv.pct === 100) {
+            bg = 'var(--green-lt, rgba(22,163,74,.1))'; fg = 'var(--green)';
+          } else if (lv.pct > 0) {
+            bg = 'var(--amber-lt, rgba(245,158,11,.1))'; fg = 'var(--amber)';
+          } else {
+            bg = 'var(--red-lt, rgba(220,38,38,.1))'; fg = 'var(--red)';
+          }
+          html += '<td style="text-align:center">';
+          if (lv.total > 0) {
+            html += '<span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:.72rem;font-weight:600;background:' + bg + ';color:' + fg + '">' +
+              lv.configured + '/' + lv.total + ' (' + lv.pct + '%)</span>';
+          } else {
+            html += '<span style="font-size:.7rem;color:var(--ink4)">N/A</span>';
+          }
+          html += '</td>';
+        });
 
-        html += '</tbody></table></div>';
+        // Achieved maturity level
+        var achievedBadge;
+        var achievedLabels = [labels.ML1, labels.ML2, labels.ML3];
+        if (s.achieved === 0) achievedBadge = '<span class="badge" style="background:var(--red-lt, rgba(220,38,38,.1));color:var(--red)">Not Met</span>';
+        else if (s.achieved === 1) achievedBadge = '<span class="badge badge-amber">' + escHtml(achievedLabels[0]) + '</span>';
+        else if (s.achieved === 2) achievedBadge = '<span class="badge badge-blue">' + escHtml(achievedLabels[1]) + '</span>';
+        else achievedBadge = '<span class="badge badge-green">' + escHtml(achievedLabels[2]) + '</span>';
+        html += '<td style="text-align:center">' + achievedBadge + '</td>';
+        html += '</tr>';
       }
-    }
+
+      html += '</tbody></table></div>';
+    });
 
     // Gap Register — with scan verification indicators
     var scanResults = AppState.get('tenantScanResults') || {};

@@ -4,7 +4,7 @@
 const Assessment = (() => {
   let initialized = false;
   let sortCol = 'id', sortAsc = true;
-  let e8StrategyView = false;
+  let strategyView = false;
   let checkToPolicyMap = null;
   let autoSuggestDismissed = false;
 
@@ -259,38 +259,48 @@ const Assessment = (() => {
       </div>
       <div style="display:flex;gap:8px">
         <button class="btn btn-sm" onclick="Assessment.toggleHeatmap()">Heatmap</button>${
-          AppState.get('selectedFrameworks').has('ASD Essential Eight')
-            ? `<button class="btn btn-sm${e8StrategyView ? ' btn-primary' : ''}" onclick="Assessment.toggleE8Strategy()">E8 Strategies</button>`
+          hasStrategyFrameworks()
+            ? `<button class="btn btn-sm${strategyView ? ' btn-primary' : ''}" onclick="Assessment.toggleStrategyView()">Strategies</button>`
             : ''
         }
         <button class="btn btn-primary btn-sm" onclick="Assessment.goStep(3)">Next: Mark Status &rarr;</button>
       </div>
     </div>`;
 
-    // E8 Strategy View
-    if (e8StrategyView && AppState.get('selectedFrameworks').has('ASD Essential Eight')) {
-      var e8Stats = AppState.getE8StrategyStats();
-      if (e8Stats && e8Stats.length > 0) {
-        html += '<div style="margin-bottom:20px">';
-        for (var si = 0; si < e8Stats.length; si++) {
-          var strat = e8Stats[si];
+    // Strategy View (generic for any hasStrategies framework)
+    if (strategyView && hasStrategyFrameworks()) {
+      var fwMeta = AppState.get('frameworkMeta') || {};
+      var sel = AppState.get('selectedFrameworks');
+      html += '<div style="margin-bottom:20px">';
+
+      sel.forEach(function (fwName) {
+        var meta = fwMeta[fwName];
+        if (!meta || !meta.hasStrategies || !meta.stateKey) return;
+        var stratStats = AppState.getStrategyStats(meta.stateKey);
+        if (!stratStats || stratStats.length === 0) return;
+        var labels = meta.levelLabels || { ML1: 'ML1', ML2: 'ML2', ML3: 'ML3' };
+        var strategies = AppState.get(meta.stateKey) || [];
+
+        html += '<div class="section-hdr" style="margin-top:12px;margin-bottom:8px">' + escHtml(fwName) + '</div>';
+        for (var si = 0; si < stratStats.length; si++) {
+          var strat = stratStats[si];
           var mlBadges = '';
           ['ML1', 'ML2', 'ML3'].forEach(function (ml) {
             var lv = strat.levels[ml];
+            var label = labels[ml] || ml;
             if (lv.total === 0) {
-              mlBadges += '<span class="badge" style="background:var(--bg2);color:var(--ink4);font-size:.6rem">' + ml + ' N/A</span> ';
+              mlBadges += '<span class="badge" style="background:var(--bg2);color:var(--ink4);font-size:.6rem">' + escHtml(label) + ' N/A</span> ';
             } else if (lv.pct === 100) {
-              mlBadges += '<span class="badge badge-green" style="font-size:.6rem">' + ml + ' ' + lv.configured + '/' + lv.total + '</span> ';
+              mlBadges += '<span class="badge badge-green" style="font-size:.6rem">' + escHtml(label) + ' ' + lv.configured + '/' + lv.total + '</span> ';
             } else if (lv.pct > 0) {
-              mlBadges += '<span class="badge badge-amber" style="font-size:.6rem">' + ml + ' ' + lv.configured + '/' + lv.total + '</span> ';
+              mlBadges += '<span class="badge badge-amber" style="font-size:.6rem">' + escHtml(label) + ' ' + lv.configured + '/' + lv.total + '</span> ';
             } else {
-              mlBadges += '<span class="badge badge-red" style="font-size:.6rem">' + ml + ' 0/' + lv.total + '</span> ';
+              mlBadges += '<span class="badge badge-red" style="font-size:.6rem">' + escHtml(label) + ' 0/' + lv.total + '</span> ';
             }
           });
 
           // Get checks for this strategy
-          var e8Strategies = AppState.get('e8Strategies') || [];
-          var stratData = e8Strategies.find(function (s) { return s.id === strat.id; });
+          var stratData = strategies.find(function (s) { return s.id === strat.id; });
           var stratChecks = [];
           if (stratData) {
             ['ML1', 'ML2', 'ML3'].forEach(function (ml) {
@@ -304,7 +314,7 @@ const Assessment = (() => {
 
           html += '<div class="card" style="margin-bottom:8px;padding:12px 16px">';
           html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
-          html += '<strong style="font-size:.82rem">' + strat.order + '. ' + strat.name + '</strong>';
+          html += '<strong style="font-size:.82rem">' + (strat.article ? '<span style="color:var(--ink4);font-size:.66rem">' + escHtml(strat.article) + '</span> ' : '') + strat.order + '. ' + escHtml(strat.name) + '</strong>';
           html += '<div>' + mlBadges + '</div>';
           html += '</div>';
           if (stratChecks.length > 0) {
@@ -320,8 +330,9 @@ const Assessment = (() => {
           }
           html += '</div>';
         }
-        html += '</div>';
-      }
+      });
+
+      html += '</div>';
       container.innerHTML = html;
       return;
     }
@@ -394,9 +405,22 @@ const Assessment = (() => {
     renderCurrentStep();
   }
 
-  function toggleE8Strategy() {
-    e8StrategyView = !e8StrategyView;
+  function hasStrategyFrameworks() {
+    var sel = AppState.get('selectedFrameworks');
+    var meta = AppState.get('frameworkMeta') || {};
+    var found = false;
+    sel.forEach(function (fw) { if (meta[fw] && meta[fw].hasStrategies) found = true; });
+    return found;
+  }
+
+  function toggleStrategyView() {
+    strategyView = !strategyView;
     renderCurrentStep();
+  }
+
+  // Backward compat alias
+  function toggleE8Strategy() {
+    toggleStrategyView();
   }
 
   function toggleHeatmap() {
@@ -726,7 +750,7 @@ const Assessment = (() => {
   return {
     init, goStep, toggleFw, applyProfile,
     sort, setCatFilter, setStatusFilter,
-    toggleHeatmap, toggleE8Strategy, setStatus,
+    toggleHeatmap, toggleE8Strategy, toggleStrategyView, setStatus,
     markAllDone, markAllGap, clearAllStatus,
     applyAutoSuggestions, dismissAutoSuggestions,
     exportAssessment, importAssessment,

@@ -1310,7 +1310,8 @@
       "NIST SP 800-53 Rev 5 - CM-6, SI-3, SC-28",
       "ISO 27001:2022 A.8.1",
       "Microsoft Cloud Security Benchmark - DP-4, PV-6",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "1.1.1",
@@ -1337,7 +1338,8 @@
       "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28",
       "ISO 27001:2022 A.8.1",
       "Microsoft Cloud Security Benchmark - DP-4",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "2.1.1",
@@ -1363,7 +1365,8 @@
       "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28",
       "ISO 27001:2022 A.8.1",
       "Microsoft Cloud Security Benchmark - DP-4",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "1.1",
@@ -1390,7 +1393,8 @@
       "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28, SI-7",
       "ISO 27001:2022 A.8.1",
       "Microsoft Cloud Security Benchmark - DP-4, ES-1",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "2.5.1.1",
@@ -1418,7 +1422,8 @@
       "NIST SP 800-171 Rev 2 - 3.13.11",
       "ISO 27001:2022 A.8.24",
       "PCI DSS v4.0 - Req 3.4",
-      "HIPAA - 164.312(a)(2)(iv)"
+      "HIPAA - 164.312(a)(2)(iv)",
+      "NIS2"
     ],
     "cisChecks": [
       "1.1.1",
@@ -1444,7 +1449,8 @@
       "NIST SP 800-171 Rev 2 - 3.5.7, 3.5.8",
       "ISO 27001:2022 A.5.17",
       "MITRE ATT&CK - T1078.003 (Local Accounts)",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "1.1.5",
@@ -1469,7 +1475,8 @@
       "NIST SP 800-171 Rev 2 - 3.14.1, 3.14.2",
       "ISO 27001:2022 A.8.7",
       "Microsoft Cloud Security Benchmark - ES-1, ES-2",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "2.3.1",
@@ -1496,7 +1503,8 @@
       "NIST SP 800-171 Rev 2 - 3.14.1",
       "ISO 27001:2022 A.8.8",
       "Microsoft Cloud Security Benchmark - PV-6, PV-7",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "18.9.102.1",
@@ -1522,7 +1530,8 @@
       "NIST SP 800-171 Rev 2 - 3.1.18, 3.1.19",
       "ISO 27001:2022 A.8.10",
       "HIPAA - 164.312(d)",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "2.6.1",
@@ -1546,7 +1555,8 @@
       "CIS Microsoft 365 Foundations Benchmark v3.1",
       "NIST SP 800-53 Rev 5 - AC-19, CM-8",
       "ISO 27001:2022 A.8.1",
-      "Microsoft Cloud Security Benchmark - AM-1, AM-2"
+      "Microsoft Cloud Security Benchmark - AM-1, AM-2",
+      "NIS2"
     ],
     "cisChecks": [
       "5.1.3.1",
@@ -1571,7 +1581,8 @@
       "NIST SP 800-171 Rev 2 - 3.1.1, 3.3.1, 3.5.1",
       "ISO 27001:2022 A.8.3, A.8.15",
       "MITRE ATT&CK - T1557 (Man-in-the-Middle), T1003 (OS Credential Dumping)",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "2.3.8.1",
@@ -1599,7 +1610,8 @@
       "NIST SP 800-53 Rev 5 - SC-18, SI-3, SI-8",
       "ISO 27001:2022 A.8.23",
       "Microsoft Cloud Security Benchmark - NS-8",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "1.1",
@@ -1628,7 +1640,8 @@
       "NIST SP 800-171 Rev 2 - 3.5.3",
       "ISO 27001:2022 A.8.5",
       "MITRE ATT&CK - T1110 (Brute Force), T1078 (Valid Accounts)",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "5.2.2.2",
@@ -1654,7 +1667,8 @@
       "NIST SP 800-171 Rev 2 - 3.13.1, 3.13.6",
       "ISO 27001:2022 A.8.20, A.8.21",
       "Microsoft Cloud Security Benchmark - NS-1, NS-4",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "9.1.1",
@@ -1683,7 +1697,8 @@
       "NIST SP 800-171 Rev 2 - 3.14.2, 3.14.6",
       "ISO 27001:2022 A.8.7, A.8.8",
       "MITRE ATT&CK - T1059 (Command and Scripting Interpreter), T1566 (Phishing), T1003 (OS Credential Dumping), T1091 (Replication Through Removable Media)",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "18.9.47.5.1.1",
@@ -1708,7 +1723,8 @@
       "NIST SP 800-171 Rev 2 - 3.13.4",
       "ISO 27001:2022 A.8.6",
       "MITRE ATT&CK - T1003.001 (LSASS Memory), T1550 (Use Alternate Authentication Material)",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "18.8.5.1",
@@ -1733,7 +1749,8 @@
       "NIST SP 800-171 Rev 2 - 3.8.7",
       "ISO 27001:2022 A.7.10, A.8.12",
       "PCI DSS v4.0 - Req 12.3.10",
-      "MITRE ATT&CK - T1052 (Exfiltration Over Physical Medium), T1091 (Replication Through Removable Media)"
+      "MITRE ATT&CK - T1052 (Exfiltration Over Physical Medium), T1091 (Replication Through Removable Media)",
+      "NIS2"
     ],
     "cisChecks": [
       "18.8.37.1",
@@ -1757,7 +1774,8 @@
       "ISO 27001:2022 A.5.33, A.8.11",
       "ISO 27701:2019 - 7.4.1",
       "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
-      "BSI IT-Grundschutz - APP.1.1.A18"
+      "BSI IT-Grundschutz - APP.1.1.A18",
+      "NIS2"
     ],
     "cisChecks": [
       "18.9.17.1",
@@ -1782,7 +1800,8 @@
       "NIST SP 800-171 Rev 2 - 3.14.2",
       "ISO 27001:2022 A.8.6",
       "MITRE ATT&CK - T1203 (Exploitation for Client Execution), T1068 (Exploitation for Privilege Escalation)",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "18.9.47.1",
@@ -1808,7 +1827,8 @@
       "NIST SP 800-171 Rev 2 - 3.14.2",
       "ISO 27001:2022 A.8.7",
       "MITRE ATT&CK - T1486 (Data Encrypted for Impact), T1490 (Inhibit System Recovery)",
-      "ASD Essential Eight"
+      "ASD Essential Eight",
+      "NIS2"
     ],
     "cisChecks": [
       "18.9.47.5.3.1",
