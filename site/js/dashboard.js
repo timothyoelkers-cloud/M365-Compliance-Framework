@@ -165,6 +165,61 @@ const Dashboard = (() => {
       }
     }
 
+    // Essential Eight Maturity Dashboard
+    if (sel.has('ASD Essential Eight')) {
+      var e8Stats = AppState.getE8StrategyStats();
+      if (e8Stats && e8Stats.length > 0) {
+        html += '<div class="section-hdr" style="margin-top:28px">Essential Eight — Maturity Assessment</div>';
+        html += '<div class="card" style="padding:0;overflow:auto">';
+        html += '<table class="data-table" style="margin:0">';
+        html += '<thead><tr>' +
+          '<th style="min-width:200px">Strategy</th>' +
+          '<th style="width:120px;text-align:center">ML1</th>' +
+          '<th style="width:120px;text-align:center">ML2</th>' +
+          '<th style="width:120px;text-align:center">ML3</th>' +
+          '<th style="width:100px;text-align:center">Achieved</th>' +
+          '</tr></thead><tbody>';
+
+        for (var si = 0; si < e8Stats.length; si++) {
+          var s = e8Stats[si];
+          html += '<tr>';
+          html += '<td style="font-size:.78rem;font-weight:600">' + s.name + '</td>';
+          ['ML1', 'ML2', 'ML3'].forEach(function (ml) {
+            var lv = s.levels[ml];
+            var bg, fg;
+            if (lv.total === 0) {
+              bg = 'var(--bg2)'; fg = 'var(--ink4)';
+            } else if (lv.pct === 100) {
+              bg = 'var(--green-lt, rgba(22,163,74,.1))'; fg = 'var(--green)';
+            } else if (lv.pct > 0) {
+              bg = 'var(--amber-lt, rgba(245,158,11,.1))'; fg = 'var(--amber)';
+            } else {
+              bg = 'var(--red-lt, rgba(220,38,38,.1))'; fg = 'var(--red)';
+            }
+            html += '<td style="text-align:center">';
+            if (lv.total > 0) {
+              html += '<span style="display:inline-block;padding:2px 10px;border-radius:4px;font-size:.72rem;font-weight:600;background:' + bg + ';color:' + fg + '">' +
+                lv.configured + '/' + lv.total + ' (' + lv.pct + '%)</span>';
+            } else {
+              html += '<span style="font-size:.7rem;color:var(--ink4)">N/A</span>';
+            }
+            html += '</td>';
+          });
+
+          // Achieved maturity level
+          var achievedBadge;
+          if (s.achieved === 0) achievedBadge = '<span class="badge" style="background:var(--red-lt, rgba(220,38,38,.1));color:var(--red)">Not Met</span>';
+          else if (s.achieved === 1) achievedBadge = '<span class="badge badge-amber">ML1</span>';
+          else if (s.achieved === 2) achievedBadge = '<span class="badge badge-blue">ML2</span>';
+          else achievedBadge = '<span class="badge badge-green">ML3</span>';
+          html += '<td style="text-align:center">' + achievedBadge + '</td>';
+          html += '</tr>';
+        }
+
+        html += '</tbody></table></div>';
+      }
+    }
+
     // Gap Register — with scan verification indicators
     var scanResults = AppState.get('tenantScanResults') || {};
     var hasScanData = Object.keys(scanResults).length > 0;

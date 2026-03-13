@@ -2,139 +2,219 @@
   "name": "ASD Essential Eight",
   "slug": "asd-essential-eight",
   "group": "APAC & Other",
+  "hasStrategies": true,
+  "strategies": [
+    {
+      "id": "app-control",
+      "name": "Application Control",
+      "order": 1,
+      "description": "Prevent execution of unapproved or malicious programs including executables, software libraries, scripts, installers, compiled HTML, HTML applications, control panel applets and drivers.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Application control is implemented on workstations to restrict execution of executables, software libraries, scripts, installers, compiled HTML, HTML applications and control panel applets to an approved set.",
+          "policies": ["INT15", "INT11"],
+          "checks": ["5.1.4.1"]
+        },
+        "ML2": {
+          "summary": "Application control is implemented on internet-facing servers. Allowed and blocked executions are logged. Microsoft's recommended application blocklist is implemented.",
+          "policies": ["MDE04", "INT20", "MDE07"],
+          "checks": ["9.1.1"]
+        },
+        "ML3": {
+          "summary": "Application control restricts drivers to an approved set. Microsoft's vulnerable driver blocklist is implemented.",
+          "policies": ["INT16", "INT19"],
+          "checks": ["9.1.9"]
+        }
+      }
+    },
+    {
+      "id": "patch-applications",
+      "name": "Patch Applications",
+      "order": 2,
+      "description": "Patch, update or mitigate vulnerabilities in applications and drivers within a risk-appropriate timeframe.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Patches, updates or vendor mitigations for vulnerabilities in internet-facing services are applied within two weeks. Applications that are no longer supported by vendors are removed.",
+          "policies": ["INT08", "INT09"],
+          "checks": ["5.1.4.2", "5.1.4.3"]
+        },
+        "ML2": {
+          "summary": "A vulnerability scanner is used at least fortnightly to identify missing patches. Patches for vulnerabilities in internet-facing services are applied within 48 hours when exploits exist.",
+          "policies": ["MDE06", "INT19"],
+          "checks": []
+        },
+        "ML3": {
+          "summary": "A vulnerability scanner is used at least weekly. Patches for vulnerabilities in internet-facing services are applied within 48 hours of availability.",
+          "policies": [],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "office-macros",
+      "name": "Configure Microsoft Office Macro Settings",
+      "order": 3,
+      "description": "Configure Microsoft Office macro settings to block macros from the internet and only allow vetted macros in trusted locations or digitally signed with a trusted certificate.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Microsoft Office macros are disabled for users who do not have a demonstrated business requirement. Macros in files originating from the internet are blocked. Antivirus scanning of macros is enabled.",
+          "policies": ["INT15", "INT07"],
+          "checks": ["7.2.8"]
+        },
+        "ML2": {
+          "summary": "Microsoft Office macros are blocked for users that do not have a validated business requirement. Only signed macros are allowed. Safe Attachments scans documents before delivery.",
+          "policies": ["DEF03", "INT11"],
+          "checks": []
+        },
+        "ML3": {
+          "summary": "Only Microsoft Office macros running from within a sandboxed environment, a Trusted Location, or digitally signed by a trusted publisher are allowed to execute.",
+          "policies": [],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "user-app-hardening",
+      "name": "User Application Hardening",
+      "order": 4,
+      "description": "Configure web browsers and Microsoft Office to block or disable support for unneeded features such as Flash, ads, Java, and unnecessary scripting.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Web browsers are configured to block web-based advertisements. Internet Explorer 11 is disabled or removed. Web browser security settings cannot be changed by users.",
+          "policies": ["INT12", "INT15"],
+          "checks": ["8.4.1", "8.5.3"]
+        },
+        "ML2": {
+          "summary": "Web browsers do not process Java from the internet. Web content filtering blocks malicious domains. Safe Links rewrites and scans URLs in email and Office documents.",
+          "policies": ["MDE08", "DEF02", "INT11"],
+          "checks": []
+        },
+        "ML3": {
+          "summary": ".NET Framework 3.5 (and earlier) is disabled or removed. PowerShell is configured to use Constrained Language Mode.",
+          "policies": [],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "restrict-admin",
+      "name": "Restrict Administrative Privileges",
+      "order": 5,
+      "description": "Restrict administrative privileges to operating systems and applications based on user duties. Regularly revalidate the need for privileges.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Requests for privileged access are validated when first requested. Privileged accounts are not used for reading email, web browsing, or accessing internet services. Legacy authentication is blocked for admin accounts.",
+          "policies": ["CA01", "CA03", "ENT03", "ENT06", "INT06"],
+          "checks": ["1.1.1", "1.1.4", "5.1.2.1", "5.1.2.2", "5.3.2", "5.3.3"]
+        },
+        "ML2": {
+          "summary": "Just-in-time administration is used for administering systems and applications. Privileged access is limited to compliant devices. Admin sessions have enforced sign-in frequency.",
+          "policies": ["CA06", "CA08", "CA14", "ENT05"],
+          "checks": ["1.3.8", "1.3.9", "5.1.4.5", "5.1.5.2", "5.2.2.9", "5.2.2.10", "5.2.2.11"]
+        },
+        "ML3": {
+          "summary": "Credential Guard is enabled. Windows Hello for Business or hardware tokens are used for privileged accounts. Administrative activities are centrally logged and audited.",
+          "policies": ["INT13", "INT16"],
+          "checks": ["5.2.3.6"]
+        }
+      }
+    },
+    {
+      "id": "patch-os",
+      "name": "Patch Operating Systems",
+      "order": 6,
+      "description": "Patch, update or mitigate vulnerabilities in operating systems within a risk-appropriate timeframe. Remove unsupported operating systems.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Patches for vulnerabilities in operating systems of internet-facing services are applied within two weeks. Operating systems that are no longer supported by vendors are replaced.",
+          "policies": ["INT01", "INT02", "INT03", "INT04"],
+          "checks": ["5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.4"]
+        },
+        "ML2": {
+          "summary": "A vulnerability scanner is used at least fortnightly. Patches for critical vulnerabilities in OS are applied within 48 hours when exploits exist. Automated update rings are configured.",
+          "policies": ["INT08", "MDE06"],
+          "checks": []
+        },
+        "ML3": {
+          "summary": "The latest or previous release of operating systems is used. All host-based firewall policies are enforced.",
+          "policies": ["INT14"],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "mfa",
+      "name": "Multi-Factor Authentication",
+      "order": 7,
+      "description": "Multi-factor authentication is used to protect access to data and systems. Phishing-resistant MFA is preferred where possible.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "MFA is used for all users for all internet-facing services. Legacy authentication that cannot use MFA is blocked. Number matching and additional context are enabled for Microsoft Authenticator.",
+          "policies": ["CA01", "CA02", "ENT10"],
+          "checks": ["1.3.1", "5.2.2.1", "5.2.2.2", "5.2.2.3", "5.2.3.1", "5.2.3.4", "5.2.3.5"]
+        },
+        "ML2": {
+          "summary": "Phishing-resistant MFA is used for privileged accounts. MFA is required for high and medium risk sign-ins. MFA is required for device registration and enrollment.",
+          "policies": ["CA03", "CA04", "CA05", "CA15", "CA17"],
+          "checks": ["1.3.3", "1.3.4", "5.2.2.5", "5.2.3.2", "5.2.3.3", "5.2.3.7"]
+        },
+        "ML3": {
+          "summary": "Phishing-resistant MFA is used for all users where possible (FIDO2 or certificate-based). MFA is required for Azure management. Sign-in frequency is enforced. Compliant devices are required.",
+          "policies": ["CA06", "CA08", "CA13"],
+          "checks": ["5.2.3.6", "6.3.1"]
+        }
+      }
+    },
+    {
+      "id": "backups",
+      "name": "Regular Backups",
+      "order": 8,
+      "description": "Regularly back up important data, software and configuration settings. Retain backups in a secure and resilient manner. Test restoration of backups.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Backups of important information, software and configuration settings are performed and retained in a coordinated and resilient manner. Audit logs are retained.",
+          "policies": ["PV11", "PV22"],
+          "checks": ["9.1.1", "9.1.9"]
+        },
+        "ML2": {
+          "summary": "Unprivileged accounts cannot access backups belonging to other accounts. Sensitivity labels protect data classification. External sharing is restricted to existing guests only.",
+          "policies": ["PV10", "PV14", "SPO01"],
+          "checks": ["9.1.10", "9.1.11", "9.1.12"]
+        },
+        "ML3": {
+          "summary": "Unprivileged accounts are prevented from modifying or deleting backups. Sharing defaults to internal only. Anonymous links expire. Downloads are blocked on unmanaged devices.",
+          "policies": ["SPO02", "SPO03", "SPO04", "SPO05", "SPO06"],
+          "checks": []
+        }
+      }
+    }
+  ],
   "checks": [
-    "1.1.1",
-    "1.1.4",
-    "1.3.1",
-    "1.3.3",
-    "1.3.4",
-    "1.3.8",
-    "1.3.9",
-    "4.2",
-    "5.1.2.1",
-    "5.1.2.2",
-    "5.1.2.6",
-    "5.1.4.1",
-    "5.1.4.2",
-    "5.1.4.3",
-    "5.1.4.4",
-    "5.1.4.5",
+    "1.1.1", "1.1.4",
+    "1.3.1", "1.3.3", "1.3.4", "1.3.8", "1.3.9",
+    "5.1.2.1", "5.1.2.2",
+    "5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.4", "5.1.4.5",
     "5.1.5.2",
-    "5.2.2.1",
-    "5.2.2.10",
-    "5.2.2.11",
-    "5.2.2.2",
-    "5.2.2.3",
-    "5.2.2.5",
-    "5.2.2.9",
-    "5.2.3.1",
-    "5.2.3.2",
-    "5.2.3.3",
-    "5.2.3.4",
-    "5.2.3.5",
-    "5.2.3.6",
-    "5.2.3.7",
-    "5.3.2",
-    "5.3.3",
+    "5.2.2.1", "5.2.2.2", "5.2.2.3", "5.2.2.5",
+    "5.2.2.9", "5.2.2.10", "5.2.2.11",
+    "5.2.3.1", "5.2.3.2", "5.2.3.3", "5.2.3.4", "5.2.3.5", "5.2.3.6", "5.2.3.7",
+    "5.3.2", "5.3.3",
     "6.3.1",
     "7.2.8",
-    "8.4.1",
-    "8.5.3",
-    "9.1.1",
-    "9.1.10",
-    "9.1.11",
-    "9.1.12",
-    "9.1.2",
-    "9.1.5",
-    "9.1.8",
-    "9.1.9"
+    "8.4.1", "8.5.3",
+    "9.1.1", "9.1.9", "9.1.10", "9.1.11", "9.1.12"
   ],
-  "checkCount": 45,
+  "checkCount": 40,
   "policies": [
-    "CA01",
-    "CA02",
-    "CA03",
-    "CA06",
-    "CA07",
-    "CA10",
-    "CA13",
-    "CA14",
-    "CA15",
-    "CA16",
-    "CA18",
-    "DEF01",
-    "DEF02",
-    "DEF03",
-    "DEF04",
-    "DEF07",
-    "DEF08",
-    "ENT01",
-    "ENT02",
-    "ENT03",
-    "ENT04",
-    "ENT05",
-    "ENT06",
-    "ENT08",
-    "ENT10",
-    "EXO04",
-    "INT01",
-    "INT02",
-    "INT03",
-    "INT04",
-    "INT05",
-    "INT06",
-    "INT07",
-    "INT08",
-    "INT09",
-    "INT10",
-    "INT11",
-    "INT12",
-    "INT13",
-    "INT14",
-    "INT15",
-    "INT16",
-    "INT17",
-    "INT19",
-    "INT20",
-    "MDE01",
-    "MDE02",
-    "MDE03",
-    "MDE04",
-    "MDE05",
-    "MDE06",
-    "MDE07",
-    "MDE08",
-    "MDE09",
-    "PV01",
-    "PV05",
-    "PV07",
-    "PV08",
-    "PV09",
-    "PV10",
-    "PV11",
-    "PV12",
-    "PV14",
-    "PV16",
-    "PV18",
-    "PV22",
-    "PV27",
-    "SPO01",
-    "SPO02",
-    "SPO03",
-    "SPO04",
-    "SPO05",
-    "SPO06",
-    "SPO09",
-    "SPO13",
-    "SPO14",
-    "SPO15",
-    "SPO16",
-    "SPO18",
-    "SPO20",
-    "TEA01",
-    "TEA02",
-    "TEA06"
+    "CA01", "CA02", "CA03", "CA04", "CA05", "CA06", "CA08", "CA13", "CA14", "CA15", "CA17",
+    "DEF02", "DEF03",
+    "ENT03", "ENT05", "ENT06", "ENT10",
+    "INT01", "INT02", "INT03", "INT04",
+    "INT06", "INT07", "INT08", "INT09", "INT11", "INT12", "INT13", "INT14", "INT15", "INT16", "INT19", "INT20",
+    "MDE04", "MDE06", "MDE07", "MDE08",
+    "PV10", "PV11", "PV14", "PV22",
+    "SPO01", "SPO02", "SPO03", "SPO04", "SPO05", "SPO06"
   ],
-  "policyCount": 83,
+  "policyCount": 47,
   "orgProfiles": []
 }

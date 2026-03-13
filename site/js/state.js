@@ -162,6 +162,64 @@ const AppState = (() => {
       .sort((a, b) => b.impact - a.impact);
   }
 
+  // Essential Eight strategy stats
+  function getE8StrategyStats() {
+    var strategies = state.e8Strategies;
+    if (!strategies || !strategies.length) return null;
+    var scanResults = state.scanResults || {};
+    var policies = state.policies || [];
+
+    // Build a lookup: short ID -> full policy ID (handles INT long IDs)
+    var polIdMap = {};
+    policies.forEach(function (p) {
+      polIdMap[p.id] = p.id;
+      // Also map short prefix (e.g. INT01 -> INT01-Device-Compliance-Windows-Baseline)
+      var dash = p.id.indexOf('-');
+      if (dash > 0) polIdMap[p.id.substring(0, dash)] = p.id;
+    });
+
+    return strategies.map(function (strat) {
+      var levels = {};
+      var cumulativePolicies = [];
+      ['ML1', 'ML2', 'ML3'].forEach(function (ml) {
+        var mlData = strat.maturityLevels[ml];
+        if (!mlData) { levels[ml] = { total: 0, configured: 0, pct: 0, policies: [] }; return; }
+
+        var mlPols = (mlData.policies || []).map(function (sid) { return polIdMap[sid] || sid; });
+        cumulativePolicies = cumulativePolicies.concat(mlPols);
+
+        var configured = 0;
+        var total = cumulativePolicies.length;
+        cumulativePolicies.forEach(function (pid) {
+          if (scanResults[pid] && scanResults[pid].status === 'configured') configured++;
+        });
+
+        levels[ml] = {
+          total: total,
+          configured: configured,
+          pct: total > 0 ? Math.round(configured / total * 100) : 0,
+          policies: mlPols,
+          cumulativePolicies: cumulativePolicies.slice()
+        };
+      });
+
+      // Achieved maturity: highest ML where cumulative is 100%
+      var achieved = 0;
+      if (levels.ML1.total > 0 && levels.ML1.pct === 100) achieved = 1;
+      if (achieved === 1 && levels.ML2.total > 0 && levels.ML2.pct === 100) achieved = 2;
+      if (achieved === 2 && levels.ML3.total > 0 && levels.ML3.pct === 100) achieved = 3;
+
+      return {
+        id: strat.id,
+        name: strat.name,
+        description: strat.description,
+        order: strat.order,
+        levels: levels,
+        achieved: achieved
+      };
+    });
+  }
+
   // Deployment history
   function addDeploymentRecord(record) {
     state.deploymentHistory.unshift({
@@ -197,7 +255,7 @@ const AppState = (() => {
   return {
     get, set, toggleInSet, on, notify,
     resetAssessment, getRequiredChecks, getCheckFwsInScope,
-    getScoreStats, getFrameworkCoverage, getGaps,
+    getScoreStats, getFrameworkCoverage, getGaps, getE8StrategyStats,
     addDeploymentRecord, getDeploymentHistory, exportDeploymentLog,
     state,
   };

@@ -11,7 +11,7 @@
       "ISO-27001-2022",
       "MITRE-ATT&CK",
       "NIS2",
-      "Essential-Eight"
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "5.2.2.3",
@@ -34,8 +34,8 @@
       "ISO-27001-2022",
       "MITRE-ATT&CK",
       "NIS2",
-      "Essential-Eight",
-      "SOC-2"
+      "SOC-2",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.3.1",
@@ -59,7 +59,7 @@
       "ISO-27001-2022",
       "MITRE-ATT&CK",
       "NIS2",
-      "Essential-Eight"
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.3.1",
@@ -84,7 +84,7 @@
       "ISO-27001-2022",
       "MITRE-ATT&CK",
       "NIS2",
-      "Essential-Eight"
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.2.2",
@@ -107,7 +107,7 @@
       "ISO-27001-2022",
       "MITRE-ATT&CK",
       "NIS2",
-      "Essential-Eight"
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.2.2",
@@ -130,7 +130,7 @@
       "ISO-27001-2022",
       "MITRE-ATT&CK",
       "NIS2",
-      "Essential-Eight"
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.3.7",
@@ -154,8 +154,7 @@
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "ISO-27001-2022",
       "MITRE-ATT&CK",
-      "NIS2",
-      "Essential-Eight"
+      "NIS2"
     ],
     "cisChecks": [
       "1.3.9"
@@ -177,7 +176,7 @@
       "ISO-27001-2022",
       "MITRE-ATT&CK",
       "NIS2",
-      "Essential-Eight"
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.3.2",
@@ -199,8 +198,7 @@
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "ISO-27001-2022",
       "MITRE-ATT&CK",
-      "NIS2",
-      "Essential-Eight"
+      "NIS2"
     ],
     "cisChecks": [
       "1.3.5"
@@ -221,8 +219,7 @@
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "ISO-27001-2022",
       "MITRE-ATT&CK",
-      "NIS2",
-      "Essential-Eight"
+      "NIS2"
     ],
     "cisChecks": [
       "1.3.6",
@@ -293,7 +290,7 @@
       "ISO-27001-2022",
       "MITRE-ATT&CK",
       "NIS2",
-      "Essential-Eight"
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.3.8",
@@ -316,7 +313,7 @@
       "ISO-27001-2022",
       "MITRE-ATT&CK",
       "NIS2",
-      "Essential-Eight"
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.3.8",
@@ -339,7 +336,7 @@
       "ISO-27001-2022",
       "MITRE-ATT&CK",
       "NIS2",
-      "Essential-Eight"
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "5.2.2.11"
@@ -360,8 +357,7 @@
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "ISO-27001-2022",
       "MITRE-ATT&CK",
-      "NIS2",
-      "Essential-Eight"
+      "NIS2"
     ],
     "cisChecks": [
       "1.3.7",
@@ -385,7 +381,7 @@
       "ISO-27001-2022",
       "MITRE-ATT&CK",
       "NIS2",
-      "Essential-Eight"
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.3.3",
@@ -407,8 +403,7 @@
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "ISO-27001-2022",
       "MITRE-ATT&CK",
-      "NIS2",
-      "Essential-Eight"
+      "NIS2"
     ],
     "cisChecks": [
       "5.1.3.1",
@@ -440,7 +435,6 @@
       "CMMC v2.0",
       "FedRAMP Moderate",
       "GDPR (EU) 2016/679",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark"
     ],
     "cisChecks": [
@@ -476,8 +470,8 @@
       "CMMC v2.0",
       "FedRAMP Moderate",
       "GDPR (EU) 2016/679",
-      "ASD Essential Eight",
-      "Microsoft Cloud Security Benchmark"
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "2.1.5",
@@ -512,8 +506,8 @@
       "CMMC v2.0",
       "FedRAMP Moderate",
       "GDPR (EU) 2016/679",
-      "ASD Essential Eight",
-      "Microsoft Cloud Security Benchmark"
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "2.1.4",
@@ -546,7 +540,6 @@
       "CMMC v2.0",
       "FedRAMP Moderate",
       "GDPR (EU) 2016/679",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark"
     ],
     "cisChecks": [
@@ -633,7 +626,6 @@
       "CMMC v2.0",
       "FedRAMP Moderate",
       "GDPR (EU) 2016/679",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark"
     ],
     "cisChecks": [
@@ -665,7 +657,6 @@
       "CMMC v2.0",
       "FedRAMP Moderate",
       "GDPR (EU) 2016/679",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark"
     ],
     "cisChecks": [
@@ -693,7 +684,6 @@
       "HITRUST CSF v11",
       "BSI IT-Grundschutz",
       "DORA",
-      "ASD Essential Eight",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "CJIS v6",
@@ -725,7 +715,6 @@
       "HITRUST CSF v11",
       "BSI IT-Grundschutz",
       "DORA",
-      "ASD Essential Eight",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "CJIS v6",
@@ -757,11 +746,11 @@
       "BSI IT-Grundschutz",
       "DORA",
       "CMMC v2.0",
-      "ASD Essential Eight",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "CJIS v6",
-      "EU Cyber Resilience Act"
+      "EU Cyber Resilience Act",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "5.1.2.2"
@@ -790,7 +779,6 @@
       "DORA",
       "CMMC v2.0",
       "NERC-CIP",
-      "ASD Essential Eight",
       "MITRE ATT&CK",
       "CJIS v6",
       "EU Cyber Resilience Act"
@@ -823,12 +811,12 @@
       "DORA",
       "CMMC v2.0",
       "NERC-CIP",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "CJIS v6",
-      "EU Cyber Resilience Act"
+      "EU Cyber Resilience Act",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "5.1.3.1"
@@ -857,12 +845,12 @@
       "DORA",
       "CMMC v2.0",
       "NERC-CIP",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "CJIS v6",
-      "EU Cyber Resilience Act"
+      "EU Cyber Resilience Act",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "5.1.6.2",
@@ -919,7 +907,6 @@
       "DORA",
       "CMMC v2.0",
       "NERC-CIP",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
@@ -953,7 +940,6 @@
       "DORA",
       "CMMC v2.0",
       "NIST CSF 1.1",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
@@ -987,13 +973,13 @@
       "DORA",
       "CMMC v2.0",
       "NIST CSF 1.1",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "CJIS v6",
       "EU Cyber Resilience Act",
-      "SEC Cyber Rule"
+      "SEC Cyber Rule",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.2.1",
@@ -1120,7 +1106,6 @@
       "GDPR (EU) 2016/679",
       "CMMC v2.0",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
       "NYDFS 23 NYCRR 500",
       "FFIEC-CAT",
       "Microsoft Cloud Security Benchmark",
@@ -1324,8 +1309,8 @@
       "NIST SP 800-171 Rev 2",
       "NIST SP 800-53 Rev 5 - CM-6, SI-3, SC-28",
       "ISO 27001:2022 A.8.1",
-      "Essential Eight - Patch Applications, Configure Microsoft Office Macro Settings",
-      "Microsoft Cloud Security Benchmark - DP-4, PV-6"
+      "Microsoft Cloud Security Benchmark - DP-4, PV-6",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.1.1",
@@ -1351,8 +1336,8 @@
       "CIS Apple iOS/iPadOS Benchmark v1.0",
       "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28",
       "ISO 27001:2022 A.8.1",
-      "Essential Eight - Patch Operating Systems",
-      "Microsoft Cloud Security Benchmark - DP-4"
+      "Microsoft Cloud Security Benchmark - DP-4",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "2.1.1",
@@ -1377,8 +1362,8 @@
       "CIS Google Android Benchmark v1.3",
       "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28",
       "ISO 27001:2022 A.8.1",
-      "Essential Eight - Patch Operating Systems",
-      "Microsoft Cloud Security Benchmark - DP-4"
+      "Microsoft Cloud Security Benchmark - DP-4",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.1",
@@ -1404,8 +1389,8 @@
       "CIS Apple macOS Benchmark v3.0",
       "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28, SI-7",
       "ISO 27001:2022 A.8.1",
-      "Essential Eight - Patch Operating Systems",
-      "Microsoft Cloud Security Benchmark - DP-4, ES-1"
+      "Microsoft Cloud Security Benchmark - DP-4, ES-1",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "2.5.1.1",
@@ -1433,7 +1418,6 @@
       "NIST SP 800-171 Rev 2 - 3.13.11",
       "ISO 27001:2022 A.8.24",
       "PCI DSS v4.0 - Req 3.4",
-      "Essential Eight - Restrict Administrative Privileges",
       "HIPAA - 164.312(a)(2)(iv)"
     ],
     "cisChecks": [
@@ -1459,8 +1443,8 @@
       "NIST SP 800-53 Rev 5 - AC-2, IA-5",
       "NIST SP 800-171 Rev 2 - 3.5.7, 3.5.8",
       "ISO 27001:2022 A.5.17",
-      "Essential Eight - Restrict Administrative Privileges",
-      "MITRE ATT&CK - T1078.003 (Local Accounts)"
+      "MITRE ATT&CK - T1078.003 (Local Accounts)",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.1.5",
@@ -1484,8 +1468,8 @@
       "NIST SP 800-53 Rev 5 - SI-3, SI-4",
       "NIST SP 800-171 Rev 2 - 3.14.1, 3.14.2",
       "ISO 27001:2022 A.8.7",
-      "Essential Eight - Application Control, Configure Microsoft Office Macro Settings",
-      "Microsoft Cloud Security Benchmark - ES-1, ES-2"
+      "Microsoft Cloud Security Benchmark - ES-1, ES-2",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "2.3.1",
@@ -1511,8 +1495,8 @@
       "NIST SP 800-53 Rev 5 - SI-2, CM-3",
       "NIST SP 800-171 Rev 2 - 3.14.1",
       "ISO 27001:2022 A.8.8",
-      "Essential Eight - Patch Operating Systems (Maturity Level 2)",
-      "Microsoft Cloud Security Benchmark - PV-6, PV-7"
+      "Microsoft Cloud Security Benchmark - PV-6, PV-7",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "18.9.102.1",
@@ -1537,8 +1521,8 @@
       "NIST SP 800-53 Rev 5 - AC-19, MP-7, SC-28",
       "NIST SP 800-171 Rev 2 - 3.1.18, 3.1.19",
       "ISO 27001:2022 A.8.10",
-      "Essential Eight - Restrict Administrative Privileges",
-      "HIPAA - 164.312(d)"
+      "HIPAA - 164.312(d)",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "2.6.1",
@@ -1562,7 +1546,6 @@
       "CIS Microsoft 365 Foundations Benchmark v3.1",
       "NIST SP 800-53 Rev 5 - AC-19, CM-8",
       "ISO 27001:2022 A.8.1",
-      "Essential Eight - Restrict Administrative Privileges",
       "Microsoft Cloud Security Benchmark - AM-1, AM-2"
     ],
     "cisChecks": [
@@ -1587,8 +1570,8 @@
       "NIST SP 800-53 Rev 5 - AC-3, AU-2, AU-3, IA-2, SC-8",
       "NIST SP 800-171 Rev 2 - 3.1.1, 3.3.1, 3.5.1",
       "ISO 27001:2022 A.8.3, A.8.15",
-      "Essential Eight - Restrict Administrative Privileges",
-      "MITRE ATT&CK - T1557 (Man-in-the-Middle), T1003 (OS Credential Dumping)"
+      "MITRE ATT&CK - T1557 (Man-in-the-Middle), T1003 (OS Credential Dumping)",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "2.3.8.1",
@@ -1615,8 +1598,8 @@
       "CIS Microsoft Edge Benchmark v2.0",
       "NIST SP 800-53 Rev 5 - SC-18, SI-3, SI-8",
       "ISO 27001:2022 A.8.23",
-      "Essential Eight - Application Control",
-      "Microsoft Cloud Security Benchmark - NS-8"
+      "Microsoft Cloud Security Benchmark - NS-8",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "1.1",
@@ -1644,8 +1627,8 @@
       "NIST SP 800-63B - AAL2",
       "NIST SP 800-171 Rev 2 - 3.5.3",
       "ISO 27001:2022 A.8.5",
-      "Essential Eight - Multi-Factor Authentication",
-      "MITRE ATT&CK - T1110 (Brute Force), T1078 (Valid Accounts)"
+      "MITRE ATT&CK - T1110 (Brute Force), T1078 (Valid Accounts)",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "5.2.2.2",
@@ -1670,8 +1653,8 @@
       "NIST SP 800-53 Rev 5 - SC-7, AU-3",
       "NIST SP 800-171 Rev 2 - 3.13.1, 3.13.6",
       "ISO 27001:2022 A.8.20, A.8.21",
-      "Essential Eight - Patch Operating Systems",
-      "Microsoft Cloud Security Benchmark - NS-1, NS-4"
+      "Microsoft Cloud Security Benchmark - NS-1, NS-4",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "9.1.1",
@@ -1699,9 +1682,8 @@
       "NIST SP 800-53 Rev 5 - SI-3, SI-4, SI-7",
       "NIST SP 800-171 Rev 2 - 3.14.2, 3.14.6",
       "ISO 27001:2022 A.8.7, A.8.8",
-      "Essential Eight - Application Control (Maturity Level 2)",
-      "Essential Eight - Configure Microsoft Office Macro Settings (Maturity Level 2)",
-      "MITRE ATT&CK - T1059 (Command and Scripting Interpreter), T1566 (Phishing), T1003 (OS Credential Dumping), T1091 (Replication Through Removable Media)"
+      "MITRE ATT&CK - T1059 (Command and Scripting Interpreter), T1566 (Phishing), T1003 (OS Credential Dumping), T1091 (Replication Through Removable Media)",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "18.9.47.5.1.1",
@@ -1725,8 +1707,8 @@
       "NIST SP 800-53 Rev 5 - AC-25, SC-39",
       "NIST SP 800-171 Rev 2 - 3.13.4",
       "ISO 27001:2022 A.8.6",
-      "Essential Eight - Restrict Administrative Privileges",
-      "MITRE ATT&CK - T1003.001 (LSASS Memory), T1550 (Use Alternate Authentication Material)"
+      "MITRE ATT&CK - T1003.001 (LSASS Memory), T1550 (Use Alternate Authentication Material)",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "18.8.5.1",
@@ -1750,7 +1732,6 @@
       "NIST SP 800-53 Rev 5 - MP-7, SC-41",
       "NIST SP 800-171 Rev 2 - 3.8.7",
       "ISO 27001:2022 A.7.10, A.8.12",
-      "Essential Eight - Restrict Administrative Privileges",
       "PCI DSS v4.0 - Req 12.3.10",
       "MITRE ATT&CK - T1052 (Exfiltration Over Physical Medium), T1091 (Replication Through Removable Media)"
     ],
@@ -1800,8 +1781,8 @@
       "NIST SP 800-53 Rev 5 - SI-16, SC-39",
       "NIST SP 800-171 Rev 2 - 3.14.2",
       "ISO 27001:2022 A.8.6",
-      "Essential Eight - Application Control",
-      "MITRE ATT&CK - T1203 (Exploitation for Client Execution), T1068 (Exploitation for Privilege Escalation)"
+      "MITRE ATT&CK - T1203 (Exploitation for Client Execution), T1068 (Exploitation for Privilege Escalation)",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "18.9.47.1",
@@ -1826,8 +1807,8 @@
       "NIST SP 800-53 Rev 5 - SI-3, SI-4, SC-7",
       "NIST SP 800-171 Rev 2 - 3.14.2",
       "ISO 27001:2022 A.8.7",
-      "Essential Eight - Application Control",
-      "MITRE ATT&CK - T1486 (Data Encrypted for Impact), T1490 (Inhibit System Recovery)"
+      "MITRE ATT&CK - T1486 (Data Encrypted for Impact), T1490 (Inhibit System Recovery)",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "18.9.47.5.3.1",
@@ -1856,7 +1837,6 @@
       "FedRAMP Moderate",
       "HITRUST CSF v11",
       "BSI IT-Grundschutz",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "PCI DSS v4.0",
@@ -1890,7 +1870,6 @@
       "FedRAMP Moderate",
       "HITRUST CSF v11",
       "BSI IT-Grundschutz",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
@@ -1925,7 +1904,6 @@
       "FedRAMP Moderate",
       "HITRUST CSF v11",
       "BSI IT-Grundschutz",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
@@ -1961,13 +1939,13 @@
       "FedRAMP Moderate",
       "HITRUST CSF v11",
       "BSI IT-Grundschutz",
-      "ASD Essential Eight",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "NIST CSF 2.0",
       "CMMC v2.0",
       "PCI DSS v4.0",
-      "HIPAA"
+      "HIPAA",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "5.1.4.1",
@@ -1995,7 +1973,6 @@
       "FedRAMP Moderate",
       "HITRUST CSF v11",
       "BSI IT-Grundschutz",
-      "ASD Essential Eight",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "NIST CSF 2.0",
@@ -2033,14 +2010,14 @@
       "FedRAMP Moderate",
       "HITRUST CSF v11",
       "BSI IT-Grundschutz",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "NIST CSF 2.0",
       "CMMC v2.0",
       "NERC-CIP",
-      "CJIS v6"
+      "CJIS v6",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "5.1.4.1",
@@ -2068,7 +2045,6 @@
       "FedRAMP Moderate",
       "HITRUST CSF v11",
       "BSI IT-Grundschutz",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
@@ -2077,7 +2053,8 @@
       "NERC-CIP",
       "PCI DSS v4.0",
       "HIPAA",
-      "CJIS v6"
+      "CJIS v6",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "5.1.4.1",
@@ -2105,14 +2082,14 @@
       "FedRAMP Moderate",
       "HITRUST CSF v11",
       "BSI IT-Grundschutz",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "CMMC v2.0",
       "PCI DSS v4.0",
       "HIPAA",
-      "CJIS v6"
+      "CJIS v6",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "5.1.4.1",
@@ -2140,7 +2117,6 @@
       "FedRAMP Moderate",
       "HITRUST CSF v11",
       "BSI IT-Grundschutz",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
@@ -2476,7 +2452,6 @@
       "NYDFS 23 NYCRR 500",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
-      "ASD Essential Eight",
       "CJIS v6"
     ],
     "cisChecks": [
@@ -2569,10 +2544,10 @@
       "FedRAMP Moderate",
       "HITRUST CSF v11",
       "CMMC v2.0",
-      "ASD Essential Eight",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
-      "CJIS v6"
+      "CJIS v6",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "9.1.7",
@@ -2603,14 +2578,14 @@
       "HITRUST CSF v11",
       "CMMC v2.0",
       "NERC-CIP",
-      "ASD Essential Eight",
       "NZ ISM v3.8",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "CJIS v6",
       "TSA Security Directive",
       "CIRCIA (US)",
-      "SEC Cyber Rule"
+      "SEC Cyber Rule",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "9.1.1",
@@ -2641,7 +2616,6 @@
       "CMMC v2.0",
       "NERC-CIP",
       "NYDFS 23 NYCRR 500",
-      "ASD Essential Eight",
       "MITRE ATT&CK",
       "Microsoft Cloud Security Benchmark",
       "CJIS v6",
@@ -2675,8 +2649,8 @@
       "GDPR (EU) 2016/679",
       "CMMC v2.0",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
-      "Microsoft Cloud Security Benchmark"
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "7.2.3",
@@ -2708,8 +2682,8 @@
       "GDPR (EU) 2016/679",
       "CMMC v2.0",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
-      "Microsoft Cloud Security Benchmark"
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "7.2.4"
@@ -2738,8 +2712,8 @@
       "GDPR (EU) 2016/679",
       "CMMC v2.0",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
-      "Microsoft Cloud Security Benchmark"
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "7.2.6"
@@ -2769,8 +2743,8 @@
       "GDPR (EU) 2016/679",
       "CMMC v2.0",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
-      "Microsoft Cloud Security Benchmark"
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "7.2.2",
@@ -2801,9 +2775,9 @@
       "GDPR (EU) 2016/679",
       "CMMC v2.0",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark",
-      "MITRE ATT&CK T1080"
+      "MITRE ATT&CK T1080",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "7.2.8"
@@ -2833,10 +2807,10 @@
       "GDPR (EU) 2016/679",
       "CMMC v2.0",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
       "NYDFS 23 NYCRR 500",
       "FFIEC-CAT",
-      "Microsoft Cloud Security Benchmark"
+      "Microsoft Cloud Security Benchmark",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "7.2.1"
@@ -2925,7 +2899,6 @@
       "HITRUST CSF v11",
       "NYDFS 23 NYCRR 500",
       "FFIEC-CAT",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark",
       "MITRE ATT&CK T1078"
     ],
@@ -2988,7 +2961,6 @@
       "GDPR (EU) 2016/679",
       "CMMC v2.0",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
       "NYDFS 23 NYCRR 500",
       "FFIEC-CAT",
       "Microsoft Cloud Security Benchmark"
@@ -3023,7 +2995,6 @@
       "GDPR (EU) 2016/679",
       "CMMC v2.0",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
       "NYDFS 23 NYCRR 500",
       "FFIEC-CAT",
       "Microsoft Cloud Security Benchmark"
@@ -3140,7 +3111,6 @@
       "GDPR (EU) 2016/679",
       "CMMC v2.0",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark",
       "MITRE ATT&CK T1199"
     ],
@@ -3200,7 +3170,6 @@
       "FedRAMP Moderate",
       "GDPR (EU) 2016/679",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark"
     ],
     "cisChecks": [
@@ -3319,8 +3288,8 @@
       "UK NCSC CAF v3.2",
       "FedRAMP Moderate",
       "Microsoft Cloud Security Benchmark",
-      "ASD Essential Eight",
-      "BSI IT-Grundschutz"
+      "BSI IT-Grundschutz",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "9.1.10",
@@ -3367,7 +3336,6 @@
     "displayName": "DLP - Block Australian PII Shared Externally",
     "description": "Data Loss Prevention policy that detects and blocks Australian Personally Identifiable Information (Tax File Numbers, Medicare Numbers, and Driver Licence Numbers) from being shared with external recipients across Exchange, SharePoint, OneDrive, and Teams.",
     "frameworks": [
-      "ASD Essential Eight",
       "NIS2",
       "ISO 27001:2022",
       "NIST SP 800-53 Rev.5",
@@ -3436,7 +3404,6 @@
       "HITRUST CSF v11",
       "Microsoft Cloud Security Benchmark",
       "NYDFS 23 NYCRR 500",
-      "ASD Essential Eight",
       "UK NCSC CAF v3.2",
       "BSI IT-Grundschutz"
     ],
@@ -3554,9 +3521,9 @@
       "UK NCSC CAF v3.2",
       "BSI IT-Grundschutz",
       "Microsoft Cloud Security Benchmark",
-      "ASD Essential Eight",
       "NERC-CIP",
-      "SEC Cyber Rule"
+      "SEC Cyber Rule",
+      "ASD Essential Eight"
     ],
     "cisChecks": [
       "9.1.12"
@@ -3699,7 +3666,6 @@
       "UK NCSC CAF v3.2",
       "BSI IT-Grundschutz",
       "Microsoft Cloud Security Benchmark",
-      "ASD Essential Eight",
       "SEC Cyber Rule",
       "NERC-CIP",
       "MITRE ATT&CK"
@@ -3867,7 +3833,6 @@
       "DORA",
       "CMMC v2.0",
       "HITRUST CSF v11",
-      "ASD Essential Eight",
       "UK NCSC CAF v3.2",
       "Microsoft Cloud Security Benchmark",
       "NYDFS 23 NYCRR 500"
@@ -3900,7 +3865,6 @@
       "HIPAA",
       "UK NCSC CAF v3.2",
       "DORA",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark"
     ],
     "cisChecks": [
@@ -3929,7 +3893,6 @@
       "DORA",
       "CMMC v2.0",
       "UK NCSC CAF v3.2",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark"
     ],
     "cisChecks": [],
@@ -3953,7 +3916,6 @@
       "CMMC v2.0",
       "FedRAMP Moderate",
       "UK NCSC CAF v3.2",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark"
     ],
     "cisChecks": [],
@@ -4012,7 +3974,6 @@
       "CMMC v2.0",
       "HITRUST CSF v11",
       "UK NCSC CAF v3.2",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark"
     ],
     "cisChecks": [
@@ -4073,7 +4034,6 @@
       "HITRUST CSF v11",
       "NYDFS 23 NYCRR 500",
       "UK NCSC CAF v3.2",
-      "ASD Essential Eight",
       "Microsoft Cloud Security Benchmark",
       "BSI IT-Grundschutz",
       "NERC-CIP",

@@ -464,6 +464,18 @@ async function bootstrap() {
     if (frameworks.frameworkMeta) {
       AppState.set('frameworkMeta', frameworks.frameworkMeta);
     }
+
+    // Lazy-load Essential Eight strategy data when selected
+    AppState.on('selectedFrameworks', async function (fws) {
+      if (fws.has('ASD Essential Eight') && !AppState.get('e8Strategies')) {
+        try {
+          var e8Data = await DataStore.loadFramework('asd-essential-eight');
+          if (e8Data && e8Data.strategies) {
+            AppState.set('e8Strategies', e8Data.strategies);
+          }
+        } catch (e) { console.warn('[E8] Failed to load strategy data:', e.message); }
+      }
+    });
     AppState.set('categories', manifest.categories);
     AppState.set('policyTypes', policyTypes);
 

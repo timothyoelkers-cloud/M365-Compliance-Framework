@@ -4,6 +4,7 @@
 const Assessment = (() => {
   let initialized = false;
   let sortCol = 'id', sortAsc = true;
+  let e8StrategyView = false;
   let checkToPolicyMap = null;
   let autoSuggestDismissed = false;
 
@@ -257,10 +258,73 @@ const Assessment = (() => {
         <span class="badge badge-blue">${AppState.get('selectedFrameworks').size} frameworks</span>
       </div>
       <div style="display:flex;gap:8px">
-        <button class="btn btn-sm" onclick="Assessment.toggleHeatmap()">Heatmap</button>
+        <button class="btn btn-sm" onclick="Assessment.toggleHeatmap()">Heatmap</button>${
+          AppState.get('selectedFrameworks').has('ASD Essential Eight')
+            ? `<button class="btn btn-sm${e8StrategyView ? ' btn-primary' : ''}" onclick="Assessment.toggleE8Strategy()">E8 Strategies</button>`
+            : ''
+        }
         <button class="btn btn-primary btn-sm" onclick="Assessment.goStep(3)">Next: Mark Status &rarr;</button>
       </div>
     </div>`;
+
+    // E8 Strategy View
+    if (e8StrategyView && AppState.get('selectedFrameworks').has('ASD Essential Eight')) {
+      var e8Stats = AppState.getE8StrategyStats();
+      if (e8Stats && e8Stats.length > 0) {
+        html += '<div style="margin-bottom:20px">';
+        for (var si = 0; si < e8Stats.length; si++) {
+          var strat = e8Stats[si];
+          var mlBadges = '';
+          ['ML1', 'ML2', 'ML3'].forEach(function (ml) {
+            var lv = strat.levels[ml];
+            if (lv.total === 0) {
+              mlBadges += '<span class="badge" style="background:var(--bg2);color:var(--ink4);font-size:.6rem">' + ml + ' N/A</span> ';
+            } else if (lv.pct === 100) {
+              mlBadges += '<span class="badge badge-green" style="font-size:.6rem">' + ml + ' ' + lv.configured + '/' + lv.total + '</span> ';
+            } else if (lv.pct > 0) {
+              mlBadges += '<span class="badge badge-amber" style="font-size:.6rem">' + ml + ' ' + lv.configured + '/' + lv.total + '</span> ';
+            } else {
+              mlBadges += '<span class="badge badge-red" style="font-size:.6rem">' + ml + ' 0/' + lv.total + '</span> ';
+            }
+          });
+
+          // Get checks for this strategy
+          var e8Strategies = AppState.get('e8Strategies') || [];
+          var stratData = e8Strategies.find(function (s) { return s.id === strat.id; });
+          var stratChecks = [];
+          if (stratData) {
+            ['ML1', 'ML2', 'ML3'].forEach(function (ml) {
+              var mlChecks = stratData.maturityLevels[ml] ? stratData.maturityLevels[ml].checks || [] : [];
+              mlChecks.forEach(function (cid) {
+                var found = checks.find(function (c) { return c.id === cid; });
+                if (found && stratChecks.indexOf(found) === -1) stratChecks.push(found);
+              });
+            });
+          }
+
+          html += '<div class="card" style="margin-bottom:8px;padding:12px 16px">';
+          html += '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+          html += '<strong style="font-size:.82rem">' + strat.order + '. ' + strat.name + '</strong>';
+          html += '<div>' + mlBadges + '</div>';
+          html += '</div>';
+          if (stratChecks.length > 0) {
+            html += '<div style="font-size:.72rem;color:var(--ink3)">';
+            for (var ci = 0; ci < stratChecks.length; ci++) {
+              var sc = stratChecks[ci];
+              var st = AppState.get('checkStatus')[sc.id] || '';
+              var stClr = st === 'done' ? 'var(--green)' : st === 'gap' ? 'var(--red)' : 'var(--ink4)';
+              var stIcon = st === 'done' ? '&#10003;' : st === 'gap' ? '&#10007;' : '&#9679;';
+              html += '<div style="padding:2px 0;color:' + stClr + '">' + stIcon + ' <span class="text-mono" style="color:var(--blue)">' + sc.id + '</span> ' + sc.name + '</div>';
+            }
+            html += '</div>';
+          }
+          html += '</div>';
+        }
+        html += '</div>';
+      }
+      container.innerHTML = html;
+      return;
+    }
 
     // Category pills
     html += `<div class="filter-bar">
@@ -327,6 +391,11 @@ const Assessment = (() => {
 
   function setCatFilter(cat) {
     AppState.set('catFilter', cat);
+    renderCurrentStep();
+  }
+
+  function toggleE8Strategy() {
+    e8StrategyView = !e8StrategyView;
     renderCurrentStep();
   }
 
@@ -657,7 +726,7 @@ const Assessment = (() => {
   return {
     init, goStep, toggleFw, applyProfile,
     sort, setCatFilter, setStatusFilter,
-    toggleHeatmap, setStatus,
+    toggleHeatmap, toggleE8Strategy, setStatus,
     markAllDone, markAllGap, clearAllStatus,
     applyAutoSuggestions, dismissAutoSuggestions,
     exportAssessment, importAssessment,

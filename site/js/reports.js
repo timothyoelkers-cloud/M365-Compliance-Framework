@@ -63,6 +63,7 @@ const Reports = (() => {
         <label class="rpt-toggle"><input type="checkbox" id="sec-gaps" checked onchange="Reports.preview()"> Gap Register</label>
         <label class="rpt-toggle"><input type="checkbox" id="sec-roadmap" checked onchange="Reports.preview()"> Remediation Roadmap</label>
         <label class="rpt-toggle"><input type="checkbox" id="sec-fwdetails" onchange="Reports.preview()"> Framework Details</label>
+        <label class="rpt-toggle"><input type="checkbox" id="sec-e8maturity" onchange="Reports.preview()"> Essential Eight Maturity</label>
         <label class="rpt-toggle"><input type="checkbox" id="sec-deploystatus" onchange="Reports.preview()"> Deployment Status</label>
         <label class="rpt-toggle"><input type="checkbox" id="sec-method" onchange="Reports.preview()"> Methodology</label>
       </div>
@@ -156,6 +157,7 @@ const Reports = (() => {
     const secGaps = checked('sec-gaps');
     const secRoadmap = checked('sec-roadmap');
     const secFwDetails = checked('sec-fwdetails');
+    const secE8Maturity = checked('sec-e8maturity');
     const secDeployStatus = checked('sec-deploystatus');
     const secMethod = checked('sec-method');
 
@@ -270,6 +272,8 @@ const Reports = (() => {
 
         ${secFwDetails ? renderFrameworkDetailsSection(primary, sel) : ''}
 
+        ${secE8Maturity && sel.has('ASD Essential Eight') ? renderE8MaturitySection(primary) : ''}
+
         ${secDeployStatus ? renderDeployStatusSection(primary) : ''}
 
         ${recommendations ? `
@@ -336,6 +340,60 @@ const Reports = (() => {
       html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;' + bg + '">' + escHtml(m.jurisdiction || '-') + '</td>';
       html += '</tr>';
     });
+
+    html += '</tbody></table>';
+    return html;
+  }
+
+  function renderE8MaturitySection(primary) {
+    var e8Stats = AppState.getE8StrategyStats();
+    if (!e8Stats || e8Stats.length === 0) return '';
+
+    var html = '<div class="rpt-section-head" style="color:' + primary + ';border-bottom:2px solid ' + primary + '">Essential Eight — Maturity Assessment</div>';
+
+    // Summary KPIs
+    var ml1Count = e8Stats.filter(function (s) { return s.achieved >= 1; }).length;
+    var ml2Count = e8Stats.filter(function (s) { return s.achieved >= 2; }).length;
+    var ml3Count = e8Stats.filter(function (s) { return s.achieved >= 3; }).length;
+    html += '<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">';
+    html += kpiBox('Strategies', '8', primary);
+    html += kpiBox('ML1 Achieved', ml1Count + '/8', ml1Count === 8 ? '#16a34a' : '#d97706');
+    html += kpiBox('ML2 Achieved', ml2Count + '/8', ml2Count === 8 ? '#16a34a' : '#d97706');
+    html += kpiBox('ML3 Achieved', ml3Count + '/8', ml3Count === 8 ? '#16a34a' : '#d97706');
+    html += '</div>';
+
+    // Strategy detail table
+    html += '<table style="width:100%;border-collapse:collapse;font-size:.72rem;margin-bottom:20px;page-break-inside:avoid">';
+    html += '<thead><tr>';
+    ['Strategy', 'ML1', 'ML2', 'ML3', 'Achieved Level'].forEach(function (h) {
+      html += '<th style="background:' + primary + ';color:white;padding:6px 10px;text-align:' + (h === 'Strategy' ? 'left' : 'center') + ';font-size:.6rem;text-transform:uppercase;letter-spacing:.05em">' + h + '</th>';
+    });
+    html += '</tr></thead><tbody>';
+
+    for (var i = 0; i < e8Stats.length; i++) {
+      var s = e8Stats[i];
+      var bg = i % 2 ? 'background:#f8f9fc;' : '';
+
+      html += '<tr>';
+      html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-weight:600;' + bg + '">' + s.order + '. ' + escHtml(s.name) + '</td>';
+
+      ['ML1', 'ML2', 'ML3'].forEach(function (ml) {
+        var lv = s.levels[ml];
+        var cellColor;
+        if (lv.total === 0) cellColor = '#999';
+        else if (lv.pct === 100) cellColor = '#16a34a';
+        else if (lv.pct > 0) cellColor = '#d97706';
+        else cellColor = '#dc2626';
+        html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;text-align:center;color:' + cellColor + ';font-weight:600;' + bg + '">';
+        html += lv.total > 0 ? lv.configured + '/' + lv.total : 'N/A';
+        html += '</td>';
+      });
+
+      var achievedText = s.achieved === 0 ? 'Not Met' : 'ML' + s.achieved;
+      var achievedColor = s.achieved === 0 ? '#dc2626' : s.achieved >= 3 ? '#16a34a' : s.achieved >= 2 ? primary : '#d97706';
+      html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;text-align:center;font-weight:700;color:' + achievedColor + ';' + bg + '">' + achievedText + '</td>';
+      html += '</tr>';
+    }
 
     html += '</tbody></table>';
     return html;
