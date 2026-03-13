@@ -247,11 +247,41 @@ const TenantAuth = (() => {
     }
   }
 
+  /** Acquire token for a specific tenant (GDAP delegated admin) */
+  async function getTokenForTenantResource(tenantId, scopes) {
+    if (!msalInstance || !currentAccount) return null;
+    var authority = 'https://login.microsoftonline.com/' + tenantId;
+    try {
+      var response = await msalInstance.acquireTokenSilent({
+        scopes: scopes,
+        account: currentAccount,
+        authority: authority,
+      });
+      return response.accessToken;
+    } catch (err) {
+      if (err instanceof msal.InteractionRequiredAuthError) {
+        try {
+          var popupResponse = await msalInstance.acquireTokenPopup({
+            scopes: scopes,
+            authority: authority,
+          });
+          return popupResponse.accessToken;
+        } catch (popupErr) {
+          console.error('[Auth] Tenant token popup failed:', popupErr);
+        }
+      } else {
+        console.error('[Auth] Tenant token failed:', err);
+      }
+      return null;
+    }
+  }
+
   return {
     init, handleRedirectPromise,
     login, logout,
     getAccessToken: getGraphToken, getGraphToken,
     getExchangeToken, getComplianceToken, getTokenForResource,
+    getTokenForTenantResource,
     isAuthenticated, getAccount, updateAuthState, decodeToken,
     GRAPH_SCOPES, EXO_TOKEN_SCOPE, COMPLIANCE_TOKEN_SCOPE,
   };

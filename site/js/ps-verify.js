@@ -232,7 +232,7 @@ const PSVerify = (() => {
     html += '</div>';
     html += '<div class="modal-body">';
     html += '<p style="font-size:.74rem;color:var(--ink2);margin-bottom:12px">Paste the JSON output from the verification script, or upload the results file.</p>';
-    html += '<textarea id="ps-results-input" style="width:100%;height:200px;font-family:\'IBM Plex Mono\',monospace;font-size:.6rem;background:var(--surface2);color:var(--ink1);border:1px solid var(--border);border-radius:4px;padding:8px;resize:vertical" placeholder="Paste JSON here..."></textarea>';
+    html += '<textarea id="ps-results-input" style="width:100%;height:200px;font-family:\'JetBrains Mono\',monospace;font-size:.6rem;background:var(--surface2);color:var(--ink1);border:1px solid var(--border);border-radius:4px;padding:8px;resize:vertical" placeholder="Paste JSON here..."></textarea>';
     html += '<div style="margin-top:8px"><input type="file" accept=".json" onchange="PSVerify.handleFileImport(this)" style="font-size:.68rem"></div>';
     html += '<div class="config-actions" style="margin-top:12px">';
     html += '<button class="btn btn-primary" onclick="PSVerify.importFromTextarea()">Import Results</button>';

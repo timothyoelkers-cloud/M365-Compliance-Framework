@@ -4,7 +4,7 @@
    stale-while-revalidate for data JSON,
    network-only for auth/Graph API
 ═══════════════════════════════════════════ */
-var CACHE_NAME = 'm365-compliance-v5';
+var CACHE_NAME = 'm365-compliance-v8';
 
 var STATIC_ASSETS = [
   './',
@@ -46,6 +46,10 @@ var STATIC_ASSETS = [
   './js/change-tracker.js',
   './js/dep-viz.js',
   './js/integrations.js',
+  './js/access-gate.js',
+  './js/license.js',
+  './js/gdap-auth.js',
+  './js/slide-over.js',
   './data/index.json',
   './data/checks.json',
   './data/frameworks.json',
@@ -60,6 +64,7 @@ var NETWORK_ONLY_HOSTS = [
   'login.microsoftonline.com',
   'outlook.office365.com',
   'ps.compliance.protection.outlook.com',
+  'api.partnercenter.microsoft.com',
 ];
 
 // Install — cache static assets

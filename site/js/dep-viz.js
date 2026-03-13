@@ -189,12 +189,12 @@ const DepViz = (() => {
     for (var ni = 0; ni < graph.nodes.length; ni++) {
       var node = graph.nodes[ni];
       var nodeColor = node.deployed ? 'var(--green)' : node.deploying ? 'var(--amber2)' : 'var(--red)';
-      var fillColor = node.deployed ? 'rgba(22,163,74,0.15)' : node.deploying ? 'rgba(240,165,0,0.15)' : 'rgba(220,38,38,0.15)';
+      var fillColor = node.deployed ? 'rgba(22,163,74,0.15)' : node.deploying ? 'rgba(37,99,235,0.15)' : 'rgba(220,38,38,0.15)';
       var radius = 16;
 
       svg += '<g class="dep-viz-node" style="cursor:pointer" onclick="DepViz.onNodeClick(\'' + escHtml(node.id) + '\')">';
       svg += '<circle cx="' + node.x + '" cy="' + node.y + '" r="' + radius + '" fill="' + fillColor + '" stroke="' + nodeColor + '" stroke-width="2"/>';
-      svg += '<text x="' + node.x + '" y="' + (node.y + 28) + '" text-anchor="middle" fill="var(--ink3)" style="font-size:9px;font-family:IBM Plex Mono,monospace">' + escHtml(node.id) + '</text>';
+      svg += '<text x="' + node.x + '" y="' + (node.y + 28) + '" text-anchor="middle" fill="var(--ink3)" style="font-size:9px;font-family:JetBrains Mono,monospace">' + escHtml(node.id) + '</text>';
 
       // Status icon inside circle
       if (node.deployed) {

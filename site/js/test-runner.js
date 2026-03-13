@@ -1777,6 +1777,251 @@ const TestRunner = (() => {
 
   // ─── Run All ───
 
+  // ─── Round 4: AccessGate Tests ───
+
+  function testAccessGate() {
+    describe('AccessGate — module structure', function () {
+      it('AccessGate is defined', function () {
+        assert(typeof AccessGate !== 'undefined', 'AccessGate should be defined');
+      });
+      it('exposes init function', function () {
+        assertEqual(typeof AccessGate.init, 'function', 'init should be a function');
+      });
+      it('exposes validate function', function () {
+        assertEqual(typeof AccessGate.validate, 'function', 'validate should be a function');
+      });
+      it('exposes checkAccess function', function () {
+        assertEqual(typeof AccessGate.checkAccess, 'function', 'checkAccess should be a function');
+      });
+    });
+
+    describe('AccessGate — sessionStorage behavior', function () {
+      it('grants access when valid token is in sessionStorage', function () {
+        var hash = '29352a43448317a963073bb9349844a2a2c993bf8072ff612be31e5943c40a47';
+        sessionStorage.setItem('m365-gate-token', hash);
+        var gate = document.getElementById('access-gate');
+        if (gate) gate.classList.remove('hidden');
+        AccessGate.checkAccess();
+        assert(gate && gate.classList.contains('hidden'), 'gate should be hidden after valid token');
+        sessionStorage.removeItem('m365-gate-token');
+      });
+      it('shows gate when no token present', function () {
+        sessionStorage.removeItem('m365-gate-token');
+        var gate = document.getElementById('access-gate');
+        if (gate) gate.classList.add('hidden');
+        AccessGate.checkAccess();
+        assert(gate && !gate.classList.contains('hidden'), 'gate should be visible when no token');
+      });
+      it('migrates localStorage token to sessionStorage', function () {
+        var hash = '29352a43448317a963073bb9349844a2a2c993bf8072ff612be31e5943c40a47';
+        localStorage.setItem('m365-gate-token', hash);
+        sessionStorage.removeItem('m365-gate-token');
+        AccessGate.checkAccess();
+        assertEqual(sessionStorage.getItem('m365-gate-token'), hash, 'should migrate to sessionStorage');
+        assert(!localStorage.getItem('m365-gate-token'), 'should remove from localStorage');
+        sessionStorage.removeItem('m365-gate-token');
+      });
+    });
+  }
+
+  // ─── Round 4: License Tests ───
+
+  function testLicense() {
+    describe('License — key validation', function () {
+      it('License is defined', function () {
+        assert(typeof License !== 'undefined', 'License should be defined');
+      });
+      it('validates correct PRO key format', function () {
+        assert(License.validateKeyFormat('PRO-ABCD1234-EF567890'), 'valid key should pass');
+      });
+      it('validates lowercase hex', function () {
+        assert(License.validateKeyFormat('PRO-abcd1234-ef567890'), 'lowercase hex should pass');
+      });
+      it('rejects key missing PRO prefix', function () {
+        assert(!License.validateKeyFormat('ABC-ABCD1234-EF567890'), 'wrong prefix should fail');
+      });
+      it('rejects key with wrong segment length', function () {
+        assert(!License.validateKeyFormat('PRO-ABC-EF567890'), 'short segment should fail');
+      });
+      it('rejects empty string', function () {
+        assert(!License.validateKeyFormat(''), 'empty string should fail');
+      });
+      it('rejects key with non-hex chars', function () {
+        assert(!License.validateKeyFormat('PRO-GHIJKLMN-12345678'), 'non-hex chars should fail');
+      });
+      it('rejects key with extra segments', function () {
+        assert(!License.validateKeyFormat('PRO-ABCD1234-EF567890-EXTRA'), 'extra segment should fail');
+      });
+    });
+
+    describe('License — tier logic', function () {
+      it('FREE_TENANT_LIMIT is 3', function () {
+        assertEqual(License.FREE_TENANT_LIMIT, 3, 'free limit should be 3');
+      });
+      it('isPro returns false with no key', function () {
+        var saved = localStorage.getItem('m365-license-key');
+        localStorage.removeItem('m365-license-key');
+        assert(!License.isPro(), 'should not be pro without key');
+        if (saved) localStorage.setItem('m365-license-key', saved);
+      });
+      it('isPro returns true with valid key', function () {
+        var saved = localStorage.getItem('m365-license-key');
+        localStorage.setItem('m365-license-key', 'PRO-ABCD1234-EF567890');
+        assert(License.isPro(), 'should be pro with valid key');
+        if (saved) localStorage.setItem('m365-license-key', saved);
+        else localStorage.removeItem('m365-license-key');
+      });
+      it('isPro returns false with invalid key', function () {
+        var saved = localStorage.getItem('m365-license-key');
+        localStorage.setItem('m365-license-key', 'INVALID-KEY');
+        assert(!License.isPro(), 'should not be pro with invalid key');
+        if (saved) localStorage.setItem('m365-license-key', saved);
+        else localStorage.removeItem('m365-license-key');
+      });
+      it('getTenantLimit returns 3 for free', function () {
+        var saved = localStorage.getItem('m365-license-key');
+        localStorage.removeItem('m365-license-key');
+        assertEqual(License.getTenantLimit(), 3, 'free limit');
+        if (saved) localStorage.setItem('m365-license-key', saved);
+      });
+      it('getTenantLimit returns Infinity for pro', function () {
+        var saved = localStorage.getItem('m365-license-key');
+        localStorage.setItem('m365-license-key', 'PRO-ABCD1234-EF567890');
+        assertEqual(License.getTenantLimit(), Infinity, 'pro limit');
+        if (saved) localStorage.setItem('m365-license-key', saved);
+        else localStorage.removeItem('m365-license-key');
+      });
+      it('canAddTenant returns true when under limit', function () {
+        var saved = localStorage.getItem('m365-license-key');
+        localStorage.removeItem('m365-license-key');
+        // TenantManager stub returns [] so under limit
+        assert(License.canAddTenant(), 'should allow adding when under limit');
+        if (saved) localStorage.setItem('m365-license-key', saved);
+      });
+      it('activate returns false for invalid key', function () {
+        assert(!License.activate('bad'), 'should reject invalid key');
+      });
+      it('activate returns true for valid key', function () {
+        var saved = localStorage.getItem('m365-license-key');
+        assert(License.activate('PRO-11111111-22222222'), 'should accept valid key');
+        assertEqual(localStorage.getItem('m365-license-key'), 'PRO-11111111-22222222', 'key should be stored');
+        if (saved) localStorage.setItem('m365-license-key', saved);
+        else localStorage.removeItem('m365-license-key');
+      });
+      it('deactivate removes key', function () {
+        localStorage.setItem('m365-license-key', 'PRO-11111111-22222222');
+        License.deactivate();
+        assert(!localStorage.getItem('m365-license-key'), 'key should be removed');
+      });
+    });
+  }
+
+  // ─── Round 4: GDAPAuth Tests ───
+
+  function testGDAPAuth() {
+    describe('GDAPAuth — module structure', function () {
+      it('GDAPAuth is defined', function () {
+        assert(typeof GDAPAuth !== 'undefined', 'GDAPAuth should be defined');
+      });
+      it('exposes init function', function () {
+        assertEqual(typeof GDAPAuth.init, 'function');
+      });
+      it('exposes fetchCustomerTenants function', function () {
+        assertEqual(typeof GDAPAuth.fetchCustomerTenants, 'function');
+      });
+      it('exposes getTokenForTenant function', function () {
+        assertEqual(typeof GDAPAuth.getTokenForTenant, 'function');
+      });
+      it('exposes getCustomerTenants function', function () {
+        assertEqual(typeof GDAPAuth.getCustomerTenants, 'function');
+      });
+      it('exposes getActiveTenantId function', function () {
+        assertEqual(typeof GDAPAuth.getActiveTenantId, 'function');
+      });
+      it('exposes setActiveTenant function', function () {
+        assertEqual(typeof GDAPAuth.setActiveTenant, 'function');
+      });
+      it('exposes isPartnerMode function', function () {
+        assertEqual(typeof GDAPAuth.isPartnerMode, 'function');
+      });
+      it('exposes clearCache function', function () {
+        assertEqual(typeof GDAPAuth.clearCache, 'function');
+      });
+    });
+
+    describe('GDAPAuth — state behavior', function () {
+      it('getCustomerTenants returns array', function () {
+        var tenants = GDAPAuth.getCustomerTenants();
+        assert(Array.isArray(tenants), 'should return an array');
+      });
+      it('isPartnerMode returns false with no tenants', function () {
+        assert(!GDAPAuth.isPartnerMode(), 'should not be partner mode without tenants');
+      });
+      it('getActiveTenantId returns null initially', function () {
+        assertEqual(GDAPAuth.getActiveTenantId(), null, 'should be null initially');
+      });
+      it('setActiveTenant updates active tenant', function () {
+        GDAPAuth.setActiveTenant('test-tenant-123');
+        assertEqual(GDAPAuth.getActiveTenantId(), 'test-tenant-123', 'should update active tenant');
+        GDAPAuth.setActiveTenant(null); // reset
+      });
+      it('clearCache does not throw', function () {
+        GDAPAuth.clearCache(); // should not throw
+        assert(true, 'clearCache ran without error');
+      });
+    });
+  }
+
+  // ─── Round 4: SlideOver Tests ───
+
+  function testSlideOver() {
+    describe('SlideOver — module structure', function () {
+      it('SlideOver is defined', function () {
+        assert(typeof SlideOver !== 'undefined', 'SlideOver should be defined');
+      });
+      it('exposes open function', function () {
+        assertEqual(typeof SlideOver.open, 'function');
+      });
+      it('exposes close function', function () {
+        assertEqual(typeof SlideOver.close, 'function');
+      });
+      it('exposes isOpen function', function () {
+        assertEqual(typeof SlideOver.isOpen, 'function');
+      });
+    });
+
+    describe('SlideOver — open/close behavior', function () {
+      it('isOpen returns false initially', function () {
+        // Ensure closed state
+        var el = document.getElementById('slide-over');
+        if (el) el.classList.remove('open');
+        assert(!SlideOver.isOpen(), 'should be closed initially');
+      });
+      it('open adds open class and shows panel', function () {
+        SlideOver.open('Test Title', '<p>Test content</p>');
+        var el = document.getElementById('slide-over');
+        assert(el && el.classList.contains('open'), 'should have open class');
+        assertEqual(el.style.display, 'block', 'should be visible');
+      });
+      it('isOpen returns true after opening', function () {
+        assert(SlideOver.isOpen(), 'should report open');
+      });
+      it('open renders title and content', function () {
+        var el = document.getElementById('slide-over');
+        assert(el.innerHTML.indexOf('Test Title') !== -1, 'should contain title');
+        assert(el.innerHTML.indexOf('Test content') !== -1, 'should contain body');
+      });
+      it('close removes open class', function () {
+        SlideOver.close();
+        var el = document.getElementById('slide-over');
+        assert(el && !el.classList.contains('open'), 'should not have open class');
+      });
+      it('isOpen returns false after closing', function () {
+        assert(!SlideOver.isOpen(), 'should report closed');
+      });
+    });
+  }
+
   function runAll() {
     results = { passed: 0, failed: 0, total: 0, suites: [] };
 
@@ -1811,6 +2056,12 @@ const TestRunner = (() => {
     testMDEConfigs();
     testPVSensitivityLabels();
     testGetSummaryExtended();
+
+    // Round 4: New module tests
+    testAccessGate();
+    testLicense();
+    testGDAPAuth();
+    testSlideOver();
 
     renderResults();
     return results;

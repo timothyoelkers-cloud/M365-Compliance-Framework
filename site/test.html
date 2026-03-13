@@ -44,7 +44,36 @@
       getDeployMethod: function () { return 'graph'; },
     };
   }
+  /* Stub TenantManager for License tests */
+  if (typeof TenantManager === 'undefined') {
+    window.TenantManager = {
+      getTenants: function () { return []; },
+      addTenant: function () { return true; }
+    };
+  }
+  /* Stub DOM elements needed by AccessGate, License, SlideOver */
+  (function () {
+    var ids = ['access-gate', 'gate-input', 'gate-error', 'gate-btn',
+               'license-badge', 'license-modal-overlay', 'license-modal-content',
+               'slide-over'];
+    ids.forEach(function (id) {
+      if (!document.getElementById(id)) {
+        var el = document.createElement('div');
+        el.id = id;
+        if (id === 'gate-input') {
+          el = document.createElement('input');
+          el.id = id;
+          el.type = 'text';
+        }
+        document.body.appendChild(el);
+      }
+    });
+  })();
 </script>
+<script src="js/access-gate.js"></script>
+<script src="js/license.js"></script>
+<script src="js/gdap-auth.js"></script>
+<script src="js/slide-over.js"></script>
 <script src="test-fixtures/graph-fixtures.js"></script>
 <script src="js/policy-matcher.js"></script>
 <script src="js/remediation.js"></script>
@@ -56,9 +85,9 @@
     try {
       statusEl.textContent = 'Loading data files...';
       if (typeof DataStore !== 'undefined') {
-        var checks = await DataStore.fetchJSON('data/checks.json');
-        var policiesAll = await DataStore.fetchJSON('data/policies-all.json');
-        var frameworks = await DataStore.fetchJSON('data/frameworks.json');
+        var checks = await DataStore.fetchJSON('checks.json');
+        var policiesAll = await DataStore.fetchJSON('policies-all.json');
+        var frameworks = await DataStore.fetchJSON('frameworks.json');
         AppState.state.checks = checks || [];
         AppState.state.policies = policiesAll || [];
         AppState.state.frameworks = frameworks || [];

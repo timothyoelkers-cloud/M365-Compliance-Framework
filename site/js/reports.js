@@ -184,7 +184,7 @@ const Reports = (() => {
     <div style="--rpt-primary:${primary};--rpt-accent:${accent}">
       <div class="rpt-cover" style="background:linear-gradient(135deg, ${primary} 0%, ${shadeColour(primary,-40)} 100%);page-break-after:always">
         ${logoDataUrl ? `<img src="${logoDataUrl}" style="max-height:48px;max-width:160px;margin-bottom:16px">` : ''}
-        <div style="font-family:'IBM Plex Mono',monospace;font-size:.7rem;opacity:.5;margin-bottom:20px">${escHtml(orgName)}</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.7rem;opacity:.5;margin-bottom:20px">${escHtml(orgName)}</div>
         <div class="rpt-cover-title">${escHtml(title)}</div>
         ${subtitle ? `<div class="rpt-cover-subtitle">${escHtml(subtitle)}</div>` : ''}
         <div class="rpt-cover-meta">
@@ -216,13 +216,13 @@ const Reports = (() => {
             <div style="position:relative;display:inline-block">
               ${donutSvg}
               <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center">
-                <div style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:1.2rem;color:${primary}">${stats.score}%</div>
+                <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:1.2rem;color:${primary}">${stats.score}%</div>
               </div>
             </div>
             <div style="display:flex;flex-direction:column;gap:6px;font-size:.73rem">
-              <div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;background:${primary}"></div>Implemented <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-weight:600;color:${primary}">${stats.done}</span></div>
-              <div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;background:#dc2626"></div>Gaps <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-weight:600;color:#dc2626">${stats.gap}</span></div>
-              <div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;background:#d1d5db"></div>Not Reviewed <span style="margin-left:auto;font-family:'IBM Plex Mono',monospace;font-weight:600;color:#9ca3af">${stats.unrev}</span></div>
+              <div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;background:${primary}"></div>Implemented <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:600;color:${primary}">${stats.done}</span></div>
+              <div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;background:#dc2626"></div>Gaps <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:600;color:#dc2626">${stats.gap}</span></div>
+              <div style="display:flex;align-items:center;gap:8px"><div style="width:10px;height:10px;background:#d1d5db"></div>Not Reviewed <span style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-weight:600;color:#9ca3af">${stats.unrev}</span></div>
             </div>
           </div>
         ` : ''}
@@ -233,7 +233,7 @@ const Reports = (() => {
             <div style="display:grid;grid-template-columns:160px 1fr 50px;align-items:center;gap:8px;margin-bottom:5px">
               <div style="font-size:.72rem;color:#374151;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap" title="${b.fw}">${b.fw}</div>
               <div style="height:6px;background:#eef0f4;overflow:hidden"><div style="height:100%;width:${b.pct}%;background:${b.pct>80?'#16a34a':b.pct>50?primary:'#dc2626'}"></div></div>
-              <div style="font-family:'IBM Plex Mono',monospace;font-size:.68rem;color:#9ca3af;text-align:right">${b.pct}%</div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:.68rem;color:#9ca3af;text-align:right">${b.pct}%</div>
             </div>
           `).join('')}
         ` : ''}
@@ -251,12 +251,12 @@ const Reports = (() => {
             </tr></thead>
             <tbody>
               ${gaps.map((g, i) => `<tr>
-                <td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:${primary};font-weight:600;${i%2?'background:#f8f9fc;':''}">${g.id}</td>
+                <td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:'JetBrains Mono',monospace;font-size:.66rem;color:${primary};font-weight:600;${i%2?'background:#f8f9fc;':''}">${g.id}</td>
                 <td style="padding:5px 10px;border-bottom:1px solid #d8dce6;max-width:260px;${i%2?'background:#f8f9fc;':''}">${g.name}</td>
-                <td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:'IBM Plex Mono',monospace;font-size:.62rem;${i%2?'background:#f8f9fc;':''}">${g.cat}</td>
-                <td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:'IBM Plex Mono',monospace;font-weight:600;color:${g.level==='L1'?'#16a34a':'#d97706'};${i%2?'background:#f8f9fc;':''}">${g.level}</td>
-                <td style="padding:5px 10px;border-bottom:1px solid #d8dce6;${i%2?'background:#f8f9fc;':''}"><span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;padding:2px 6px;font-weight:600;${g.tier==='critical'?'background:#fef2f2;color:#dc2626;border:1px solid #fee2e2':g.tier==='high'?'background:#fefce8;color:#ca8a04;border:1px solid #fef08a':'background:#eff6ff;color:#1d4ed8;border:1px solid #dbeafe'}">${g.tier}</span></td>
-                <td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:'IBM Plex Mono',monospace;font-size:.66rem;${i%2?'background:#f8f9fc;':''}">${g.impact} fw</td>
+                <td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:'JetBrains Mono',monospace;font-size:.62rem;${i%2?'background:#f8f9fc;':''}">${g.cat}</td>
+                <td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:'JetBrains Mono',monospace;font-weight:600;color:${g.level==='L1'?'#16a34a':'#d97706'};${i%2?'background:#f8f9fc;':''}">${g.level}</td>
+                <td style="padding:5px 10px;border-bottom:1px solid #d8dce6;${i%2?'background:#f8f9fc;':''}"><span style="font-family:'JetBrains Mono',monospace;font-size:.6rem;padding:2px 6px;font-weight:600;${g.tier==='critical'?'background:#fef2f2;color:#dc2626;border:1px solid #fee2e2':g.tier==='high'?'background:#fefce8;color:#ca8a04;border:1px solid #fef08a':'background:#eff6ff;color:#1d4ed8;border:1px solid #dbeafe'}">${g.tier}</span></td>
+                <td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:'JetBrains Mono',monospace;font-size:.66rem;${i%2?'background:#f8f9fc;':''}">${g.impact} fw</td>
               </tr>`).join('')}
             </tbody>
           </table>
@@ -293,7 +293,7 @@ const Reports = (() => {
   function kpiBox(label, value, color) {
     return `<div style="border:1px solid #d8dce6;padding:12px;position:relative;overflow:hidden">
       <div style="position:absolute;top:0;left:0;right:0;height:3px;background:${color}"></div>
-      <div style="font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:1.6rem;color:${color};line-height:1">${value}</div>
+      <div style="font-family:'JetBrains Mono',monospace;font-weight:600;font-size:1.6rem;color:${color};line-height:1">${value}</div>
       <div style="font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:#9ca3af;margin-top:2px">${label}</div>
     </div>`;
   }
@@ -304,9 +304,9 @@ const Reports = (() => {
       <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:${titleColor};margin-bottom:6px">${title}</div>
       ${items.slice(0, 10).map(g => `
         <div style="display:flex;align-items:flex-start;gap:10px;padding:5px 0;border-bottom:1px solid #d8dce6;font-size:.72rem">
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:.66rem;color:${primary};min-width:48px;font-weight:600">${g.id}</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.66rem;color:${primary};min-width:48px;font-weight:600">${g.id}</span>
           <span style="color:#374151;flex:1">${g.name}</span>
-          <span style="font-family:'IBM Plex Mono',monospace;font-size:.6rem;color:#9ca3af">${g.impact}fw</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:#9ca3af">${g.impact}fw</span>
         </div>
       `).join('')}
     </div>`;
@@ -331,7 +331,7 @@ const Reports = (() => {
       html += '<tr>';
       html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-weight:600;color:' + primary + ';' + bg + '">' + escHtml(fw) + '</td>';
       html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;' + bg + '">' + escHtml(m.type || '-') + '</td>';
-      html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:\'IBM Plex Mono\',monospace;font-size:.66rem;' + bg + '">' + escHtml(m.version || '-') + '</td>';
+      html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:\'JetBrains Mono\',monospace;font-size:.66rem;' + bg + '">' + escHtml(m.version || '-') + '</td>';
       html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;' + bg + '">' + escHtml(m.publisher || '-') + '</td>';
       html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;' + bg + '">' + escHtml(m.jurisdiction || '-') + '</td>';
       html += '</tr>';
@@ -372,7 +372,7 @@ const Reports = (() => {
       var ts = d.toLocaleDateString() + ' ' + d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
       var statusColor = h.status === 'success' ? '#16a34a' : h.status === 'failed' ? '#dc2626' : '#d97706';
       html += '<tr>';
-      html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:\'IBM Plex Mono\',monospace;font-size:.66rem;color:' + primary + ';font-weight:600;' + bg + '">' + escHtml(h.policyId) + '</td>';
+      html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-family:\'JetBrains Mono\',monospace;font-size:.66rem;color:' + primary + ';font-weight:600;' + bg + '">' + escHtml(h.policyId) + '</td>';
       html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-size:.66rem;' + bg + '">' + escHtml(ts) + '</td>';
       html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;color:' + statusColor + ';font-weight:600;' + bg + '">' + escHtml(h.status) + '</td>';
       html += '<td style="padding:5px 10px;border-bottom:1px solid #d8dce6;font-size:.66rem;color:#9ca3af;' + bg + '">' + escHtml(h.detail || '-') + '</td>';
@@ -401,10 +401,10 @@ const Reports = (() => {
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Compliance Report - ${escHtml(orgName)}</title>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Plus Jakarta Sans',sans-serif;background:white;color:#111827;max-width:900px;margin:0 auto}
+body{font-family:'Inter',sans-serif;background:white;color:#111827;max-width:900px;margin:0 auto}
 </style>
 </head>
 <body>

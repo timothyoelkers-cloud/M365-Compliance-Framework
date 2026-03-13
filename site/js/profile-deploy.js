@@ -65,7 +65,7 @@ const ProfileDeploy = (() => {
       var label = (policyTypes[type] && policyTypes[type].label) || type;
       html += '<div style="font-size:.72rem;display:flex;justify-content:space-between;padding:4px 8px;background:var(--glass-bg2);border-radius:4px">';
       html += '<span style="color:var(--ink2)">' + escHtml(label.split('(')[0].trim()) + '</span>';
-      html += '<span style="font-family:\'IBM Plex Mono\',monospace;color:var(--ink4)">' + stats.byType[type] + '</span>';
+      html += '<span style="font-family:\'JetBrains Mono\',monospace;color:var(--ink4)">' + stats.byType[type] + '</span>';
       html += '</div>';
     });
     html += '</div>';

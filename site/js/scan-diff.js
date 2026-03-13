@@ -178,7 +178,7 @@ const ScanDiff = (() => {
         var rowClass = d.match ? '' : ' style="background:rgba(220,38,38,.04)"';
 
         html += '<tr' + rowClass + '>';
-        html += '<td style="font-family:\'IBM Plex Mono\',monospace;font-size:.62rem;word-break:break-all">' + escHtml(d.field) + '</td>';
+        html += '<td style="font-family:\'JetBrains Mono\',monospace;font-size:.62rem;word-break:break-all">' + escHtml(d.field) + '</td>';
         html += '<td style="font-size:.66rem">' + formatValue(d.expected) + '</td>';
         html += '<td style="font-size:.66rem">' + formatValue(d.actual) + '</td>';
         html += '<td style="text-align:center">' + statusIcon + '</td>';
