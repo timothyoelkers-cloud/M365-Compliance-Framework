@@ -1,5 +1,11 @@
 {
   "name": "CMMC v2.0",
+  "source": {
+    "title": "Cybersecurity Maturity Model Certification (CMMC) 2.0",
+    "url": "https://dodcio.defense.gov/CMMC/",
+    "versionDate": "2024-10-15",
+    "legalReference": "32 CFR Part 170"
+  },
   "slug": "cmmc-v2-0",
   "group": "NIST / US Federal",
   "hasStrategies": true,

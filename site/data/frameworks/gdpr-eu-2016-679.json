@@ -1,5 +1,11 @@
 {
   "name": "GDPR (EU) 2016/679",
+  "source": {
+    "title": "Regulation (EU) 2016/679 (GDPR)",
+    "url": "https://eur-lex.europa.eu/eli/reg/2016/679/oj",
+    "versionDate": "2016-04-27",
+    "legalReference": "OJ L 119, 4.5.2016, p. 1–88"
+  },
   "slug": "gdpr-eu-2016-679",
   "group": "EU Regulatory",
   "hasStrategies": true,

@@ -1,5 +1,11 @@
 {
   "name": "NIS2",
+  "source": {
+    "title": "Directive (EU) 2022/2555 (NIS2)",
+    "url": "https://eur-lex.europa.eu/eli/dir/2022/2555",
+    "versionDate": "2022-12-14",
+    "legalReference": "OJ L 333, 27.12.2022, p. 80–152"
+  },
   "slug": "nis2",
   "group": "EU Regulatory",
   "hasStrategies": true,

@@ -6,10 +6,10 @@
     "displayName": "CA01 | Block Legacy Authentication",
     "description": "Blocks all legacy authentication protocols including Exchange ActiveSync, SMTP AUTH, POP3, IMAP, and older Office clients that do not support modern authentication. Legacy auth cannot enforce MFA and is the primary vector for password-spray and credential-stuffing attacks.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
       "ASD Essential Eight"
     ],
@@ -29,12 +29,12 @@
     "displayName": "CA02 | Require MFA for All Users",
     "description": "Requires multi-factor authentication for all users across all cloud applications. This is the foundational MFA policy and the single most effective control against identity compromise, blocking over 99.9% of account compromise attacks.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
-      "SOC-2",
+      "SOC 2",
       "ASD Essential Eight"
     ],
     "cisChecks": [
@@ -54,10 +54,10 @@
     "displayName": "CA03 | Require Phishing-Resistant MFA for Admins",
     "description": "Requires phishing-resistant MFA (FIDO2 security keys, Windows Hello for Business, or X.509 certificate-based authentication) for all privileged administrator roles. Standard MFA methods like SMS, voice call, or Authenticator app push notifications are insufficient for admin accounts due to real-time phishing (AiTM) attacks and MFA fatigue exploitation.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
       "ASD Essential Eight"
     ],
@@ -79,10 +79,10 @@
     "displayName": "CA04 | Block High-Risk Sign-Ins",
     "description": "Blocks sign-in attempts that Microsoft Entra ID Identity Protection classifies as high risk in real time. High-risk detections include sign-ins from anonymous IP addresses, malware-linked IP addresses, impossible travel, token anomalies, and password spray patterns.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
       "ASD Essential Eight"
     ],
@@ -102,10 +102,10 @@
     "displayName": "CA05 | Require Password Change for High-Risk Users",
     "description": "Requires both MFA verification and a secure password change when Microsoft Entra ID Identity Protection classifies a user account as high risk. High-risk users are those with confirmed compromised credentials detected via dark web intelligence, leaked credential databases, or confirmed malicious sign-in activity patterns.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
       "ASD Essential Eight"
     ],
@@ -125,10 +125,10 @@
     "displayName": "CA06 | Require Compliant or Hybrid Azure AD Joined Device",
     "description": "Requires that the device accessing cloud resources is either marked as Intune-compliant or is Hybrid Azure AD Joined. This prevents access from unmanaged personal devices, kiosks, and attacker-controlled endpoints, ensuring only corporate-managed endpoints that meet compliance policies can access organisational data.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
       "ASD Essential Eight"
     ],
@@ -150,10 +150,10 @@
     "displayName": "CA07 | Block Sign-Ins from Non-Approved Countries",
     "description": "Blocks all sign-in attempts originating from countries not included in the approved Named Location. This is a geo-fencing control that significantly reduces the attack surface by preventing authentication from regions where the organisation has no legitimate users or operations.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2"
     ],
     "cisChecks": [
@@ -171,10 +171,10 @@
     "displayName": "CA08 | Require MFA for Azure Management",
     "description": "Requires MFA for all access to Microsoft Azure Management, which covers the Azure Portal, Azure CLI, Azure PowerShell, and Azure Resource Manager API. This prevents unauthorised subscription and resource modifications even if credentials are compromised.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
       "ASD Essential Eight"
     ],
@@ -194,10 +194,10 @@
     "displayName": "CA09 | Require MFA for Windows Azure Service Management API",
     "description": "Requires MFA for Windows Azure Service Management API access. This complements CA08 by explicitly targeting the Service Management API layer used by Azure classic deployment model operations, REST API calls, and programmatic Azure resource management. Both CA08 and CA09 use the same service principal ID as Microsoft consolidated the Azure Management endpoints.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2"
     ],
     "cisChecks": [
@@ -215,10 +215,10 @@
     "displayName": "CA10 | Require Managed Device for Security Info Registration",
     "description": "Requires a managed, Intune-compliant device for users registering or modifying their security information (MFA methods, SSPR, passwordless credentials). This prevents attackers who have compromised a password from registering their own MFA device on an unmanaged endpoint, which is a critical step in account takeover attacks.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2"
     ],
     "cisChecks": [
@@ -238,12 +238,12 @@
     "displayName": "CA11 | Block All Guest and External User Access",
     "description": "Blocks all access for guest and external users including B2B collaboration guests, B2B direct connect users, and other external users from all tenants. This is the most restrictive guest policy and should be used as a baseline when external collaboration is not required or when specific app-level exceptions via CA12 are preferred.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
-      "GDPR"
+      "GDPR (EU) 2016/679"
     ],
     "cisChecks": [
       "5.1.6.2",
@@ -262,12 +262,12 @@
     "displayName": "CA12 | Require MFA for Guest and External Users",
     "description": "Requires multi-factor authentication for all guest and external user types when accessing any cloud application. This is the recommended alternative to CA11 when external B2B collaboration is needed but must be secured. Covers B2B collaboration guests, B2B collaboration members, B2B direct connect users, other external users, and service provider users.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
-      "GDPR"
+      "GDPR (EU) 2016/679"
     ],
     "cisChecks": [
       "5.1.6.2",
@@ -285,10 +285,10 @@
     "displayName": "CA13 | Enforce Sign-In Frequency 1 Hour",
     "description": "Enforces a 1-hour sign-in frequency for all users across all cloud applications and disables persistent browser sessions. This limits the window of opportunity for session token theft and replay attacks by forcing re-authentication every hour. Persistent browser sessions are set to 'never' to prevent 'keep me signed in' tokens from persisting.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
       "ASD Essential Eight"
     ],
@@ -308,10 +308,10 @@
     "displayName": "CA14 | Enforce Sign-In Frequency Every Time for Admins",
     "description": "Enforces 'every time' sign-in frequency for all privileged administrator roles. This is the most restrictive session control, requiring fresh authentication for every single session. Combined with persistent browser mode 'never', this ensures no admin session tokens persist and every admin action requires fresh, verified authentication.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
       "ASD Essential Eight"
     ],
@@ -331,10 +331,10 @@
     "displayName": "CA15 | Require MFA for Device Registration and Enrollment",
     "description": "Requires MFA for all Intune device enrollment and Azure AD device registration actions, with sign-in frequency set to 'every time' to ensure fresh authentication for each device enrollment. This prevents attackers from registering rogue devices to your tenant using compromised credentials.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
       "ASD Essential Eight"
     ],
@@ -353,10 +353,10 @@
     "displayName": "CA16 | Block Access from Unregistered or Non-Compliant Devices",
     "description": "Blocks access from devices that are not registered with Entra ID or are not marked as Intune-compliant. Uses a device filter rule to explicitly identify non-compliant and unregistered devices. This is a more aggressive version of CA06 that uses device filters for granular device state evaluation.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2"
     ],
     "cisChecks": [
@@ -376,10 +376,10 @@
     "displayName": "CA17 | Require MFA for Medium-Risk Sign-Ins",
     "description": "Requires MFA step-up verification for sign-in attempts classified as medium risk by Microsoft Entra ID Identity Protection. Unlike CA04 which blocks high-risk sign-ins entirely, this policy allows medium-risk sign-ins to proceed after MFA verification, balancing security with usability. Medium-risk detections include atypical travel, anomalous token, and suspicious browser patterns.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2",
       "ASD Essential Eight"
     ],
@@ -399,10 +399,10 @@
     "displayName": "CA18 | Block Access from Unsupported Device Platforms",
     "description": "Blocks access from unsupported device platforms by including all platforms and excluding only the approved ones (Android, iOS, Windows, macOS). This effectively blocks Linux, ChromeOS, and any other unrecognised or spoofed platform strings. Ensures only organisationally managed and supported operating systems can access corporate cloud resources.",
     "frameworks": [
-      "NIST-800-53",
+      "NIST SP 800-53 Rev.5",
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "ISO-27001-2022",
-      "MITRE-ATT&CK",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "NIS2"
     ],
     "cisChecks": [
@@ -422,8 +422,8 @@
     "description": "Deploys a strict anti-phishing policy with aggressive thresholds, mailbox intelligence, spoof intelligence, organization domain protection, and targeted user protection. All impersonation detections are routed to quarantine.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
-      "MITRE ATT&CK T1566",
+      "NIST SP 800-53 Rev.5",
+      "MITRE ATT&CK",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -457,8 +457,8 @@
     "description": "Enables Safe Links URL scanning and detonation for email, Microsoft Teams, and Office desktop/mobile apps. Blocks click-through to malicious URLs, rewrites URLs for tracking, and scans links at time of click.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
-      "MITRE ATT&CK T1566.002",
+      "NIST SP 800-53 Rev.5",
+      "MITRE ATT&CK",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -493,8 +493,8 @@
     "description": "Enables Safe Attachments with Dynamic Delivery mode. Email bodies are delivered immediately while attachments are sandboxed and scanned. Malicious attachments are blocked after detonation. ActionOnError ensures messages are not delivered if scanning fails.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
-      "MITRE ATT&CK T1566.001",
+      "NIST SP 800-53 Rev.5",
+      "MITRE ATT&CK",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -527,8 +527,8 @@
     "description": "Strict anti-malware policy for Exchange Online. Enables the common attachment types filter to block 70+ dangerous file extensions. Enables ZAP for retroactive malware removal. Sends internal admin notifications for malware detections.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
-      "MITRE ATT&CK T1204",
+      "NIST SP 800-53 Rev.5",
+      "MITRE ATT&CK",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -559,7 +559,7 @@
     "description": "Strict inbound anti-spam policy. Routes all spam categories (spam, high-confidence spam, bulk, phish, high-confidence phish) to quarantine instead of junk mail folder. Enables ZAP for retroactive removal. Sets bulk complaint level threshold to 5.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "UK NCSC CAF v3.2",
@@ -587,7 +587,7 @@
     "description": "Strict outbound spam filtering policy. Limits external recipients to 500/hour and internal to 1000/hour. Blocks users who exceed thresholds (indicates account compromise). Disables automatic external forwarding. Notifies security team of outbound spam detections.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "UK NCSC CAF v3.2",
@@ -613,8 +613,8 @@
     "description": "Enables Microsoft Defender for Office 365 file scanning for SharePoint Online, OneDrive for Business, and Microsoft Teams. Enables Safe Documents for Office clients. Prevents users from opening files flagged as malicious in Safe Documents.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
-      "MITRE ATT&CK T1080",
+      "NIST SP 800-53 Rev.5",
+      "MITRE ATT&CK",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -645,8 +645,8 @@
     "description": "Updates the default malware filter policy to enable the common attachment types filter. Blocks 50+ dangerous file extensions at the transport layer. Uses the default policy so all recipients are covered without needing a rule.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
-      "MITRE ATT&CK T1204.002",
+      "NIST SP 800-53 Rev.5",
+      "MITRE ATT&CK",
       "NIS2",
       "ISO 27001:2022",
       "UK NCSC CAF v3.2",
@@ -999,7 +999,7 @@
     "description": "Enables DomainKeys Identified Mail (DKIM) signing for all accepted domains in Exchange Online. Creates DKIM signing configurations and enables them. DKIM cryptographically signs outbound email to prove domain authenticity and detect message tampering.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -1030,7 +1030,7 @@
     "description": "Configures Domain-based Message Authentication, Reporting, and Conformance (DMARC) via DNS TXT records. DMARC builds on SPF and DKIM to prevent domain spoofing. Includes a staged rollout plan from monitoring (p=none) through quarantine to full reject enforcement.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -1061,7 +1061,7 @@
     "description": "Blocks automatic email forwarding to external domains using both the Remote Domain default setting and a transport rule. This is a critical anti-data-exfiltration control that prevents compromised accounts or malicious insiders from silently forwarding email externally.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -1075,7 +1075,7 @@
       "HITRUST CSF v11",
       "NYDFS 23 NYCRR 500",
       "Microsoft Cloud Security Benchmark",
-      "MITRE ATT&CK T1114.003"
+      "MITRE ATT&CK"
     ],
     "cisChecks": [
       "2.2.1",
@@ -1094,7 +1094,7 @@
     "description": "Creates an authentication policy that disables basic authentication for all Exchange Online protocols (POP3, IMAP, SMTP, MAPI, ActiveSync, EWS, Autodiscover, Offline Address Book, RPC, PowerShell) and assigns it as the organization default. Basic auth transmits credentials in clear text and cannot enforce MFA.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -1109,7 +1109,7 @@
       "NYDFS 23 NYCRR 500",
       "FFIEC-CAT",
       "Microsoft Cloud Security Benchmark",
-      "MITRE ATT&CK T1078"
+      "MITRE ATT&CK"
     ],
     "cisChecks": [
       "6.5.1",
@@ -1128,7 +1128,7 @@
     "description": "Explicitly enables Modern Authentication (OAuth 2.0) for Exchange Online via Set-OrganizationConfig. Modern auth supports MFA, certificate-based auth, conditional access, and token-based authentication. This must be enabled before disabling basic auth (EXO04).",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -1160,7 +1160,7 @@
     "description": "Audits and removes transport rules that set SCL to -1 (whitelist), which bypasses all spam filtering for matched senders. These rules are a common attack surface as they allow phishing and malware to bypass all email security scanning for whitelisted domains.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "UK NCSC CAF v3.2",
@@ -1173,7 +1173,7 @@
       "HITRUST CSF v11",
       "NYDFS 23 NYCRR 500",
       "Microsoft Cloud Security Benchmark",
-      "MITRE ATT&CK T1562.001"
+      "MITRE ATT&CK"
     ],
     "cisChecks": [
       "2.1.14",
@@ -1192,7 +1192,7 @@
     "description": "Restricts Exchange Online calendar sharing to prevent detailed availability and appointment data from being shared with external or anonymous users. Limits the default sharing policy to free/busy time only (no subject or location details). Also restricts public folder connections.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -1219,7 +1219,7 @@
     "description": "Clears the IP Allow List in the connection filter policy and disables the Safe List. IP allow lists bypass all spam filtering for messages from listed IPs, creating a significant security gap. The Safe List is a Microsoft-maintained list of trusted third-party sources that also bypasses filtering.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "UK NCSC CAF v3.2",
@@ -1250,7 +1250,7 @@
     "description": "Deploys the Microsoft Report Message and Report Phishing add-ins organization-wide for all users. Enables users to report suspicious, phishing, and junk emails directly from Outlook. Reported messages are submitted to Microsoft for analysis and optionally to a security team mailbox.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -1277,7 +1277,7 @@
     "description": "Disables mail-enabled public folders in Exchange Online. Mail-enabled public folders can receive email from external senders but bypass DLP policies, message trace, and audit logging. This policy removes email addresses from existing mail-enabled public folders and disables mail functionality.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -1306,10 +1306,10 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
-      "NIST SP 800-171 Rev 2",
-      "NIST SP 800-53 Rev 5 - CM-6, SI-3, SC-28",
-      "ISO 27001:2022 A.8.1",
-      "Microsoft Cloud Security Benchmark - DP-4, PV-6",
+      "NIST SP 800-171 Rev.2",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "Microsoft Cloud Security Benchmark",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1335,9 +1335,9 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Apple iOS/iPadOS Benchmark v1.0",
-      "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28",
-      "ISO 27001:2022 A.8.1",
-      "Microsoft Cloud Security Benchmark - DP-4",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "Microsoft Cloud Security Benchmark",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1362,9 +1362,9 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Google Android Benchmark v1.3",
-      "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28",
-      "ISO 27001:2022 A.8.1",
-      "Microsoft Cloud Security Benchmark - DP-4",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "Microsoft Cloud Security Benchmark",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1390,9 +1390,9 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Apple macOS Benchmark v3.0",
-      "NIST SP 800-53 Rev 5 - AC-7, IA-5, SC-28, SI-7",
-      "ISO 27001:2022 A.8.1",
-      "Microsoft Cloud Security Benchmark - DP-4, ES-1",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "Microsoft Cloud Security Benchmark",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1418,11 +1418,11 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
-      "NIST SP 800-53 Rev 5 - SC-28(1)",
-      "NIST SP 800-171 Rev 2 - 3.13.11",
-      "ISO 27001:2022 A.8.24",
-      "PCI DSS v4.0 - Req 3.4",
-      "HIPAA - 164.312(a)(2)(iv)",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "PCI DSS v4.0",
+      "HIPAA",
       "NIS2"
     ],
     "cisChecks": [
@@ -1445,10 +1445,10 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
-      "NIST SP 800-53 Rev 5 - AC-2, IA-5",
-      "NIST SP 800-171 Rev 2 - 3.5.7, 3.5.8",
-      "ISO 27001:2022 A.5.17",
-      "MITRE ATT&CK - T1078.003 (Local Accounts)",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1471,10 +1471,10 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
-      "NIST SP 800-53 Rev 5 - SI-3, SI-4",
-      "NIST SP 800-171 Rev 2 - 3.14.1, 3.14.2",
-      "ISO 27001:2022 A.8.7",
-      "Microsoft Cloud Security Benchmark - ES-1, ES-2",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "Microsoft Cloud Security Benchmark",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1499,10 +1499,10 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
-      "NIST SP 800-53 Rev 5 - SI-2, CM-3",
-      "NIST SP 800-171 Rev 2 - 3.14.1",
-      "ISO 27001:2022 A.8.8",
-      "Microsoft Cloud Security Benchmark - PV-6, PV-7",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "Microsoft Cloud Security Benchmark",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1526,10 +1526,10 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft 365 Foundations Benchmark v3.1",
-      "NIST SP 800-53 Rev 5 - AC-19, MP-7, SC-28",
-      "NIST SP 800-171 Rev 2 - 3.1.18, 3.1.19",
-      "ISO 27001:2022 A.8.10",
-      "HIPAA - 164.312(d)",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "HIPAA",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1553,9 +1553,9 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft 365 Foundations Benchmark v3.1",
-      "NIST SP 800-53 Rev 5 - AC-19, CM-8",
-      "ISO 27001:2022 A.8.1",
-      "Microsoft Cloud Security Benchmark - AM-1, AM-2",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "Microsoft Cloud Security Benchmark",
       "NIS2"
     ],
     "cisChecks": [
@@ -1576,11 +1576,11 @@
     "description": "Windows security baseline aligned with CIS benchmarks: SMB signing required, NTLM restricted, LM hash storage disabled, audit logon events, credential caching limited to 1, screen lock after 15 minutes inactivity.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0 - Level 1",
-      "NIST SP 800-53 Rev 5 - AC-3, AU-2, AU-3, IA-2, SC-8",
-      "NIST SP 800-171 Rev 2 - 3.1.1, 3.3.1, 3.5.1",
-      "ISO 27001:2022 A.8.3, A.8.15",
-      "MITRE ATT&CK - T1557 (Man-in-the-Middle), T1003 (OS Credential Dumping)",
+      "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1607,9 +1607,9 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Edge Benchmark v2.0",
-      "NIST SP 800-53 Rev 5 - SC-18, SI-3, SI-8",
-      "ISO 27001:2022 A.8.23",
-      "Microsoft Cloud Security Benchmark - NS-8",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "Microsoft Cloud Security Benchmark",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1635,11 +1635,11 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
-      "NIST SP 800-53 Rev 5 - IA-2, IA-5, IA-12",
-      "NIST SP 800-63B - AAL2",
-      "NIST SP 800-171 Rev 2 - 3.5.3",
-      "ISO 27001:2022 A.8.5",
-      "MITRE ATT&CK - T1110 (Brute Force), T1078 (Valid Accounts)",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-63B",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1663,10 +1663,10 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
-      "NIST SP 800-53 Rev 5 - SC-7, AU-3",
-      "NIST SP 800-171 Rev 2 - 3.13.1, 3.13.6",
-      "ISO 27001:2022 A.8.20, A.8.21",
-      "Microsoft Cloud Security Benchmark - NS-1, NS-4",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "Microsoft Cloud Security Benchmark",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1693,10 +1693,10 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Intune for Windows 11 Benchmark v3.0.1",
-      "NIST SP 800-53 Rev 5 - SI-3, SI-4, SI-7",
-      "NIST SP 800-171 Rev 2 - 3.14.2, 3.14.6",
-      "ISO 27001:2022 A.8.7, A.8.8",
-      "MITRE ATT&CK - T1059 (Command and Scripting Interpreter), T1566 (Phishing), T1003 (OS Credential Dumping), T1091 (Replication Through Removable Media)",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1719,10 +1719,10 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
-      "NIST SP 800-53 Rev 5 - AC-25, SC-39",
-      "NIST SP 800-171 Rev 2 - 3.13.4",
-      "ISO 27001:2022 A.8.6",
-      "MITRE ATT&CK - T1003.001 (LSASS Memory), T1550 (Use Alternate Authentication Material)",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1745,11 +1745,11 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
-      "NIST SP 800-53 Rev 5 - MP-7, SC-41",
-      "NIST SP 800-171 Rev 2 - 3.8.7",
-      "ISO 27001:2022 A.7.10, A.8.12",
-      "PCI DSS v4.0 - Req 12.3.10",
-      "MITRE ATT&CK - T1052 (Exfiltration Over Physical Medium), T1091 (Replication Through Removable Media)",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "PCI DSS v4.0",
+      "MITRE ATT&CK",
       "NIS2"
     ],
     "cisChecks": [
@@ -1769,12 +1769,12 @@
     "description": "Restricts Windows diagnostic data collection to the Required (Security) level. Disables optional telemetry. Supports GDPR and data minimisation compliance.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "GDPR (EU) 2016/679 - Article 5(1)(c) Data Minimisation",
-      "NIST SP 800-53 Rev 5 - SI-12",
-      "ISO 27001:2022 A.5.33, A.8.11",
-      "ISO 27701:2019 - 7.4.1",
+      "GDPR (EU) 2016/679",
+      "NIST SP 800-53 Rev.5",
+      "ISO 27001:2022",
+      "ISO 27701:2019",
       "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
-      "BSI IT-Grundschutz - APP.1.1.A18",
+      "BSI IT-Grundschutz",
       "NIS2"
     ],
     "cisChecks": [
@@ -1796,10 +1796,10 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
-      "NIST SP 800-53 Rev 5 - SI-16, SC-39",
-      "NIST SP 800-171 Rev 2 - 3.14.2",
-      "ISO 27001:2022 A.8.6",
-      "MITRE ATT&CK - T1203 (Exploitation for Client Execution), T1068 (Exploitation for Privilege Escalation)",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -1823,10 +1823,10 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "CIS Microsoft Windows 11 Enterprise Benchmark v3.0.0",
-      "NIST SP 800-53 Rev 5 - SI-3, SI-4, SC-7",
-      "NIST SP 800-171 Rev 2 - 3.14.2",
-      "ISO 27001:2022 A.8.7",
-      "MITRE ATT&CK - T1486 (Data Encrypted for Impact), T1490 (Inhibit System Recovery)",
+      "NIST SP 800-53 Rev.5",
+      "NIST SP 800-171 Rev.2",
+      "ISO 27001:2022",
+      "MITRE ATT&CK",
       "ASD Essential Eight",
       "NIS2"
     ],
@@ -2657,7 +2657,7 @@
     "description": "Restricts SharePoint Online and OneDrive for Business external sharing to existing authenticated guest users only. No anonymous links permitted, no new external invitations. Only users already in the directory as guest accounts can access shared content.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -2691,7 +2691,7 @@
     "description": "Changes the default sharing link type from 'Anyone with the link' to 'People in your organization'. Sets the default permission to View-only. Users can still choose other link types, but the default prevents accidental oversharing.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "UK NCSC CAF v3.2",
@@ -2721,7 +2721,7 @@
     "description": "Sets anonymous (Anyone) sharing links to automatically expire after 30 days. Prevents indefinite anonymous access to shared files and folders. If anonymous sharing is permitted, this ensures temporary shares do not persist forever.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "UK NCSC CAF v3.2",
@@ -2751,7 +2751,7 @@
     "description": "Configures SharePoint Online to allow limited (browser-only, view-only) access from unmanaged devices while blocking downloads, print, and sync. Prevents corporate data from being saved to personal or unmanaged devices. Full enforcement requires a complementary Conditional Access policy.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -2783,7 +2783,7 @@
     "description": "Prevents users from downloading files that have been flagged as infected by Microsoft Defender for Office 365 in SharePoint Online and OneDrive for Business. Users will see a warning that the file is infected and cannot download it.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -2796,7 +2796,7 @@
       "CMMC v2.0",
       "HITRUST CSF v11",
       "Microsoft Cloud Security Benchmark",
-      "MITRE ATT&CK T1080",
+      "MITRE ATT&CK",
       "ASD Essential Eight"
     ],
     "cisChecks": [
@@ -2815,7 +2815,7 @@
     "description": "Enables SharePoint and OneDrive integration with Entra ID (Azure AD) B2B. When enabled, all external sharing creates Entra ID guest accounts, making external users subject to Conditional Access policies, access reviews, and centralized identity governance.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -2848,7 +2848,7 @@
     "description": "Restricts SharePoint Online external sharing to authenticated external users with organizational accounts only (no anonymous links, no personal Microsoft accounts). Requires the invited email address to match the accepting account, preventing invitation forwarding.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -2877,7 +2877,7 @@
     "description": "Restricts OneDrive and SharePoint file sync to devices that are domain-joined to specific Active Directory domains or Intune-compliant. Prevents the OneDrive sync client from syncing corporate data to unmanaged personal devices.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -2905,7 +2905,7 @@
     "description": "Disables legacy authentication protocols for SharePoint Online by setting LegacyAuthProtocolsEnabled to false. This forces all SharePoint Online connections to use Modern Authentication (OAuth 2.0), which supports MFA, Conditional Access, and token-based authentication.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -2920,7 +2920,7 @@
       "NYDFS 23 NYCRR 500",
       "FFIEC-CAT",
       "Microsoft Cloud Security Benchmark",
-      "MITRE ATT&CK T1078"
+      "MITRE ATT&CK"
     ],
     "cisChecks": [
       "7.3.1"
@@ -2938,7 +2938,7 @@
     "description": "Configures IP-based access restrictions for SharePoint Online. Only allows access from specified corporate IP ranges (e.g., office egress IPs, VPN endpoints). All access from non-listed IP addresses is blocked.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -2969,7 +2969,7 @@
     "description": "Prevents anonymous (unauthenticated) users from joining Microsoft Teams meetings. All meeting participants must authenticate with a valid identity. This prevents unauthorized access to meetings containing sensitive discussions.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -3003,7 +3003,7 @@
     "description": "Configures Teams meetings so that only internal users (same organization, excluding guests) can bypass the lobby. All external participants including guests, federated users, and PSTN dial-in callers must wait in the lobby until admitted by the meeting organizer.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -3037,7 +3037,7 @@
     "description": "Configures the Global Teams meeting policy so only users within the same organization (excluding guests) can bypass the meeting lobby. All external users, guest accounts, and federated users must wait in the lobby. This is the most restrictive lobby setting that still allows internal users to join seamlessly.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -3068,7 +3068,7 @@
     "description": "Disables all third-party cloud storage provider integrations in Microsoft Teams. Blocks Dropbox, Box, Google Drive, ShareFile, and Egnyte. File sharing in Teams is restricted to SharePoint Online and OneDrive for Business only, ensuring all files remain within managed Microsoft 365 storage.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -3095,7 +3095,7 @@
     "description": "Blocks communication with external users on unmanaged (personal/free) Teams accounts. Prevents both outbound and inbound communication with Teams consumer accounts. Only managed organizational Teams accounts can communicate with your users.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -3122,7 +3122,7 @@
     "description": "Restricts or disables Teams federation (external access) to prevent communication with users in other Microsoft 365 tenants. Provides two options: fully disable federation, or use an allow-list to permit only specific approved partner domains.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "UK NCSC CAF v3.2",
@@ -3132,7 +3132,7 @@
       "CMMC v2.0",
       "HITRUST CSF v11",
       "Microsoft Cloud Security Benchmark",
-      "MITRE ATT&CK T1199"
+      "MITRE ATT&CK"
     ],
     "cisChecks": [
       "8.4.1"
@@ -3150,7 +3150,7 @@
     "description": "Restricts guest access in Microsoft Teams to prevent automatic guest user creation. When disabled, external users cannot be directly added as guests to Teams. Guest access must be explicitly managed through Entra ID B2B invitation workflows with appropriate approval processes.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -3177,7 +3177,7 @@
     "description": "Sets the default presenter role in Teams meetings to 'Organizer Only' with user override permitted. Only the meeting organizer and co-organizers can present (share screen, control slides) by default. Other participants must be promoted to presenter by the organizer. Meeting organizers can change this setting per-meeting if needed.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "UK NCSC CAF v3.2",
@@ -3209,7 +3209,7 @@
     "description": "Configures Teams meeting recording so that only internal meeting organizers and co-organizers can initiate recordings. Cloud recording is enabled for internal use but restricted to prevent external participants from recording meetings. Recording storage remains within the organization's OneDrive/SharePoint.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -3236,7 +3236,7 @@
     "description": "Disables the ability to send email to Teams channel email addresses. Channel email bypasses Exchange Online Protection (anti-spam, anti-malware, Safe Attachments, Safe Links, transport rules, DLP) because messages are delivered directly to the Teams channel without passing through the email security stack.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "DORA",
       "ISO 27001:2022",
@@ -3794,7 +3794,7 @@
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
       "ISO 27001:2022",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "SOC 2",
       "GDPR (EU) 2016/679",
@@ -3819,7 +3819,7 @@
     "description": "Enables automatic version history trimming with a maximum of 500 major versions and expiration of versions older than 30 days.",
     "frameworks": [
       "ISO 27001:2022",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "SOC 2",
       "NIS2",
       "GDPR (EU) 2016/679",
@@ -3844,7 +3844,7 @@
     "frameworks": [
       "NIS2",
       "ISO 27001:2022",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "GDPR (EU) 2016/679",
       "SOC 2",
       "PCI DSS v4.0",
@@ -3877,7 +3877,7 @@
     "frameworks": [
       "NIS2",
       "ISO 27001:2022",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "SOC 2",
       "PCI DSS v4.0",
       "CMMC v2.0",
@@ -3903,7 +3903,7 @@
     "displayName": "Configure Idle Session Sign-Out Timeout",
     "description": "Configures automatic sign-out for inactive SharePoint Online and OneDrive for Business browser sessions after 60 minutes of inactivity.",
     "frameworks": [
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "SOC 2",
@@ -3930,7 +3930,7 @@
     "frameworks": [
       "NIS2",
       "ISO 27001:2022",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "SOC 2",
       "PCI DSS v4.0",
       "CMMC v2.0",
@@ -3956,7 +3956,7 @@
       "HIPAA",
       "NIS2",
       "ISO 27001:2022",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "DORA",
       "SOC 2",
       "FedRAMP Moderate",
@@ -3984,7 +3984,7 @@
     "frameworks": [
       "NIS2",
       "ISO 27001:2022",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "SOC 2",
       "PCI DSS v4.0",
       "HIPAA",
@@ -4014,7 +4014,7 @@
     "frameworks": [
       "NIS2",
       "ISO 27001:2022",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "GDPR (EU) 2016/679",
       "SOC 2",
       "PCI DSS v4.0",
@@ -4043,7 +4043,7 @@
     "frameworks": [
       "NIS2",
       "ISO 27001:2022",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "GDPR (EU) 2016/679",
       "SOC 2",
       "PCI DSS v4.0",
@@ -4075,7 +4075,7 @@
     "description": "Configures recurring access reviews for all privileged directory roles to ensure least-privilege access. Reviewers must confirm each user's need for the role quarterly.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "SOC 2",
@@ -4102,7 +4102,7 @@
     "description": "Creates a Conditional Access policy requiring all users with admin roles to register for multi-factor authentication within 14 days.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "SOC 2",
@@ -4130,7 +4130,7 @@
     "description": "Prevents persistent browser sessions on unmanaged devices to reduce the risk of credential theft via shared or public computers.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "SOC 2",
@@ -4156,7 +4156,7 @@
     "description": "Restricts guest invitation permissions so that only admins and users with the Guest Inviter role can invite external guests. Prevents unrestricted guest sprawl.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "SOC 2",
@@ -4180,7 +4180,7 @@
     "description": "Ensures the Microsoft 365 Unified Audit Log is enabled for the organisation. Required for security investigations, compliance monitoring, and forensic analysis.",
     "frameworks": [
       "CIS Microsoft 365 Foundations Benchmark v6.0.0",
-      "NIST SP 800-53 Rev 5",
+      "NIST SP 800-53 Rev.5",
       "NIS2",
       "ISO 27001:2022",
       "SOC 2",

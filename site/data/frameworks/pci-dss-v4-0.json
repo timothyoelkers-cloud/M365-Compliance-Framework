@@ -1,5 +1,11 @@
 {
   "name": "PCI DSS v4.0",
+  "source": {
+    "title": "PCI DSS v4.0",
+    "url": "https://www.pcisecuritystandards.org/document_library/",
+    "versionDate": "2022-03-31",
+    "legalReference": "PCI SSC"
+  },
   "slug": "pci-dss-v4-0",
   "group": "US Sector",
   "hasStrategies": true,

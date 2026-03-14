@@ -1,5 +1,11 @@
 {
   "name": "DORA",
+  "source": {
+    "title": "Regulation (EU) 2022/2554 (DORA)",
+    "url": "https://eur-lex.europa.eu/eli/reg/2022/2554",
+    "versionDate": "2022-12-14",
+    "legalReference": "OJ L 333, 27.12.2022, p. 1–79"
+  },
   "slug": "dora",
   "group": "EU Regulatory",
   "hasStrategies": true,

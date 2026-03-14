@@ -1,5 +1,11 @@
 {
   "name": "UK NCSC CAF v3.2",
+  "source": {
+    "title": "UK NCSC Cyber Assessment Framework v3.2",
+    "url": "https://www.ncsc.gov.uk/collection/cyber-assessment-framework",
+    "versionDate": "2024-04-01",
+    "legalReference": "NCSC-UK"
+  },
   "slug": "uk-ncsc-caf-v3-2",
   "group": "UK & Ireland",
   "hasStrategies": true,

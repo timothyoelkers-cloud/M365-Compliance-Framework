@@ -16,18 +16,19 @@ const PolicyMatcher = (() => {
     },
     contains(actual, expected) {
       if (Array.isArray(actual)) return actual.includes(expected);
-      if (typeof actual === 'string') return actual.indexOf(expected) !== -1;
+      if (typeof actual === 'string') return actual.toLowerCase().indexOf(String(expected).toLowerCase()) !== -1;
       return false;
     },
     containsAny(actual, expected) {
       if (!Array.isArray(expected)) return false;
       if (Array.isArray(actual)) return expected.some(v => actual.includes(v));
-      if (typeof actual === 'string') return expected.some(v => actual.indexOf(v) !== -1);
+      if (typeof actual === 'string') { var lc = actual.toLowerCase(); return expected.some(v => lc.indexOf(String(v).toLowerCase()) !== -1); }
       return false;
     },
     containsAll(actual, expected) {
       if (!Array.isArray(expected)) return false;
       if (Array.isArray(actual)) return expected.every(v => actual.includes(v));
+      if (typeof actual === 'string') { var lc = actual.toLowerCase(); return expected.every(v => lc.indexOf(String(v).toLowerCase()) !== -1); }
       return false;
     },
     isEmpty(actual) {
@@ -58,6 +59,8 @@ const PolicyMatcher = (() => {
    */
   function getNestedValue(obj, path) {
     if (obj === null || obj === undefined) return undefined;
+    // Try direct property first (handles keys containing dots like @odata.type)
+    if (typeof obj === 'object' && path in obj) return obj[path];
     const parts = path.split('.');
     let current = obj;
     for (const part of parts) {

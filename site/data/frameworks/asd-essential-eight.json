@@ -1,5 +1,11 @@
 {
   "name": "ASD Essential Eight",
+  "source": {
+    "title": "ASD Essential Eight Maturity Model",
+    "url": "https://www.cyber.gov.au/resources-business-and-government/essential-cyber-security/essential-eight/essential-eight-maturity-model",
+    "versionDate": "2023-11-01",
+    "legalReference": "Australian Signals Directorate"
+  },
   "slug": "asd-essential-eight",
   "group": "APAC & Other",
   "hasStrategies": true,

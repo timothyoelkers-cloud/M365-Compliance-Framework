@@ -1,5 +1,11 @@
 {
   "name": "ISO 27001:2022",
+  "source": {
+    "title": "ISO/IEC 27001:2022 Information Security Management",
+    "url": "https://www.iso.org/standard/27001",
+    "versionDate": "2022-10-25",
+    "legalReference": "ISO/IEC 27001:2022"
+  },
   "slug": "iso-27001-2022",
   "group": "ISO Standards",
   "hasStrategies": true,

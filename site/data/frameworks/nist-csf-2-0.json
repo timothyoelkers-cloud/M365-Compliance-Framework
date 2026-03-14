@@ -1,5 +1,11 @@
 {
   "name": "NIST CSF 2.0",
+  "source": {
+    "title": "NIST Cybersecurity Framework 2.0",
+    "url": "https://www.nist.gov/cyberframework",
+    "versionDate": "2024-02-26",
+    "legalReference": "NIST CSWP 29"
+  },
   "slug": "nist-csf-2-0",
   "group": "NIST / US Federal",
   "hasStrategies": true,

@@ -1051,7 +1051,7 @@ const TestRunner = (() => {
       });
 
       it('check categories are valid', function () {
-        var validCats = ['Entra', 'Defender', 'Exchange', 'SharePoint', 'Teams', 'Purview'];
+        var validCats = ['Entra', 'Defender', 'Defender For Office 365', 'Exchange', 'SharePoint', 'Sharepoint', 'Teams', 'Purview', 'M365'];
         for (var i = 0; i < checks.length; i++) {
           assert(validCats.indexOf(checks[i].cat) !== -1,
             'check ' + checks[i].id + ' cat is ' + checks[i].cat);

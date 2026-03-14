@@ -1,5 +1,11 @@
 {
   "name": "SOC 2",
+  "source": {
+    "title": "SOC 2 — Trust Services Criteria",
+    "url": "https://www.aicpa-cima.com/topic/system-and-organization-controls-soc",
+    "versionDate": "2022-10-01",
+    "legalReference": "AICPA TSP Section 100"
+  },
   "slug": "soc-2",
   "group": "US Sector",
   "hasStrategies": true,

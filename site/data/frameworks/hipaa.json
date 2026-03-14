@@ -1,5 +1,11 @@
 {
   "name": "HIPAA",
+  "source": {
+    "title": "HIPAA Security Rule",
+    "url": "https://www.hhs.gov/hipaa/for-professionals/security/index.html",
+    "versionDate": "2013-01-25",
+    "legalReference": "45 CFR Parts 160, 162, 164"
+  },
   "slug": "hipaa",
   "group": "US Sector",
   "hasStrategies": true,
