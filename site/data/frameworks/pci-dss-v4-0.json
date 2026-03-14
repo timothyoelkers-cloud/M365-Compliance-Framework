@@ -2,6 +2,154 @@
   "name": "PCI DSS v4.0",
   "slug": "pci-dss-v4-0",
   "group": "US Sector",
+  "hasStrategies": true,
+  "levelLabels": { "ML1": "Defined", "ML2": "Implemented", "ML3": "Managed" },
+  "strategies": [
+    {
+      "id": "secure-network",
+      "name": "Build and Maintain a Secure Network and Systems",
+      "order": 1,
+      "description": "Install and maintain network security controls and apply secure configurations to all system components to protect cardholder data environments from malicious individuals and software.",
+      "article": "Req 1-2",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Network security controls are installed between trusted and untrusted networks. Default vendor credentials are changed and unnecessary services are removed. Secure baseline configurations are defined for all system components.",
+          "policies": ["INT01", "INT02", "INT03", "INT04", "INT10", "INT14"],
+          "checks": ["5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.4", "5.1.3.1", "5.1.3.2"]
+        },
+        "ML2": {
+          "summary": "Network segmentation controls are verified. Inbound and outbound traffic rules are restricted to only necessary connections. Wireless networks are secured or eliminated. Firewall and router configurations are reviewed at least every six months.",
+          "policies": ["INT07", "INT08", "INT09", "INT11", "INT12", "INT15", "INT16", "INT17", "INT19", "INT20"],
+          "checks": ["5.1.4.5", "5.1.4.6", "5.1.5.1", "5.1.5.2", "5.1.6.1", "5.1.6.2", "5.1.6.3"]
+        },
+        "ML3": {
+          "summary": "Network architecture diagrams are maintained and kept current. All changes to network connections and firewall/router configurations are approved and tested. Intrusion-detection or intrusion-prevention techniques are used on the network perimeter.",
+          "policies": ["INT05", "INT13"],
+          "checks": ["4.1", "4.2"]
+        }
+      }
+    },
+    {
+      "id": "protect-account-data",
+      "name": "Protect Account Data",
+      "order": 2,
+      "description": "Protect stored account data and encrypt transmission of cardholder data across open, public networks using strong cryptography to render data unreadable during storage and transit.",
+      "article": "Req 3-4",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Data retention and disposal policies are defined. Sensitive authentication data is not stored after authorisation. Primary account numbers are rendered unreadable anywhere they are stored. Encryption keys are managed securely.",
+          "policies": ["EXO01", "EXO02", "PV01", "PV10"],
+          "checks": ["2.1.1", "2.1.2", "2.1.3", "2.1.4", "2.1.5"]
+        },
+        "ML2": {
+          "summary": "Strong cryptography is used to protect cardholder data during transmission over open networks. Encryption protocols and key strengths are validated. Data discovery scans confirm no unencrypted PAN exists in unintended locations.",
+          "policies": ["EXO03", "EXO05", "PV03", "PV04", "PV07", "PV13", "PV14", "PV15", "PV16", "PV17", "SPO09"],
+          "checks": ["2.1.6", "2.1.7", "2.1.8", "2.1.9", "2.1.10", "2.1.11", "2.1.12", "2.1.13", "2.1.14", "2.1.15"]
+        },
+        "ML3": {
+          "summary": "Cryptographic key management processes are fully documented and consistently applied. Key-encrypting keys are at least as strong as data-encrypting keys. Key custodian responsibilities are formally acknowledged. Certificates are managed and renewed before expiry.",
+          "policies": ["PV18", "PV19", "PV20", "PV21", "SPO12", "SPO13", "SPO14", "SPO15"],
+          "checks": ["3.1.1", "3.2.1", "3.2.2", "3.3.1"]
+        }
+      }
+    },
+    {
+      "id": "vulnerability-management",
+      "name": "Maintain a Vulnerability Management Program",
+      "order": 3,
+      "description": "Protect all systems and networks from malicious software and regularly maintain and update anti-virus or anti-malware programs. Develop and maintain secure systems and software throughout the development lifecycle.",
+      "article": "Req 5-6",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Anti-malware solutions are deployed on all systems commonly affected by malicious software. Anti-malware mechanisms are current, actively running, and generating audit logs. Secure development processes are established.",
+          "policies": ["MDE01", "MDE02", "MDE03", "DEF01"],
+          "checks": ["7.2.1", "7.2.3", "7.2.4", "7.2.5", "2.2.1"]
+        },
+        "ML2": {
+          "summary": "Anti-malware is evaluated periodically for systems not commonly affected by malware. Security vulnerabilities are identified and ranked. System components are protected from known vulnerabilities via timely patching. Web application firewalls are deployed for public-facing web applications.",
+          "policies": ["MDE04", "MDE05", "MDE06", "MDE07", "MDE08", "MDE09", "DEF02", "DEF03", "DEF04", "DEF05", "DEF07", "DEF08"],
+          "checks": ["7.2.6", "7.2.7", "7.2.8", "7.3.1", "2.4.1", "2.4.2", "2.4.3", "2.4.4"]
+        },
+        "ML3": {
+          "summary": "Automated mechanisms continuously monitor and alert on malware activity. Application security testing is integrated into deployment pipelines. Custom and bespoke software is reviewed prior to release to identify coding vulnerabilities.",
+          "policies": ["EXO04", "EXO06", "EXO08"],
+          "checks": ["8.4.1", "8.5.3", "8.5.8", "8.5.9"]
+        }
+      }
+    },
+    {
+      "id": "access-control",
+      "name": "Implement Strong Access Control Measures",
+      "order": 4,
+      "description": "Restrict access to system components and cardholder data to only those individuals whose job requires such access. Identify users and authenticate access to system components. Restrict physical access to cardholder data.",
+      "article": "Req 7-9",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Access to system components and cardholder data is limited to individuals whose job requires access. A role-based access control model is defined. Users are uniquely identified before access is allowed. Multi-factor authentication is implemented for remote network access.",
+          "policies": ["CA01", "CA02"],
+          "checks": ["1.1.2", "1.1.3", "1.2.1", "1.3.1", "1.3.2"]
+        },
+        "ML2": {
+          "summary": "Access rights are assigned based on least privilege and job classification. MFA is implemented for all non-console administrative access. Shared and group accounts are managed and controlled. Authentication policies and procedures are documented and communicated.",
+          "policies": ["CA03", "CA04", "CA05", "CA06", "CA07", "CA08", "CA10", "CA13", "CA14", "CA16", "CA17", "CA18"],
+          "checks": ["1.3.3", "1.3.4", "1.3.5", "1.3.7", "1.3.8", "1.3.9", "5.1.2.2", "5.1.2.5", "5.1.2.6", "5.2.2.1", "5.2.2.3", "5.2.2.4", "5.2.2.5", "5.2.2.6", "5.2.2.7", "5.2.2.8", "5.2.2.12"]
+        },
+        "ML3": {
+          "summary": "All access to cardholder data is logged and monitored. Physical access controls protect facilities housing systems that store, process, or transmit cardholder data. Visitor access is managed and an audit trail is maintained. Media containing cardholder data is physically secured and destroyed when no longer needed.",
+          "policies": ["CA09", "SPO04"],
+          "checks": ["5.2.3.1", "5.2.3.2", "5.2.3.3", "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5", "6.3.1"]
+        }
+      }
+    },
+    {
+      "id": "monitor-test",
+      "name": "Regularly Monitor and Test Networks",
+      "order": 5,
+      "description": "Track and monitor all access to network resources and cardholder data using logging mechanisms. Regularly test security systems and processes including vulnerability scans and penetration testing.",
+      "article": "Req 10-11",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Audit trails are established to link access to system components to individual users. Logging mechanisms are implemented and active. Audit trail records capture sufficient detail for all system components. Audit trails are secured so they cannot be altered.",
+          "policies": ["PV11", "PV12"],
+          "checks": ["9.1.1", "9.1.2"]
+        },
+        "ML2": {
+          "summary": "Audit trails are reviewed at least daily. Time-synchronisation technology is implemented. Internal and external network vulnerability scans are performed at least quarterly. Network intrusion-detection and change-detection mechanisms are deployed.",
+          "policies": ["PV05", "PV09", "PV22", "PV29", "PV30"],
+          "checks": ["9.1.3", "9.1.4", "9.1.5", "9.1.6", "9.1.7", "9.1.8", "9.1.9"]
+        },
+        "ML3": {
+          "summary": "Internal and external penetration testing is performed at least annually and after significant changes. File integrity monitoring or change-detection is implemented on critical files. Service providers report failures of critical security controls. Unauthorised wireless access points are detected and addressed.",
+          "policies": ["PV23", "PV24", "PV25", "PV26", "PV27", "PV28", "SPO16", "SPO17", "SPO18", "SPO19", "SPO20"],
+          "checks": ["9.1.10", "9.1.11", "9.1.12", "8.1.1", "8.1.2"]
+        }
+      }
+    },
+    {
+      "id": "security-policy",
+      "name": "Maintain an Information Security Policy",
+      "order": 6,
+      "description": "Establish, publish, maintain, and disseminate a security policy that addresses all PCI DSS requirements. Implement a risk-assessment process and maintain an information security program to manage the security of cardholder data.",
+      "article": "Req 12",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "An information security policy is established, published, and disseminated to all relevant personnel. The security policy is reviewed at least annually and updated when the environment changes. Usage policies for critical technologies are defined and implemented.",
+          "policies": ["SPO01"],
+          "checks": ["6.1.1", "6.1.2", "6.1.3"]
+        },
+        "ML2": {
+          "summary": "A formal risk assessment is performed at least annually. Security awareness training is delivered to all personnel upon hire and at least annually. Service providers acknowledge their responsibility for securing cardholder data. An incident response plan is established and tested annually.",
+          "policies": ["SPO02", "SPO03", "SPO05", "SPO06", "TEA01", "TEA02", "TEA03", "TEA08"],
+          "checks": ["6.2.2", "6.5.1", "6.5.3"]
+        },
+        "ML3": {
+          "summary": "A targeted risk analysis is performed for each PCI DSS requirement with flexibility. Cryptographic cipher suites and protocols are documented and reviewed. PCI DSS scope is documented and confirmed at least annually. Responsibility for protecting cardholder data is formally assigned.",
+          "policies": ["SPO04"],
+          "checks": ["8.2.1", "8.2.2", "8.2.3", "8.2.4"]
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.2",
     "1.1.3",
@@ -15,12 +163,6 @@
     "1.3.8",
     "1.3.9",
     "2.1.1",
-    "2.1.10",
-    "2.1.11",
-    "2.1.12",
-    "2.1.13",
-    "2.1.14",
-    "2.1.15",
     "2.1.2",
     "2.1.3",
     "2.1.4",
@@ -29,6 +171,12 @@
     "2.1.7",
     "2.1.8",
     "2.1.9",
+    "2.1.10",
+    "2.1.11",
+    "2.1.12",
+    "2.1.13",
+    "2.1.14",
+    "2.1.15",
     "2.2.1",
     "2.4.1",
     "2.4.2",
@@ -57,13 +205,13 @@
     "5.1.6.2",
     "5.1.6.3",
     "5.2.2.1",
-    "5.2.2.12",
     "5.2.2.3",
     "5.2.2.4",
     "5.2.2.5",
     "5.2.2.6",
     "5.2.2.7",
     "5.2.2.8",
+    "5.2.2.12",
     "5.2.3.1",
     "5.2.3.2",
     "5.2.3.3",
@@ -88,14 +236,16 @@
     "7.2.8",
     "7.3.1",
     "8.1.1",
+    "8.1.2",
+    "8.2.1",
+    "8.2.2",
+    "8.2.3",
+    "8.2.4",
     "8.4.1",
     "8.5.3",
     "8.5.8",
     "8.5.9",
     "9.1.1",
-    "9.1.10",
-    "9.1.11",
-    "9.1.12",
     "9.1.2",
     "9.1.3",
     "9.1.4",
@@ -103,7 +253,10 @@
     "9.1.6",
     "9.1.7",
     "9.1.8",
-    "9.1.9"
+    "9.1.9",
+    "9.1.10",
+    "9.1.11",
+    "9.1.12"
   ],
   "checkCount": 101,
   "policies": [

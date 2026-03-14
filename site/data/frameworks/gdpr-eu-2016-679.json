@@ -2,6 +2,154 @@
   "name": "GDPR (EU) 2016/679",
   "slug": "gdpr-eu-2016-679",
   "group": "EU Regulatory",
+  "hasStrategies": true,
+  "levelLabels": { "ML1": "Essential", "ML2": "Enhanced", "ML3": "Comprehensive" },
+  "strategies": [
+    {
+      "id": "lawful-processing",
+      "name": "Lawful Processing & Data Principles",
+      "article": "Art. 5-6",
+      "order": 1,
+      "description": "Foundational data processing principles including lawfulness, fairness, transparency, purpose limitation, data minimisation, accuracy, storage limitation, and integrity. Controls that ensure data is processed only with a lawful basis and in accordance with GDPR core principles.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish governance foundations: enable audit logging and SharePoint audit events, deploy sensitivity labels for data classification, restrict third-party app consent, enable admin consent workflows, and block user app registrations.",
+          "policies": ["ENT01", "ENT02", "ENT03", "PV10", "PV11", "SPO20", "SPO11"],
+          "checks": ["4.1", "5.1.2.1", "5.1.5.1", "9.1.1", "9.1.7"]
+        },
+        "ML2": {
+          "summary": "Deploy auto-labelling for consistent classification, default labels for SharePoint libraries, DLP integration for SharePoint content protection, container-level sensitivity labels, classification-based retention labels, and limit Windows diagnostic data for data minimisation.",
+          "policies": ["PV13", "PV14", "PV15", "SPO17", "SPO12", "PV24", "INT18"],
+          "checks": ["9.1.6", "9.1.8"]
+        },
+        "ML3": {
+          "summary": "Enable insider risk management, adaptive protection with dynamic DLP, and communication compliance for offensive language detection to ensure comprehensive data governance.",
+          "policies": ["PV12", "PV29", "PV27"],
+          "checks": ["9.1.2", "9.1.3"]
+        }
+      }
+    },
+    {
+      "id": "data-subject-rights",
+      "name": "Data Subject Rights",
+      "article": "Art. 12-23",
+      "order": 2,
+      "description": "Controls supporting the exercise of data subject rights including right of access, rectification, erasure, restriction of processing, data portability, and objection. Covers eDiscovery, retention, records management, and data lifecycle controls needed to fulfil DSAR obligations.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy baseline retention policies across all workloads, enable eDiscovery for subject access requests, and configure DLP policies for PII and special category data to track personal data flows.",
+          "policies": ["PV22", "PV30", "PV02", "PV08", "PV01"],
+          "checks": ["9.1.1", "9.1.2", "9.1.3"]
+        },
+        "ML2": {
+          "summary": "Implement records management with regulatory records declaration and disposition review, DLP policies for financial data, Australian PII, US SSN, and Teams-specific DLP to ensure comprehensive personal data tracking.",
+          "policies": ["PV25", "PV26", "PV04", "PV16", "PV17", "PV09"],
+          "checks": ["9.1.6", "9.1.7"]
+        },
+        "ML3": {
+          "summary": "Enable endpoint DLP to control data on devices, Power BI DLP for analytics workloads, DLP for insider risk bulk download detection, and HIPAA PHI protection for health data processing.",
+          "policies": ["PV18", "PV19", "PV05", "PV03"],
+          "checks": ["9.1.8"]
+        }
+      }
+    },
+    {
+      "id": "security-of-processing",
+      "name": "Security of Processing",
+      "article": "Art. 32",
+      "order": 3,
+      "description": "Technical and organisational measures to ensure a level of security appropriate to the risk, including encryption, access controls, identity protection, endpoint security, device compliance, and network protection as required by Article 32.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enforce MFA for all users, block legacy authentication, configure custom banned passwords, enable self-service password reset, restrict device registration, configure Authenticator number matching, deploy Defender Antivirus, BitLocker encryption, Windows Update policies, device enrollment restrictions, and enable modern authentication for SharePoint.",
+          "policies": ["CA01", "CA02", "CA08", "ENT04", "ENT05", "ENT07", "ENT10", "INT05", "INT07", "INT08", "INT10", "SPO09"],
+          "checks": ["1.1.1", "1.1.2", "1.1.3", "1.2.1", "5.1.3.1", "5.1.3.2", "5.2.2.1", "5.2.2.7", "5.2.2.8", "5.2.3.1", "5.2.3.4", "5.2.3.5", "5.2.4.1", "5.3.1", "5.3.2", "5.3.3", "7.3.1"]
+        },
+        "ML2": {
+          "summary": "Deploy phishing-resistant MFA for admins, risk-based sign-in policies, geo-blocking, device compliance baselines across all platforms, Windows security baseline, Edge security baseline, Windows Hello for Business, and app protection policies for mobile.",
+          "policies": ["CA03", "CA04", "CA05", "CA06", "CA07", "CA17", "INT01", "INT02", "INT03", "INT04", "INT09", "INT11", "INT12", "INT13"],
+          "checks": ["1.2.2", "1.3.1", "1.3.5", "1.3.7", "1.3.9", "5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.6", "5.2.2.5", "5.2.2.9"]
+        },
+        "ML3": {
+          "summary": "Enforce sign-in frequency controls for all users and admins, block unsupported platforms, deploy LAPS, firewall policies, ASR rules in block mode, removable storage controls, and require managed devices for MFA registration and device enrollment.",
+          "policies": ["CA09", "CA10", "CA13", "CA14", "CA15", "CA16", "CA18", "INT06", "INT14", "INT15", "INT17"],
+          "checks": ["1.3.6", "5.1.4.4", "5.1.4.5", "5.2.2.6", "5.2.2.10", "5.2.2.11", "5.2.2.12", "5.2.3.2", "5.2.3.3", "5.2.3.6", "5.2.3.7"]
+        }
+      }
+    },
+    {
+      "id": "dpia",
+      "name": "Data Protection Impact Assessment",
+      "article": "Art. 35-36",
+      "order": 4,
+      "description": "Controls supporting Data Protection Impact Assessments including threat protection, email security, data classification scanning, and monitoring controls that identify and protect high-risk processing activities and sensitive data stores.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy DLP policies for blocking source code and credential sharing externally, block infected file downloads, and configure DKIM and DMARC for email authentication to protect personal data channels.",
+          "policies": ["PV06", "PV07", "SPO05", "EXO01", "EXO02"],
+          "checks": ["2.1.8", "2.1.9", "2.1.10", "6.2.2", "7.2.8"]
+        },
+        "ML2": {
+          "summary": "Deploy the full Defender for Office 365 suite (anti-phishing, Safe Links, Safe Attachments, anti-malware, anti-spam inbound and outbound, common attachment filter, SharePoint/OneDrive/Teams file scanning), clear connection filter safe list, and enable user reporting.",
+          "policies": ["DEF01", "DEF02", "DEF03", "DEF04", "DEF05", "DEF06", "DEF07", "DEF08", "EXO08", "EXO09"],
+          "checks": ["2.1.1", "2.1.2", "2.1.3", "2.1.4", "2.1.5", "2.1.6", "2.1.7", "2.1.11", "2.1.12", "2.1.13", "2.1.14", "2.1.15", "2.2.1", "2.4.1", "2.4.2", "2.4.3", "2.4.4", "6.2.3", "6.5.4", "6.5.5"]
+        },
+        "ML3": {
+          "summary": "Enable web content filtering, disable LinkedIn account connections to reduce data leakage risk, hide KMSI prompt to prevent persistent sessions, and disable public folder email addresses to close unmonitored data channels.",
+          "policies": ["MDE08", "ENT08", "ENT09", "EXO10"],
+          "checks": ["5.1.2.4", "5.1.2.5", "6.3.1", "6.5.2"]
+        }
+      }
+    },
+    {
+      "id": "breach-notification",
+      "name": "Breach Notification",
+      "article": "Art. 33-34",
+      "order": 5,
+      "description": "Incident detection, response, and notification controls to meet the GDPR 72-hour breach notification obligation to supervisory authorities (Art. 33) and communication to affected data subjects (Art. 34). Covers endpoint detection, threat protection, alert management, and automated response capabilities.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Onboard all device types to Defender for Endpoint, enable tamper protection, configure alert notifications, block external auto-forwarding, disable basic authentication, and enable modern authentication for Exchange Online.",
+          "policies": ["MDE01", "MDE02", "MDE03", "MDE09", "MDE10", "EXO03", "EXO04", "EXO05"],
+          "checks": ["1.1.4", "5.1.4.2", "5.1.4.3", "6.1.2", "6.1.3", "6.5.1", "6.5.3"]
+        },
+        "ML2": {
+          "summary": "Deploy network protection in block mode, audit and remove mail transport whitelist rules, block downloads on unmanaged devices, and require managed devices for OneDrive sync to prevent data exfiltration during a breach.",
+          "policies": ["MDE07", "EXO06", "SPO04", "SPO08"],
+          "checks": ["5.3.4", "5.3.5", "7.2.2", "7.2.10"]
+        },
+        "ML3": {
+          "summary": "Restrict SharePoint access by IP range, enable restricted access control for sensitive sites, and disable calendar external sharing to minimise the breach surface and enable rapid containment.",
+          "policies": ["SPO10", "SPO18", "EXO07"],
+          "checks": ["3.1.1", "3.2.1", "3.2.2", "3.3.1", "6.1.1", "6.2.1", "7.2.11"]
+        }
+      }
+    },
+    {
+      "id": "international-transfers",
+      "name": "International Transfers",
+      "article": "Art. 44-49",
+      "order": 6,
+      "description": "Controls governing the transfer of personal data to third countries or international organisations, including external sharing restrictions, guest access controls, federation policies, and data boundary enforcement to ensure adequate safeguards for cross-border data flows.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Restrict external sharing to existing guests, restrict guest invitations to admins, enable B2B integration for governed external identities, restrict Teams federation, and disable automatic guest access in Teams.",
+          "policies": ["SPO01", "SPO06", "ENT06", "TEA06", "TEA07"],
+          "checks": ["5.1.6.1", "5.1.6.2", "5.1.6.3", "7.2.1", "7.2.3", "7.2.5", "7.2.7", "7.3.2", "8.5.2"]
+        },
+        "ML2": {
+          "summary": "Block or require MFA for guest and external users, restrict sharing to allowed domains, set default sharing links to internal, enforce anonymous link expiry, block guest resharing, disable external file sharing via unapproved storage, and disable unmanaged Teams communication.",
+          "policies": ["CA11", "CA12", "SPO02", "SPO03", "SPO07", "SPO13", "SPO19", "TEA04", "TEA05"],
+          "checks": ["5.1.2.3", "5.1.8.1", "7.2.4", "7.2.6", "7.2.9", "8.2.3", "8.2.4"]
+        },
+        "ML3": {
+          "summary": "Secure Teams communications with meeting lobby controls, anonymous join restrictions, presenter restrictions, recording restrictions, and disable Teams channel email addresses to prevent uncontrolled international data transfer channels.",
+          "policies": ["TEA01", "TEA02", "TEA03", "TEA08", "TEA09", "TEA10"],
+          "checks": ["8.1.1", "8.1.2", "8.2.1", "8.2.2", "8.5.1", "8.5.3", "8.5.4", "8.5.5", "8.5.6", "8.5.7", "8.5.8", "8.6.1"]
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.2",

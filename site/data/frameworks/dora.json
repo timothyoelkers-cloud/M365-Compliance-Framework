@@ -2,6 +2,130 @@
   "name": "DORA",
   "slug": "dora",
   "group": "EU Regulatory",
+  "hasStrategies": true,
+  "levelLabels": { "ML1": "Basic", "ML2": "Intermediate", "ML3": "Advanced" },
+  "strategies": [
+    {
+      "id": "ict-risk-management",
+      "name": "ICT Risk Management",
+      "article": "Art. 5-16",
+      "order": 1,
+      "description": "ICT risk management framework encompassing governance arrangements, identification of ICT-supported business functions, protection and prevention measures, detection of anomalous activities, and response and recovery procedures.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish foundational ICT risk governance, restrict third-party app consent, enable audit logging, and enforce baseline identity protection controls.",
+          "policies": ["ENT01", "ENT05", "ENT06", "CA01", "CA02", "INT01", "INT02", "INT03", "INT04"],
+          "checks": ["1.2.2", "5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.4"]
+        },
+        "ML2": {
+          "summary": "Deploy comprehensive conditional access policies, advanced identity protection, network segmentation, endpoint compliance, and data classification controls aligned to ICT risk assessments.",
+          "policies": ["CA03", "CA04", "CA05", "CA06", "CA07", "CA08", "CA10", "CA13", "CA14", "CA16", "CA17", "CA18", "INT05", "INT06", "INT07", "INT08", "INT09", "INT10", "INT11", "INT13", "INT14", "INT15", "INT16", "INT17", "INT18", "INT19", "INT20", "ENT07", "ENT10"],
+          "checks": ["1.3.6", "1.3.9", "4.1", "5.1.2.3", "5.1.8.1", "5.2.2.6", "5.2.2.7", "5.2.2.8", "5.2.4.1"]
+        },
+        "ML3": {
+          "summary": "Enable advanced ICT risk controls including device compliance enforcement, real-time risk-based sign-in policies, DLP protections, and continuous monitoring for anomalous activities.",
+          "policies": ["CA09", "CA11", "PV05", "PV06", "PV07", "SPO04"],
+          "checks": ["6.5.1"]
+        }
+      }
+    },
+    {
+      "id": "ict-incident-management",
+      "name": "ICT-Related Incident Management",
+      "article": "Art. 17-23",
+      "order": 2,
+      "description": "Classification and reporting of ICT-related incidents, including detection capabilities, incident response procedures, notification to competent authorities, and harmonised reporting templates.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Onboard devices to Defender for Endpoint, enable core detection capabilities, configure tamper protection, and establish baseline alert notification workflows.",
+          "policies": ["MDE01", "MDE02", "MDE03", "DEF01"],
+          "checks": ["7.2.1", "7.2.8"]
+        },
+        "ML2": {
+          "summary": "Enable EDR in block mode, automated investigation and remediation, network protection, web content filtering, attack surface reduction rules, and advanced threat detection capabilities.",
+          "policies": ["MDE04", "MDE05", "MDE06", "MDE07", "MDE08", "MDE09", "MDE10", "DEF02", "DEF03", "DEF04", "DEF07"],
+          "checks": ["7.2.10", "7.2.11", "8.1.2", "8.2.1", "8.2.2", "8.2.3"]
+        },
+        "ML3": {
+          "summary": "Deploy deception technology, threat intelligence indicators, insider risk detection, and advanced incident classification aligned to DORA reporting thresholds.",
+          "policies": ["MDE11", "MDE12", "PV09", "PV12"],
+          "checks": ["8.2.4", "8.5.1", "8.5.2", "8.5.3", "8.6.1"]
+        }
+      }
+    },
+    {
+      "id": "resilience-testing",
+      "name": "Digital Operational Resilience Testing",
+      "article": "Art. 24-27",
+      "order": 3,
+      "description": "Testing of ICT tools, systems and processes through vulnerability assessments, network security assessments, scenario-based testing, and threat-led penetration testing (TLPT) for critical financial entities.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish baseline audit logging, vulnerability scanning, and retention policies to support resilience testing evidence collection and gap analysis.",
+          "policies": ["PV11", "INT01", "INT02", "INT03", "INT04"],
+          "checks": ["9.1.1", "9.1.2"]
+        },
+        "ML2": {
+          "summary": "Configure advanced testing controls including attack surface reduction, automated remediation, and scenario-based policy validation for operational resilience.",
+          "policies": ["MDE06", "PV22", "PV29", "PV30"],
+          "checks": ["9.1.6", "9.1.8"]
+        },
+        "ML3": {
+          "summary": "Enable eDiscovery, records management, and regulatory hold capabilities to support threat-led penetration testing (TLPT) documentation and evidence preservation.",
+          "policies": ["PV23", "PV24", "PV25", "PV26"],
+          "checks": ["5.2.4.1"]
+        }
+      }
+    },
+    {
+      "id": "third-party-risk",
+      "name": "ICT Third-Party Risk Management",
+      "article": "Art. 28-30",
+      "order": 4,
+      "description": "Managing risks arising from ICT third-party service providers, including key contractual provisions, oversight of critical third-party providers, and the Union Oversight Framework.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Restrict third-party application consent, enforce admin consent workflows, and establish foundational external collaboration controls.",
+          "policies": ["ENT01", "ENT06", "SPO01"],
+          "checks": ["3.2.1", "3.2.2"]
+        },
+        "ML2": {
+          "summary": "Configure SharePoint and Teams external sharing policies, guest access restrictions, and cross-tenant access controls for third-party risk oversight.",
+          "policies": ["SPO05", "SPO06", "SPO07", "SPO08", "SPO09", "TEA04", "TEA05", "TEA07"],
+          "checks": ["3.3.1", "6.2.3"]
+        },
+        "ML3": {
+          "summary": "Deploy advanced third-party governance including sensitivity-labelled sites, customer lockbox, information barriers, and comprehensive external sharing auditing.",
+          "policies": ["SPO10", "SPO12", "SPO13", "SPO14", "SPO15", "SPO17", "SPO18", "SPO19", "SPO20", "TEA09", "TEA10"],
+          "checks": ["6.5.1"]
+        }
+      }
+    },
+    {
+      "id": "information-sharing",
+      "name": "Information Sharing Arrangements",
+      "article": "Art. 45",
+      "order": 5,
+      "description": "Voluntary sharing of cyber threat intelligence and information amongst financial entities, including arrangements for exchanging indicators of compromise, tactics, techniques, and procedures.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy sensitivity labels and baseline data protection policies to enable secure classification and sharing of threat intelligence information.",
+          "policies": ["PV01", "PV02", "PV08", "EXO01", "EXO02"],
+          "checks": ["3.2.1", "3.2.2"]
+        },
+        "ML2": {
+          "summary": "Configure auto-labeling, DLP policies, secure mail transport rules, and Exchange Online protection controls for regulated information exchange.",
+          "policies": ["PV04", "PV10", "PV13", "PV14", "PV15", "EXO03", "EXO04", "EXO05", "EXO07", "EXO09", "EXO10"],
+          "checks": ["8.5.1", "8.5.2", "8.5.3"]
+        },
+        "ML3": {
+          "summary": "Enable insider risk management, endpoint DLP, information barriers, communication compliance, and advanced encryption for comprehensive information sharing governance.",
+          "policies": ["PV18", "PV19", "PV20", "PV21", "PV27", "PV28", "TEA01", "TEA02", "TEA03"],
+          "checks": ["8.6.1"]
+        }
+      }
+    }
+  ],
   "checks": [
     "1.2.2",
     "1.3.6",

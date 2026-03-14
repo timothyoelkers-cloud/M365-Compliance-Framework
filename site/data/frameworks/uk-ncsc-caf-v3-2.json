@@ -2,6 +2,106 @@
   "name": "UK NCSC CAF v3.2",
   "slug": "uk-ncsc-caf-v3-2",
   "group": "UK & Ireland",
+  "hasStrategies": true,
+  "levelLabels": { "ML1": "Initial", "ML2": "Achieved", "ML3": "Enhanced" },
+  "strategies": [
+    {
+      "id": "managing-security-risk",
+      "name": "Managing Security Risk",
+      "article": "Obj. A",
+      "order": 1,
+      "description": "Board-level governance, risk management, asset management, and supply chain security. Ensures organisations understand and manage security risks to essential functions.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish foundational governance: restrict third-party app consent, enable admin consent workflows, configure custom banned passwords, restrict guest invitations, and enable audit logging with SharePoint audit events.",
+          "policies": ["ENT01", "ENT02", "ENT03", "ENT04", "ENT06", "PV11", "SPO20"],
+          "checks": ["4.1", "4.2", "5.1.5.1", "5.1.5.2", "9.1.1"]
+        },
+        "ML2": {
+          "summary": "Deploy sensitivity labels across workloads, auto-labeling, container labels for Teams/Groups/Sites, default labels for libraries, site classification, versioning, and DLP integration for SharePoint.",
+          "policies": ["PV10", "PV13", "PV14", "PV15", "SPO11", "SPO12", "SPO17"],
+          "checks": ["9.1.6", "9.1.7"]
+        },
+        "ML3": {
+          "summary": "Enable insider risk management, adaptive protection with dynamic DLP, records management with disposition review, communication compliance for offensive language and regulatory violations.",
+          "policies": ["PV12", "PV26", "PV27", "PV28", "PV29"],
+          "checks": ["9.1.4", "9.1.8"]
+        }
+      }
+    },
+    {
+      "id": "protecting-against-cyber-attack",
+      "name": "Protecting Against Cyber Attack",
+      "article": "Obj. B",
+      "order": 2,
+      "description": "Access control, data security, system security, and resilient networks. Proportionate security measures to protect systems and data against cyber attack.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Require MFA for all users, block legacy authentication, enforce modern authentication, configure DKIM/DMARC, block external auto-forwarding, deploy anti-phishing, BitLocker encryption, configure Authenticator with number matching, enable SSPR, and restrict device enrollment.",
+          "policies": ["CA01", "CA02", "CA08", "DEF01", "ENT07", "ENT10", "EXO01", "EXO02", "EXO03", "EXO04", "EXO05", "INT05", "INT07", "INT10", "SPO01", "SPO06", "SPO09"],
+          "checks": ["1.1.1", "1.1.2", "1.1.3", "1.1.4", "1.2.1", "1.2.2", "5.1.2.2", "5.1.2.3", "5.1.2.4", "5.2.2.1", "5.2.2.12", "5.2.4.1", "6.1.3", "6.5.1", "6.5.3"]
+        },
+        "ML2": {
+          "summary": "Deploy full Defender for Office 365 suite, require phishing-resistant MFA for admins, enforce compliant devices, geo-blocking, device compliance baselines across platforms, app protection policies, manage external sharing, and DLP policies for regulated data.",
+          "policies": ["CA03", "CA04", "CA05", "CA06", "CA07", "CA09", "CA10", "CA11", "CA12", "CA15", "CA16", "CA17", "DEF02", "DEF03", "DEF04", "DEF05", "DEF06", "DEF07", "DEF08", "EXO06", "EXO08", "EXO09", "EXO10", "INT01", "INT02", "INT03", "INT04", "INT08", "INT09", "INT11", "INT12", "PV01", "PV02", "PV03", "PV04", "PV08", "SPO02", "SPO03", "SPO04", "SPO07", "SPO08", "SPO13", "SPO16", "SPO19", "TEA04", "TEA05", "TEA06", "TEA07"],
+          "checks": ["1.3.5", "1.3.6", "1.3.7", "1.3.9", "2.1.1", "2.1.3", "2.1.5", "2.1.6", "2.4.3", "2.4.4", "5.1.3.1", "5.1.3.2", "5.1.4.1", "5.1.4.2", "5.1.4.3", "5.2.2.5", "5.2.3.1", "6.2.1", "6.2.3", "6.5.2", "7.2.1", "7.2.2", "7.2.3", "7.2.4", "7.2.5", "7.2.6", "7.2.7", "7.2.8", "7.2.9", "7.3.1", "7.3.2"]
+        },
+        "ML3": {
+          "summary": "Enforce sign-in frequency, block unsupported platforms, deploy ASR rules, Credential Guard, controlled folder access, exploit protection, LAPS, firewall policies, removable storage controls, Windows Hello, restrict SharePoint by IP, DLP for source code and credentials, endpoint DLP, and advanced access controls.",
+          "policies": ["CA13", "CA14", "CA18", "ENT05", "ENT08", "ENT09", "EXO07", "INT06", "INT13", "INT14", "INT15", "INT16", "INT17", "INT18", "INT19", "INT20", "PV06", "PV07", "PV09", "PV18", "SPO10", "SPO14", "SPO15", "SPO18", "TEA10"],
+          "checks": ["3.2.1", "3.2.2", "3.3.1", "5.1.4.4", "5.1.4.6", "5.1.6.1", "5.1.6.2", "5.1.6.3", "7.2.10", "7.2.11"]
+        }
+      }
+    },
+    {
+      "id": "detecting-cyber-security-events",
+      "name": "Detecting Cyber Security Events",
+      "article": "Obj. C",
+      "order": 3,
+      "description": "Security monitoring and anomaly detection. Capabilities to ensure security defences remain effective and to detect cyber security events affecting essential functions.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Onboard all device types to Defender for Endpoint, enable tamper protection, configure alert notifications, and enable vulnerability management scanning.",
+          "policies": ["MDE01", "MDE02", "MDE03", "MDE06", "MDE09", "MDE10"],
+          "checks": ["5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5"]
+        },
+        "ML2": {
+          "summary": "Enable EDR in block mode, automated investigation and remediation, network protection in block mode, web content filtering, threat intelligence integration, and DLP insider risk detection for bulk downloads.",
+          "policies": ["MDE04", "MDE05", "MDE07", "MDE08", "MDE12", "PV05"],
+          "checks": ["9.1.2", "9.1.3"]
+        },
+        "ML3": {
+          "summary": "Deploy deception technology for proactive threat detection using decoy accounts, honeytokens, and lures to identify lateral movement and advanced persistent threats.",
+          "policies": ["MDE11"],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "minimising-impact-of-incidents",
+      "name": "Minimising Impact of Incidents",
+      "article": "Obj. D",
+      "order": 4,
+      "description": "Response and recovery planning, and lessons learned. Minimising the adverse impact of a cyber security incident on the delivery of essential functions, including data recovery and secure communications during incidents.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Secure communications during incidents with Teams meeting lobby controls, disable anonymous meeting join, restrict lobby bypass to internal users, and block infected file downloads to contain malware spread.",
+          "policies": ["SPO05", "TEA01", "TEA02", "TEA03"],
+          "checks": ["8.1.1", "8.1.2", "8.2.1", "8.2.2", "8.2.3", "8.2.4", "8.4.1"]
+        },
+        "ML2": {
+          "summary": "Deploy retention policies across all workloads for data recovery, classification-based retention labels for structured lifecycle management, restrict meeting presenters to organisers, and disable meeting recording for external participants.",
+          "policies": ["PV22", "PV24", "TEA08", "TEA09"],
+          "checks": ["8.5.1", "8.5.2", "8.5.3", "8.5.4", "8.5.5", "8.5.6", "8.5.7", "8.5.8", "8.5.9", "8.6.1"]
+        },
+        "ML3": {
+          "summary": "Enable eDiscovery Standard case templates for structured incident investigation and forensic evidence collection to support lessons-learned processes.",
+          "policies": ["PV30"],
+          "checks": []
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.2",

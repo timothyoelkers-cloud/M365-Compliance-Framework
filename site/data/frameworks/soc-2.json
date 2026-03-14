@@ -2,6 +2,130 @@
   "name": "SOC 2",
   "slug": "soc-2",
   "group": "US Sector",
+  "hasStrategies": true,
+  "levelLabels": { "ML1": "Foundational", "ML2": "Operational", "ML3": "Advanced" },
+  "strategies": [
+    {
+      "id": "security",
+      "name": "Security",
+      "order": 1,
+      "description": "Common Criteria covering logical and physical access controls, system operations, change management, and risk mitigation. Security is the foundation of every SOC 2 audit and is always included.",
+      "article": "CC",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish baseline identity and access controls, enable MFA, configure foundational endpoint protection, and deploy core threat-detection capabilities across the tenant.",
+          "policies": ["CA01", "CA02", "ENT01", "ENT02", "ENT03", "ENT04", "ENT06", "ENT07", "ENT10", "INT01", "INT02", "INT03", "INT04", "MDE01", "MDE02", "MDE03", "DEF01"],
+          "checks": ["1.1.1", "1.1.2", "1.1.3", "1.1.4", "1.2.1", "1.2.2", "1.3.1", "1.3.3", "5.1.2.1", "5.1.2.2", "5.1.2.3", "5.1.2.4", "5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.4", "5.2.2.1", "5.2.2.2", "5.2.2.3"]
+        },
+        "ML2": {
+          "summary": "Enforce risk-based Conditional Access, implement privileged access management, harden device compliance, extend detection and response coverage, and operationalise vulnerability management.",
+          "policies": ["CA03", "CA04", "CA05", "CA06", "CA07", "CA08", "CA09", "CA10", "CA13", "CA14", "CA15", "CA16", "CA17", "CA18", "ENT05", "ENT08", "ENT09", "INT05", "INT06", "INT07", "INT08", "INT09", "INT10", "INT11", "INT12", "INT13", "INT14", "INT15", "INT16", "INT17", "INT19", "INT20", "MDE04", "MDE05", "MDE06", "MDE07", "MDE08", "MDE09", "MDE10", "DEF02", "DEF03", "DEF04", "DEF05", "DEF06", "DEF07", "DEF08"],
+          "checks": ["1.3.4", "1.3.5", "1.3.6", "1.3.7", "1.3.8", "1.3.9", "4.1", "4.2", "5.1.2.6", "5.1.3.1", "5.1.3.2", "5.1.4.5", "5.1.4.6", "5.1.5.1", "5.1.5.2", "5.1.6.1", "5.1.6.2", "5.1.6.3", "5.2.2.5", "5.2.2.6", "5.2.2.7", "5.2.2.8", "5.2.2.9", "5.2.2.10", "5.2.2.11", "5.2.3.1", "5.2.3.2", "5.2.3.3", "5.2.3.4", "5.2.3.5", "5.2.3.6", "5.2.3.7", "5.2.4.1", "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5"]
+        },
+        "ML3": {
+          "summary": "Deploy advanced endpoint investigation, automated remediation, and continuous compliance monitoring to demonstrate mature security operations.",
+          "policies": ["MDE11", "MDE12", "CA11", "CA12"],
+          "checks": ["7.2.1", "7.2.2", "7.2.3", "7.2.4", "7.2.5", "7.2.6", "7.2.7", "7.2.8", "7.2.9", "7.2.10", "7.2.11", "7.3.1", "7.3.2"]
+        }
+      }
+    },
+    {
+      "id": "availability",
+      "name": "Availability",
+      "order": 2,
+      "description": "System availability for operation and use as committed or agreed. Controls ensure infrastructure resilience, backup, recovery, and continuity of service.",
+      "article": "A1",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Configure baseline retention policies, enable audit logging, and verify core service availability settings.",
+          "policies": ["SPO05", "PV11"],
+          "checks": ["9.1.1", "9.1.2"]
+        },
+        "ML2": {
+          "summary": "Extend retention and recovery capabilities, configure versioning, and implement site-level backup controls.",
+          "policies": ["SPO06", "PV22", "PV24", "PV25"],
+          "checks": ["9.1.3", "9.1.5", "9.1.6"]
+        },
+        "ML3": {
+          "summary": "Implement advanced continuity and disaster-recovery controls including cross-region redundancy and granular restoration testing.",
+          "policies": ["SPO01", "SPO02", "SPO03", "PV23", "PV26"],
+          "checks": ["9.1.4", "9.1.7", "9.1.8", "9.1.9"]
+        }
+      }
+    },
+    {
+      "id": "processing-integrity",
+      "name": "Processing Integrity",
+      "order": 3,
+      "description": "System processing is complete, valid, accurate, timely, and authorized. Controls ensure data is processed correctly and outputs are reliable.",
+      "article": "PI",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish baseline data-processing controls with audit logging and retention to verify processing completeness and accuracy.",
+          "policies": ["PV11", "PV12"],
+          "checks": ["9.1.1", "9.1.2"]
+        },
+        "ML2": {
+          "summary": "Implement validation and monitoring controls to detect processing errors, enforce data-quality rules, and ensure timely processing.",
+          "policies": ["PV05", "PV09", "PV29", "PV30"],
+          "checks": ["8.1.1", "8.1.2"]
+        },
+        "ML3": {
+          "summary": "Deploy advanced processing-integrity monitoring with automated anomaly detection and remediation workflows.",
+          "policies": ["PV27", "PV28"],
+          "checks": ["8.2.1", "8.2.2", "8.2.3", "8.2.4"]
+        }
+      }
+    },
+    {
+      "id": "confidentiality",
+      "name": "Confidentiality",
+      "order": 4,
+      "description": "Information designated as confidential is protected as committed or agreed. Controls govern classification, labelling, encryption, and restricted sharing of sensitive data.",
+      "article": "C1",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Apply foundational data-classification labels, configure transport encryption for email, and establish baseline information-protection policies.",
+          "policies": ["EXO01", "EXO02", "EXO04", "PV01", "PV02", "PV10"],
+          "checks": ["2.1.1", "2.1.5", "2.1.8", "2.1.9", "2.1.10", "3.2.1", "3.2.2"]
+        },
+        "ML2": {
+          "summary": "Enforce DLP policies across workloads, restrict external sharing, apply sensitivity labels to containers, and extend encryption controls.",
+          "policies": ["EXO03", "EXO05", "EXO06", "EXO07", "EXO08", "EXO09", "EXO10", "PV03", "PV04", "PV08", "PV13", "PV14", "PV15", "PV16", "PV17", "SPO04", "SPO07", "SPO08", "SPO09"],
+          "checks": ["2.4.3", "2.4.4", "3.1.1", "3.3.1", "6.1.3", "6.2.1", "6.2.3", "6.5.1", "6.5.2", "6.5.3", "6.5.4", "6.5.5"]
+        },
+        "ML3": {
+          "summary": "Deploy advanced information-protection controls including auto-labelling, exact data match DLP, customer-managed keys, and granular site-level access governance.",
+          "policies": ["PV06", "PV07", "PV18", "PV19", "PV20", "PV21", "SPO10", "SPO11", "SPO12", "SPO13", "SPO14", "SPO15", "SPO16", "SPO17", "SPO18", "SPO19", "SPO20"],
+          "checks": ["8.4.1", "8.5.1", "8.5.2", "8.5.3", "8.5.4", "8.5.5", "8.5.6", "8.5.7", "8.5.8", "8.5.9", "8.6.1"]
+        }
+      }
+    },
+    {
+      "id": "privacy",
+      "name": "Privacy",
+      "order": 5,
+      "description": "Personal information is collected, used, retained, disclosed, and disposed of in conformity with the entity's privacy commitments and system requirements.",
+      "article": "P",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish foundational privacy controls including consent management, data-subject access mechanisms, and baseline personal-data inventories.",
+          "policies": ["PV01", "PV02", "PV10", "ENT01"],
+          "checks": ["9.1.10", "9.1.11", "9.1.12"]
+        },
+        "ML2": {
+          "summary": "Implement privacy-by-design controls with data minimisation, purpose limitation, retention scheduling, and cross-border transfer safeguards.",
+          "policies": ["PV03", "PV04", "PV08", "PV13", "PV14", "PV15", "PV16", "PV17", "SPO06"],
+          "checks": ["2.2.1"]
+        },
+        "ML3": {
+          "summary": "Deploy advanced privacy governance including automated data-lifecycle management, privacy-impact assessments, and organisation-wide awareness training.",
+          "policies": ["PV06", "PV07", "PV18", "PV19", "PV20", "PV21", "TEA01", "TEA02", "TEA03", "TEA04", "TEA05", "TEA06", "TEA07", "TEA08", "TEA09", "TEA10"],
+          "checks": ["6.1.1", "6.1.2"]
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.2",
@@ -18,12 +142,14 @@
     "1.3.8",
     "1.3.9",
     "2.1.1",
-    "2.1.10",
     "2.1.5",
     "2.1.8",
     "2.1.9",
+    "2.1.10",
+    "2.2.1",
     "2.4.3",
     "2.4.4",
+    "3.1.1",
     "3.2.1",
     "3.2.2",
     "3.3.1",
@@ -48,8 +174,6 @@
     "5.1.6.2",
     "5.1.6.3",
     "5.2.2.1",
-    "5.2.2.10",
-    "5.2.2.11",
     "5.2.2.2",
     "5.2.2.3",
     "5.2.2.5",
@@ -57,6 +181,8 @@
     "5.2.2.7",
     "5.2.2.8",
     "5.2.2.9",
+    "5.2.2.10",
+    "5.2.2.11",
     "5.2.3.1",
     "5.2.3.2",
     "5.2.3.3",
@@ -70,6 +196,8 @@
     "5.3.3",
     "5.3.4",
     "5.3.5",
+    "6.1.1",
+    "6.1.2",
     "6.1.3",
     "6.2.1",
     "6.2.3",
@@ -79,8 +207,6 @@
     "6.5.4",
     "6.5.5",
     "7.2.1",
-    "7.2.10",
-    "7.2.11",
     "7.2.2",
     "7.2.3",
     "7.2.4",
@@ -89,6 +215,8 @@
     "7.2.7",
     "7.2.8",
     "7.2.9",
+    "7.2.10",
+    "7.2.11",
     "7.3.1",
     "7.3.2",
     "8.1.1",
@@ -109,9 +237,6 @@
     "8.5.9",
     "8.6.1",
     "9.1.1",
-    "9.1.10",
-    "9.1.11",
-    "9.1.12",
     "9.1.2",
     "9.1.3",
     "9.1.4",
@@ -119,7 +244,10 @@
     "9.1.6",
     "9.1.7",
     "9.1.8",
-    "9.1.9"
+    "9.1.9",
+    "9.1.10",
+    "9.1.11",
+    "9.1.12"
   ],
   "checkCount": 117,
   "policies": [

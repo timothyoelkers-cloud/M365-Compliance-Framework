@@ -468,7 +468,16 @@ async function bootstrap() {
     // Lazy-load strategy data for any framework with hasStrategies
     var strategyFrameworks = {
       'ASD Essential Eight': { slug: 'asd-essential-eight', stateKey: 'e8Strategies' },
-      'NIS2': { slug: 'nis2', stateKey: 'nis2Strategies' }
+      'NIS2': { slug: 'nis2', stateKey: 'nis2Strategies' },
+      'NIST CSF 2.0': { slug: 'nist-csf-2-0', stateKey: 'nistCsfStrategies' },
+      'ISO 27001:2022': { slug: 'iso-27001-2022', stateKey: 'iso27001Strategies' },
+      'CMMC v2.0': { slug: 'cmmc-v2-0', stateKey: 'cmmcStrategies' },
+      'SOC 2': { slug: 'soc-2', stateKey: 'soc2Strategies' },
+      'PCI DSS v4.0': { slug: 'pci-dss-v4-0', stateKey: 'pciDssStrategies' },
+      'DORA': { slug: 'dora', stateKey: 'doraStrategies' },
+      'GDPR (EU) 2016/679': { slug: 'gdpr-eu-2016-679', stateKey: 'gdprStrategies' },
+      'HIPAA': { slug: 'hipaa', stateKey: 'hipaaStrategies' },
+      'UK NCSC CAF v3.2': { slug: 'uk-ncsc-caf-v3-2', stateKey: 'ncscCafStrategies' }
     };
     AppState.on('selectedFrameworks', async function (fws) {
       for (var fwName in strategyFrameworks) {

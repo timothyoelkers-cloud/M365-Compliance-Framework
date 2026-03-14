@@ -2,127 +2,187 @@
   "name": "NIST CSF 2.0",
   "slug": "nist-csf-2-0",
   "group": "NIST / US Federal",
+  "hasStrategies": true,
+  "levelLabels": {
+    "ML1": "Tier 1 (Partial)",
+    "ML2": "Tier 2 (Risk Informed)",
+    "ML3": "Tier 3 (Repeatable)"
+  },
+  "strategies": [
+    {
+      "id": "govern",
+      "name": "Govern (GV)",
+      "order": 1,
+      "description": "Establish and monitor the organization's cybersecurity risk management strategy, expectations, and policy. Covers organizational context, risk management strategy, roles and responsibilities, policy, oversight, and cybersecurity supply chain risk management.",
+      "article": "GV",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Organizational context and basic risk management strategy are established. Foundational governance structures define cybersecurity roles and document the operating environment.",
+          "policies": ["ENT02", "ENT03"],
+          "checks": ["1.1.2", "1.1.3"]
+        },
+        "ML2": {
+          "summary": "Risk management policies are formalized and communicated across the organization. Conditional access and compliance policies enforce governance requirements consistently.",
+          "policies": ["CA01", "CA09", "PV12"],
+          "checks": ["1.2.2", "9.1.1", "9.1.2"]
+        },
+        "ML3": {
+          "summary": "Governance processes are integrated into enterprise risk management. Policy enforcement is automated, continuously monitored, and reviewed for effectiveness.",
+          "policies": ["PV05", "CA17"],
+          "checks": ["9.1.4", "9.1.6"]
+        }
+      }
+    },
+    {
+      "id": "identify",
+      "name": "Identify (ID)",
+      "order": 2,
+      "description": "Understand the organization's current cybersecurity risks. Covers asset management, risk assessment, and continuous improvement of cybersecurity posture.",
+      "article": "ID",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Hardware and software assets are inventoried and managed. Baseline compliance policies ensure devices meet minimum security configuration standards.",
+          "policies": ["INT01", "INT02", "INT03", "INT04"],
+          "checks": ["5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.4"]
+        },
+        "ML2": {
+          "summary": "Vulnerability assessments identify and prioritize risks. Software update compliance and patch status are tracked across endpoints to reduce the attack surface.",
+          "policies": ["MDE06", "INT08", "INT09"],
+          "checks": ["5.1.2.2", "5.1.2.3", "5.1.2.4"]
+        },
+        "ML3": {
+          "summary": "Advanced asset discovery and risk assessment processes are in place. Device health attestation and security baselines are continuously validated and improved upon.",
+          "policies": ["MDE11", "MDE12"],
+          "checks": ["5.1.5.2", "5.1.6.1", "5.1.6.2", "5.1.6.3"]
+        }
+      }
+    },
+    {
+      "id": "protect",
+      "name": "Protect (PR)",
+      "order": 3,
+      "description": "Use safeguards to prevent or reduce cybersecurity risk. Covers identity management and access control, awareness and training, data security, platform security, and technology infrastructure resilience.",
+      "article": "PR",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Foundational access controls and identity protections are implemented. MFA is enforced, legacy authentication is blocked, and basic data security policies restrict unauthorized access.",
+          "policies": ["CA02", "INT05", "INT07", "EXO04"],
+          "checks": ["1.3.5", "1.3.6", "2.1.1", "2.1.5", "5.3.1"]
+        },
+        "ML2": {
+          "summary": "Conditional access policies enforce risk-based and compliant-device requirements. Advanced data protection, anti-phishing, and Safe Attachments safeguards are deployed across workloads.",
+          "policies": ["CA04", "CA05", "CA07", "CA08", "INT10", "INT11", "INT13", "INT14", "INT15", "SPO04", "SPO05"],
+          "checks": ["1.3.9", "2.2.1", "2.4.2", "2.4.3", "2.4.4", "5.3.2", "5.3.3", "5.3.4", "5.3.5", "8.4.1", "8.5.1", "8.5.2", "8.5.3"]
+        },
+        "ML3": {
+          "summary": "Comprehensive platform hardening, network segmentation, and infrastructure resilience controls are enforced. Advanced threat protection, application restrictions, and Teams/SharePoint security hardening are fully deployed.",
+          "policies": ["INT12", "INT16", "INT18", "INT20", "SPO06", "SPO09", "EXO05", "TEA02", "TEA03", "TEA06", "TEA08"],
+          "checks": ["3.1.1", "3.2.1", "3.2.2", "3.3.1", "4.1", "6.1.1", "6.1.2", "6.2.1", "6.2.3", "6.5.1", "6.5.2", "8.5.4", "8.5.5", "8.5.6", "8.5.7", "8.5.8", "8.5.9", "8.6.1"]
+        }
+      }
+    },
+    {
+      "id": "detect",
+      "name": "Detect (DE)",
+      "order": 4,
+      "description": "Find and analyze possible cybersecurity attacks and compromises. Covers continuous monitoring and adverse event analysis to identify anomalies and potential incidents.",
+      "article": "DE",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Basic continuous monitoring is enabled through Microsoft Defender for Endpoint and alert policies. Security signals are collected from endpoints and cloud services.",
+          "policies": ["MDE01", "MDE04"],
+          "checks": ["7.2.1", "7.2.2"]
+        },
+        "ML2": {
+          "summary": "Advanced detection capabilities analyze adverse events across the environment. Automated investigation, custom detection rules, and expanded alert tuning improve signal fidelity.",
+          "policies": ["MDE05", "MDE07", "MDE09"],
+          "checks": ["7.2.8", "7.2.9", "7.2.10"]
+        },
+        "ML3": {
+          "summary": "Detection is comprehensive with advanced hunting, cross-workload correlation, and proactive threat intelligence. Monitoring covers the full attack lifecycle with minimal blind spots.",
+          "policies": ["MDE10"],
+          "checks": ["7.2.11", "7.3.1", "7.3.2"]
+        }
+      }
+    },
+    {
+      "id": "respond",
+      "name": "Respond (RS)",
+      "order": 5,
+      "description": "Take action regarding a detected cybersecurity incident. Covers incident management, incident analysis, incident response reporting and communication, and incident mitigation.",
+      "article": "RS",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Basic incident management processes are established. Defender for Endpoint provides initial incident triage, and foundational response playbooks guide containment actions.",
+          "policies": ["MDE01", "MDE04"],
+          "checks": ["8.1.2", "8.2.1"]
+        },
+        "ML2": {
+          "summary": "Incident analysis capabilities are expanded with automated investigation and remediation. Response workflows integrate across security tools for faster containment and communication.",
+          "policies": ["MDE05", "MDE09"],
+          "checks": ["8.2.2", "8.2.3"]
+        },
+        "ML3": {
+          "summary": "Incident response is mature with advanced mitigation, cross-functional coordination, and lessons-learned processes. Threat intelligence informs response actions and drives continuous improvement.",
+          "policies": ["MDE10", "MDE11"],
+          "checks": ["8.2.4", "5.2.4.1"]
+        }
+      }
+    },
+    {
+      "id": "recover",
+      "name": "Recover (RC)",
+      "order": 6,
+      "description": "Restore assets and operations affected by a cybersecurity incident. Covers incident recovery plan execution and incident recovery communication to restore normal operations.",
+      "article": "RC",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Basic recovery plans and backup procedures are in place. SharePoint and OneDrive retention policies ensure critical data can be restored after an incident.",
+          "policies": ["SPO05"],
+          "checks": ["9.1.1"]
+        },
+        "ML2": {
+          "summary": "Recovery processes are formalized with defined communication plans. Retention policies and site-level protections ensure data integrity and availability during recovery operations.",
+          "policies": ["SPO06", "PV12"],
+          "checks": ["9.1.2", "9.1.8"]
+        },
+        "ML3": {
+          "summary": "Recovery capabilities are tested and validated regularly. Comprehensive site governance and sharing controls ensure resilient restoration with minimal data loss and business disruption.",
+          "policies": ["SPO04"],
+          "checks": ["9.1.4", "9.1.6"]
+        }
+      }
+    }
+  ],
   "checks": [
-    "1.1.2",
-    "1.1.3",
-    "1.2.2",
-    "1.3.5",
-    "1.3.6",
-    "1.3.9",
-    "2.1.1",
-    "2.1.5",
-    "2.2.1",
-    "2.4.2",
-    "2.4.3",
-    "2.4.4",
-    "3.1.1",
-    "3.2.1",
-    "3.2.2",
-    "3.3.1",
+    "1.1.2", "1.1.3", "1.2.2", "1.3.5", "1.3.6", "1.3.9",
+    "2.1.1", "2.1.5", "2.2.1", "2.4.2", "2.4.3", "2.4.4",
+    "3.1.1", "3.2.1", "3.2.2", "3.3.1",
     "4.1",
-    "5.1.2.2",
-    "5.1.2.3",
-    "5.1.2.4",
-    "5.1.4.1",
-    "5.1.4.2",
-    "5.1.4.3",
-    "5.1.4.4",
-    "5.1.5.2",
-    "5.1.6.1",
-    "5.1.6.2",
-    "5.1.6.3",
+    "5.1.2.2", "5.1.2.3", "5.1.2.4",
+    "5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.4",
+    "5.1.5.2", "5.1.6.1", "5.1.6.2", "5.1.6.3",
     "5.2.4.1",
-    "5.3.1",
-    "5.3.2",
-    "5.3.3",
-    "5.3.4",
-    "5.3.5",
-    "6.1.1",
-    "6.1.2",
-    "6.2.1",
-    "6.2.3",
-    "6.5.1",
-    "6.5.2",
-    "7.2.1",
-    "7.2.10",
-    "7.2.11",
-    "7.2.2",
-    "7.2.8",
-    "7.2.9",
-    "7.3.1",
-    "7.3.2",
-    "8.1.2",
-    "8.2.1",
-    "8.2.2",
-    "8.2.3",
-    "8.2.4",
-    "8.4.1",
-    "8.5.1",
-    "8.5.2",
-    "8.5.3",
-    "8.5.4",
-    "8.5.5",
-    "8.5.6",
-    "8.5.7",
-    "8.5.8",
-    "8.5.9",
+    "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5",
+    "6.1.1", "6.1.2", "6.2.1", "6.2.3", "6.5.1", "6.5.2",
+    "7.2.1", "7.2.10", "7.2.11", "7.2.2", "7.2.8", "7.2.9",
+    "7.3.1", "7.3.2",
+    "8.1.2", "8.2.1", "8.2.2", "8.2.3", "8.2.4",
+    "8.4.1", "8.5.1", "8.5.2", "8.5.3", "8.5.4", "8.5.5", "8.5.6", "8.5.7", "8.5.8", "8.5.9",
     "8.6.1",
-    "9.1.1",
-    "9.1.2",
-    "9.1.4",
-    "9.1.6",
-    "9.1.8"
+    "9.1.1", "9.1.2", "9.1.4", "9.1.6", "9.1.8"
   ],
   "checkCount": 69,
   "policies": [
-    "CA01",
-    "CA02",
-    "CA04",
-    "CA05",
-    "CA07",
-    "CA08",
-    "CA09",
-    "CA17",
-    "ENT02",
-    "ENT03",
-    "EXO04",
-    "EXO05",
-    "INT01",
-    "INT02",
-    "INT03",
-    "INT04",
-    "INT05",
-    "INT07",
-    "INT08",
-    "INT09",
-    "INT10",
-    "INT11",
-    "INT12",
-    "INT13",
-    "INT14",
-    "INT15",
-    "INT16",
-    "INT18",
-    "INT20",
-    "MDE01",
-    "MDE04",
-    "MDE05",
-    "MDE06",
-    "MDE07",
-    "MDE09",
-    "MDE10",
-    "MDE11",
-    "MDE12",
-    "PV05",
-    "PV12",
-    "SPO04",
-    "SPO05",
-    "SPO06",
-    "SPO09",
-    "TEA02",
-    "TEA03",
-    "TEA06",
-    "TEA08"
+    "CA01", "CA02", "CA04", "CA05", "CA07", "CA08", "CA09", "CA17",
+    "ENT02", "ENT03",
+    "EXO04", "EXO05",
+    "INT01", "INT02", "INT03", "INT04", "INT05", "INT07", "INT08", "INT09",
+    "INT10", "INT11", "INT12", "INT13", "INT14", "INT15", "INT16", "INT18", "INT20",
+    "MDE01", "MDE04", "MDE05", "MDE06", "MDE07", "MDE09", "MDE10", "MDE11", "MDE12",
+    "PV05", "PV12",
+    "SPO04", "SPO05", "SPO06", "SPO09",
+    "TEA02", "TEA03", "TEA06", "TEA08"
   ],
   "policyCount": 48,
   "orgProfiles": [

@@ -2,6 +2,106 @@
   "name": "ISO 27001:2022",
   "slug": "iso-27001-2022",
   "group": "ISO Standards",
+  "hasStrategies": true,
+  "levelLabels": { "ML1": "Documented", "ML2": "Implemented", "ML3": "Optimised" },
+  "strategies": [
+    {
+      "id": "organisational-controls",
+      "name": "Organisational Controls",
+      "article": "Annex A.5",
+      "order": 1,
+      "description": "Information security policies, defined roles and responsibilities, segregation of duties, management direction, contact with authorities and special interest groups, threat intelligence, information security in project management, inventory and classification of assets, identity management, authentication information, access rights, supplier relationships, information security incident management, business continuity, and legal and regulatory compliance.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Document foundational information security policies, assign organisational roles and responsibilities, establish asset inventories, and define identity governance baselines aligned with Annex A.5 requirements.",
+          "policies": ["GOV01", "GOV02", "GOV03", "GOV04", "GOV05", "ENT01", "ENT02", "ENT03", "ENT06"],
+          "checks": ["1.1.1", "1.1.2", "1.1.3", "1.1.4", "1.2.1", "1.2.2", "5.1.2.1", "5.1.2.2"]
+        },
+        "ML2": {
+          "summary": "Implement access control policies, enforce conditional access and authentication requirements, configure data classification and handling procedures, and operationalise supplier security and incident response processes.",
+          "policies": ["CA01", "CA09", "CA11", "CA12", "CA15", "CA16", "PV01", "PV02", "PV04", "PV08", "PV10", "PV11", "PV13", "PV14", "PV15", "PV16", "PV17", "PV22", "SPO01", "SPO17", "SPO20"],
+          "checks": ["1.3.5", "1.3.6", "1.3.7", "5.1.2.3", "5.1.2.4", "5.1.2.5", "5.1.2.6", "5.1.8.1", "9.1.1", "9.1.2", "9.1.3", "9.1.4", "9.1.5"]
+        },
+        "ML3": {
+          "summary": "Optimise data protection controls with advanced DLP, sensitivity labelling, information barriers, insider risk management, and continuous compliance monitoring to achieve mature governance across all information assets.",
+          "policies": ["PV03", "PV05", "PV06", "PV07", "PV09", "PV12", "PV18", "PV19", "PV20", "PV21", "PV23", "PV24", "PV25", "PV26", "PV27", "PV28", "PV29", "PV30"],
+          "checks": ["9.1.6", "9.1.7", "9.1.8", "9.1.9", "9.1.10", "9.1.11", "9.1.12"]
+        }
+      }
+    },
+    {
+      "id": "people-controls",
+      "name": "People Controls",
+      "article": "Annex A.6",
+      "order": 2,
+      "description": "Pre-employment screening, terms and conditions of employment, information security awareness education and training, disciplinary processes, responsibilities after termination or change of employment, confidentiality and non-disclosure agreements, remote working arrangements, and information security event reporting.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Document baseline people security controls including screening requirements, terms of employment covering information security responsibilities, and initial user awareness and acceptable-use policies.",
+          "policies": ["ENT04", "ENT07", "ENT10"],
+          "checks": ["5.2.2.1", "5.2.2.2", "5.2.2.3", "5.2.3.1"]
+        },
+        "ML2": {
+          "summary": "Implement role-based security awareness training, enforce remote working security controls, configure user-level conditional access policies, and operationalise disciplinary and termination procedures for information security violations.",
+          "policies": ["ENT05", "ENT08", "ENT09", "CA02", "CA03", "CA06"],
+          "checks": ["5.2.2.4", "5.2.2.5", "5.2.2.6", "5.2.2.7", "5.2.2.8", "5.2.2.9", "5.2.2.10", "5.2.2.11", "5.2.2.12", "5.2.3.2", "5.2.3.3", "5.2.3.4", "5.2.3.5"]
+        },
+        "ML3": {
+          "summary": "Optimise people controls with advanced conditional access evaluations, sign-in risk and user risk policies, privileged identity protections, continuous access evaluation, and comprehensive security event reporting for all user populations.",
+          "policies": ["CA04", "CA05", "CA07", "CA08", "CA10", "CA13", "CA14", "CA17", "CA18"],
+          "checks": ["5.2.3.6", "5.2.3.7", "5.2.4.1", "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5"]
+        }
+      }
+    },
+    {
+      "id": "physical-controls",
+      "name": "Physical Controls",
+      "article": "Annex A.7",
+      "order": 3,
+      "description": "Physical security perimeters, physical entry controls, securing offices rooms and facilities, monitoring for physical threats, working in secure areas, clear desk and clear screen policies, equipment siting and protection, security of assets off-premises, storage media handling, supporting utilities, cabling security, and equipment maintenance and secure disposal.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Document device security baselines, establish Intune enrolment and compliance policies, define storage media handling procedures, and enforce screen lock and clear desk requirements through endpoint configuration profiles.",
+          "policies": ["INT01", "INT02", "INT03", "INT04"],
+          "checks": ["5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.4"]
+        },
+        "ML2": {
+          "summary": "Implement device compliance enforcement, deploy endpoint security configuration profiles, configure BitLocker and encryption policies, enable remote wipe capabilities, and enforce compliant device access requirements.",
+          "policies": ["INT05", "INT06", "INT07", "INT08", "INT09", "INT10", "INT14"],
+          "checks": ["5.1.3.1", "5.1.3.2", "5.1.4.5", "5.1.4.6", "5.1.5.1", "5.1.5.2"]
+        },
+        "ML3": {
+          "summary": "Optimise physical and device controls with Credential Guard, attack surface reduction rules, application guard policies, Windows Hello for Business enforcement, and advanced endpoint protection for comprehensive equipment security and secure disposal.",
+          "policies": ["INT13", "INT16", "INT17", "INT18", "INT19", "INT20"],
+          "checks": ["5.1.6.1", "5.1.6.2", "5.1.6.3", "4.1", "4.2"]
+        }
+      }
+    },
+    {
+      "id": "technological-controls",
+      "name": "Technological Controls",
+      "article": "Annex A.8",
+      "order": 4,
+      "description": "User endpoint devices, privileged access rights, information access restriction, access to source code, secure authentication, capacity management, protection against malware, management of technical vulnerabilities, configuration management, information deletion, data masking, data leakage prevention, activity monitoring, network security, web filtering, and use of cryptography.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Document and deploy foundational endpoint protection, onboard devices to Defender for Endpoint, enable tamper protection, configure baseline mail transport rules, anti-spam and anti-phishing policies, and establish initial network segmentation controls.",
+          "policies": ["MDE01", "MDE02", "MDE03", "DEF01", "INT11", "INT12", "INT15", "EXO01", "EXO02", "EXO03", "EXO04"],
+          "checks": ["2.1.1", "2.1.3", "2.1.4", "2.1.5", "2.1.6", "2.1.7", "3.1.1", "3.2.1", "3.2.2", "3.3.1", "6.1.1", "6.1.2", "6.1.3"]
+        },
+        "ML2": {
+          "summary": "Implement advanced endpoint detection and response, automated investigation, Safe Attachments and Safe Links, anti-malware policies, DLP for Exchange and SharePoint, vulnerability management, web content filtering, and technical access restriction controls.",
+          "policies": ["MDE04", "MDE05", "MDE06", "MDE07", "MDE08", "MDE09", "MDE10", "DEF02", "DEF03", "DEF04", "DEF05", "DEF06", "DEF07", "DEF08", "EXO05", "EXO06", "EXO07", "EXO08", "EXO09", "EXO10", "SPO02", "SPO03", "SPO04", "SPO05", "SPO06"],
+          "checks": ["2.1.12", "2.1.13", "2.1.14", "2.1.15", "2.2.1", "2.4.1", "2.4.2", "2.4.3", "2.4.4", "6.2.1", "6.2.2", "6.2.3", "6.5.1", "6.5.2", "6.5.3", "6.5.4", "6.5.5", "7.2.1", "7.2.2", "7.2.3", "7.2.4", "7.2.5", "7.2.6", "7.2.7", "7.2.8", "7.2.9", "7.2.10", "7.2.11", "7.3.1", "7.3.2"]
+        },
+        "ML3": {
+          "summary": "Optimise technological controls with deception technology, advanced threat intelligence integration, SharePoint and OneDrive advanced security, Teams governance and security policies, and comprehensive monitoring, logging, and cryptographic controls across all workloads.",
+          "policies": ["MDE11", "MDE12", "SPO07", "SPO08", "SPO09", "SPO10", "SPO11", "SPO12", "SPO13", "SPO14", "SPO15", "SPO16", "SPO18", "SPO19", "TEA01", "TEA02", "TEA03", "TEA04", "TEA05", "TEA06", "TEA07", "TEA08", "TEA09", "TEA10"],
+          "checks": ["8.1.1", "8.1.2", "8.2.1", "8.2.2", "8.2.3", "8.2.4", "8.4.1", "8.5.1", "8.5.2", "8.5.3", "8.5.4", "8.5.5", "8.5.6", "8.5.7", "8.5.8", "8.5.9", "8.6.1"]
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.2",
@@ -19,15 +119,15 @@
     "1.3.8",
     "1.3.9",
     "2.1.1",
-    "2.1.12",
-    "2.1.13",
-    "2.1.14",
-    "2.1.15",
     "2.1.3",
     "2.1.4",
     "2.1.5",
     "2.1.6",
     "2.1.7",
+    "2.1.12",
+    "2.1.13",
+    "2.1.14",
+    "2.1.15",
     "2.2.1",
     "2.4.1",
     "2.4.2",
@@ -60,9 +160,6 @@
     "5.1.6.3",
     "5.1.8.1",
     "5.2.2.1",
-    "5.2.2.10",
-    "5.2.2.11",
-    "5.2.2.12",
     "5.2.2.2",
     "5.2.2.3",
     "5.2.2.4",
@@ -71,6 +168,9 @@
     "5.2.2.7",
     "5.2.2.8",
     "5.2.2.9",
+    "5.2.2.10",
+    "5.2.2.11",
+    "5.2.2.12",
     "5.2.3.1",
     "5.2.3.2",
     "5.2.3.3",
@@ -96,8 +196,6 @@
     "6.5.4",
     "6.5.5",
     "7.2.1",
-    "7.2.10",
-    "7.2.11",
     "7.2.2",
     "7.2.3",
     "7.2.4",
@@ -106,6 +204,8 @@
     "7.2.7",
     "7.2.8",
     "7.2.9",
+    "7.2.10",
+    "7.2.11",
     "7.3.1",
     "7.3.2",
     "8.1.1",
@@ -126,9 +226,6 @@
     "8.5.9",
     "8.6.1",
     "9.1.1",
-    "9.1.10",
-    "9.1.11",
-    "9.1.12",
     "9.1.2",
     "9.1.3",
     "9.1.4",
@@ -136,7 +233,10 @@
     "9.1.6",
     "9.1.7",
     "9.1.8",
-    "9.1.9"
+    "9.1.9",
+    "9.1.10",
+    "9.1.11",
+    "9.1.12"
   ],
   "checkCount": 134,
   "policies": [

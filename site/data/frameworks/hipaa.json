@@ -2,6 +2,106 @@
   "name": "HIPAA",
   "slug": "hipaa",
   "group": "US Sector",
+  "hasStrategies": true,
+  "levelLabels": { "ML1": "Required", "ML2": "Addressable", "ML3": "Advanced" },
+  "strategies": [
+    {
+      "id": "administrative-safeguards",
+      "name": "Administrative Safeguards",
+      "article": "§164.308",
+      "order": 1,
+      "description": "Risk analysis, workforce security, information access management, security awareness and training, contingency planning, evaluation, and business associate contracts.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enforce foundational access controls: require MFA for all users, block legacy authentication, configure Conditional Access baselines, restrict guest invitations, and enable audit logging.",
+          "policies": ["CA01", "CA02", "CA03", "CA04", "CA05", "CA06", "CA07", "CA08", "PV01", "PV02", "PV03", "SPO17"],
+          "checks": ["1.1.2", "1.1.3", "1.2.1", "1.3.2", "1.3.5", "1.3.7", "1.3.9"]
+        },
+        "ML2": {
+          "summary": "Deploy sensitivity labels for ePHI classification, configure auto-labeling, implement DLP policies for healthcare data, enable access reviews, and deploy information barriers.",
+          "policies": ["PV04", "PV08", "PV10", "PV13", "PV15", "PV16", "PV17", "PV18", "PV19", "SPO04", "SPO06"],
+          "checks": ["5.1.2.5", "5.1.3.1", "5.1.3.2", "9.1.6", "9.1.7"]
+        },
+        "ML3": {
+          "summary": "Enable insider risk management, adaptive protection, communication compliance, and advanced data governance for comprehensive ePHI risk coverage.",
+          "policies": ["PV20", "PV21", "PV29", "PV30", "CA09", "CA10"],
+          "checks": ["9.1.8"]
+        }
+      }
+    },
+    {
+      "id": "physical-safeguards",
+      "name": "Physical Safeguards",
+      "article": "§164.310",
+      "order": 2,
+      "description": "Facility access controls, workstation use and security, device and media controls including encryption, configuration baselines, and endpoint protection.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy device compliance baselines, enforce BitLocker encryption, configure Defender Antivirus, enable tamper protection, and restrict device enrollment to corporate devices.",
+          "policies": ["INT01", "INT02", "INT03", "INT04", "INT05", "INT07", "INT08", "INT10", "MDE01", "MDE02", "MDE03"],
+          "checks": ["5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.4", "5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5"]
+        },
+        "ML2": {
+          "summary": "Deploy exploit protection, network protection, CIS-aligned security baselines, controlled folder access, and mobile app protection policies for comprehensive endpoint hardening.",
+          "policies": ["INT09", "INT11", "INT12", "INT13", "INT14", "INT19", "MDE06", "MDE07", "MDE08"],
+          "checks": ["5.1.4.6", "5.1.5.1"]
+        },
+        "ML3": {
+          "summary": "Enable all ASR rules in block mode, Credential Guard, Device Guard, firewall policies, removable storage controls, and advanced endpoint threat detection.",
+          "policies": ["INT15", "INT16", "INT17", "INT20", "MDE04", "MDE05", "MDE09"],
+          "checks": ["5.1.6.1", "5.1.6.2", "5.1.6.3"]
+        }
+      }
+    },
+    {
+      "id": "technical-safeguards",
+      "name": "Technical Safeguards",
+      "article": "§164.312",
+      "order": 3,
+      "description": "Access controls, audit controls, integrity controls, person or entity authentication, and transmission security including encryption and email protection.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Configure DKIM and DMARC for email authentication, deploy anti-phishing and anti-spam policies, enforce modern authentication, and configure SharePoint sharing restrictions.",
+          "policies": ["EXO01", "EXO02", "EXO03", "EXO04", "EXO05", "EXO06", "DEF01", "DEF02", "DEF03", "SPO01", "SPO02", "SPO03"],
+          "checks": ["2.1.1", "2.1.5", "2.2.1", "6.1.1", "6.1.2", "6.5.1", "6.5.3"]
+        },
+        "ML2": {
+          "summary": "Deploy Safe Links, Safe Attachments, advanced anti-malware, data retention policies, records management, and DLP incident management across all workloads.",
+          "policies": ["DEF04", "DEF05", "DEF07", "DEF08", "EXO08", "PV22", "PV24", "PV25", "SPO05", "SPO13", "SPO14", "SPO15"],
+          "checks": ["2.4.3", "2.4.4", "7.2.1", "7.2.3", "7.2.4", "7.2.5", "7.2.6", "7.2.7", "7.2.8", "9.1.1", "9.1.2", "9.1.3"]
+        },
+        "ML3": {
+          "summary": "Configure advanced retention with disposition review, restricted access control on sensitive sites, endpoint DLP, and IP-range restrictions for SharePoint.",
+          "policies": ["PV26", "PV27", "PV28", "SPO18", "SPO19", "CA13", "CA14"],
+          "checks": ["7.3.1"]
+        }
+      }
+    },
+    {
+      "id": "breach-notification",
+      "name": "Breach Notification",
+      "article": "§164.400-414",
+      "order": 4,
+      "description": "Breach detection, notification procedures, incident response capabilities, and security monitoring to support timely breach reporting obligations.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enable unified audit logging, configure alert notifications, deploy baseline Teams security settings, and establish audit log retention for breach investigation readiness.",
+          "policies": ["CA16", "CA17", "CA18", "PV11", "SPO20", "TEA01", "TEA02", "TEA03"],
+          "checks": ["3.1.1", "3.2.1", "3.2.2", "4.1", "8.1.1", "8.5.3", "9.1.1"]
+        },
+        "ML2": {
+          "summary": "Enable DLP incident management, comprehensive SharePoint audit events, and insider risk detection to identify potential breaches across all workloads.",
+          "policies": ["PV09", "PV12", "SPO09"],
+          "checks": ["9.1.2", "9.1.3"]
+        },
+        "ML3": {
+          "summary": "Deploy communication compliance for detecting regulatory violations and insider threats to support proactive breach prevention.",
+          "policies": [],
+          "checks": []
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.2",
     "1.1.3",

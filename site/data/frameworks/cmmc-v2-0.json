@@ -2,6 +2,202 @@
   "name": "CMMC v2.0",
   "slug": "cmmc-v2-0",
   "group": "NIST / US Federal",
+  "hasStrategies": true,
+  "levelLabels": { "ML1": "Level 1 (Foundational)", "ML2": "Level 2 (Advanced)", "ML3": "Level 3 (Expert)" },
+  "strategies": [
+    {
+      "id": "access-control",
+      "name": "Access Control (AC)",
+      "article": "AC",
+      "order": 1,
+      "description": "Limit information system access to authorized users, processes acting on behalf of authorized users, and devices. Limit information system access to the types of transactions and functions that authorized users are permitted to execute. Control the flow of CUI in accordance with approved authorizations.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish foundational access controls: enforce MFA for all users, block legacy authentication, restrict administrative access, and apply baseline Conditional Access policies to limit system access to authorized users and devices.",
+          "policies": ["CA01", "CA02", "ENT03", "ENT06"],
+          "checks": ["1.1.1", "1.1.4", "1.2.1", "1.2.2", "1.3.1", "1.3.2"]
+        },
+        "ML2": {
+          "summary": "Implement advanced access controls including risk-based Conditional Access, session controls, compliant device requirements, app protection policies, privileged identity management, and fine-grained authorization policies for CUI access.",
+          "policies": ["CA03", "CA04", "CA05", "CA06", "CA07", "CA08", "CA10", "CA13", "CA14", "CA16", "CA17", "CA18", "ENT05"],
+          "checks": ["1.3.3", "1.3.4", "1.3.5", "1.3.6", "1.3.7", "1.3.8", "1.3.9", "5.1.2.2", "5.1.2.5", "5.1.2.6"]
+        },
+        "ML3": {
+          "summary": "Enforce expert-level access controls with network-based restrictions, just-in-time privileged access, continuous access evaluation, and data-centric controls that restrict CUI flow across organizational boundaries.",
+          "policies": ["CA09", "INT06", "SPO04", "SPO08"],
+          "checks": ["5.3.1", "5.3.2", "5.3.3", "5.3.4", "5.3.5"]
+        }
+      }
+    },
+    {
+      "id": "awareness-training",
+      "name": "Awareness & Training (AT)",
+      "article": "AT",
+      "order": 2,
+      "description": "Ensure that managers, systems administrators, and users of organizational information systems are made aware of the security risks associated with their activities and of the applicable policies, standards, and procedures related to the security of those systems. Ensure personnel are adequately trained to carry out their assigned information security-related duties and responsibilities.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy foundational security awareness training for all users covering phishing, social engineering, and basic cyber hygiene. Configure attack simulation training baselines.",
+          "policies": ["ENT04", "ENT07"],
+          "checks": ["5.2.2.1", "5.2.2.3"]
+        },
+        "ML2": {
+          "summary": "Implement role-based training for privileged users and CUI handlers. Deploy advanced attack simulation campaigns, track completion metrics, and enforce training compliance through automated reminders and reporting.",
+          "policies": ["ENT08", "ENT09"],
+          "checks": ["5.2.2.4", "5.2.2.5", "5.2.2.6", "5.2.2.7", "5.2.2.8"]
+        },
+        "ML3": {
+          "summary": "Provide specialized insider threat awareness training and advanced social engineering simulations. Integrate training outcomes with adaptive security policies and continuous improvement processes.",
+          "policies": [],
+          "checks": ["5.2.2.12"]
+        }
+      }
+    },
+    {
+      "id": "audit-accountability",
+      "name": "Audit & Accountability (AU)",
+      "article": "AU",
+      "order": 3,
+      "description": "Create, protect, and retain information system audit records to the extent needed to enable the monitoring, analysis, investigation, and reporting of unlawful, unauthorized, or inappropriate information system activity. Ensure that the actions of individual information system users can be uniquely traced to those users so they can be held accountable for their actions.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enable unified audit logging across M365 workloads and configure baseline log retention policies to ensure audit records are created and retained for security monitoring and accountability.",
+          "policies": ["PV11", "PV12"],
+          "checks": ["9.1.1", "9.1.2"]
+        },
+        "ML2": {
+          "summary": "Configure advanced audit capabilities including extended log retention, audit log search and alerting, mailbox auditing, and integration with Microsoft Sentinel for centralized log correlation and analysis.",
+          "policies": ["PV05", "PV09", "PV22", "PV29"],
+          "checks": ["9.1.3", "9.1.4", "9.1.5", "9.1.7", "9.1.8", "9.1.9"]
+        },
+        "ML3": {
+          "summary": "Implement expert-level audit controls with automated audit log analysis, anomaly detection, long-term immutable log storage, and continuous monitoring workflows that correlate events across all M365 workloads.",
+          "policies": ["PV27", "PV28"],
+          "checks": ["9.1.10", "9.1.11", "9.1.12"]
+        }
+      }
+    },
+    {
+      "id": "config-management",
+      "name": "Configuration Management & Maintenance (CM)",
+      "article": "CM",
+      "order": 4,
+      "description": "Establish and maintain baseline configurations and inventories of organizational information systems throughout the respective system development life cycles. Establish and enforce security configuration settings for information technology products employed in organizational systems. Track, review, approve or disapprove, and audit changes to information systems. Perform maintenance on organizational information systems and provide effective controls on tools, techniques, mechanisms, and personnel used to conduct maintenance.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish device configuration baselines using Intune compliance and configuration policies. Deploy foundational security baselines for Windows, macOS, and mobile devices to enforce least functionality.",
+          "policies": ["INT01", "INT02", "INT03", "INT04"],
+          "checks": ["5.1.4.1", "5.1.4.2", "5.1.4.3", "5.1.4.4"]
+        },
+        "ML2": {
+          "summary": "Implement advanced configuration management with application control policies, software update rings, device compliance enforcement, endpoint security baselines, and change tracking through configuration drift detection.",
+          "policies": ["INT07", "INT08", "INT09", "INT10", "INT14", "INT15"],
+          "checks": ["5.1.3.1", "5.1.3.2", "5.1.4.5", "5.1.4.6", "5.1.5.1", "5.1.5.2"]
+        },
+        "ML3": {
+          "summary": "Enforce expert-level configuration controls with application whitelisting, driver block lists, advanced endpoint protection policies, network isolation, and automated remediation of configuration deviations across all managed endpoints.",
+          "policies": ["INT05", "INT11", "INT12", "INT13", "INT16", "INT17", "INT19", "INT20"],
+          "checks": ["5.1.6.1", "5.1.6.2", "5.1.6.3", "4.1", "4.2"]
+        }
+      }
+    },
+    {
+      "id": "identification-authentication",
+      "name": "Identification & Authentication (IA)",
+      "article": "IA",
+      "order": 5,
+      "description": "Identify information system users, processes acting on behalf of users, and devices. Authenticate the identities of those users, processes, and devices as a prerequisite to allowing access to organizational information systems. Use multifactor authentication for local and network access to privileged accounts and for network access to non-privileged accounts.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enforce multi-factor authentication for all users, configure password protection and self-service password reset, and establish baseline identity verification controls for M365 access.",
+          "policies": ["CA02", "ENT03"],
+          "checks": ["5.2.3.1", "5.2.3.2", "5.2.3.3"]
+        },
+        "ML2": {
+          "summary": "Deploy phishing-resistant authentication methods, enforce password complexity and banned password lists, implement device-based authentication, and configure authentication strength policies for privileged and sensitive operations.",
+          "policies": ["CA04", "CA05", "INT13"],
+          "checks": ["5.2.3.4", "5.2.3.5", "5.2.3.6", "5.2.3.7", "5.2.4.1"]
+        },
+        "ML3": {
+          "summary": "Implement expert-level identity controls with FIDO2 or certificate-based authentication for all users, hardware token requirements for privileged accounts, continuous identity validation, and advanced credential protection mechanisms.",
+          "policies": ["CA08", "TEA01", "TEA02", "TEA08"],
+          "checks": ["6.3.1"]
+        }
+      }
+    },
+    {
+      "id": "incident-response",
+      "name": "Incident Response (IR)",
+      "article": "IR",
+      "order": 6,
+      "description": "Establish an operational incident-handling capability for organizational information systems that includes adequate preparation, detection, analysis, containment, recovery, and user response activities. Track, document, and report incidents to appropriate organizational officials and external authorities.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy Microsoft Defender for Endpoint and configure foundational threat detection and response capabilities including automated investigation, alert policies, and baseline incident response procedures.",
+          "policies": ["MDE01", "MDE02", "MDE03"],
+          "checks": ["7.2.1", "7.2.3", "7.2.4", "7.2.5"]
+        },
+        "ML2": {
+          "summary": "Implement advanced detection and response with endpoint detection and response, vulnerability management, web content filtering, attack surface reduction rules, threat analytics, and integration with Microsoft Sentinel for automated incident workflows.",
+          "policies": ["MDE04", "MDE05", "MDE06", "MDE07", "MDE08", "MDE09"],
+          "checks": ["7.2.6", "7.2.7", "7.2.8", "7.2.10", "7.2.11", "7.3.1"]
+        },
+        "ML3": {
+          "summary": "Enable expert-level incident response with advanced hunting, automated remediation playbooks, cross-workload threat correlation, and proactive threat hunting capabilities that ensure rapid containment and recovery from sophisticated attacks.",
+          "policies": ["MDE10", "MDE11", "MDE12"],
+          "checks": ["8.1.1"]
+        }
+      }
+    },
+    {
+      "id": "media-data-protection",
+      "name": "Media & Data Protection (MP)",
+      "article": "MP",
+      "order": 7,
+      "description": "Protect information system media, both paper and digital. Limit access to CUI on information system media to authorized users. Sanitize or destroy information system media before disposal or release for reuse. Control the use of removable media on information system components. Protect the confidentiality of CUI at rest and in transit.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish foundational data protection controls including sensitivity labels, data loss prevention baselines, information protection policies, and basic external sharing restrictions for SharePoint and Exchange Online.",
+          "policies": ["PV01", "PV02", "PV10", "EXO01", "SPO01"],
+          "checks": ["2.1.1", "2.1.2", "2.1.4", "2.1.5"]
+        },
+        "ML2": {
+          "summary": "Deploy advanced data protection with auto-labeling policies, DLP rules for CUI data types, encryption policies, rights management, advanced sharing controls, and content-aware protection across Exchange, SharePoint, OneDrive, and Teams.",
+          "policies": ["PV03", "PV04", "PV13", "PV14", "PV15", "PV17", "SPO02", "SPO03", "SPO05", "SPO06", "SPO09", "EXO03", "EXO05"],
+          "checks": ["2.1.7", "2.1.11", "2.1.12", "2.1.13", "2.1.14", "2.1.15", "3.2.1", "3.2.2"]
+        },
+        "ML3": {
+          "summary": "Implement expert-level media and data protection with endpoint DLP, information barriers, customer-managed encryption keys, advanced rights management, and comprehensive CUI lifecycle controls across all M365 workloads.",
+          "policies": ["PV06", "PV07", "PV18", "PV19", "PV20", "PV21", "SPO10", "SPO11", "SPO13", "SPO14", "SPO15", "SPO16", "SPO17", "SPO18", "SPO19", "SPO20"],
+          "checks": ["3.1.1", "3.3.1"]
+        }
+      }
+    },
+    {
+      "id": "system-comms-integrity",
+      "name": "System & Communications Protection / System Integrity (SC/SI)",
+      "article": "SC/SI",
+      "order": 8,
+      "description": "Monitor, control, and protect organizational communications at the external boundaries and key internal boundaries of information systems. Employ architectural designs, software development techniques, and systems engineering principles that promote effective information security. Identify, report, and correct information and information system flaws in a timely manner. Provide protection from malicious code at appropriate locations within organizational information systems. Monitor information system security alerts and advisories and take appropriate actions in response.",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enable foundational boundary protection and system integrity controls including Microsoft Defender for Office 365, anti-malware policies, Exchange Online mail flow rules, and baseline email authentication (SPF, DKIM, DMARC).",
+          "policies": ["DEF01", "EXO04", "INT07", "EXO06"],
+          "checks": ["2.2.1", "2.4.1", "2.4.2", "2.4.3", "2.4.4"]
+        },
+        "ML2": {
+          "summary": "Deploy advanced communications protection with Safe Attachments, Safe Links, anti-phishing policies, advanced threat protection for SharePoint and Teams, network security group controls, and enhanced email security configurations.",
+          "policies": ["DEF02", "DEF03", "DEF04", "DEF07", "DEF08", "EXO08", "EXO10", "INT05", "TEA03", "TEA06"],
+          "checks": ["6.1.1", "6.1.2", "6.1.3", "6.2.2", "6.5.1", "6.5.2", "6.5.3", "6.5.4", "6.5.5"]
+        },
+        "ML3": {
+          "summary": "Implement expert-level system integrity controls with advanced encryption, customer-managed keys, continuous compliance monitoring, and comprehensive communications security controls that protect CUI across all system boundaries.",
+          "policies": ["PV23", "PV24", "PV25", "SPO20"],
+          "checks": ["8.4.1", "8.5.3", "8.5.8", "8.5.9"]
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.4",
@@ -34,6 +230,7 @@
     "3.1.1",
     "3.2.1",
     "3.2.2",
+    "3.3.1",
     "4.1",
     "4.2",
     "5.1.2.2",
@@ -63,6 +260,10 @@
     "5.2.3.1",
     "5.2.3.2",
     "5.2.3.3",
+    "5.2.3.4",
+    "5.2.3.5",
+    "5.2.3.6",
+    "5.2.3.7",
     "5.2.4.1",
     "5.3.1",
     "5.3.2",
@@ -106,7 +307,7 @@
     "9.1.8",
     "9.1.9"
   ],
-  "checkCount": 102,
+  "checkCount": 107,
   "policies": [
     "CA01",
     "CA02",
