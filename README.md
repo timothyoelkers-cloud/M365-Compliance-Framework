@@ -50,6 +50,27 @@ This platform is engineered for accuracy at every layer. Customers can trust tha
 - **Fallback derivation** — if the curated map is unavailable, mappings are derived from each policy's `cisChecks` field
 - **Bidirectional traceability** — from any CIS check you can find the relevant policies, and from any policy you can find which CIS checks it satisfies
 
+### Control-Level Traceability
+
+102 of 143 policies include a `controlMappings` object linking to specific controls within each framework:
+
+```json
+{
+  "controlMappings": {
+    "NIST SP 800-53 Rev.5": ["IA-2", "IA-5", "AC-17(2)"],
+    "ISO 27001:2022": ["A.8.5"],
+    "MITRE ATT&CK": ["T1078", "T1110"],
+    "ASD Essential Eight": ["Restrict administrative privileges"]
+  }
+}
+```
+
+- **NIST SP 800-53 Rev.5** — specific control families (AC, IA, SI, SC, CM, etc.)
+- **MITRE ATT&CK** — technique IDs (T1078, T1566, T1059, etc.)
+- **ISO 27001:2022** — Annex A control references (A.5.x–A.8.x)
+- **ASD Essential Eight** — mitigation strategy names
+- **HIPAA, PCI DSS v4.0, NIST SP 800-171** — section/requirement references
+
 ### Framework Name Normalisation
 
 All 143 policies reference frameworks using **43 canonical names** — no suffixed variants, no separator inconsistencies:

@@ -1298,8 +1298,6 @@ window.TEST_FIXTURES = {
   GOV04: {
     // scanSource: 'authorizationPolicy', matchMode: 'all'
     // condition: allowInvitesFrom equalsAny ['adminsAndGuestInviters', 'none']
-    // NOTE: 'equalsAny' operator is not defined in OPERATORS, so this rule
-    // will always fail to match. We test that it returns 'missing' in both cases.
     configured: {
       authorizationPolicy: {
         displayName: 'Authorization Policy',

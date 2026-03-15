@@ -46,6 +46,10 @@ const PolicyMatcher = (() => {
     notExists(actual) {
       return actual === null || actual === undefined;
     },
+    equalsAny(actual, expected) {
+      if (!Array.isArray(expected)) return false;
+      return expected.some(v => actual === v);
+    },
     includes(actual, expected) {
       return OPERATORS.contains(actual, expected);
     },
@@ -99,7 +103,7 @@ const PolicyMatcher = (() => {
         return operatorFn(actual);
       }
       // Use 'values' for array-expecting operators, otherwise 'value'
-      const expected = (op === 'containsAny' || op === 'containsAll') ? (values || value) : value;
+      const expected = (op === 'containsAny' || op === 'containsAll' || op === 'equalsAny') ? (values || value) : value;
       return operatorFn(actual, expected);
     } catch (e) {
       return false;

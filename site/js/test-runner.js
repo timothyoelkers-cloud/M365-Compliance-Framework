@@ -464,18 +464,11 @@ const TestRunner = (() => {
           var fixture = fixtures[key];
           if (!fixture.configured) return;
 
-          // GOV04 uses the undefined 'equalsAny' operator, so it always returns 'missing'
-          var expectMissing = (key === 'GOV04');
-
-          it(key + ' -- configured fixture should return ' + (expectMissing ? 'missing (equalsAny operator undefined)' : 'configured'), function () {
+          it(key + ' -- configured fixture should return configured', function () {
             var policy = { id: key, type: inferTypeFromId(key) };
             var result = PM.matchPolicy(policy, fixture.configured);
             assert(result, key + ' matchPolicy returned a result');
-            if (expectMissing) {
-              assertEqual(result.status, 'missing', key + ' configured status (equalsAny undefined)');
-            } else {
-              assertEqual(result.status, 'configured', key + ' configured status');
-            }
+            assertEqual(result.status, 'configured', key + ' configured status');
           });
         })(fixtureKeys[i]);
       }
