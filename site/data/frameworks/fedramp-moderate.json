@@ -1,7 +1,478 @@
 {
   "name": "FedRAMP Moderate",
+  "source": {
+    "title": "Federal Risk and Authorization Management Program (FedRAMP) Moderate Baseline",
+    "url": "https://www.fedramp.gov/baselines/",
+    "versionDate": "2024-05-20",
+    "legalReference": "FedRAMP Rev.5 Baselines (based on NIST SP 800-53 Rev.5)"
+  },
   "slug": "fedramp-moderate",
   "group": "NIST / US Federal",
+  "hasStrategies": true,
+  "levelLabels": {
+    "ML1": "Core",
+    "ML2": "Operational",
+    "ML3": "Advanced"
+  },
+  "strategies": [
+    {
+      "id": "access-control",
+      "name": "Access Control (AC)",
+      "order": 1,
+      "description": "Controls for managing access to cloud service offerings. Covers identity governance, privileged access management, external sharing, guest access restrictions, and information sharing agreements in the FedRAMP Moderate boundary.",
+      "article": "AC",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish identity and access governance foundations: disable user consent to third-party apps, configure password protection, enable security defaults, define authentication methods, implement access reviews, PIM, and baseline SharePoint external sharing controls.",
+          "policies": [
+            "ENT01",
+            "ENT02",
+            "ENT03",
+            "ENT04",
+            "ENT10",
+            "GOV01",
+            "GOV02",
+            "SPO01",
+            "SPO06"
+          ],
+          "checks": [
+            "1.1.1",
+            "1.1.2",
+            "1.1.4",
+            "1.2.1",
+            "1.3.1",
+            "3.2.1",
+            "3.2.2",
+            "5.1.2.1",
+            "5.1.2.2",
+            "5.1.2.4",
+            "5.1.3.2",
+            "5.1.5.1",
+            "5.1.5.2",
+            "5.1.6.1",
+            "5.1.8.1",
+            "5.2.2.1",
+            "5.2.2.7",
+            "5.2.2.8",
+            "5.2.3.2",
+            "5.2.3.3",
+            "5.2.3.4",
+            "5.2.3.5",
+            "5.2.3.7",
+            "5.3.4",
+            "5.3.5",
+            "7.2.1",
+            "7.2.3",
+            "7.2.5",
+            "7.2.7",
+            "7.3.2"
+          ]
+        },
+        "ML2": {
+          "summary": "Enforce operational access controls: restrict application registration, enable admin consent workflows, restrict guest invitations, enforce SharePoint domain-restricted sharing, anonymous link expiry, and access request workflows.",
+          "policies": [
+            "ENT05",
+            "ENT06",
+            "GOV03",
+            "GOV04",
+            "SPO02",
+            "SPO03",
+            "SPO04",
+            "SPO07",
+            "SPO08",
+            "SPO09",
+            "SPO13",
+            "SPO19"
+          ],
+          "checks": [
+            "5.1.2.2",
+            "5.1.2.3",
+            "5.1.3.1",
+            "5.1.6.2",
+            "5.1.6.3",
+            "7.2.2",
+            "7.2.3",
+            "7.2.4",
+            "7.2.5",
+            "7.2.6",
+            "7.2.7",
+            "7.2.9",
+            "7.2.10",
+            "7.3.1"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced access governance: deploy admin consent workflow, enforce SSPR registration and token protection, and configure strict SharePoint site-level access, conditional access policies, and information barriers.",
+          "policies": [
+            "ENT07",
+            "ENT08",
+            "ENT09",
+            "SPO10",
+            "SPO11",
+            "SPO14",
+            "SPO15",
+            "SPO18"
+          ],
+          "checks": [
+            "5.1.2.5",
+            "5.1.2.6",
+            "5.2.4.1",
+            "7.2.2",
+            "7.2.4",
+            "7.2.10",
+            "7.2.11"
+          ]
+        }
+      }
+    },
+    {
+      "id": "audit-accountability",
+      "name": "Audit & Accountability (AU)",
+      "order": 2,
+      "description": "Controls ensuring cloud service activities are auditable and traceable within the FedRAMP authorization boundary. Covers unified audit logging, compliance monitoring, and evidence preservation.",
+      "article": "AU",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enable foundational audit capabilities: activate unified audit logging across all M365 workloads and deploy communication compliance policies for regulatory monitoring.",
+          "policies": [
+            "GOV05",
+            "PV11"
+          ],
+          "checks": [
+            "3.1.1",
+            "3.3.1",
+            "4.1",
+            "6.1.1",
+            "9.1.1",
+            "9.1.9"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend audit coverage: configure Purview Audit Premium for enhanced event capture and deploy SharePoint site-level audit and classification policies.",
+          "policies": [
+            "PV09",
+            "SPO20"
+          ],
+          "checks": [
+            "4.2",
+            "9.1.1",
+            "9.1.5"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive audit: deploy eDiscovery hold policies for legal preservation and compliance investigation capabilities.",
+          "policies": [
+            "PV12"
+          ],
+          "checks": [
+            "9.1.4"
+          ]
+        }
+      }
+    },
+    {
+      "id": "contingency-planning",
+      "name": "Contingency Planning (CP)",
+      "order": 3,
+      "description": "Controls for data recovery and continuity of operations within FedRAMP-authorized cloud environments. Covers retention policies, backup procedures, and recovery capabilities.",
+      "article": "CP",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish data recovery fundamentals: deploy retention policies for Exchange, SharePoint, and Teams content, and configure SharePoint versioning and recycle bin protections.",
+          "policies": [
+            "PV22",
+            "SPO05"
+          ],
+          "checks": [
+            "7.2.8",
+            "9.1.12"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend retention coverage: implement OneDrive retention policies and Teams channel message retention to protect against data loss across collaboration workloads.",
+          "policies": [
+            "PV24",
+            "PV25"
+          ],
+          "checks": [
+            "9.1.12"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement preservation controls: deploy litigation hold policies for legal preservation, and configure retention lock to prevent policy modification.",
+          "policies": [
+            "PV23",
+            "PV26"
+          ],
+          "checks": [
+            "9.1.12"
+          ]
+        }
+      }
+    },
+    {
+      "id": "incident-response",
+      "name": "Incident Response (IR)",
+      "order": 4,
+      "description": "Controls for detecting, analysing, containing, and recovering from security incidents in FedRAMP-authorized cloud environments. Covers endpoint detection and response, threat intelligence, and incident handling.",
+      "article": "IR",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy core endpoint detection: enable Defender for Endpoint EDR, configure antivirus policies, deploy next-generation protection, and establish automated investigation capabilities.",
+          "policies": [
+            "MDE01",
+            "MDE02",
+            "MDE03",
+            "MDE09"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "5.1.4.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Enhance detection and response: configure vulnerability management, web content filtering, attack indicators, and network protection. Deploy DLP incident management and insider risk alerting.",
+          "policies": [
+            "MDE04",
+            "MDE05",
+            "MDE10",
+            "MDE11",
+            "PV05",
+            "PV30"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "9.1.1",
+            "9.1.4"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced threat response: deploy device control, application guard, exploit guard, and advanced hunting. Enable insider risk investigation and communication monitoring.",
+          "policies": [
+            "MDE06",
+            "MDE07",
+            "MDE08",
+            "MDE12",
+            "PV27",
+            "PV28"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "9.1.8"
+          ]
+        }
+      }
+    },
+    {
+      "id": "media-protection",
+      "name": "Media Protection (MP)",
+      "order": 5,
+      "description": "Controls for protecting information throughout its lifecycle within FedRAMP-authorized environments. Covers data classification, sensitivity labelling, data loss prevention, and encryption for data at rest and in transit.",
+      "article": "MP",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish data classification foundations: deploy sensitivity labels for Confidential, Highly Confidential, and Internal use, and configure DLP policies for credit card and personal data detection.",
+          "policies": [
+            "PV01",
+            "PV02",
+            "PV03"
+          ],
+          "checks": [
+            "9.1.1",
+            "9.1.2",
+            "9.1.3",
+            "9.1.5"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend data protection: deploy sensitivity label auto-labelling, encryption-enforcing labels, DLP for Exchange/Teams/SharePoint, exact data matching, endpoint DLP, and SharePoint data access governance.",
+          "policies": [
+            "PV04",
+            "PV06",
+            "PV07",
+            "PV08",
+            "PV10",
+            "PV13",
+            "PV14",
+            "PV17",
+            "SPO17"
+          ],
+          "checks": [
+            "9.1.2",
+            "9.1.3",
+            "9.1.6",
+            "9.1.7",
+            "9.1.10",
+            "9.1.11"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive data controls: deploy trainable classifiers, advanced DLP tuning, information barriers, data lifecycle management, and SharePoint advanced access and versioning controls.",
+          "policies": [
+            "PV15",
+            "PV18",
+            "PV20",
+            "PV21",
+            "SPO12",
+            "SPO16"
+          ],
+          "checks": [
+            "9.1.2",
+            "9.1.3",
+            "9.1.6",
+            "9.1.11"
+          ]
+        }
+      }
+    },
+    {
+      "id": "system-communications-protection",
+      "name": "System & Communications Protection (SC)",
+      "order": 6,
+      "description": "Controls for protecting communications channels and securing information in transit within FedRAMP-authorized cloud environments. Covers email security, transport encryption, anti-phishing, and safe content scanning.",
+      "article": "SC",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish communications security: enforce TLS for Exchange transport, configure DKIM/DMARC email authentication, block auto-forwarding to external domains, and deploy baseline anti-phishing policies.",
+          "policies": [
+            "EXO01",
+            "EXO02",
+            "EXO03",
+            "DEF01"
+          ],
+          "checks": [
+            "2.1.1",
+            "2.1.2",
+            "2.1.3",
+            "2.1.4",
+            "2.1.7",
+            "2.1.8",
+            "2.1.9",
+            "2.1.10",
+            "2.2.1",
+            "6.2.2",
+            "6.5.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen email security: enable mailbox auditing, deploy DKIM signing, configure anti-spoofing, journal rules, Safe Links URL scanning, Safe Attachments, impersonation protection, and internal phishing policies.",
+          "policies": [
+            "EXO04",
+            "EXO05",
+            "EXO06",
+            "EXO08",
+            "DEF02",
+            "DEF03",
+            "DEF04",
+            "DEF08"
+          ],
+          "checks": [
+            "2.1.1",
+            "2.1.3",
+            "2.1.4",
+            "2.1.5",
+            "2.1.11",
+            "2.1.12",
+            "2.1.13",
+            "2.1.14",
+            "2.4.1",
+            "2.4.2",
+            "2.4.3",
+            "2.4.4",
+            "6.1.2",
+            "6.1.3",
+            "6.3.1",
+            "6.5.1",
+            "6.5.4",
+            "6.5.5"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced communications protection: disable calendar sharing externally, configure mail flow rules for sensitive content, deploy tenant allow/block lists, and advanced Safe Links/Attachments with ZAP.",
+          "policies": [
+            "EXO07",
+            "EXO09",
+            "EXO10",
+            "DEF05",
+            "DEF06",
+            "DEF07"
+          ],
+          "checks": [
+            "2.1.2",
+            "2.1.6",
+            "2.1.12",
+            "2.1.13",
+            "2.1.15",
+            "6.2.1",
+            "6.2.3",
+            "6.5.2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "system-information-integrity",
+      "name": "System & Information Integrity (SI)",
+      "order": 7,
+      "description": "Controls for maintaining the integrity of information and collaboration systems within FedRAMP-authorized environments. Covers Teams security, collaboration controls, and external integration restrictions.",
+      "article": "SI",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish collaboration integrity controls: configure Teams meeting policies to prevent anonymous join and lobby bypass, and restrict external domain access to approved organisations.",
+          "policies": [
+            "TEA01",
+            "TEA06"
+          ],
+          "checks": [
+            "8.1.1",
+            "8.2.1",
+            "8.2.2",
+            "8.4.1",
+            "8.5.1",
+            "8.5.9"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen collaboration security: enforce meeting recording consent, restrict external messaging, disable unmanaged file sharing in Teams chats, and control meeting chat capabilities.",
+          "policies": [
+            "TEA02",
+            "TEA03",
+            "TEA07",
+            "TEA08"
+          ],
+          "checks": [
+            "8.1.2",
+            "8.5.2",
+            "8.5.3",
+            "8.5.4",
+            "8.5.8",
+            "8.5.9",
+            "8.6.1"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced collaboration controls: restrict external app and cloud storage access in Teams, enforce meeting watermarks, disable email-to-channel, and restrict channel creation permissions.",
+          "policies": [
+            "TEA04",
+            "TEA05",
+            "TEA09",
+            "TEA10"
+          ],
+          "checks": [
+            "8.2.3",
+            "8.2.4",
+            "8.5.5",
+            "8.5.6",
+            "8.5.7",
+            "8.6.1"
+          ]
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.2",
@@ -143,22 +614,6 @@
   ],
   "checkCount": 137,
   "policies": [
-    "CA01",
-    "CA02",
-    "CA03",
-    "CA04",
-    "CA05",
-    "CA06",
-    "CA07",
-    "CA08",
-    "CA09",
-    "CA10",
-    "CA13",
-    "CA14",
-    "CA15",
-    "CA16",
-    "CA17",
-    "CA18",
     "DEF01",
     "DEF02",
     "DEF03",
@@ -187,25 +642,11 @@
     "EXO08",
     "EXO09",
     "EXO10",
-    "INT01",
-    "INT02",
-    "INT03",
-    "INT04",
-    "INT05",
-    "INT06",
-    "INT07",
-    "INT08",
-    "INT09",
-    "INT10",
-    "INT11",
-    "INT12",
-    "INT13",
-    "INT14",
-    "INT15",
-    "INT16",
-    "INT17",
-    "INT19",
-    "INT20",
+    "GOV01",
+    "GOV02",
+    "GOV03",
+    "GOV04",
+    "GOV05",
     "MDE01",
     "MDE02",
     "MDE03",
@@ -276,7 +717,7 @@
     "TEA09",
     "TEA10"
   ],
-  "policyCount": 132,
+  "policyCount": 102,
   "orgProfiles": [
     "US Federal"
   ]

@@ -1,7 +1,619 @@
 {
   "name": "NIST SP 800-53 Rev.5",
+  "source": {
+    "title": "NIST Special Publication 800-53 Revision 5: Security and Privacy Controls for Information Systems and Organizations",
+    "url": "https://csrc.nist.gov/publications/detail/sp/800-53/rev-5/final",
+    "versionDate": "2020-09-23",
+    "legalReference": "NIST SP 800-53 Rev.5 (updated 2020-12-10)"
+  },
   "slug": "nist-sp-800-53-rev-5",
   "group": "NIST / US Federal",
+  "hasStrategies": true,
+  "levelLabels": {
+    "ML1": "Low Baseline",
+    "ML2": "Moderate Baseline",
+    "ML3": "High Baseline"
+  },
+  "strategies": [
+    {
+      "id": "access-control",
+      "name": "Access Control (AC)",
+      "order": 1,
+      "description": "Policies and mechanisms that control who can access organizational systems, data, and resources. Covers user access provisioning, access enforcement, separation of duties, least privilege, session management, external access, and information sharing.",
+      "article": "AC",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish foundational access controls: block legacy authentication, enforce MFA for all users, disable user consent to third-party apps, configure self-service password reset, and implement access reviews and privileged identity management.",
+          "policies": [
+            "CA01",
+            "CA02",
+            "ENT01",
+            "ENT04",
+            "GOV01",
+            "GOV02",
+            "SPO01"
+          ],
+          "checks": [
+            "1.1.1",
+            "1.1.4",
+            "1.3.1",
+            "3.2.1",
+            "3.2.2",
+            "5.1.2.1",
+            "5.1.3.2",
+            "5.1.5.1",
+            "5.1.6.1",
+            "5.1.8.1",
+            "5.2.2.2",
+            "5.2.2.3",
+            "5.2.3.1",
+            "5.2.3.2",
+            "5.2.3.3",
+            "5.2.3.7",
+            "5.3.1",
+            "5.3.4",
+            "5.3.5",
+            "6.5.1",
+            "7.2.3",
+            "7.2.5",
+            "7.2.7",
+            "7.3.2"
+          ]
+        },
+        "ML2": {
+          "summary": "Enforce risk-based and conditional access: require phishing-resistant MFA for admins, sign-in and user risk policies, device compliance requirements, location-based restrictions, guest access controls, and granular SharePoint sharing restrictions.",
+          "policies": [
+            "CA03",
+            "CA04",
+            "CA05",
+            "CA06",
+            "CA07",
+            "CA08",
+            "CA09",
+            "CA11",
+            "CA12",
+            "CA16",
+            "CA17",
+            "ENT05",
+            "ENT06",
+            "GOV03",
+            "GOV04",
+            "INT10-Device-Enrollment-Restrictions",
+            "SPO02",
+            "SPO03",
+            "SPO04",
+            "SPO06",
+            "SPO07",
+            "SPO08",
+            "SPO13",
+            "SPO19"
+          ],
+          "checks": [
+            "1.1.3",
+            "1.1.4",
+            "1.2.2",
+            "1.3.1",
+            "1.3.2",
+            "1.3.3",
+            "1.3.4",
+            "1.3.5",
+            "1.3.7",
+            "1.3.9",
+            "3.2.2",
+            "5.1.2.2",
+            "5.1.2.3",
+            "5.1.3.1",
+            "5.1.4.1",
+            "5.1.4.3",
+            "5.1.6.1",
+            "5.1.6.2",
+            "5.1.6.3",
+            "5.1.8.1",
+            "5.2.2.2",
+            "5.2.2.5",
+            "5.2.2.6",
+            "5.2.2.9",
+            "5.2.2.12",
+            "5.3.1",
+            "7.2.1",
+            "7.2.2",
+            "7.2.3",
+            "7.2.4",
+            "7.2.5",
+            "7.2.6",
+            "7.2.7",
+            "7.2.9",
+            "7.2.10"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced access controls: device registration MFA, session timeouts for users and admins, platform-specific restrictions, external access governance, and strict SharePoint site-level access controls.",
+          "policies": [
+            "CA10",
+            "CA13",
+            "CA14",
+            "CA15",
+            "CA18",
+            "ENT07",
+            "SPO10",
+            "SPO11",
+            "SPO14",
+            "SPO15",
+            "SPO18"
+          ],
+          "checks": [
+            "1.3.6",
+            "1.3.8",
+            "5.1.3.1",
+            "5.1.4.3",
+            "5.2.2.4",
+            "5.2.2.10",
+            "5.2.2.11",
+            "5.2.4.1",
+            "7.2.2",
+            "7.2.4",
+            "7.2.10",
+            "7.2.11"
+          ]
+        }
+      }
+    },
+    {
+      "id": "identification-authentication",
+      "name": "Identification & Authentication (IA)",
+      "order": 2,
+      "description": "Controls for uniquely identifying and authenticating users, devices, and services. Covers authentication policies, credential management, multi-factor authentication, and authenticator lifecycle management.",
+      "article": "IA",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish identity baselines: configure password protection with custom banned lists, enable security defaults, and define allowed authentication methods to eliminate weak authenticators.",
+          "policies": [
+            "ENT02",
+            "ENT03",
+            "ENT10"
+          ],
+          "checks": [
+            "1.1.2",
+            "1.2.1",
+            "5.1.2.2",
+            "5.1.2.4",
+            "5.1.5.2",
+            "5.2.2.1",
+            "5.2.2.7",
+            "5.2.2.8",
+            "5.2.3.4",
+            "5.2.3.5",
+            "5.2.3.7",
+            "5.3.4"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen authentication: deploy Windows Hello for Business for passwordless sign-in and enforce SSPR registration to ensure all users have recovery methods configured.",
+          "policies": [
+            "INT13-Windows-Hello-For-Business",
+            "ENT08"
+          ],
+          "checks": [
+            "5.1.2.6",
+            "5.2.2.2",
+            "5.2.3.6",
+            "5.3.1",
+            "5.3.2",
+            "5.3.3"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced identity controls: enable token protection to bind tokens to specific devices, and deploy Windows LAPS for automated local admin password rotation.",
+          "policies": [
+            "ENT09",
+            "INT06-Windows-LAPS-Local-Admin-Password"
+          ],
+          "checks": [
+            "5.1.2.5",
+            "5.1.4.5"
+          ]
+        }
+      }
+    },
+    {
+      "id": "audit-accountability",
+      "name": "Audit & Accountability (AU)",
+      "order": 3,
+      "description": "Controls ensuring organizational activities are auditable and that audit records are generated, reviewed, and retained. Covers audit logging, monitoring, analysis, and reporting.",
+      "article": "AU",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enable foundational audit capabilities: activate unified audit logging across all M365 workloads and deploy communication compliance policies for regulatory monitoring.",
+          "policies": [
+            "GOV05",
+            "PV11"
+          ],
+          "checks": [
+            "3.1.1",
+            "3.3.1",
+            "4.1",
+            "6.1.1",
+            "9.1.1",
+            "9.1.9"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend audit coverage: configure Purview Audit Premium for enhanced event capture and deploy site-level audit and classification policies in SharePoint.",
+          "policies": [
+            "PV09",
+            "SPO20"
+          ],
+          "checks": [
+            "4.2",
+            "9.1.1",
+            "9.1.5"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive audit: deploy eDiscovery hold policies for legal preservation and advanced compliance monitoring with automated alert rules.",
+          "policies": [
+            "PV12",
+            "PV29"
+          ],
+          "checks": [
+            "9.1.4"
+          ]
+        }
+      }
+    },
+    {
+      "id": "configuration-management",
+      "name": "Configuration Management (CM)",
+      "order": 4,
+      "description": "Controls for establishing and maintaining baseline configurations for systems and enforcing security configuration settings. Covers configuration baselines, change control, and least functionality.",
+      "article": "CM",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Define device compliance baselines: enforce BitLocker, Secure Boot, TPM, Defender real-time protection, and minimum OS versions across Windows, iOS, Android, and macOS endpoints.",
+          "policies": [
+            "INT01-Device-Compliance-Windows-Baseline",
+            "INT02-Device-Compliance-iOS-Baseline",
+            "INT03-Device-Compliance-Android-Baseline",
+            "INT04-Device-Compliance-macOS-Baseline"
+          ],
+          "checks": []
+        },
+        "ML2": {
+          "summary": "Harden endpoint configuration: deploy Defender AV policies, Windows update rings, mobile app protection, CIS security baselines, Edge browser hardening, and firewall policies.",
+          "policies": [
+            "INT07-Defender-AV-Configuration-Windows",
+            "INT08-Windows-Update-Ring-Policy",
+            "INT09-App-Protection-Policy-iOS-Android",
+            "INT11-Windows-Security-Baseline-CIS",
+            "INT12-Microsoft-Edge-Security-Baseline",
+            "INT14-Firewall-Policy-Windows"
+          ],
+          "checks": []
+        },
+        "ML3": {
+          "summary": "Implement advanced endpoint hardening: attack surface reduction rules, Credential Guard, diagnostic data restrictions, exploit protection, and controlled folder access for ransomware prevention.",
+          "policies": [
+            "INT15-Attack-Surface-Reduction-Rules",
+            "INT16-Credential-Guard-Windows",
+            "INT18-Windows-Diagnostic-Data-Limit",
+            "INT19-Exploit-Protection-Policy",
+            "INT20-Controlled-Folder-Access"
+          ],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "contingency-planning",
+      "name": "Contingency Planning (CP)",
+      "order": 5,
+      "description": "Controls for preparing for, responding to, and recovering from disruptions. Covers backup, recovery, and continuity of operations to ensure system availability.",
+      "article": "CP",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish data recovery fundamentals: deploy retention policies for Exchange, SharePoint, and Teams content, and configure SharePoint versioning and recycle bin protections.",
+          "policies": [
+            "PV22",
+            "SPO05"
+          ],
+          "checks": [
+            "7.2.8",
+            "9.1.12"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend retention coverage: implement OneDrive retention policies and Teams channel message retention to protect against data loss across collaboration workloads.",
+          "policies": [
+            "PV24",
+            "PV25"
+          ],
+          "checks": [
+            "9.1.12"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement preservation controls: deploy litigation hold policies for legal and compliance preservation, and configure retention lock to prevent policy modification.",
+          "policies": [
+            "PV23",
+            "PV26"
+          ],
+          "checks": [
+            "9.1.12"
+          ]
+        }
+      }
+    },
+    {
+      "id": "incident-response",
+      "name": "Incident Response (IR)",
+      "order": 6,
+      "description": "Controls for detecting, analysing, containing, eradicating, and recovering from security incidents. Covers incident handling, monitoring, reporting, and post-incident activities.",
+      "article": "IR",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy core endpoint detection: enable Defender for Endpoint EDR, configure antivirus policies, deploy next-generation protection, and establish automated investigation capabilities.",
+          "policies": [
+            "MDE01",
+            "MDE02",
+            "MDE03",
+            "MDE09"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "5.1.4.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Enhance detection and response: configure vulnerability management, web content filtering, attack indicators, and network protection. Deploy DLP incident management and insider risk alerting.",
+          "policies": [
+            "MDE04",
+            "MDE05",
+            "MDE10",
+            "MDE11",
+            "PV05",
+            "PV30"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "9.1.1",
+            "9.1.4"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced threat response: deploy device control, application guard, exploit guard, and advanced hunting. Enable insider risk investigation and communication monitoring for data exfiltration.",
+          "policies": [
+            "MDE06",
+            "MDE07",
+            "MDE08",
+            "MDE12",
+            "PV27",
+            "PV28"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "9.1.8"
+          ]
+        }
+      }
+    },
+    {
+      "id": "media-protection",
+      "name": "Media Protection (MP)",
+      "order": 7,
+      "description": "Controls for protecting information at rest and ensuring proper handling of data throughout its lifecycle. Covers data classification, labelling, data loss prevention, encryption, and information handling.",
+      "article": "MP",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish data classification foundations: deploy sensitivity labels for Confidential, Highly Confidential, and Internal use. Configure DLP policies for credit card and personal data detection. Enforce BitLocker full-disk encryption.",
+          "policies": [
+            "PV01",
+            "PV02",
+            "PV03",
+            "INT05-BitLocker-Encryption-Policy"
+          ],
+          "checks": [
+            "5.1.4.4",
+            "5.1.4.6",
+            "9.1.1",
+            "9.1.2",
+            "9.1.3",
+            "9.1.5"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend data protection: deploy sensitivity label auto-labelling, encryption-enforcing labels, DLP for Exchange/Teams/SharePoint, exact data matching, endpoint DLP, and SharePoint IRM and data access governance.",
+          "policies": [
+            "PV04",
+            "PV06",
+            "PV07",
+            "PV08",
+            "PV10",
+            "PV13",
+            "PV14",
+            "PV16",
+            "PV17",
+            "SPO09",
+            "SPO17"
+          ],
+          "checks": [
+            "7.3.1",
+            "9.1.2",
+            "9.1.3",
+            "9.1.6",
+            "9.1.7",
+            "9.1.10",
+            "9.1.11"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive data controls: deploy trainable classifiers, advanced DLP tuning, information barriers, data lifecycle management, and removable storage restrictions. Enforce SharePoint advanced access and versioning controls.",
+          "policies": [
+            "PV15",
+            "PV18",
+            "PV19",
+            "PV20",
+            "PV21",
+            "INT17-Removable-Storage-Control",
+            "SPO12",
+            "SPO16"
+          ],
+          "checks": [
+            "9.1.2",
+            "9.1.3",
+            "9.1.6",
+            "9.1.11"
+          ]
+        }
+      }
+    },
+    {
+      "id": "system-communications-protection",
+      "name": "System & Communications Protection (SC)",
+      "order": 8,
+      "description": "Controls for protecting communications and the systems that process, store, or transmit information. Covers boundary protection, transmission confidentiality and integrity, and cryptographic protections.",
+      "article": "SC",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish communications security: enforce TLS for Exchange transport, configure DKIM/DMARC email authentication, block auto-forwarding to external domains, and deploy baseline anti-phishing policies.",
+          "policies": [
+            "EXO01",
+            "EXO02",
+            "EXO03",
+            "DEF01"
+          ],
+          "checks": [
+            "2.1.1",
+            "2.1.2",
+            "2.1.3",
+            "2.1.4",
+            "2.1.7",
+            "2.1.8",
+            "2.1.9",
+            "2.1.10",
+            "2.2.1",
+            "6.2.2",
+            "6.5.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen email and messaging security: enable mailbox auditing, deploy DKIM signing, configure anti-spoofing, journal rules, Safe Links URL scanning, Safe Attachments, impersonation protection, and internal phishing policies.",
+          "policies": [
+            "EXO04",
+            "EXO05",
+            "EXO06",
+            "EXO08",
+            "DEF02",
+            "DEF03",
+            "DEF04",
+            "DEF08"
+          ],
+          "checks": [
+            "2.1.1",
+            "2.1.3",
+            "2.1.4",
+            "2.1.5",
+            "2.1.11",
+            "2.1.12",
+            "2.1.13",
+            "2.1.14",
+            "2.4.1",
+            "2.4.2",
+            "2.4.3",
+            "2.4.4",
+            "6.1.2",
+            "6.1.3",
+            "6.3.1",
+            "6.5.1",
+            "6.5.4",
+            "6.5.5"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced communications protection: disable calendar sharing externally, configure mail flow rules for sensitive content, deploy tenant allow/block lists, and advanced Safe Links/Attachments policies with zero-hour auto-purge.",
+          "policies": [
+            "EXO07",
+            "EXO09",
+            "EXO10",
+            "DEF05",
+            "DEF06",
+            "DEF07"
+          ],
+          "checks": [
+            "2.1.2",
+            "2.1.6",
+            "2.1.12",
+            "2.1.13",
+            "2.1.15",
+            "6.2.1",
+            "6.2.3",
+            "6.5.2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "system-information-integrity",
+      "name": "System & Information Integrity (SI)",
+      "order": 9,
+      "description": "Controls for protecting the integrity of information and systems from unauthorized modification or destruction. Covers flaw remediation, malicious code protection, information handling, and software/firmware integrity.",
+      "article": "SI",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish collaboration integrity controls: configure Teams meeting policies to prevent anonymous join and lobby bypass, and restrict external domain access to approved organisations.",
+          "policies": [
+            "TEA01",
+            "TEA06"
+          ],
+          "checks": [
+            "8.1.1",
+            "8.2.1",
+            "8.2.2",
+            "8.4.1",
+            "8.5.1",
+            "8.5.9"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen collaboration security: enforce meeting recording consent, restrict external messaging, disable unmanaged file sharing in Teams chats, and control meeting chat and file upload capabilities.",
+          "policies": [
+            "TEA02",
+            "TEA03",
+            "TEA07",
+            "TEA08"
+          ],
+          "checks": [
+            "8.1.2",
+            "8.5.2",
+            "8.5.3",
+            "8.5.4",
+            "8.5.8",
+            "8.5.9",
+            "8.6.1"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced collaboration controls: restrict external app and cloud storage access in Teams, enforce meeting watermarks, disable email-to-channel functionality, and restrict channel creation permissions.",
+          "policies": [
+            "TEA04",
+            "TEA05",
+            "TEA09",
+            "TEA10"
+          ],
+          "checks": [
+            "8.2.3",
+            "8.2.4",
+            "8.5.5",
+            "8.5.6",
+            "8.5.7",
+            "8.6.1"
+          ]
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.2",
@@ -192,26 +804,31 @@
     "EXO08",
     "EXO09",
     "EXO10",
-    "INT01",
-    "INT02",
-    "INT03",
-    "INT04",
-    "INT05",
-    "INT06",
-    "INT07",
-    "INT08",
-    "INT09",
-    "INT10",
-    "INT11",
-    "INT12",
-    "INT13",
-    "INT14",
-    "INT15",
-    "INT16",
-    "INT17",
-    "INT18",
-    "INT19",
-    "INT20",
+    "GOV01",
+    "GOV02",
+    "GOV03",
+    "GOV04",
+    "GOV05",
+    "INT01-Device-Compliance-Windows-Baseline",
+    "INT02-Device-Compliance-iOS-Baseline",
+    "INT03-Device-Compliance-Android-Baseline",
+    "INT04-Device-Compliance-macOS-Baseline",
+    "INT05-BitLocker-Encryption-Policy",
+    "INT06-Windows-LAPS-Local-Admin-Password",
+    "INT07-Defender-AV-Configuration-Windows",
+    "INT08-Windows-Update-Ring-Policy",
+    "INT09-App-Protection-Policy-iOS-Android",
+    "INT10-Device-Enrollment-Restrictions",
+    "INT11-Windows-Security-Baseline-CIS",
+    "INT12-Microsoft-Edge-Security-Baseline",
+    "INT13-Windows-Hello-For-Business",
+    "INT14-Firewall-Policy-Windows",
+    "INT15-Attack-Surface-Reduction-Rules",
+    "INT16-Credential-Guard-Windows",
+    "INT17-Removable-Storage-Control",
+    "INT18-Windows-Diagnostic-Data-Limit",
+    "INT19-Exploit-Protection-Policy",
+    "INT20-Controlled-Folder-Access",
     "MDE01",
     "MDE02",
     "MDE03",
@@ -285,7 +902,7 @@
     "TEA09",
     "TEA10"
   ],
-  "policyCount": 138,
+  "policyCount": 143,
   "orgProfiles": [
     "US Federal",
     "US Healthcare",

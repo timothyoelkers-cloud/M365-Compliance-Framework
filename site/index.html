@@ -477,7 +477,9 @@ async function bootstrap() {
       'DORA': { slug: 'dora', stateKey: 'doraStrategies' },
       'GDPR (EU) 2016/679': { slug: 'gdpr-eu-2016-679', stateKey: 'gdprStrategies' },
       'HIPAA': { slug: 'hipaa', stateKey: 'hipaaStrategies' },
-      'UK NCSC CAF v3.2': { slug: 'uk-ncsc-caf-v3-2', stateKey: 'ncscCafStrategies' }
+      'UK NCSC CAF v3.2': { slug: 'uk-ncsc-caf-v3-2', stateKey: 'ncscCafStrategies' },
+      'NIST SP 800-53 Rev.5': { slug: 'nist-sp-800-53-rev-5', stateKey: 'nist80053Strategies' },
+      'FedRAMP Moderate': { slug: 'fedramp-moderate', stateKey: 'fedrampStrategies' }
     };
     AppState.on('selectedFrameworks', async function (fws) {
       for (var fwName in strategyFrameworks) {
