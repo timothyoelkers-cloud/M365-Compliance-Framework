@@ -26,7 +26,13 @@ const ThemeToggle = (() => {
     }
   }
 
-  function applyTheme(theme) {
+  function applyTheme(theme, animate) {
+    if (animate) {
+      document.documentElement.classList.add('theme-transition');
+      setTimeout(function() {
+        document.documentElement.classList.remove('theme-transition');
+      }, 350);
+    }
     document.documentElement.setAttribute('data-theme', theme);
     var btn = document.getElementById('theme-toggle-btn');
     if (btn) {
@@ -39,7 +45,7 @@ const ThemeToggle = (() => {
     var current = document.documentElement.getAttribute('data-theme') || 'light';
     var next = current === 'dark' ? 'light' : 'dark';
     localStorage.setItem(STORAGE_KEY, next);
-    applyTheme(next);
+    applyTheme(next, true);
     if (typeof AuditTrail !== 'undefined') {
       AuditTrail.log('config.theme', 'Theme changed to ' + next);
     }

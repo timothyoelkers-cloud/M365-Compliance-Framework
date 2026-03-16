@@ -1,7 +1,250 @@
 {
   "name": "CSA CCM v4",
+  "source": {
+    "title": "CSA Cloud Controls Matrix v4.0.12",
+    "url": "https://cloudsecurityalliance.org/research/cloud-controls-matrix",
+    "versionDate": "2024-03-01",
+    "legalReference": "CSA CCM v4.0 (Cloud Security Alliance)"
+  },
   "slug": "csa-ccm-v4",
   "group": "Cloud & Tech",
+  "hasStrategies": true,
+  "levelLabels": {
+    "ML1": "Foundation",
+    "ML2": "Advanced",
+    "ML3": "Comprehensive"
+  },
+  "strategies": [
+    {
+      "id": "identity-access-management",
+      "name": "Identity & Access Management (IAM)",
+      "order": 1,
+      "description": "Controls for managing user identities, authentication, and access to cloud resources. Covers conditional access, guest and external user governance, privileged access, and session management aligned to CCM IAM domain controls.",
+      "article": "IAM",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish foundational identity controls: enforce MFA registration, block legacy authentication, configure self-service password reset, and restrict external collaboration defaults.",
+          "policies": [
+            "ENT04",
+            "ENT05",
+            "ENT06"
+          ],
+          "checks": [
+            "1.1.1",
+            "1.1.2",
+            "1.1.3",
+            "1.1.4",
+            "5.1.2.5",
+            "5.1.3.1",
+            "5.1.3.2",
+            "5.1.5.1",
+            "5.1.6.1",
+            "5.2.2.1",
+            "5.2.3.1",
+            "5.2.3.2",
+            "5.2.3.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen identity governance: enforce token protection to bind tokens to devices, apply advanced session management, and implement just-in-time privileged access controls.",
+          "policies": [
+            "ENT09",
+            "SPO01"
+          ],
+          "checks": [
+            "1.2.1",
+            "1.3.1",
+            "1.3.2",
+            "5.1.4.1",
+            "5.1.4.2",
+            "5.1.4.3",
+            "5.1.6.2",
+            "5.1.6.3",
+            "5.2.2.4",
+            "5.2.2.5"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive access controls: granular SharePoint access policies, advanced conditional access evaluation, and cross-workload identity protection.",
+          "policies": [
+            "SPO02"
+          ],
+          "checks": [
+            "1.3.5",
+            "1.3.7",
+            "5.1.4.4",
+            "5.1.4.5",
+            "5.1.4.6",
+            "5.2.2.6",
+            "5.2.2.7",
+            "5.2.2.8"
+          ]
+        }
+      }
+    },
+    {
+      "id": "data-security-encryption",
+      "name": "Data Security & Encryption (DSP, EKM)",
+      "order": 2,
+      "description": "Controls for protecting data at rest, in transit, and in use through classification, encryption, and data loss prevention. Covers sensitivity labeling, DLP policies, information barriers, and encryption key management aligned to CCM DSP and EKM domain controls.",
+      "article": "DSP",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy foundational data protection: enable sensitivity labels and auto-labeling policies, configure basic DLP rules, and establish information protection baselines.",
+          "policies": [
+            "PV01",
+            "PV04",
+            "PV05"
+          ],
+          "checks": [
+            "3.1.1",
+            "3.2.1",
+            "3.2.2",
+            "3.3.1",
+            "6.1.1",
+            "6.1.2",
+            "6.1.3",
+            "6.5.1",
+            "9.1.1",
+            "9.1.2"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend data security: deploy eDiscovery hold policies for data preservation, configure advanced SharePoint information management, and enforce data classification across collaboration workloads.",
+          "policies": [
+            "PV12",
+            "SPO05",
+            "SPO06"
+          ],
+          "checks": [
+            "4.2",
+            "6.5.3",
+            "7.2.1",
+            "7.2.3",
+            "7.2.4",
+            "7.2.5",
+            "7.2.6",
+            "7.2.7",
+            "7.2.8",
+            "9.1.3"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive encryption and data governance: enforce site-level sensitivity and classification policies, advanced retention and lifecycle management, and end-to-end encryption controls.",
+          "policies": [
+            "SPO09"
+          ],
+          "checks": [
+            "7.3.1",
+            "9.1.4",
+            "9.1.6",
+            "9.1.7",
+            "9.1.8"
+          ]
+        }
+      }
+    },
+    {
+      "id": "infrastructure-virtualization-security",
+      "name": "Infrastructure & Virtualization Security (IVS)",
+      "order": 3,
+      "description": "Controls for securing cloud infrastructure, endpoint devices, and network configurations. Covers device compliance baselines, endpoint hardening, transport security, and mobile device management aligned to CCM IVS domain controls.",
+      "article": "IVS",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish endpoint compliance baselines: enforce device compliance for Windows endpoints, configure Defender real-time protection, and set minimum OS version requirements.",
+          "policies": [
+            "INT01-Device-Compliance-Windows-Baseline",
+            "EXO01"
+          ],
+          "checks": [
+            "2.1.1",
+            "2.1.3",
+            "2.1.4",
+            "2.1.5",
+            "2.1.6",
+            "2.1.7",
+            "2.4.1",
+            "2.4.2",
+            "8.1.1"
+          ]
+        },
+        "ML2": {
+          "summary": "Harden infrastructure: deploy transport rules for email security, configure mail flow encryption, and enforce advanced endpoint protection settings.",
+          "policies": [
+            "EXO03",
+            "EXO04",
+            "EXO05"
+          ],
+          "checks": [
+            "2.1.12",
+            "2.1.13",
+            "2.1.14",
+            "2.1.15",
+            "2.2.1",
+            "2.4.3",
+            "2.4.4",
+            "8.5.3",
+            "8.5.8"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive infrastructure protection: advanced anti-phishing and safe links policies, full endpoint detection and response, and strict mail flow controls.",
+          "policies": [
+            "EXO06"
+          ],
+          "checks": [
+            "5.3.1",
+            "5.3.2",
+            "5.3.3",
+            "5.3.4",
+            "5.3.5",
+            "8.5.9"
+          ]
+        }
+      }
+    },
+    {
+      "id": "governance-compliance",
+      "name": "Governance & Compliance (GRC, LOG)",
+      "order": 4,
+      "description": "Controls for audit logging, compliance monitoring, collaboration governance, and regulatory reporting. Covers unified audit log, Teams governance, communication compliance, and organizational policy enforcement aligned to CCM GRC and LOG domain controls.",
+      "article": "GRC",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish governance foundations: configure Teams meeting policies, enable audit logging, and set collaboration defaults for external and guest access.",
+          "policies": [
+            "TEA01",
+            "TEA02"
+          ],
+          "checks": [
+            "5.2.2.12",
+            "5.2.3.1",
+            "8.1.1"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend governance controls: deploy advanced Teams messaging policies, enforce app permission governance, and configure compliance monitoring for collaboration workloads.",
+          "policies": [
+            "TEA08",
+            "SPO03"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "8.5.3",
+            "8.5.8"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive compliance: advanced regulatory reporting, cross-workload policy enforcement, and continuous compliance monitoring with automated remediation.",
+          "policies": [],
+          "checks": [
+            "8.5.9"
+          ]
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.2",

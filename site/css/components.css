@@ -161,13 +161,14 @@
   border-color: #0e7490;
 }
 .btn-dark {
-  background: var(--dark-bg2);
-  color: var(--dark-soft);
-  border-color: var(--dark-border);
+  background: var(--gray-100);
+  color: var(--ink2);
+  border-color: var(--border);
 }
 .btn-dark:hover {
-  background: var(--dark-bg3);
-  color: var(--dark-bright);
+  background: var(--gray-50);
+  color: var(--ink);
+  border-color: var(--border2);
 }
 .btn-sm { font-size: .75rem; padding: 4px 10px; border-radius: 6px; }
 .btn-lg { font-size: .875rem; padding: 10px 20px; border-radius: var(--r2); }
@@ -435,11 +436,11 @@
 /* ── TOAST ────────────────────────────── */
 .toast {
   position: fixed; bottom: 20px; right: 20px;
-  background: var(--dark-bg);
-  color: var(--dark-bright);
+  background: #0f172a;
+  color: #e6edf3;
   padding: 14px 20px;
   font-size: .875rem; font-weight: 600;
-  border: 1px solid var(--dark-border);
+  border: 1px solid #334155;
   border-radius: var(--r2);
   box-shadow: var(--shadow3);
   z-index: 300;
@@ -499,8 +500,8 @@
   font-size: .75rem;
 }
 .heatmap-header {
-  background: var(--dark-bg);
-  color: var(--dark-soft);
+  background: #0f172a;
+  color: #c9d1d9;
   writing-mode: vertical-lr;
   text-orientation: mixed;
   padding: 6px 2px;
@@ -558,13 +559,13 @@
 }
 .section-hdr:first-child { margin-top: 0; }
 
-/* ── HERO (dark zone inside content) ──── */
+/* ── HERO (always-dark accent zone) ──── */
 .hero {
-  background: var(--dark-bg);
-  color: var(--dark-bright);
+  background: #0f172a;
+  color: #e6edf3;
   padding: 48px 40px;
   margin: -24px -32px 24px;
-  border-bottom: 1px solid var(--dark-border);
+  border-bottom: 1px solid #334155;
   position: relative;
   overflow: hidden;
 }
@@ -572,8 +573,8 @@
   content: '';
   position: absolute; inset: 0; z-index: 0;
   background-image:
-    linear-gradient(var(--dark-rule) 1px, transparent 1px),
-    linear-gradient(90deg, var(--dark-rule) 1px, transparent 1px);
+    linear-gradient(rgba(55,62,71,.15) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(55,62,71,.15) 1px, transparent 1px);
   background-size: 40px 40px;
   opacity: 0.08;
 }
@@ -584,7 +585,7 @@
 }
 .hero h1 span { color: var(--secondary); }
 .hero .subtitle {
-  font-size: .95rem; color: var(--dark-muted);
+  font-size: .95rem; color: #8b949e;
   max-width: 600px; line-height: 1.6;
   margin-bottom: 20px;
 }
@@ -597,12 +598,12 @@
 .hero-stat .num {
   font-family: 'JetBrains Mono', monospace;
   font-size: 2rem; font-weight: 700;
-  color: var(--primary);
+  color: var(--primary-light);
   line-height: 1;
 }
 .hero-stat .lbl {
   font-size: .75rem; text-transform: uppercase;
-  letter-spacing: .08em; color: var(--dark-dim);
+  letter-spacing: .08em; color: #6e7681;
   margin-top: 2px;
 }
 
@@ -920,7 +921,7 @@
 .auth-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
-  background: rgba(255,255,255,.25);
+  background: var(--border2);
   display: inline-block;
   flex-shrink: 0;
   transition: background .3s var(--ease), box-shadow .3s var(--ease);
@@ -988,8 +989,8 @@
 .deploy-progress {
   position: fixed;
   bottom: 60px; right: 20px;
-  background: var(--dark-bg);
-  border: 1px solid var(--dark-border);
+  background: #0f172a;
+  border: 1px solid #334155;
   padding: 16px 20px;
   min-width: 300px;
   box-shadow: var(--shadow3);

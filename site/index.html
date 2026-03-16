@@ -480,7 +480,11 @@ async function bootstrap() {
       'UK NCSC CAF v3.2': { slug: 'uk-ncsc-caf-v3-2', stateKey: 'ncscCafStrategies' },
       'NIST SP 800-53 Rev.5': { slug: 'nist-sp-800-53-rev-5', stateKey: 'nist80053Strategies' },
       'FedRAMP Moderate': { slug: 'fedramp-moderate', stateKey: 'fedrampStrategies' },
-      'UK NCSC Cyber Essentials v3.2': { slug: 'uk-ncsc-cyber-essentials-v3-2', stateKey: 'cyberEssentialsStrategies' }
+      'UK NCSC Cyber Essentials v3.2': { slug: 'uk-ncsc-cyber-essentials-v3-2', stateKey: 'cyberEssentialsStrategies' },
+      'NIST SP 800-171 Rev.3': { slug: 'nist-sp-800-171-rev-3', stateKey: 'nist800171Strategies' },
+      'HITRUST CSF v11': { slug: 'hitrust-csf-v11', stateKey: 'hitrustStrategies' },
+      'CSA CCM v4': { slug: 'csa-ccm-v4', stateKey: 'csaCcmStrategies' },
+      'Microsoft Cloud Security Benchmark': { slug: 'microsoft-cloud-security-benchmark', stateKey: 'mcsbStrategies' }
     };
     AppState.on('selectedFrameworks', async function (fws) {
       for (var fwName in strategyFrameworks) {

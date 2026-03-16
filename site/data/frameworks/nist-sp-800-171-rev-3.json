@@ -1,7 +1,333 @@
 {
   "name": "NIST SP 800-171 Rev.3",
+  "source": {
+    "title": "NIST SP 800-171 Rev.3: Protecting CUI in Nonfederal Systems",
+    "url": "https://csrc.nist.gov/publications/detail/sp/800-171/rev-3/final",
+    "versionDate": "2024-05-14",
+    "legalReference": "NIST SP 800-171 Rev.3 (DFARS 252.204-7012)"
+  },
   "slug": "nist-sp-800-171-rev-3",
   "group": "NIST / US Federal",
+  "hasStrategies": true,
+  "levelLabels": {
+    "ML1": "Basic",
+    "ML2": "Derived",
+    "ML3": "Enhanced"
+  },
+  "strategies": [
+    {
+      "id": "access-control-identification",
+      "name": "Access Control & Identification (AC, IA)",
+      "order": 1,
+      "description": "Controls governing who can access CUI and how users are identified and authenticated. Covers access enforcement, least privilege, session management, multi-factor authentication, credential management, and identity verification for nonfederal systems handling CUI.",
+      "article": "AC/IA",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish foundational access controls and identity verification: enforce MFA for all users, restrict third-party app consent, configure self-service password reset, implement access reviews, and deploy privileged identity management for CUI-handling systems.",
+          "policies": [
+            "ENT03",
+            "ENT04",
+            "ENT05",
+            "SPO01",
+            "SPO02"
+          ],
+          "checks": [
+            "1.1.1",
+            "1.1.4",
+            "1.2.1",
+            "1.3.1",
+            "3.2.1",
+            "3.2.2",
+            "5.1.2.2",
+            "5.1.3.2",
+            "5.1.5.1",
+            "5.1.5.2",
+            "5.2.2.1",
+            "5.2.2.3",
+            "5.3.1",
+            "5.3.4",
+            "5.3.5"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen access controls with risk-based policies: enforce phishing-resistant MFA for admins, configure sign-in and user risk policies, deploy device-compliance-based conditional access, restrict guest access, and enforce granular SharePoint sharing restrictions.",
+          "policies": [
+            "ENT06",
+            "ENT08",
+            "SPO03",
+            "SPO06"
+          ],
+          "checks": [
+            "1.3.2",
+            "1.3.3",
+            "1.3.4",
+            "1.3.5",
+            "5.1.2.5",
+            "5.1.2.6",
+            "5.1.3.1",
+            "5.1.6.1",
+            "5.1.6.2",
+            "5.2.2.5",
+            "5.2.2.6",
+            "5.2.3.1",
+            "5.2.3.2",
+            "5.2.3.3",
+            "5.3.2",
+            "5.3.3",
+            "7.2.1",
+            "7.2.3",
+            "7.2.4",
+            "7.2.5",
+            "7.2.6",
+            "7.2.7"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced identity controls: deploy token protection to bind authentication tokens to specific devices, configure Windows LAPS for automated local admin password rotation, and enforce session timeout policies for privileged users.",
+          "policies": [
+            "ENT09",
+            "INT06-Windows-LAPS-Local-Admin-Password"
+          ],
+          "checks": [
+            "1.3.7",
+            "1.3.8",
+            "1.3.9",
+            "5.1.4.5",
+            "5.2.2.7",
+            "5.2.2.8"
+          ]
+        }
+      }
+    },
+    {
+      "id": "configuration-management",
+      "name": "Configuration Management (CM)",
+      "order": 2,
+      "description": "Controls for establishing and maintaining secure baseline configurations for systems processing CUI. Covers device compliance baselines, security configuration enforcement, change control, patch management, and least functionality across all endpoint platforms.",
+      "article": "CM",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Define device compliance baselines for CUI systems: enforce BitLocker, Secure Boot, TPM, and Defender real-time protection requirements across Windows, iOS, Android, and macOS endpoints. Deploy Windows update rings and device enrollment restrictions.",
+          "policies": [
+            "INT01-Device-Compliance-Windows-Baseline",
+            "INT02-Device-Compliance-iOS-Baseline",
+            "INT03-Device-Compliance-Android-Baseline",
+            "INT04-Device-Compliance-macOS-Baseline",
+            "INT08-Windows-Update-Ring-Policy",
+            "INT10-Device-Enrollment-Restrictions"
+          ],
+          "checks": []
+        },
+        "ML2": {
+          "summary": "Harden endpoint configurations: deploy CIS security baselines for Windows, Microsoft Edge security baseline, Defender AV configuration, mobile app protection policies, firewall rules, and Windows Hello for Business for passwordless authentication.",
+          "policies": [
+            "INT07-Defender-AV-Configuration-Windows",
+            "INT09-App-Protection-Policy-iOS-Android",
+            "INT11-Windows-Security-Baseline-CIS",
+            "INT12-Microsoft-Edge-Security-Baseline",
+            "INT13-Windows-Hello-For-Business",
+            "INT14-Firewall-Policy-Windows"
+          ],
+          "checks": []
+        },
+        "ML3": {
+          "summary": "Implement advanced endpoint hardening for CUI protection: deploy Credential Guard, restrict Windows diagnostic data collection, and enforce removable storage controls to prevent data exfiltration from CUI systems.",
+          "policies": [
+            "INT16-Credential-Guard-Windows",
+            "INT17-Removable-Storage-Control",
+            "INT18-Windows-Diagnostic-Data-Limit"
+          ],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "incident-response-audit",
+      "name": "Incident Response & Audit (IR, AU)",
+      "order": 3,
+      "description": "Controls for detecting, analysing, and responding to security incidents affecting CUI, and ensuring audit accountability. Covers endpoint detection and response, vulnerability management, audit logging, monitoring, and compliance reporting.",
+      "article": "IR/AU",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy core detection and audit capabilities: enable Defender for Endpoint EDR, configure antivirus and next-generation protection, activate unified audit logging, and deploy communication compliance policies for CUI monitoring.",
+          "policies": [
+            "MDE01",
+            "MDE02",
+            "MDE03",
+            "MDE09",
+            "PV11"
+          ],
+          "checks": [
+            "3.1.1",
+            "4.2",
+            "5.1.4.1",
+            "5.1.4.2",
+            "5.1.4.3",
+            "6.1.1",
+            "9.1.1",
+            "9.1.9"
+          ]
+        },
+        "ML2": {
+          "summary": "Enhance detection and audit coverage: configure vulnerability management, web content filtering, attack indicators, network protection, Purview Audit Premium, and deploy DLP incident management for CUI-related breaches.",
+          "policies": [
+            "MDE04",
+            "MDE05",
+            "MDE10",
+            "MDE11",
+            "PV09"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "6.1.2",
+            "6.1.3",
+            "9.1.1",
+            "9.1.5"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced threat response: deploy device control policies, application guard, exploit guard, advanced hunting capabilities, and eDiscovery hold policies for legal preservation of CUI-related evidence.",
+          "policies": [
+            "MDE06",
+            "MDE07",
+            "MDE08",
+            "MDE12",
+            "PV12"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "9.1.8"
+          ]
+        }
+      }
+    },
+    {
+      "id": "media-protection-communications",
+      "name": "Media Protection & System Communications (MP, SC)",
+      "order": 4,
+      "description": "Controls for protecting CUI at rest and in transit. Covers data classification, sensitivity labelling, data loss prevention, encryption enforcement, email authentication, transport security, and information handling for nonfederal systems.",
+      "article": "MP/SC",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish CUI protection foundations: deploy sensitivity labels, configure DLP policies for CUI detection, enforce BitLocker full-disk encryption, enable mailbox auditing, and configure DKIM email authentication.",
+          "policies": [
+            "EXO04",
+            "INT05-BitLocker-Encryption-Policy",
+            "PV06",
+            "PV07",
+            "SPO09"
+          ],
+          "checks": [
+            "2.1.1",
+            "2.1.5",
+            "2.2.1",
+            "5.1.4.4",
+            "5.1.4.6",
+            "9.1.2",
+            "9.1.3",
+            "9.1.10",
+            "9.1.11"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend CUI data protection: deploy auto-labelling, encryption-enforcing sensitivity labels, DLP for Exchange and Teams, endpoint DLP, Safe Links URL scanning, Safe Attachments sandboxing, and SharePoint IRM policies.",
+          "policies": [
+            "EXO06",
+            "EXO08",
+            "PV10",
+            "SPO05"
+          ],
+          "checks": [
+            "2.4.3",
+            "2.4.4",
+            "5.1.6.3",
+            "6.5.1",
+            "6.5.3",
+            "6.5.4",
+            "6.5.5",
+            "7.2.8",
+            "7.3.1",
+            "9.1.6",
+            "9.1.7",
+            "9.1.12"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive CUI controls: deploy advanced DLP tuning, information barriers for CUI compartmentalization, and removable storage restrictions to prevent unauthorized CUI extraction from protected systems.",
+          "policies": [],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "system-information-integrity",
+      "name": "System & Information Integrity (SI)",
+      "order": 5,
+      "description": "Controls for protecting the integrity of systems and information from unauthorized modification. Covers malicious code protection, attack surface reduction, exploit protection, controlled folder access, flaw remediation, and software integrity verification for CUI systems.",
+      "article": "SI",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish system integrity baselines for CUI systems: deploy attack surface reduction rules and exploit protection policies to prevent common attack vectors against endpoints handling controlled unclassified information.",
+          "policies": [
+            "INT15-Attack-Surface-Reduction-Rules",
+            "INT19-Exploit-Protection-Policy"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen CUI system integrity: deploy controlled folder access for ransomware prevention, and enforce data access governance policies to protect critical CUI repositories from unauthorized modification.",
+          "policies": [
+            "INT20-Controlled-Folder-Access"
+          ],
+          "checks": [
+            "5.1.4.3",
+            "5.2.2.4"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced CUI integrity controls: deploy insider risk and communication monitoring to detect unauthorized CUI modification or exfiltration attempts from nonfederal systems.",
+          "policies": [],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "personnel-physical-security",
+      "name": "Personnel & Physical Security (PE, PS, PM)",
+      "order": 6,
+      "description": "Controls for managing personnel security, physical access, and collaboration environment security for CUI. Covers Teams meeting policies, external access governance, collaboration controls, and information sharing restrictions to protect CUI in collaborative environments.",
+      "article": "PE/PS/PM",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish collaboration security for CUI environments: configure Teams meeting policies to prevent anonymous join and lobby bypass, restrict external domain access to approved organisations, and deploy baseline SharePoint versioning.",
+          "policies": [
+            "TEA01",
+            "TEA06"
+          ],
+          "checks": [
+            "8.1.1",
+            "8.4.1",
+            "8.5.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen collaboration controls: enforce meeting recording consent, restrict external messaging, and control file sharing capabilities in Teams to prevent inadvertent CUI disclosure through collaboration channels.",
+          "policies": [],
+          "checks": []
+        },
+        "ML3": {
+          "summary": "Implement advanced collaboration governance: restrict external app and cloud storage access in Teams, enforce meeting watermarks for CUI discussions, and deploy channel creation restrictions for CUI workspaces.",
+          "policies": [],
+          "checks": []
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.4",

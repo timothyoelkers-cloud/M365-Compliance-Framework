@@ -1,7 +1,461 @@
 {
   "name": "Microsoft Cloud Security Benchmark",
+  "source": {
+    "title": "Microsoft Cloud Security Benchmark v1",
+    "url": "https://learn.microsoft.com/en-us/security/benchmark/azure/overview",
+    "versionDate": "2024-10-15",
+    "legalReference": "Microsoft Cloud Security Benchmark v1 (supersedes Azure Security Benchmark v3)"
+  },
   "slug": "microsoft-cloud-security-benchmark",
   "group": "Cloud & Tech",
+  "hasStrategies": true,
+  "levelLabels": {
+    "ML1": "Baseline",
+    "ML2": "Enhanced",
+    "ML3": "Advanced"
+  },
+  "strategies": [
+    {
+      "id": "network-security",
+      "name": "Network Security (NS)",
+      "order": 1,
+      "description": "Controls for securing network boundaries, segmenting traffic, and protecting data in transit. Covers firewall policies, mail flow rules, transport encryption, and network-layer threat protection aligned to MCSB NS control domain.",
+      "article": "NS",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish network security baselines: configure mail transport rules for external sender tagging and enforce baseline transport encryption for Exchange Online communications.",
+          "policies": [
+            "EXO04",
+            "EXO05"
+          ],
+          "checks": [
+            "2.1.5",
+            "2.4.3",
+            "2.4.4",
+            "6.1.1"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend network protection: deploy advanced anti-phishing and safe links policies, and enable Defender for Office 365 network-layer protections.",
+          "policies": [
+            "EXO06",
+            "DEF05"
+          ],
+          "checks": [
+            "2.1.1",
+            "2.2.1",
+            "6.1.2",
+            "6.1.3"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive network controls: deploy Windows firewall policies via Intune and enforce advanced Defender network protection capabilities.",
+          "policies": [
+            "INT14-Firewall-Policy-Windows",
+            "DEF06"
+          ],
+          "checks": [
+            "6.5.1",
+            "6.5.3"
+          ]
+        }
+      }
+    },
+    {
+      "id": "identity-management",
+      "name": "Identity Management (IM)",
+      "order": 2,
+      "description": "Controls for managing user identities, authentication methods, and conditional access policies. Covers MFA enforcement, risk-based access, guest management, password protection, and identity governance aligned to MCSB IM control domain.",
+      "article": "IM",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish identity foundations: block legacy authentication, enforce MFA for all users, disable user consent to third-party apps, configure password protection with custom banned lists, and define allowed authentication methods.",
+          "policies": [
+            "CA01",
+            "CA02",
+            "CA03",
+            "ENT01",
+            "ENT02",
+            "ENT03"
+          ],
+          "checks": [
+            "1.1.1",
+            "1.1.2",
+            "1.1.3",
+            "1.1.4",
+            "1.3.3",
+            "1.3.4",
+            "5.1.2.1",
+            "5.1.2.2",
+            "5.1.3.1",
+            "5.1.3.2",
+            "5.1.5.1",
+            "5.1.8.1",
+            "5.2.2.1",
+            "5.2.2.2",
+            "5.2.2.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen identity controls: enforce risk-based conditional access, phishing-resistant MFA for admins, device compliance requirements, SSPR registration, guest access governance, and external collaboration restrictions.",
+          "policies": [
+            "CA06",
+            "CA08",
+            "ENT05",
+            "ENT06",
+            "ENT08",
+            "ENT10"
+          ],
+          "checks": [
+            "1.2.1",
+            "1.3.5",
+            "1.3.7",
+            "1.3.8",
+            "5.1.2.6",
+            "5.1.4.1",
+            "5.1.4.2",
+            "5.1.4.3",
+            "5.1.5.2",
+            "5.1.6.1",
+            "5.1.6.2",
+            "5.1.6.3",
+            "5.2.2.5",
+            "5.2.2.6",
+            "5.2.2.7",
+            "5.2.2.8"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced identity governance: session timeouts, platform-specific restrictions, token protection, device registration MFA, and strict external access controls with advanced conditional access evaluation.",
+          "policies": [
+            "CA10",
+            "CA15",
+            "CA16",
+            "CA18"
+          ],
+          "checks": [
+            "1.3.9",
+            "5.1.4.4",
+            "5.1.4.6",
+            "5.2.2.9",
+            "5.2.2.10",
+            "5.2.2.11",
+            "5.2.2.12",
+            "5.2.3.4",
+            "5.2.3.5",
+            "5.2.3.6",
+            "5.2.3.7"
+          ]
+        }
+      }
+    },
+    {
+      "id": "privileged-access",
+      "name": "Privileged Access (PA)",
+      "order": 3,
+      "description": "Controls for managing privileged accounts, just-in-time access, and administrative collaboration policies. Covers PIM, admin-specific conditional access, Teams admin governance, and privileged session management aligned to MCSB PA control domain.",
+      "article": "PA",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish privileged access baselines: configure Teams meeting policies for external participants, enforce collaboration defaults, and restrict anonymous join capabilities.",
+          "policies": [
+            "TEA01",
+            "TEA02"
+          ],
+          "checks": [
+            "8.1.1",
+            "8.4.1",
+            "8.5.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend privileged access controls: deploy Teams phone and messaging policies, enforce app permission governance, and restrict external communication channels.",
+          "policies": [
+            "TEA03",
+            "TEA06"
+          ],
+          "checks": [
+            "8.5.8",
+            "8.5.9"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive privileged access management: advanced Teams app governance, strict external app controls, and continuous monitoring of administrative actions.",
+          "policies": [
+            "TEA08"
+          ],
+          "checks": [
+            "5.2.3.1"
+          ]
+        }
+      }
+    },
+    {
+      "id": "data-protection",
+      "name": "Data Protection (DP)",
+      "order": 4,
+      "description": "Controls for classifying, labeling, and protecting sensitive data across cloud workloads. Covers sensitivity labels, DLP policies, information barriers, SharePoint sharing controls, retention policies, and data lifecycle management aligned to MCSB DP control domain.",
+      "article": "DP",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy foundational data protection: enable sensitivity labels and auto-labeling, configure basic DLP policies, restrict default SharePoint sharing, and establish information protection baselines across collaboration workloads.",
+          "policies": [
+            "PV01",
+            "PV02",
+            "PV05",
+            "SPO01",
+            "SPO02",
+            "SPO03",
+            "SPO04",
+            "SPO05",
+            "SPO06"
+          ],
+          "checks": [
+            "3.1.1",
+            "3.2.1",
+            "3.2.2",
+            "3.3.1",
+            "7.2.1",
+            "7.2.3",
+            "7.2.4",
+            "7.2.5",
+            "7.2.6",
+            "7.2.7",
+            "7.2.8"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend data protection: deploy advanced DLP rules for endpoint and email, configure information barriers, enforce site-level sharing restrictions, and implement granular retention policies for SharePoint sites.",
+          "policies": [
+            "PV06",
+            "PV07",
+            "PV10",
+            "PV11",
+            "SPO11",
+            "SPO12",
+            "SPO13",
+            "SPO14",
+            "SPO15"
+          ],
+          "checks": [
+            "4.2",
+            "7.3.1",
+            "9.1.1",
+            "9.1.2",
+            "9.1.3",
+            "9.1.4"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive data governance: advanced sensitivity label scoping, exact data match classifiers, site-level sensitivity enforcement, versioning and lifecycle policies, and cross-workload data loss prevention with automated remediation.",
+          "policies": [
+            "PV13",
+            "PV14",
+            "PV15",
+            "PV16",
+            "PV17",
+            "PV18",
+            "SPO16",
+            "SPO17",
+            "SPO18",
+            "SPO19",
+            "SPO20"
+          ],
+          "checks": [
+            "9.1.5",
+            "9.1.6",
+            "9.1.7",
+            "9.1.8",
+            "9.1.9",
+            "9.1.10",
+            "9.1.11",
+            "9.1.12"
+          ]
+        }
+      }
+    },
+    {
+      "id": "asset-management",
+      "name": "Asset Management (AM)",
+      "order": 5,
+      "description": "Controls for discovering, inventorying, and managing cloud and endpoint assets. Covers device compliance baselines, enrollment restrictions, OS update management, mobile app protection, and security baseline deployment aligned to MCSB AM control domain.",
+      "article": "AM",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish asset baselines: enforce device compliance for Windows, iOS, Android, and macOS endpoints with minimum OS versions, encryption, and Defender real-time protection requirements.",
+          "policies": [
+            "INT01-Device-Compliance-Windows-Baseline",
+            "INT02-Device-Compliance-iOS-Baseline",
+            "INT03-Device-Compliance-Android-Baseline",
+            "INT04-Device-Compliance-macOS-Baseline"
+          ],
+          "checks": [
+            "5.3.1",
+            "5.3.2",
+            "5.3.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend asset management: deploy BitLocker encryption policies, Windows LAPS for local admin passwords, Defender AV configuration, Windows update rings, mobile app protection, and device enrollment restrictions.",
+          "policies": [
+            "INT05-BitLocker-Encryption-Policy",
+            "INT06-Windows-LAPS-Local-Admin-Password",
+            "INT07-Defender-AV-Configuration-Windows",
+            "INT08-Windows-Update-Ring-Policy",
+            "INT09-App-Protection-Policy-iOS-Android",
+            "INT10-Device-Enrollment-Restrictions"
+          ],
+          "checks": [
+            "5.3.4",
+            "5.3.5"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive asset hardening: deploy CIS security baselines, Edge browser hardening, and Windows Hello for Business for passwordless authentication across managed devices.",
+          "policies": [
+            "INT11-Windows-Security-Baseline-CIS",
+            "INT12-Microsoft-Edge-Security-Baseline",
+            "INT13-Windows-Hello-For-Business"
+          ],
+          "checks": []
+        }
+      }
+    },
+    {
+      "id": "logging-threat-detection",
+      "name": "Logging & Threat Detection (LT)",
+      "order": 6,
+      "description": "Controls for enabling audit logging, configuring threat detection, and monitoring security events across cloud workloads. Covers unified audit log, Purview audit policies, communication compliance, eDiscovery, retention, and advanced compliance monitoring aligned to MCSB LT control domain.",
+      "article": "LT",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enable foundational logging: activate unified audit logging, deploy Purview Audit Premium, configure eDiscovery hold policies for legal preservation, and enable Defender for Cloud Apps baseline detection.",
+          "policies": [
+            "PV09",
+            "PV12",
+            "DEF01"
+          ],
+          "checks": [
+            "1.3.3",
+            "1.3.4"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend threat detection: deploy communication compliance policies, advanced retention and data lifecycle policies, Purview compliance monitoring, and Defender for Cloud Apps advanced threat detection.",
+          "policies": [
+            "PV19",
+            "PV20",
+            "PV21",
+            "PV22",
+            "DEF02"
+          ],
+          "checks": [
+            "1.3.5"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive logging and detection: advanced compliance alert policies, cross-workload correlation, insider risk management integration, automated investigation triggers, and long-term audit log retention.",
+          "policies": [
+            "PV24",
+            "PV27",
+            "PV28",
+            "PV29",
+            "PV30"
+          ],
+          "checks": [
+            "1.3.7"
+          ]
+        }
+      }
+    },
+    {
+      "id": "incident-response",
+      "name": "Incident Response (IR)",
+      "order": 7,
+      "description": "Controls for detecting, investigating, and responding to security incidents. Covers Microsoft Defender for Endpoint configuration, EDR capabilities, automated investigation and remediation, alert management, and Defender for Cloud Apps incident response aligned to MCSB IR control domain.",
+      "article": "IR",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish incident response foundations: onboard devices to Microsoft Defender for Endpoint, enable baseline EDR capabilities, configure alert notifications, and deploy Defender for Cloud Apps basic incident detection.",
+          "policies": [
+            "MDE01",
+            "MDE02",
+            "MDE03",
+            "MDE04",
+            "DEF03"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend incident response: enable automated investigation and remediation, configure advanced EDR policies, deploy web content filtering, and integrate Defender for Cloud Apps advanced investigation capabilities.",
+          "policies": [
+            "MDE05",
+            "MDE06",
+            "MDE07",
+            "MDE08",
+            "DEF04"
+          ],
+          "checks": [
+            "5.1.4.3",
+            "5.1.4.4",
+            "5.1.4.6"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive incident management: advanced threat hunting, custom detection rules, endpoint isolation capabilities, and full automated remediation with cross-workload incident correlation.",
+          "policies": [
+            "MDE09",
+            "MDE10",
+            "MDE11",
+            "MDE12"
+          ],
+          "checks": [
+            "5.2.2.10",
+            "5.2.2.11"
+          ]
+        }
+      }
+    },
+    {
+      "id": "endpoint-security",
+      "name": "Endpoint Security (ES)",
+      "order": 8,
+      "description": "Controls for hardening endpoints against advanced threats through attack surface reduction, exploit protection, and advanced endpoint configuration. Covers ASR rules, Credential Guard, removable storage controls, exploit protection, and controlled folder access aligned to MCSB ES control domain.",
+      "article": "ES",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish endpoint security baselines: deploy Defender for Office 365 safe attachments and safe links baseline policies, and configure Defender endpoint protection defaults.",
+          "policies": [
+            "DEF07",
+            "DEF08"
+          ],
+          "checks": [
+            "5.2.2.12"
+          ]
+        },
+        "ML2": {
+          "summary": "Harden endpoint attack surface: deploy attack surface reduction rules, enable Credential Guard for credential theft prevention, and enforce removable storage access controls.",
+          "policies": [
+            "INT15-Attack-Surface-Reduction-Rules",
+            "INT16-Credential-Guard-Windows",
+            "INT17-Removable-Storage-Control"
+          ],
+          "checks": []
+        },
+        "ML3": {
+          "summary": "Implement comprehensive endpoint protection: deploy exploit protection policies for process-level mitigations and controlled folder access for ransomware prevention.",
+          "policies": [
+            "INT19-Exploit-Protection-Policy",
+            "INT20-Controlled-Folder-Access"
+          ],
+          "checks": []
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.2",

@@ -1,7 +1,502 @@
 {
   "name": "HITRUST CSF v11",
+  "source": {
+    "title": "HITRUST CSF v11.3",
+    "url": "https://hitrustalliance.net/csf",
+    "versionDate": "2024-01-01",
+    "legalReference": "HITRUST CSF v11.3 (based on ISO 27001, NIST, HIPAA)"
+  },
   "slug": "hitrust-csf-v11",
   "group": "US Sector",
+  "hasStrategies": true,
+  "levelLabels": {
+    "ML1": "1-Year Validated",
+    "ML2": "Interim",
+    "ML3": "r2 Certified"
+  },
+  "strategies": [
+    {
+      "id": "information-protection-program",
+      "name": "Information Protection Program (01.x)",
+      "order": 1,
+      "description": "Governance controls that establish and maintain an information protection program. Covers organizational security policies, access reviews, privileged identity management, authentication methods, and identity provider configuration.",
+      "article": "01",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish identity governance foundations: configure Entra ID tenant security defaults, enable self-service password reset, deploy access reviews, and define allowed authentication methods to eliminate weak authenticators.",
+          "policies": [
+            "ENT01",
+            "ENT02",
+            "ENT03",
+            "ENT04"
+          ],
+          "checks": [
+            "1.1.1",
+            "1.1.2",
+            "1.2.1",
+            "3.2.1",
+            "3.2.2",
+            "5.1.2.1",
+            "5.1.2.4",
+            "5.1.5.1",
+            "5.1.5.2",
+            "5.2.2.1",
+            "5.2.2.7",
+            "5.2.2.8",
+            "5.2.3.4",
+            "5.2.3.5"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen identity governance: enable privileged identity management, enforce SSPR registration, deploy password protection with custom banned lists, and configure external collaboration settings.",
+          "policies": [
+            "ENT05",
+            "ENT06",
+            "ENT08",
+            "ENT10"
+          ],
+          "checks": [
+            "1.1.3",
+            "1.2.2",
+            "3.1.1",
+            "3.3.1",
+            "5.1.2.2",
+            "5.1.2.6",
+            "5.1.8.1",
+            "5.2.2.3",
+            "5.2.3.6",
+            "5.2.3.7",
+            "5.3.2",
+            "5.3.3"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced identity controls: enforce token protection to bind tokens to specific devices, and restrict external access governance with granular domain-level controls.",
+          "policies": [
+            "ENT07",
+            "ENT09"
+          ],
+          "checks": [
+            "1.1.4",
+            "5.1.2.5",
+            "5.2.2.4",
+            "5.2.2.10",
+            "5.2.2.11",
+            "5.2.4.1"
+          ]
+        }
+      }
+    },
+    {
+      "id": "access-control",
+      "name": "Access Control (02.x)",
+      "order": 2,
+      "description": "Controls that manage who can access organizational systems, data, and resources. Covers conditional access policies, multi-factor authentication, risk-based access, device enrollment restrictions, and passwordless authentication.",
+      "article": "02",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish foundational access controls: block legacy authentication, enforce MFA for all users, and require MFA for administrative roles to prevent credential-based attacks.",
+          "policies": [
+            "CA02",
+            "CA04",
+            "CA05"
+          ],
+          "checks": [
+            "1.3.1",
+            "1.3.2",
+            "1.3.3",
+            "5.1.3.2",
+            "5.1.6.1",
+            "5.2.2.2",
+            "5.3.1",
+            "5.3.4",
+            "5.3.5"
+          ]
+        },
+        "ML2": {
+          "summary": "Enforce risk-based and conditional access: require device compliance for access, deploy sign-in and user risk policies, and restrict access based on location and platform conditions.",
+          "policies": [
+            "CA11",
+            "CA12",
+            "CA17"
+          ],
+          "checks": [
+            "1.3.4",
+            "1.3.5",
+            "1.3.7",
+            "1.3.9",
+            "5.1.2.3",
+            "5.1.3.1",
+            "5.1.6.2",
+            "5.1.6.3",
+            "5.2.2.5",
+            "5.2.2.6",
+            "5.2.2.9",
+            "5.2.2.12"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced access controls: deploy Windows Hello for Business for passwordless authentication, restrict device enrollment, and enforce Windows LAPS for automated local admin password rotation.",
+          "policies": [
+            "INT06-Windows-LAPS-Local-Admin-Password",
+            "INT10-Device-Enrollment-Restrictions",
+            "INT13-Windows-Hello-For-Business"
+          ],
+          "checks": [
+            "1.3.6",
+            "1.3.8",
+            "5.1.4.5",
+            "5.2.3.1",
+            "5.2.3.2",
+            "5.2.3.3"
+          ]
+        }
+      }
+    },
+    {
+      "id": "endpoint-protection",
+      "name": "Endpoint Protection (09.x)",
+      "order": 3,
+      "description": "Controls for securing endpoints through device compliance baselines, configuration management, endpoint detection and response, and advanced threat protection. Covers Intune device policies, Defender for Endpoint, and attack surface reduction.",
+      "article": "09",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Define device compliance baselines across all platforms and deploy core endpoint detection: enforce BitLocker, Secure Boot, TPM, minimum OS versions, and enable Defender for Endpoint EDR with antivirus and next-generation protection.",
+          "policies": [
+            "INT01-Device-Compliance-Windows-Baseline",
+            "INT02-Device-Compliance-iOS-Baseline",
+            "INT03-Device-Compliance-Android-Baseline",
+            "INT04-Device-Compliance-macOS-Baseline",
+            "MDE01",
+            "MDE02",
+            "MDE03"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "5.1.4.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Harden endpoint configuration and enhance detection: deploy Defender AV policies, Windows update rings, mobile app protection, CIS security baselines, Edge browser hardening, firewall policies, vulnerability management, web content filtering, and automated investigation.",
+          "policies": [
+            "INT07-Defender-AV-Configuration-Windows",
+            "INT08-Windows-Update-Ring-Policy",
+            "INT09-App-Protection-Policy-iOS-Android",
+            "INT11-Windows-Security-Baseline-CIS",
+            "INT12-Microsoft-Edge-Security-Baseline",
+            "INT14-Firewall-Policy-Windows",
+            "MDE04",
+            "MDE05",
+            "MDE09"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced endpoint hardening and threat response: deploy attack surface reduction rules, Credential Guard, diagnostic data restrictions, exploit protection, controlled folder access, removable storage control, device control, application guard, and advanced hunting.",
+          "policies": [
+            "INT15-Attack-Surface-Reduction-Rules",
+            "INT16-Credential-Guard-Windows",
+            "INT17-Removable-Storage-Control",
+            "INT18-Windows-Diagnostic-Data-Limit",
+            "INT19-Exploit-Protection-Policy",
+            "INT20-Controlled-Folder-Access",
+            "MDE06",
+            "MDE07",
+            "MDE08",
+            "MDE10",
+            "MDE11",
+            "MDE12"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "5.1.4.3"
+          ]
+        }
+      }
+    },
+    {
+      "id": "transmission-protection",
+      "name": "Transmission Protection (10.x)",
+      "order": 4,
+      "description": "Controls for protecting information in transit through email security, anti-phishing, anti-malware, and safe messaging policies. Covers Exchange Online transport rules, Defender for Office 365, DKIM/DMARC authentication, and URL/attachment scanning.",
+      "article": "10",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish communications security: enforce TLS for Exchange transport, configure DKIM/DMARC email authentication, block auto-forwarding to external domains, and deploy baseline anti-phishing policies.",
+          "policies": [
+            "EXO01",
+            "EXO02",
+            "EXO03",
+            "DEF01"
+          ],
+          "checks": [
+            "2.1.1",
+            "2.1.2",
+            "2.1.3",
+            "2.1.4",
+            "2.1.7",
+            "2.1.8",
+            "2.1.9",
+            "2.1.10",
+            "2.2.1",
+            "6.2.2",
+            "6.5.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen email and messaging security: enable mailbox auditing, deploy DKIM signing, configure anti-spoofing, Safe Links URL scanning, Safe Attachments sandboxing, and impersonation protection policies.",
+          "policies": [
+            "EXO04",
+            "EXO05",
+            "EXO06",
+            "DEF02",
+            "DEF03",
+            "DEF04"
+          ],
+          "checks": [
+            "2.1.1",
+            "2.1.3",
+            "2.1.4",
+            "2.1.5",
+            "2.1.11",
+            "2.1.12",
+            "2.1.13",
+            "2.1.14",
+            "2.4.1",
+            "2.4.2",
+            "2.4.3",
+            "2.4.4",
+            "6.1.2",
+            "6.1.3",
+            "6.3.1",
+            "6.5.1",
+            "6.5.4",
+            "6.5.5"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced communications protection: disable external calendar sharing, configure mail flow rules for sensitive content, deploy tenant allow/block lists, and advanced Safe Links/Attachments with zero-hour auto-purge.",
+          "policies": [
+            "EXO07",
+            "EXO09",
+            "EXO10",
+            "DEF05",
+            "DEF07"
+          ],
+          "checks": [
+            "2.1.2",
+            "2.1.6",
+            "2.1.12",
+            "2.1.13",
+            "2.1.15",
+            "6.2.1",
+            "6.2.3",
+            "6.5.2"
+          ]
+        }
+      }
+    },
+    {
+      "id": "audit-logging-monitoring",
+      "name": "Audit Logging & Monitoring (12.x)",
+      "order": 5,
+      "description": "Controls ensuring organizational activities are auditable and that audit records are generated, reviewed, and retained. Covers unified audit logging, Purview Audit Premium, communication compliance, and insider risk monitoring.",
+      "article": "12",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Enable foundational audit capabilities: activate unified audit logging across all M365 workloads and deploy Purview Audit standard policies for regulatory monitoring and compliance evidence collection.",
+          "policies": [
+            "PV09",
+            "PV11"
+          ],
+          "checks": [
+            "4.1",
+            "6.1.1",
+            "9.1.1",
+            "9.1.5",
+            "9.1.9"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend audit and incident coverage: deploy DLP incident management and eDiscovery hold policies for legal preservation and enhanced event capture across workloads.",
+          "policies": [
+            "PV05",
+            "PV12"
+          ],
+          "checks": [
+            "4.2",
+            "9.1.1",
+            "9.1.8"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced compliance monitoring: deploy insider risk investigation policies and communication compliance monitoring for data exfiltration detection and regulatory surveillance.",
+          "policies": [
+            "PV27",
+            "PV28"
+          ],
+          "checks": [
+            "9.1.1",
+            "9.1.8"
+          ]
+        }
+      }
+    },
+    {
+      "id": "data-protection-privacy",
+      "name": "Data Protection & Privacy (06.x, 07.x)",
+      "order": 6,
+      "description": "Controls for protecting information at rest through data classification, sensitivity labelling, data loss prevention, encryption, and SharePoint/OneDrive sharing and access governance. Covers Purview Information Protection, DLP policies, and site-level controls.",
+      "article": "06",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish data classification foundations: deploy sensitivity labels, configure DLP policies for credit card and personal data detection, enforce BitLocker encryption, and set baseline SharePoint sharing and access restrictions.",
+          "policies": [
+            "PV01",
+            "PV02",
+            "PV03",
+            "INT05-BitLocker-Encryption-Policy",
+            "SPO01",
+            "SPO02",
+            "SPO03"
+          ],
+          "checks": [
+            "5.1.4.4",
+            "5.1.4.6",
+            "7.2.1",
+            "7.2.3",
+            "7.2.5",
+            "7.2.7",
+            "7.3.2",
+            "9.1.2",
+            "9.1.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Extend data protection: deploy sensitivity label auto-labelling, encryption-enforcing labels, DLP for Exchange/Teams/SharePoint, endpoint DLP, exact data matching, and granular SharePoint sharing restrictions with data access governance.",
+          "policies": [
+            "PV04",
+            "PV06",
+            "PV07",
+            "PV08",
+            "PV10",
+            "PV13",
+            "PV14",
+            "SPO04",
+            "SPO06",
+            "SPO07",
+            "SPO08",
+            "SPO09",
+            "SPO13"
+          ],
+          "checks": [
+            "5.2.2.2",
+            "7.2.2",
+            "7.2.4",
+            "7.2.6",
+            "7.2.9",
+            "7.2.10",
+            "7.3.1",
+            "9.1.2",
+            "9.1.3",
+            "9.1.6",
+            "9.1.7",
+            "9.1.10",
+            "9.1.11"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive data controls: deploy advanced DLP tuning, data lifecycle management, retention policies across workloads, and strict SharePoint site-level access controls, versioning, and advanced classification policies.",
+          "policies": [
+            "PV17",
+            "PV18",
+            "PV22",
+            "PV24",
+            "SPO05",
+            "SPO10",
+            "SPO17",
+            "SPO18",
+            "SPO20"
+          ],
+          "checks": [
+            "7.2.2",
+            "7.2.4",
+            "7.2.8",
+            "7.2.10",
+            "7.2.11",
+            "9.1.2",
+            "9.1.3",
+            "9.1.6",
+            "9.1.11",
+            "9.1.12"
+          ]
+        }
+      }
+    },
+    {
+      "id": "business-continuity",
+      "name": "Business Continuity (17.x)",
+      "order": 7,
+      "description": "Controls for preparing for, responding to, and recovering from disruptions. Covers Teams meeting and collaboration policies, retention and recovery controls, and continuity of operations to ensure system availability.",
+      "article": "17",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish collaboration and continuity foundations: configure Teams meeting policies to prevent anonymous join and lobby bypass, enforce meeting recording consent, and restrict external domain access.",
+          "policies": [
+            "TEA01",
+            "TEA02",
+            "TEA06"
+          ],
+          "checks": [
+            "8.1.1",
+            "8.1.2",
+            "8.2.1",
+            "8.2.2",
+            "8.4.1",
+            "8.5.1",
+            "8.5.2"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen collaboration security: restrict external messaging, disable unmanaged file sharing in Teams chats, control meeting chat and file upload capabilities, and enforce channel-level policies.",
+          "policies": [
+            "TEA03",
+            "TEA07",
+            "TEA08"
+          ],
+          "checks": [
+            "8.5.3",
+            "8.5.4",
+            "8.5.5",
+            "8.5.6",
+            "8.6.1"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced collaboration controls: restrict external app and cloud storage access in Teams, enforce meeting watermarks, disable email-to-channel functionality, and restrict channel creation permissions.",
+          "policies": [
+            "TEA04",
+            "TEA05",
+            "TEA09",
+            "TEA10"
+          ],
+          "checks": [
+            "8.2.3",
+            "8.2.4",
+            "8.5.5",
+            "8.5.6",
+            "8.5.7",
+            "8.6.1"
+          ]
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.2",
