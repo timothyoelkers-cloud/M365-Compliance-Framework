@@ -1,7 +1,323 @@
 {
   "name": "UK NCSC Cyber Essentials v3.2",
+  "source": {
+    "title": "NCSC Cyber Essentials Requirements for IT Infrastructure v3.2",
+    "url": "https://www.ncsc.gov.uk/cyberessentials/overview",
+    "versionDate": "2024-04-29",
+    "legalReference": "Cyber Essentials v3.2 (IASME Consortium, endorsed by NCSC)"
+  },
   "slug": "uk-ncsc-cyber-essentials-v3-2",
   "group": "UK & Ireland",
+  "hasStrategies": true,
+  "levelLabels": {
+    "ML1": "Essential",
+    "ML2": "Certified",
+    "ML3": "Plus"
+  },
+  "strategies": [
+    {
+      "id": "firewalls",
+      "name": "Firewalls & Internet Gateways",
+      "order": 1,
+      "description": "Boundary protection controls ensuring that internet-facing services are protected by firewalls, email authentication is enforced, and attack surfaces at the network boundary are minimised.",
+      "article": "Control 1",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish boundary protection: block legacy authentication protocols, enforce DMARC email authentication, deploy host-based firewall policies, and enable anti-impersonation protection for inbound email.",
+          "policies": [
+            "CA01",
+            "EXO02",
+            "INT14-Firewall-Policy-Windows",
+            "DEF08"
+          ],
+          "checks": [
+            "1.1.1",
+            "1.1.2",
+            "2.1.1",
+            "2.1.5",
+            "6.5.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen boundary controls: block access from high-risk countries, deploy attack surface reduction rules to harden endpoints against common attack vectors, and enable Credential Guard to protect authentication secrets.",
+          "policies": [
+            "CA05",
+            "INT15-Attack-Surface-Reduction-Rules",
+            "INT16-Credential-Guard-Windows"
+          ],
+          "checks": [
+            "1.1.3",
+            "1.1.4",
+            "2.4.2",
+            "2.4.3",
+            "2.4.4"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced boundary hardening: enforce platform-specific conditional access restrictions and control removable storage to prevent data exfiltration via physical media.",
+          "policies": [
+            "CA18",
+            "INT17-Removable-Storage-Control"
+          ],
+          "checks": [
+            "1.3.8",
+            "1.3.9"
+          ]
+        }
+      }
+    },
+    {
+      "id": "secure-configuration",
+      "name": "Secure Configuration",
+      "order": 2,
+      "description": "Controls ensuring that devices and software are configured securely, with unnecessary functionality removed, default passwords changed, and security baselines applied across all endpoint types.",
+      "article": "Control 2",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy device compliance baselines across all platforms (Windows, iOS, Android, macOS), apply CIS security baselines, harden Edge browser, configure Windows Update rings for automated patching, and restrict external SharePoint sharing.",
+          "policies": [
+            "INT01-Device-Compliance-Windows-Baseline",
+            "INT02-Device-Compliance-iOS-Baseline",
+            "INT03-Device-Compliance-Android-Baseline",
+            "INT04-Device-Compliance-macOS-Baseline",
+            "INT08-Windows-Update-Ring-Policy",
+            "INT11-Windows-Security-Baseline-CIS",
+            "INT12-Microsoft-Edge-Security-Baseline",
+            "SPO01",
+            "SPO05"
+          ],
+          "checks": [
+            "7.2.3",
+            "7.2.5",
+            "7.2.7",
+            "7.2.8"
+          ]
+        },
+        "ML2": {
+          "summary": "Harden configurations further: enforce BitLocker full-disk encryption, deploy mobile app protection policies, set default sharing links to internal-only, configure anonymous link expiry, and enable Purview audit logging.",
+          "policies": [
+            "INT05-BitLocker-Encryption-Policy",
+            "INT09-App-Protection-Policy-iOS-Android",
+            "SPO02",
+            "SPO03",
+            "PV11"
+          ],
+          "checks": [
+            "4.2",
+            "7.2.4",
+            "7.2.6",
+            "7.3.1",
+            "9.1.1",
+            "9.1.9"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced endpoint hardening: deploy exploit protection, controlled folder access for ransomware prevention, Windows LAPS for local admin password rotation, and restrict device enrollment.",
+          "policies": [
+            "INT06-Windows-LAPS-Local-Admin-Password",
+            "INT10-Device-Enrollment-Restrictions",
+            "INT19-Exploit-Protection-Policy",
+            "INT20-Controlled-Folder-Access"
+          ],
+          "checks": [
+            "5.1.4.5",
+            "5.1.4.6"
+          ]
+        }
+      }
+    },
+    {
+      "id": "user-access-control",
+      "name": "User Access Control",
+      "order": 3,
+      "description": "Controls for managing user accounts, enforcing multi-factor authentication, applying least-privilege access, and governing external and guest user access to organisational resources.",
+      "article": "Control 3",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Establish identity foundations: enforce MFA for all users, disable user consent to third-party apps, configure password protection with custom banned lists, enable security defaults, define authentication methods, implement access reviews and PIM.",
+          "policies": [
+            "CA02",
+            "CA03",
+            "ENT01",
+            "ENT02",
+            "ENT03",
+            "ENT04",
+            "ENT10"
+          ],
+          "checks": [
+            "1.2.1",
+            "1.3.1",
+            "5.1.2.1",
+            "5.1.2.2",
+            "5.1.3.1",
+            "5.1.3.2",
+            "5.1.5.1",
+            "5.1.5.2",
+            "5.2.2.1",
+            "5.2.2.2",
+            "5.2.2.3",
+            "5.2.3.1",
+            "5.2.3.2",
+            "5.2.3.3",
+            "5.2.3.4",
+            "5.2.3.5",
+            "5.2.3.7",
+            "5.3.4",
+            "5.3.5"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen access controls: enforce risk-based conditional access (sign-in/user risk), require compliant devices, apply location-based restrictions, restrict guest access, deploy phishing-resistant MFA for admins, configure SSPR, and Windows Hello for Business.",
+          "policies": [
+            "CA04",
+            "CA06",
+            "CA07",
+            "CA08",
+            "CA09",
+            "CA16",
+            "CA17",
+            "ENT05",
+            "ENT06",
+            "ENT08",
+            "INT13-Windows-Hello-For-Business"
+          ],
+          "checks": [
+            "1.3.2",
+            "1.3.3",
+            "1.3.4",
+            "1.3.5",
+            "1.3.7",
+            "5.1.2.5",
+            "5.1.2.6",
+            "5.1.6.1",
+            "5.1.6.2",
+            "5.1.6.3",
+            "5.2.2.4",
+            "5.2.2.5",
+            "5.2.2.9",
+            "5.2.2.10",
+            "5.2.2.11",
+            "5.2.3.6",
+            "5.3.1",
+            "5.3.2",
+            "5.3.3"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced identity controls: enforce device registration MFA, session timeouts for users and admins, platform-specific conditional access, and token protection to bind tokens to specific devices.",
+          "policies": [
+            "CA10",
+            "CA13",
+            "CA14",
+            "CA15",
+            "ENT09"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "5.1.4.3"
+          ]
+        }
+      }
+    },
+    {
+      "id": "malware-protection",
+      "name": "Malware Protection",
+      "order": 4,
+      "description": "Controls ensuring that anti-malware software is installed, configured, and kept up to date across all devices. Covers endpoint detection and response, real-time protection, and advanced threat prevention.",
+      "article": "Control 4",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Deploy core endpoint protection: enable Defender for Endpoint EDR, configure antivirus real-time protection, deploy next-generation protection policies, and enable Defender AV configuration across Windows endpoints.",
+          "policies": [
+            "MDE01",
+            "MDE02",
+            "MDE03",
+            "INT07-Defender-AV-Configuration-Windows"
+          ],
+          "checks": [
+            "5.1.4.1",
+            "5.1.4.2",
+            "5.1.4.3",
+            "5.1.4.4"
+          ]
+        },
+        "ML2": {
+          "summary": "Enhance threat protection: deploy device control policies, configure web content filtering and network protection, enable automated investigation and response, and vulnerability management scanning.",
+          "policies": [
+            "MDE06",
+            "MDE07",
+            "MDE08",
+            "MDE09",
+            "MDE10"
+          ],
+          "checks": [
+            "8.5.3",
+            "8.5.8",
+            "9.1.4",
+            "9.1.8"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement advanced malware defence: deploy application guard for browser isolation, advanced hunting capabilities, and comprehensive endpoint DLP with insider risk detection.",
+          "policies": [
+            "MDE12",
+            "PV05"
+          ],
+          "checks": [
+            "9.1.5",
+            "9.1.7"
+          ]
+        }
+      }
+    },
+    {
+      "id": "secure-services",
+      "name": "Secure Management of Services",
+      "order": 5,
+      "description": "Controls for securing cloud collaboration services including Teams meetings, SharePoint data protection, email security, and information governance. Ensures services are configured to prevent data leakage and unauthorised access.",
+      "article": "Control 5",
+      "maturityLevels": {
+        "ML1": {
+          "summary": "Secure collaboration foundations: disable anonymous meeting join, restrict Teams federation to approved domains, configure meeting lobby for external users, and deploy baseline data classification and DLP policies.",
+          "policies": [
+            "TEA01",
+            "TEA06",
+            "PV09",
+            "PV10"
+          ],
+          "checks": [
+            "8.1.1",
+            "8.4.1",
+            "8.5.9",
+            "9.1.2",
+            "9.1.3"
+          ]
+        },
+        "ML2": {
+          "summary": "Strengthen service security: enable meeting lobby for all external users, restrict default presenters to organisers only, block unmanaged device downloads from SharePoint, and deploy eDiscovery hold policies.",
+          "policies": [
+            "TEA02",
+            "TEA08",
+            "SPO04",
+            "PV12"
+          ],
+          "checks": [
+            "9.1.10",
+            "9.1.11",
+            "9.1.12"
+          ]
+        },
+        "ML3": {
+          "summary": "Implement comprehensive service hardening: restrict SharePoint to organisation-only accounts to eliminate anonymous and personal account access.",
+          "policies": [
+            "SPO07"
+          ],
+          "checks": []
+        }
+      }
+    }
+  ],
   "checks": [
     "1.1.1",
     "1.1.2",
@@ -149,13 +465,15 @@
     "SPO01",
     "SPO02",
     "SPO03",
+    "SPO04",
     "SPO05",
+    "SPO07",
     "TEA01",
     "TEA02",
     "TEA06",
     "TEA08"
   ],
-  "policyCount": 68,
+  "policyCount": 70,
   "orgProfiles": [
     "UK Organisation"
   ]
