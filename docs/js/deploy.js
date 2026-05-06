@@ -703,7 +703,11 @@ const DeployEngine = (() => {
       // Test with a read-only cmdlet
       const test = await callInvokeCommand('Get-OrganizationConfig', {}, DEPLOY_METHOD.EXO_INVOKE);
       if (!test.success) {
-        showToast('Exchange preflight failed: ' + test.error);
+        if (test.needsConsent) {
+          showConsentNeededModal(test.consentUrl, test.currentScopes);
+        } else {
+          showToast('Exchange preflight failed: ' + test.error);
+        }
         return false;
       }
       console.log('[Preflight] Exchange InvokeCommand OK');
@@ -722,7 +726,11 @@ const DeployEngine = (() => {
       console.log('[Preflight] Compliance — aud:', info.aud, '| scp:', info.scp);
       const test = await callInvokeCommand('Get-DlpCompliancePolicy', {}, DEPLOY_METHOD.COMPLIANCE_INVOKE);
       if (!test.success) {
-        showToast('Compliance preflight failed: ' + test.error);
+        if (test.needsConsent) {
+          showConsentNeededModal(test.consentUrl, test.currentScopes);
+        } else {
+          showToast('Compliance preflight failed: ' + test.error);
+        }
         return false;
       }
       console.log('[Preflight] Compliance InvokeCommand OK');

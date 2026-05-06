@@ -335,6 +335,46 @@
 <!-- ═══ DEPLOY PROGRESS ═══ -->
 <div id="deploy-progress" class="deploy-progress" style="display:none"></div>
 
+<!-- ═══ CONSENT NEEDED MODAL ═══ -->
+<div id="consent-overlay" class="modal-overlay" onclick="if(event.target===this)dismissConsentModal()">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-header">
+      <h3>Admin consent needed</h3>
+      <button class="modal-close" onclick="dismissConsentModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin:0 0 12px;font-size:.78rem;color:var(--ink2);line-height:1.6">
+        Your tenant hasn't granted the framework permission to manage Defender for O365, Exchange Online, or Purview yet.
+      </p>
+      <p style="margin:0 0 12px;font-size:.72rem;color:var(--ink3);line-height:1.6">
+        Microsoft requires a tenant administrator to grant <strong>Office 365 Exchange Online → Exchange.Manage</strong>
+        (delegated) once per tenant. This is a one-time action.
+      </p>
+      <div id="consent-current-scopes" style="font-size:.66rem;color:var(--ink4);margin:0 0 14px;padding:8px 10px;background:var(--surface2);border-radius:6px;font-family:'IBM Plex Mono',monospace"></div>
+
+      <div style="margin:0 0 12px">
+        <strong style="font-size:.7rem;color:var(--ink2)">How to grant consent:</strong>
+        <ol style="margin:6px 0 0;padding-left:20px;font-size:.7rem;color:var(--ink3);line-height:1.7">
+          <li>Click the button below — this opens Microsoft's admin-consent page in a new tab.</li>
+          <li>Sign in with a <strong>Global Admin</strong> account for your tenant.</li>
+          <li>Review the permissions and click <strong>Accept</strong>.</li>
+          <li>Come back to this tab and click <strong>Re-sign-in</strong> to refresh the token.</li>
+        </ol>
+      </div>
+
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:18px">
+        <a id="consent-grant-btn" class="btn btn-primary" target="_blank" rel="noopener">Grant Admin Consent ↗</a>
+        <button class="btn" onclick="reauthAfterConsent()">Re-sign-in</button>
+        <button class="btn btn-sm" onclick="dismissConsentModal()">Close</button>
+      </div>
+
+      <p style="margin:14px 0 0;font-size:.6rem;color:var(--ink4);line-height:1.5">
+        Note: each customer tenant requires its own consent. The same step is needed every time you onboard a new tenant.
+      </p>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ WHAT'S NEW MODAL ═══ -->
 <div id="whatsnew-overlay" class="modal-overlay" onclick="if(event.target===this)dismissWhatsNew()">
   <div class="modal" style="max-width:540px">
@@ -776,6 +816,41 @@ function dismissWhatsNew() {
 function bootstrapWithWhatsNew() {
   bootstrap();
   setTimeout(maybeShowWhatsNew, 600);
+}
+
+// ── Admin-consent flow for the deployment proxy InvokeCommand path ──
+function showConsentNeededModal(consentUrl, currentScopes) {
+  var overlay = document.getElementById('consent-overlay');
+  var btn = document.getElementById('consent-grant-btn');
+  var scopesEl = document.getElementById('consent-current-scopes');
+  if (!overlay || !btn) return;
+
+  btn.href = consentUrl;
+  if (scopesEl) {
+    var scopeList = (currentScopes && currentScopes.length) ? currentScopes.join(' ') : '<none>';
+    scopesEl.innerHTML = '<span style="color:var(--ink3)">Token currently has scopes:</span> ' + escHtml(scopeList);
+  }
+  overlay.classList.add('open');
+}
+
+function dismissConsentModal() {
+  var overlay = document.getElementById('consent-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+async function reauthAfterConsent() {
+  dismissConsentModal();
+  try {
+    if (typeof TenantAuth !== 'undefined' && TenantAuth.logout) {
+      await TenantAuth.logout();
+    }
+  } catch (e) { /* ignore */ }
+  // Slight delay so logout completes before login prompt fires.
+  setTimeout(function () {
+    if (typeof TenantAuth !== 'undefined' && TenantAuth.login) {
+      TenantAuth.login();
+    }
+  }, 400);
 }
 
 if (typeof AccessGate !== 'undefined') {
