@@ -95,7 +95,7 @@ function json(status, body) {
 
 // ── /invoke handler ─────────────────────────────────────────────────────
 async function handleInvoke(payload) {
-  const { target, tenantId, cmdlet } = payload || {};
+  const { target, tenantId, cmdlet, userToken } = payload || {};
   if (!target || !tenantId || !cmdlet || !cmdlet.CmdletInput) {
     return json(400, { error: 'Missing required fields: target, tenantId, cmdlet.CmdletInput' });
   }
@@ -105,17 +105,23 @@ async function handleInvoke(payload) {
     return json(400, { error: 'tenantId must be a GUID.' });
   }
 
-  // 1) Acquire (or reuse cached) app token for this tenant.
+  // 1) Get a token: either use the caller-supplied delegated token (used
+  //    during onboarding to register the EXO/IPPS service principal under
+  //    the user's identity), or acquire an app-only token via client_credentials.
   let token;
-  try {
-    token = await getAppTokenForTenant(tenantId);
-  } catch (err) {
-    return json(401, {
-      error: 'App-only token acquisition failed',
-      message: err.message,
-      hint: 'Has the customer admin granted consent for Exchange.ManageAsApp and assigned the app to a role? See /api/onboarding for instructions.',
-      aadError: err.aadError || null,
-    });
+  if (userToken) {
+    token = userToken;
+  } else {
+    try {
+      token = await getAppTokenForTenant(tenantId);
+    } catch (err) {
+      return json(401, {
+        error: 'App-only token acquisition failed',
+        message: err.message,
+        hint: 'Has the customer admin granted consent for Exchange.ManageAsApp and assigned the app to a role? See /api/onboarding for instructions.',
+        aadError: err.aadError || null,
+      });
+    }
   }
 
   // 2) Call the InvokeCommand endpoint with the app token.
