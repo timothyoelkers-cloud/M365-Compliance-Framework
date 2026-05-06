@@ -625,17 +625,23 @@ const DeployEngine = (() => {
 
       if (res.ok) {
         // InvokeCommand returns HTTP 200 even on cmdlet errors;
-        // check for ErrorRecords in the response
+        // check for ErrorRecords in the response.
         if (data && data.ErrorRecords && data.ErrorRecords.length > 0) {
           var errMsg = '';
           var rec = data.ErrorRecords[0];
-          if (rec.ErrorRecord && rec.ErrorRecord.Exception && rec.ErrorRecord.Exception.Message) {
-            errMsg = rec.ErrorRecord.Exception.Message;
-          } else if (rec.Message) {
-            errMsg = rec.Message;
-          } else {
-            errMsg = JSON.stringify(rec).substring(0, 200);
-          }
+          // Try every shape Microsoft returns these errors in.
+          errMsg =
+            (rec.ErrorRecord && rec.ErrorRecord.Exception && rec.ErrorRecord.Exception.Message) ||
+            (rec.ErrorRecord && rec.ErrorRecord.Message) ||
+            (rec.Exception && rec.Exception.Message) ||
+            rec.Message ||
+            rec.ErrorMessage ||
+            rec.error ||
+            JSON.stringify(rec).substring(0, 400);
+          // Some EXO responses also include CategoryInfo / FullyQualifiedErrorId.
+          var fqid = (rec.ErrorRecord && rec.ErrorRecord.FullyQualifiedErrorId) || rec.FullyQualifiedErrorId;
+          if (fqid && !errMsg.includes(fqid)) errMsg += ' [' + fqid + ']';
+          console.error('[InvokeCommand] Cmdlet error:', cmdletName, '→', rec);
           return { success: false, status: res.status, error: errMsg, data: data };
         }
         // Check for @odata error format
