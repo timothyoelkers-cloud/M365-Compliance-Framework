@@ -8,7 +8,15 @@ const TenantAuth = (() => {
 
   // ─── App Registration: Framework-Assessment-Deployment ───
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
-  const REDIRECT_URI = window.location.origin + window.location.pathname;
+
+  // Pin redirect URI to a canonical value so AAD only ever needs one URI
+  // registered, regardless of which subpath the user happens to land on.
+  // - On the production GitHub Pages host, always use the canonical /M365-Compliance-Framework/ URL.
+  // - On localhost (dev), use whatever the dev server is serving from.
+  const CANONICAL_GHPAGES_URI = 'https://timothyoelkers-cloud.github.io/M365-Compliance-Framework/';
+  const REDIRECT_URI = (window.location.host === 'timothyoelkers-cloud.github.io')
+    ? CANONICAL_GHPAGES_URI
+    : window.location.origin + window.location.pathname;
 
   // ─── Token Scopes (per-resource) ───
   // .default returns ALL admin-consented permissions for that resource
