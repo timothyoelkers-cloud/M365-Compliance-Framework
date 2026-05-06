@@ -54,7 +54,9 @@ const RBACCheck = (() => {
       var token = await TenantAuth.getGraphToken();
       if (!token) { userRoles = []; return []; }
 
-      var response = await fetch('https://graph.microsoft.com/v1.0/me/memberOf?$select=displayName,@odata.type', {
+      // Graph rejects $select on @odata.type — request without $select and
+      // filter on the type at parse time instead.
+      var response = await fetch('https://graph.microsoft.com/v1.0/me/memberOf', {
         headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' }
       });
 
