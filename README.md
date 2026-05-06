@@ -57,17 +57,17 @@ data/
 
 ## Local Development
 
-Serve the site directory with any HTTP server:
+Serve the repo root with any HTTP server:
 
 ```bash
 # Python
-cd site && python -m http.server 8080
+python3 -m http.server 8080
 
 # Node.js
-npx serve site
+npx serve .
 
 # VS Code Live Server
-# Open site/index.html and use the Live Server extension
+# Open index.html and use the Live Server extension
 ```
 
 Then open `http://localhost:8080`.
@@ -78,10 +78,11 @@ Then open `http://localhost:8080`.
 
 This site is designed for **GitHub Pages**:
 
-1. Push the `site/` directory contents to the `gh-pages` branch, or
-2. Set GitHub Pages source to the `site/` folder in repository settings
+1. Repository **Settings → Pages → Source: Deploy from a branch**
+2. Set **Branch: `master`**, **Folder: `/ (root)`**, click **Save**
 
-The `.nojekyll` file is included to bypass Jekyll processing.
+The `.nojekyll` file is included to bypass Jekyll processing. The site will be
+served at `https://<your-user>.github.io/M365-Compliance-Framework/`.
 
 ## Deploying policies into a tenant
 
