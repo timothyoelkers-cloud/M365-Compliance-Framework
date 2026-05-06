@@ -5,7 +5,7 @@
 var AccessGate = (function () {
   'use strict';
 
-  var GATE_HASH = '29352a43448317a963073bb9349844a2a2c993bf8072ff612be31e5943c40a47';
+  var GATE_HASH = '2571f83e1cf14e5d39088841df7ec36f6b1a252d5141f3c30056750ca4f68173';
   var GATE_TOKEN_KEY = 'm365-gate-token';
   var _onGranted = null;
 

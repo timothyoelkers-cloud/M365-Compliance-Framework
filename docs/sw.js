@@ -4,7 +4,7 @@
    stale-while-revalidate for data JSON,
    network-only for auth/Graph API
 ═══════════════════════════════════════════ */
-var CACHE_NAME = 'm365-compliance-v16';
+var CACHE_NAME = 'm365-compliance-v17';
 
 var STATIC_ASSETS = [
   './',
