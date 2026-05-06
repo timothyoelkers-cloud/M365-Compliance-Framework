@@ -557,19 +557,27 @@ const DeployEngine = (() => {
     const claims = decodeJwtScopes(token);
     if (!claims.scp.includes('Exchange.Manage')) {
       const tenant = (TenantAuth.getAccount() || {}).tenantId || 'common';
+      // Use the authorize endpoint with prompt=admin_consent. This is more
+      // reliable than /v2.0/adminconsent — it forces the consent UI every
+      // time, even if AAD thinks consent already exists. After accepting,
+      // AAD redirects back with code= or admin_consent=True.
       const consentUrl = 'https://login.microsoftonline.com/' + tenant +
-        '/v2.0/adminconsent' +
+        '/oauth2/v2.0/authorize' +
         '?client_id=c9bcd329-2658-493b-ab75-6afc6d98adc4' +
-        '&scope=' + encodeURIComponent('https://outlook.office365.com/.default') +
+        '&response_type=code' +
+        '&response_mode=query' +
+        '&prompt=admin_consent' +
+        '&scope=' + encodeURIComponent('https://outlook.office365.com/.default openid profile') +
         '&redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);
       return {
         success: false,
         status: 0,
         error: 'Token missing Exchange.Manage scope (got: ' + (claims.scp.join(' ') || '<none>') +
-               '). Add "Office 365 Exchange Online → Exchange.Manage" delegated permission to the App Registration and grant admin consent. Quick consent URL: ' + consentUrl,
+               '). An admin of this tenant must grant consent. Open: ' + consentUrl,
         needsConsent: true,
         consentUrl: consentUrl,
         currentScopes: claims.scp,
+        tenantId: tenant,
       };
     }
 

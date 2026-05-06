@@ -355,10 +355,11 @@
       <div style="margin:0 0 12px">
         <strong style="font-size:.7rem;color:var(--ink2)">How to grant consent:</strong>
         <ol style="margin:6px 0 0;padding-left:20px;font-size:.7rem;color:var(--ink3);line-height:1.7">
-          <li>Click the button below — this opens Microsoft's admin-consent page in a new tab.</li>
-          <li>Sign in with a <strong>Global Admin</strong> account for your tenant.</li>
+          <li>Click the button below — opens Microsoft's admin-consent page in a new tab.</li>
+          <li>Sign in with a <strong>Global Admin</strong> for this tenant (not just any user).</li>
           <li>Review the permissions and click <strong>Accept</strong>.</li>
-          <li>Come back to this tab and click <strong>Re-sign-in</strong> to refresh the token.</li>
+          <li>You'll be redirected back to this site — close that tab.</li>
+          <li>Come back here and click <strong>Re-sign-in</strong> to pick up the new scope.</li>
         </ol>
       </div>
 
@@ -367,6 +368,16 @@
         <button class="btn" onclick="reauthAfterConsent()">Re-sign-in</button>
         <button class="btn btn-sm" onclick="dismissConsentModal()">Close</button>
       </div>
+
+      <details style="margin-top:14px;font-size:.66rem;color:var(--ink3)">
+        <summary style="cursor:pointer;color:var(--ink2)">Didn't see a consent prompt?</summary>
+        <ul style="margin:8px 0 0;padding-left:18px;line-height:1.7">
+          <li><strong>Already signed in as a non-admin?</strong> AAD silently no-ops if the signed-in user lacks admin rights. Sign in as a Global Admin in the new tab — use private/incognito to force a fresh login.</li>
+          <li><strong>Got redirected straight back?</strong> Check the URL bar — if you see <code>?error=...</code>, that's the cause. <code>?admin_consent=True</code> means it worked.</li>
+          <li><strong>Got an "AADSTS50011 redirect URI mismatch"?</strong> Add this site's URL as a redirect URI to the App Registration's Authentication tab.</li>
+          <li><strong>Permissions look empty on consent page?</strong> The App Registration owner hasn't added Exchange.Manage to its API permissions yet — that has to happen before any tenant can consent.</li>
+        </ul>
+      </details>
 
       <p style="margin:14px 0 0;font-size:.6rem;color:var(--ink4);line-height:1.5">
         Note: each customer tenant requires its own consent. The same step is needed every time you onboard a new tenant.
