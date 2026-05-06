@@ -447,70 +447,10 @@ async function handleConnectTenant() {
   }
 }
 
-async function showTenantStatusModal() {
+function showTenantStatusModal() {
   const content = document.getElementById('tenant-config-content');
   const acct = TenantAuth.getAccount();
   document.getElementById('tenant-modal-overlay').classList.add('open');
-
-  // Probe by running the cheapest read-only InvokeCommand against the proxy.
-  // Either succeeds (onboarded ✅), gets 401 token error (needs admin consent),
-  // or gets MS tenant-lookup error (needs role assignment).
-  let onboardingState = 'checking';
-  let onboardingDetail = '';
-  try {
-    const test = await DeployEngine.callInvokeCommand('Get-OrganizationConfig', {}, DeployEngine.DEPLOY_METHOD.EXO_INVOKE);
-    if (test.success) {
-      onboardingState = 'onboarded';
-    } else {
-      const errStr = String(test.error || '');
-      if (errStr.indexOf('CannotResolveTenantNameException') !== -1 ||
-          errStr.indexOf('organization container') !== -1) {
-        onboardingState = 'needs-role';
-        onboardingDetail = 'App service principal exists but is not yet a member of "Organization Management" or "Compliance Administrator". Run the PowerShell snippet below.';
-      } else if (errStr.indexOf('App-only token acquisition failed') !== -1) {
-        onboardingState = 'needs-consent';
-        onboardingDetail = 'Customer admin has not granted consent yet. Click Grant Admin Consent below.';
-      } else {
-        onboardingState = 'error';
-        onboardingDetail = errStr;
-      }
-    }
-  } catch (e) {
-    onboardingState = 'error';
-    onboardingDetail = e.message || String(e);
-  }
-
-  let onboardingSection = '';
-  if (onboardingState === 'onboarded') {
-    onboardingSection = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border-left:3px solid var(--green);border-radius:6px;margin-top:14px">
-      <span class="auth-dot connected" style="background:var(--green);flex-shrink:0"></span>
-      <div style="font-size:.72rem;color:var(--ink2)">
-        <strong>Tenant onboarded</strong> — all policy types are deployable.
-      </div>
-    </div>`;
-  } else {
-    const colour = onboardingState === 'checking' ? 'var(--ink3)' : 'var(--amber)';
-    const heading = onboardingState === 'checking' ? 'Checking onboarding status…' : 'Onboarding required';
-    onboardingSection = `<div style="padding:12px;background:var(--surface2);border-left:3px solid ${colour};border-radius:6px;margin-top:14px">
-      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-        <span class="auth-dot" style="background:${colour};flex-shrink:0"></span>
-        <strong style="font-size:.74rem;color:var(--ink2)">${heading}</strong>
-      </div>
-      ${onboardingDetail ? `<p style="margin:0 0 10px;font-size:.66rem;color:var(--ink3);line-height:1.5">${escHtml(onboardingDetail)}</p>` : ''}
-      <p style="margin:0 0 10px;font-size:.66rem;color:var(--ink3);line-height:1.5">
-        Defender for O365, Exchange Online and Purview deploys use <strong>app-only authentication</strong>. One-time onboarding for this tenant takes ~10 seconds and runs entirely in the browser:
-      </p>
-      <ol style="margin:0 0 12px;padding-left:18px;font-size:.66rem;color:var(--ink3);line-height:1.7">
-        <li>Admin-consent popup opens — sign in as Global Admin and accept.</li>
-        <li>The SPA looks up the app's service principal in this tenant.</li>
-        <li>The SPA assigns it to <strong>Exchange Administrator</strong> + <strong>Compliance Administrator</strong> via Graph.</li>
-        <li>Done — you can close this and click Deploy.</li>
-      </ol>
-      <button class="btn btn-sm btn-primary" onclick="onboardTenant()">Onboard This Tenant</button>
-      <button class="btn btn-sm" onclick="recheckOnboarding()" style="margin-left:6px">Re-check</button>
-      <div id="onboarding-status" style="margin-top:10px;font-size:.66rem;color:var(--ink2);min-height:1em"></div>
-    </div>`;
-  }
 
   content.innerHTML = `
     <div style="text-align:center;padding:8px 0 0">
@@ -519,17 +459,18 @@ async function showTenantStatusModal() {
       <p style="font-size:.78rem;color:var(--ink2)">${escHtml(acct.email)}</p>
       <p style="font-size:.7rem;color:var(--ink3);margin-top:4px;font-family:'JetBrains Mono',monospace">Tenant: ${escHtml(acct.tenantId)}</p>
     </div>
-    ${onboardingSection}
+    <div style="padding:10px 12px;background:var(--surface2);border-left:3px solid var(--ink3);border-radius:6px;margin-top:14px;font-size:.66rem;color:var(--ink3);line-height:1.6">
+      <strong style="color:var(--ink2)">What deploys browser-only?</strong> Conditional Access, Intune, Entra, Defender for Endpoint and SharePoint admin policies use Microsoft Graph from your signed-in session.
+      <br><br>
+      <strong style="color:var(--ink2)">What needs PowerShell?</strong> Defender for O365, Exchange Online, Purview and Teams policies require <code>Connect-ExchangeOnline</code>/<code>Connect-IPPSSession</code>/<code>Connect-MicrosoftTeams</code>. Use the <strong>Deploy in Cloud Shell</strong> button on those policy cards — script copied to clipboard, Cloud Shell opens in a new tab.
+    </div>
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;border-top:1px solid var(--border);padding-top:14px">
       <button class="btn btn-sm" onclick="disconnectTenant()">Disconnect</button>
       <button class="btn btn-sm" onclick="document.getElementById('tenant-modal-overlay').classList.remove('open')">Close</button>
     </div>`;
 }
 
-function recheckOnboarding() {
-  showToast('Re-checking…');
-  showTenantStatusModal();
-}
+// (recheckOnboarding removed)
 
 async function disconnectTenant() {
   document.getElementById('tenant-modal-overlay').classList.remove('open');
@@ -845,181 +786,7 @@ function bootstrapWithWhatsNew() {
   setTimeout(maybeShowWhatsNew, 600);
 }
 
-// ── One-click tenant onboarding (consent + role assignment via Graph) ──
-// Runs the full onboarding for the signed-in admin's tenant:
-//   1. Trigger admin consent popup (creates SP + grants app permissions)
-//   2. Look up the SP's object ID via Graph
-//   3. Activate the relevant directory roles (Exchange Admin, Compliance Admin)
-//   4. Add the SP as a member of each role
-// All without leaving the SPA.
-
-const APP_ID_TO_ONBOARD = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
-// Well-known directory role template IDs (constant across all M365 tenants).
-const ONBOARDING_ROLES = [
-  { name: 'Exchange Administrator',   templateId: '29232cdf-9323-42fd-ade2-1d097af3e4de' },
-  { name: 'Compliance Administrator', templateId: '17315797-102d-40b4-93e0-432062caca18' },
-];
-
-async function graphRequest(method, path, body) {
-  const token = await TenantAuth.getGraphToken();
-  if (!token) throw new Error('No Graph token — please re-sign in');
-  const opts = {
-    method,
-    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-  };
-  if (body) opts.body = JSON.stringify(body);
-  const res = await fetch('https://graph.microsoft.com/v1.0' + path, opts);
-  const text = await res.text();
-  let data = null; try { data = text ? JSON.parse(text) : null; } catch (e) { /* non-JSON */ }
-  if (!res.ok) {
-    const err = new Error((data && data.error && data.error.message) || text || res.statusText);
-    err.status = res.status;
-    err.code = data && data.error && data.error.code;
-    err.data = data;
-    throw err;
-  }
-  return data;
-}
-
-// Activates a directory role from its template if not already active.
-// Returns the active role's id.
-async function activateDirectoryRole(templateId) {
-  const list = await graphRequest('GET', '/directoryRoles?$filter=roleTemplateId eq \'' + templateId + '\'');
-  if (list.value && list.value.length > 0) return list.value[0].id;
-  const activated = await graphRequest('POST', '/directoryRoles', { roleTemplateId: templateId });
-  return activated.id;
-}
-
-async function addServicePrincipalToRole(roleId, spObjectId) {
-  try {
-    await graphRequest('POST', '/directoryRoles/' + roleId + '/members/$ref', {
-      '@odata.id': 'https://graph.microsoft.com/v1.0/directoryObjects/' + spObjectId,
-    });
-    return 'added';
-  } catch (err) {
-    // Already a member → 400 with "added object references already exist"
-    if (err.status === 400 && /already exist/i.test(err.message)) return 'already';
-    if (err.status === 409) return 'already';
-    throw err;
-  }
-}
-
-// Create the Exchange/Compliance-side ServicePrincipal entry by running
-// New-ServicePrincipal under the user's delegated identity. This is what
-// lets MS resolve the app to a tenant container after the AAD role assignment.
-async function createExoServicePrincipalEntry(target, tenantId, appId, spObjectId) {
-  // Both Exchange (target='exchange') and Compliance (target='compliance')
-  // accept a delegated token with audience https://outlook.office365.com.
-  // MSAL's getExchangeToken returns that audience already.
-  const userToken = await TenantAuth.getExchangeToken();
-  if (!userToken) throw new Error('Could not acquire delegated EXO token (Exchange.Manage)');
-
-  const proxy = (typeof DeployEngine !== 'undefined' && DeployEngine.getDeploymentProxy)
-    ? DeployEngine.getDeploymentProxy() : '';
-  if (!proxy) throw new Error('Deployment proxy not configured');
-
-  const res = await fetch(proxy + '/invoke', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      target: target,
-      tenantId: tenantId,
-      userToken: userToken,
-      cmdlet: {
-        CmdletInput: {
-          CmdletName: 'New-ServicePrincipal',
-          Parameters: {
-            AppId:       appId,
-            ServiceId:   spObjectId,
-            DisplayName: 'M365 Compliance Framework Deploy',
-          },
-        },
-      },
-    }),
-  });
-  const text = await res.text();
-  let data = null; try { data = JSON.parse(text); } catch (e) { /* non-JSON */ }
-
-  // Cmdlet returns 200 even on errors. Treat "already exists" as success.
-  const errMsg = (data && data.ErrorRecords && data.ErrorRecords[0]) ||
-                 (data && data.error && data.error.message) || '';
-  const errStr = typeof errMsg === 'string' ? errMsg : JSON.stringify(errMsg);
-  if (/already exists/i.test(errStr) || /A service principal with the App Id .* already exists/i.test(errStr)) {
-    return 'already';
-  }
-  if (data && data.ErrorRecords && data.ErrorRecords.length > 0) {
-    const e = new Error('New-ServicePrincipal failed for ' + target + ': ' + errStr.substring(0, 300));
-    e.target = target;
-    throw e;
-  }
-  return 'created';
-}
-
-async function onboardTenant() {
-  if (typeof TenantAuth === 'undefined' || !TenantAuth.isAuthenticated()) {
-    showToast('Sign in first, then onboard the tenant');
-    return;
-  }
-  const status = document.getElementById('onboarding-status');
-  const setStatus = (txt, colour) => {
-    if (status) {
-      status.textContent = txt;
-      status.style.color = colour || 'var(--ink2)';
-    }
-    showToast(txt);
-  };
-
-  try {
-    setStatus('Step 1/5: Opening admin-consent popup…');
-    await TenantAuth.consentPopup(TenantAuth.EXO_TOKEN_SCOPE);
-
-    setStatus('Step 2/5: Finding the app service principal…');
-    const sp = await graphRequest('GET', '/servicePrincipals?$filter=appId eq \'' + APP_ID_TO_ONBOARD + '\'');
-    if (!sp.value || sp.value.length === 0) {
-      throw new Error('Service principal not created — consent may not have been completed.');
-    }
-    const spId = sp.value[0].id;
-    const acct = TenantAuth.getAccount();
-    const tenantId = acct.tenantId;
-
-    for (let i = 0; i < ONBOARDING_ROLES.length; i++) {
-      const role = ONBOARDING_ROLES[i];
-      setStatus('Step 3/5: Granting "' + role.name + '" role… (' + (i + 1) + '/' + ONBOARDING_ROLES.length + ')');
-      const roleId = await activateDirectoryRole(role.templateId);
-      const result = await addServicePrincipalToRole(roleId, spId);
-      console.log('[Onboard]', role.name, '→', result);
-    }
-
-    setStatus('Step 4/5: Registering app in Exchange Online…');
-    const exoResult = await createExoServicePrincipalEntry('exchange', tenantId, APP_ID_TO_ONBOARD, spId);
-    console.log('[Onboard] EXO SP:', exoResult);
-
-    setStatus('Step 4/5: Registering app in Security & Compliance…');
-    try {
-      const ccResult = await createExoServicePrincipalEntry('compliance', tenantId, APP_ID_TO_ONBOARD, spId);
-      console.log('[Onboard] Compliance SP:', ccResult);
-    } catch (ccErr) {
-      // Compliance can lag Exchange by a few seconds; surface the error but
-      // don't block the rest of the flow.
-      console.warn('[Onboard] Compliance SP creation warning:', ccErr.message);
-    }
-
-    setStatus('Step 5/5: Verifying…');
-    await new Promise(r => setTimeout(r, 2000));
-
-    setStatus('Tenant onboarded successfully', 'var(--green)');
-    showTenantStatusModal();
-  } catch (err) {
-    console.error('[Onboard] Failed:', err);
-    const userMsg = err.errorCode === 'user_cancelled'
-      ? 'Onboarding cancelled'
-      : 'Onboarding failed: ' + (err.message || err.errorCode || 'unknown error');
-    setStatus(userMsg, 'var(--red)');
-  }
-}
-
-// Backwards-compatible alias for older event handlers in the modal.
-async function grantAdminConsent() { return onboardTenant(); }
+// (Onboarding helpers removed — DEF/EXO/PV/Teams use Cloud Shell deploy.)
 
 if (typeof AccessGate !== 'undefined') {
   AccessGate.init(bootstrapWithWhatsNew);

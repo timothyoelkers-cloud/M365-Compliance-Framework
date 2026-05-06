@@ -34,12 +34,11 @@ const DeployEngine = (() => {
     'governance':         DEPLOY_METHOD.PS_ONLY,
   };
 
-  // Type → method when a deployment proxy is configured.
-  const PROXY_TYPE_MAP = {
-    'defender': DEPLOY_METHOD.EXO_INVOKE,
-    'exchange': DEPLOY_METHOD.EXO_INVOKE,
-    'purview':  DEPLOY_METHOD.COMPLIANCE_INVOKE,
-  };
+  // (Reverted: proxy-based InvokeCommand path disabled. DEF/EXO/PV/Teams
+  // policies use the Cloud Shell deploy fallback or PS1 download instead.
+  // The proxy code paths below remain in place for future re-enablement,
+  // but TYPE_DEPLOY_MAP keeps these types as PS_ONLY.)
+  const PROXY_TYPE_MAP = {};
 
   // Per-policy overrides — SharePoint policies routed to /admin/sharepoint/settings (Graph)
   // Only includes properties that exist in the Graph admin-settings schema.
@@ -491,35 +490,20 @@ const DeployEngine = (() => {
   const EXO_INVOKE_BASE = 'https://outlook.office365.com/adminapi/beta/';
   const COMPLIANCE_INVOKE_BASE = 'https://ps.compliance.protection.outlook.com/adminapi/beta/';
 
-  // ── Deployment proxy ──
-  // outlook.office365.com and ps.compliance.protection.outlook.com do not allow
-  // browser CORS preflight. A hosted relay forwards calls server-side; CORS is
-  // locked to this site's origin. Customers can override with a self-hosted
-  // proxy via setDeploymentProxy().
+  // ── Deployment proxy (disabled in this build) ──
+  // The previous build routed DEF/EXO/PV through a server-side relay so the
+  // browser could call /InvokeCommand without CORS issues. That path required
+  // per-tenant onboarding (admin consent + EXO/IPPS service-principal record)
+  // that wasn't a clean browser-only experience, so it's been disabled.
+  // DEF/EXO/PV/Teams now fall through to the Cloud Shell deploy fallback.
   const PROXY_KEY = 'm365-deployment-proxy-url';
-  const DEFAULT_PROXY_URL = 'https://m365-deploy-proxy-inforcer.azurewebsites.net/api';
+  const DEFAULT_PROXY_URL = '';
 
-  function getDeploymentProxy() {
-    try {
-      const override = localStorage.getItem(PROXY_KEY);
-      if (override === '__disabled__') return '';
-      return override || DEFAULT_PROXY_URL;
-    } catch (e) { return DEFAULT_PROXY_URL; }
-  }
-  function setDeploymentProxy(url) {
-    try {
-      const normalised = String(url || '').trim().replace(/\/+$/, '');
-      if (!normalised || normalised === DEFAULT_PROXY_URL) localStorage.removeItem(PROXY_KEY);
-      else localStorage.setItem(PROXY_KEY, normalised);
-    } catch (e) { /* ignore */ }
-  }
-  function disableDeploymentProxy() {
-    try { localStorage.setItem(PROXY_KEY, '__disabled__'); } catch (e) { /* ignore */ }
-  }
-  function isUsingDefaultProxy() {
-    try { return localStorage.getItem(PROXY_KEY) === null; } catch (e) { return true; }
-  }
-  function hasDeploymentProxy() { return !!getDeploymentProxy(); }
+  function getDeploymentProxy()    { return ''; }
+  function setDeploymentProxy()    { /* no-op */ }
+  function disableDeploymentProxy(){ /* no-op */ }
+  function isUsingDefaultProxy()   { return true; }
+  function hasDeploymentProxy()    { return false; }
 
   /**
    * Call the InvokeCommand REST API (Exchange or Compliance).

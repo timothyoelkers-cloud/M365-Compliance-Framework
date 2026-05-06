@@ -1,8 +1,0 @@
-*.js.map
-*.ts
-.git*
-.vscode
-local.settings.json
-test
-node_modules
-README.md
