@@ -593,12 +593,26 @@ async function bootstrap() {
     // Offline mode detection
     if (typeof OfflineManager !== 'undefined') OfflineManager.init();
 
-    // Service Worker registration (PWA) + update notification
+    // Service Worker registration (PWA) + auto-update on version change.
+    // We force an update check on every page load and reload once when a new
+    // SW takes control — this prevents stale workers (with outdated host
+    // allowlists, missing API routing, etc.) from sticking around.
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(function (e) { console.warn('SW registration failed:', e); });
+      navigator.serviceWorker.register('sw.js').then(function (reg) {
+        if (reg && typeof reg.update === 'function') reg.update();
+      }).catch(function (e) { console.warn('SW registration failed:', e); });
+
+      var _swReloadInFlight = false;
+      navigator.serviceWorker.addEventListener('controllerchange', function () {
+        if (_swReloadInFlight) return;
+        _swReloadInFlight = true;
+        // A new SW has taken control. Reload once so the page runs against it.
+        window.location.reload();
+      });
+
       navigator.serviceWorker.addEventListener('message', function (event) {
         if (event.data && event.data.type === 'SW_UPDATED') {
-          showToast('App updated — refresh for latest version', 'info', 8000);
+          showToast('App updated — reloading…', 'info', 3000);
         }
       });
     }
