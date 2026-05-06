@@ -4,7 +4,7 @@
    stale-while-revalidate for data JSON,
    network-only for auth/Graph API
 ═══════════════════════════════════════════ */
-var CACHE_NAME = 'm365-compliance-v17';
+var CACHE_NAME = 'm365-compliance-v18';
 
 var STATIC_ASSETS = [
   './',
@@ -58,13 +58,15 @@ var STATIC_ASSETS = [
   './data/check-policy-map.json',
 ];
 
-// Network-only hosts (auth + live data)
+// Network-only hosts (auth + live data + deployment proxy)
 var NETWORK_ONLY_HOSTS = [
   'graph.microsoft.com',
   'login.microsoftonline.com',
   'outlook.office365.com',
   'ps.compliance.protection.outlook.com',
   'api.partnercenter.microsoft.com',
+  // Deployment relay: cross-origin POST that must not be intercepted/cached.
+  'm365-deploy-proxy-inforcer.azurewebsites.net',
 ];
 
 // Install — cache static assets
