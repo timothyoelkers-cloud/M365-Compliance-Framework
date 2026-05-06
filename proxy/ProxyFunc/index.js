@@ -60,15 +60,38 @@ async function handleInvoke(payload) {
   }
 
   const url = base + tenantId + '/InvokeCommand';
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + token,
-      'Content-Type':  'application/json;odata.metadata=minimal',
-      'X-ResponseFormat': 'json',
-    },
-    body: JSON.stringify(cmdlet),
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 60000);
+
+  let res;
+  try {
+    res = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Authorization': 'Bearer ' + token,
+        'Content-Type':  'application/json;odata.metadata=minimal',
+        'X-ResponseFormat': 'json',
+      },
+      body: JSON.stringify(cmdlet),
+      signal: controller.signal,
+    });
+  } catch (err) {
+    // Node 18+ undici wraps the real error in err.cause. Surface it so the SPA
+    // shows a useful message instead of a bare "fetch failed".
+    const cause = err && err.cause ? err.cause : {};
+    return json(502, {
+      error: 'Upstream fetch failed',
+      target: target,
+      message: err.message || String(err),
+      causeMessage: cause.message || null,
+      causeCode: cause.code || null,
+      causeErrno: cause.errno || null,
+      url: url,
+    });
+  } finally {
+    clearTimeout(timer);
+  }
+
   const text = await res.text();
   return {
     status: res.status,
