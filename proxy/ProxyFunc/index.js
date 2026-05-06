@@ -103,16 +103,26 @@ async function handleInvoke(payload) {
     }
   }
 
-  // All attempts failed — surface the underlying cause.
+  // All attempts failed — surface the underlying cause + a hypothesis hint.
   const cause = lastErr && lastErr.cause ? lastErr.cause : {};
+  const code = cause.code || (lastErr && lastErr.name === 'AbortError' ? 'TIMEOUT' : null);
+  let hint = null;
+  if (code === 'ETIMEDOUT' || code === 'TIMEOUT' || code === 'UND_ERR_CONNECT_TIMEOUT') {
+    if (target === 'compliance') {
+      hint = 'Microsoft\'s compliance endpoint silently dropped the request. Most common cause: this tenant does not have a Microsoft Purview / Security & Compliance workload provisioned (requires M365 E5, E3+Compliance add-on, or Compliance E5).';
+    } else {
+      hint = 'Microsoft\'s Exchange endpoint did not respond. Check that the signed-in user has an Exchange Online admin role assigned.';
+    }
+  }
   return json(502, {
     error: 'Upstream fetch failed after retry',
     target: target,
     message: lastErr ? (lastErr.message || String(lastErr)) : 'unknown',
     causeMessage: cause.message || null,
-    causeCode: cause.code || null,
+    causeCode: code,
     causeErrno: cause.errno || null,
     url: url,
+    hint: hint,
   });
 }
 
