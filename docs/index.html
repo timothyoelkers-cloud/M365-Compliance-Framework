@@ -452,36 +452,66 @@ async function showTenantStatusModal() {
   const acct = TenantAuth.getAccount();
   document.getElementById('tenant-modal-overlay').classList.add('open');
 
-  // Probe Exchange/Compliance scope silently — don't trigger popups.
-  let exchangeOk = false;
+  // Probe by running the cheapest read-only InvokeCommand against the proxy.
+  // Either succeeds (onboarded ✅), gets 401 token error (needs admin consent),
+  // or gets MS tenant-lookup error (needs role assignment).
+  let onboardingState = 'checking';
+  let onboardingDetail = '';
   try {
-    const tok = await TenantAuth.getTokenSilent(TenantAuth.EXO_TOKEN_SCOPE);
-    if (tok && typeof DeployEngine !== 'undefined' && DeployEngine.decodeJwtScopes) {
-      const claims = DeployEngine.decodeJwtScopes(tok);
-      exchangeOk = (claims.scp || []).indexOf('Exchange.Manage') !== -1;
+    const test = await DeployEngine.callInvokeCommand('Get-OrganizationConfig', {}, DeployEngine.DEPLOY_METHOD.EXO_INVOKE);
+    if (test.success) {
+      onboardingState = 'onboarded';
+    } else {
+      const errStr = String(test.error || '');
+      if (errStr.indexOf('CannotResolveTenantNameException') !== -1 ||
+          errStr.indexOf('organization container') !== -1) {
+        onboardingState = 'needs-role';
+        onboardingDetail = 'App service principal exists but is not yet a member of "Organization Management" or "Compliance Administrator". Run the PowerShell snippet below.';
+      } else if (errStr.indexOf('App-only token acquisition failed') !== -1) {
+        onboardingState = 'needs-consent';
+        onboardingDetail = 'Customer admin has not granted consent yet. Click Grant Admin Consent below.';
+      } else {
+        onboardingState = 'error';
+        onboardingDetail = errStr;
+      }
     }
-  } catch (e) { /* ignore */ }
+  } catch (e) {
+    onboardingState = 'error';
+    onboardingDetail = e.message || String(e);
+  }
 
-  const consentSection = exchangeOk
-    ? `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border-left:3px solid var(--green);border-radius:6px;margin-top:14px">
-        <span class="auth-dot connected" style="background:var(--green);flex-shrink:0"></span>
-        <div style="font-size:.72rem;color:var(--ink2)">
-          <strong>Exchange.Manage granted</strong> — Defender for O365, Exchange Online, and Purview policies are deployable.
-        </div>
-      </div>`
-    : `<div style="padding:10px 12px;background:var(--surface2);border-left:3px solid var(--amber);border-radius:6px;margin-top:14px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
-          <span class="auth-dot" style="background:var(--amber);flex-shrink:0"></span>
-          <strong style="font-size:.74rem;color:var(--ink2)">Admin consent required</strong>
-        </div>
-        <p style="margin:0 0 10px;font-size:.66rem;color:var(--ink3);line-height:1.5">
-          A Global Admin needs to grant <code>Exchange.Manage</code> once for this tenant before Defender for O365, Exchange Online, and Purview policies can deploy. SharePoint, Conditional Access, Intune, Entra and Defender for Endpoint already work.
-        </p>
-        <p style="margin:0 0 10px;font-size:.66rem;color:var(--ink3);line-height:1.5">
-          Clicking the button opens a small popup. On the consent screen, tick <strong>"Consent on behalf of your organization"</strong>, then <strong>Accept</strong>. The popup auto-closes — no redirect, no re-entering this site's password.
-        </p>
-        <button class="btn btn-sm btn-primary" onclick="grantAdminConsent()">Grant Admin Consent</button>
-      </div>`;
+  const ps1 = appOnlyOnboardingScript(acct.tenantId);
+  let onboardingSection = '';
+  if (onboardingState === 'onboarded') {
+    onboardingSection = `<div style="display:flex;align-items:center;gap:8px;padding:10px 12px;background:var(--surface2);border-left:3px solid var(--green);border-radius:6px;margin-top:14px">
+      <span class="auth-dot connected" style="background:var(--green);flex-shrink:0"></span>
+      <div style="font-size:.72rem;color:var(--ink2)">
+        <strong>Tenant onboarded</strong> — Defender for O365, Exchange Online and Purview policies are deployable. SharePoint, Conditional Access, Intune, Entra and Defender for Endpoint use Microsoft Graph directly.
+      </div>
+    </div>`;
+  } else {
+    const colour = onboardingState === 'checking' ? 'var(--ink3)' : 'var(--amber)';
+    const heading = onboardingState === 'checking' ? 'Checking onboarding status…' : 'Onboarding required';
+    onboardingSection = `<div style="padding:12px;background:var(--surface2);border-left:3px solid ${colour};border-radius:6px;margin-top:14px">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <span class="auth-dot" style="background:${colour};flex-shrink:0"></span>
+        <strong style="font-size:.74rem;color:var(--ink2)">${heading}</strong>
+      </div>
+      ${onboardingDetail ? `<p style="margin:0 0 10px;font-size:.66rem;color:var(--ink3);line-height:1.5">${escHtml(onboardingDetail)}</p>` : ''}
+      <p style="margin:0 0 10px;font-size:.66rem;color:var(--ink3);line-height:1.5">
+        The framework deploys policies using <strong>app-only authentication</strong>, not your user identity. Each new customer tenant requires a one-time onboarding by a Global Admin: grant consent, then assign the app's service principal to an admin role group via PowerShell.
+      </p>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        <button class="btn btn-sm btn-primary" onclick="grantAdminConsent()">1. Grant Admin Consent</button>
+        <button class="btn btn-sm" onclick="copyOnboardingScript()">2. Copy PowerShell</button>
+        <button class="btn btn-sm" onclick="recheckOnboarding()">Re-check</button>
+      </div>
+      <details style="margin-top:6px">
+        <summary style="cursor:pointer;font-size:.66rem;color:var(--ink2)">Show PowerShell script</summary>
+        <pre style="margin:6px 0 0;padding:10px;background:#0d1117;color:#c9d1d9;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.62rem;overflow-x:auto;line-height:1.5;white-space:pre-wrap">${escHtml(ps1)}</pre>
+      </details>
+    </div>`;
+  }
 
   content.innerHTML = `
     <div style="text-align:center;padding:8px 0 0">
@@ -490,11 +520,66 @@ async function showTenantStatusModal() {
       <p style="font-size:.78rem;color:var(--ink2)">${escHtml(acct.email)}</p>
       <p style="font-size:.7rem;color:var(--ink3);margin-top:4px;font-family:'JetBrains Mono',monospace">Tenant: ${escHtml(acct.tenantId)}</p>
     </div>
-    ${consentSection}
+    ${onboardingSection}
     <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px;border-top:1px solid var(--border);padding-top:14px">
       <button class="btn btn-sm" onclick="disconnectTenant()">Disconnect</button>
       <button class="btn btn-sm" onclick="document.getElementById('tenant-modal-overlay').classList.remove('open')">Close</button>
     </div>`;
+}
+
+// PowerShell snippet for the customer admin to run after granting consent.
+function appOnlyOnboardingScript(tenantId) {
+  const appId = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
+  return [
+    '# One-time onboarding for the M365 Compliance Framework (app-only)',
+    '# Run as a Global Admin of this tenant.',
+    '',
+    '$appId = "' + appId + '"',
+    '',
+    '# 1) Look up the AAD service principal (created when admin consent was granted)',
+    'Connect-MgGraph -Scopes "Application.Read.All" -NoWelcome',
+    '$aadSp = Get-MgServicePrincipal -Filter "appId eq \'$appId\'"',
+    'if (-not $aadSp) { throw "AAD service principal not found. Click Grant Admin Consent in the SPA first." }',
+    '',
+    '# 2) Connect to Exchange Online and create the EXO service principal entry',
+    'Connect-ExchangeOnline',
+    '$exoSp = Get-ServicePrincipal -ErrorAction SilentlyContinue | Where-Object { $_.AppId -eq $appId }',
+    'if (-not $exoSp) {',
+    '    $exoSp = New-ServicePrincipal -AppId $appId -ServiceId $aadSp.Id -DisplayName "M365 Compliance Framework Deploy"',
+    '}',
+    '',
+    '# 3) Add to role groups required for Exchange + Defender for O365 cmdlets',
+    'Add-RoleGroupMember -Identity "Organization Management" -Member $exoSp.Identity -ErrorAction SilentlyContinue',
+    '',
+    '# 4) Connect to Security & Compliance Center for Purview cmdlets',
+    'Connect-IPPSSession',
+    '$ippsSp = Get-ServicePrincipal -ErrorAction SilentlyContinue | Where-Object { $_.AppId -eq $appId }',
+    'if (-not $ippsSp) {',
+    '    $ippsSp = New-ServicePrincipal -AppId $appId -ServiceId $aadSp.Id -DisplayName "M365 Compliance Framework Deploy"',
+    '}',
+    'Add-RoleGroupMember -Identity "Compliance Administrator" -Member $ippsSp.Identity -ErrorAction SilentlyContinue',
+    '',
+    '# 5) Verify',
+    'Get-RoleGroupMember "Organization Management" | Where-Object { $_.Name -eq $exoSp.Identity }',
+    '',
+    'Write-Host "Onboarding complete for tenant ' + (tenantId || '<your-tenant>') + '. Return to the SPA and click Re-check." -ForegroundColor Green',
+  ].join('\n');
+}
+
+async function copyOnboardingScript() {
+  const acct = TenantAuth.getAccount();
+  const ps1 = appOnlyOnboardingScript(acct ? acct.tenantId : '');
+  try {
+    await navigator.clipboard.writeText(ps1);
+    showToast('Onboarding PowerShell copied — paste into a Global Admin PowerShell session');
+  } catch (e) {
+    showToast('Copy failed: ' + e.message);
+  }
+}
+
+function recheckOnboarding() {
+  showToast('Re-checking…');
+  showTenantStatusModal();
 }
 
 async function disconnectTenant() {

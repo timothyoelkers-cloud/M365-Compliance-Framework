@@ -553,69 +553,34 @@ const DeployEngine = (() => {
   async function callInvokeCommand(cmdletName, parameters, method) {
     const isCompliance = (method === DEPLOY_METHOD.COMPLIANCE_INVOKE);
 
-    const token = isCompliance
-      ? await TenantAuth.getComplianceToken()
-      : await TenantAuth.getExchangeToken();
-
-    if (!token) {
-      return {
-        success: false, status: 0,
-        error: 'No ' + (isCompliance ? 'Compliance' : 'Exchange') + ' token — ensure permissions are granted and re-sign in',
-      };
-    }
-
-    // Pre-flight scope check — Microsoft silently drops connections (ETIMEDOUT)
-    // when the token lacks Exchange.Manage rather than returning 401. Detect
-    // this client-side so the user gets an actionable message immediately.
-    const claims = decodeJwtScopes(token);
-    if (!claims.scp.includes('Exchange.Manage')) {
-      return {
-        success: false,
-        status: 0,
-        error: 'Token missing Exchange.Manage scope (got: ' + (claims.scp.join(' ') || '<none>') +
-               '). Open Connect Tenant → Grant Admin Consent to authorize this tenant.',
-        needsConsent: true,
-        currentScopes: claims.scp,
-      };
-    }
-
     const acct = TenantAuth.getAccount();
     if (!acct || !acct.tenantId) {
-      return { success: false, status: 0, error: 'No tenant ID — please sign in' };
+      return { success: false, status: 0, error: 'No tenant ID — please sign in to identify the tenant' };
     }
 
+    // App-only mode: the proxy authenticates as the framework app via
+    // client_credentials. The browser does NOT forward a user token.
+    // Customer onboarding (admin consent + app-SP role assignment) is what
+    // grants the app permission to act in their tenant.
     const proxy = getDeploymentProxy();
-    const directUrl = (isCompliance ? COMPLIANCE_INVOKE_BASE : EXO_INVOKE_BASE) + acct.tenantId + '/InvokeCommand';
+    if (!proxy) {
+      return { success: false, status: 0, error: 'No deployment proxy configured — Defender/Exchange/Purview need a proxy' };
+    }
 
     const cmdletBody = {
       CmdletInput: { CmdletName: cmdletName, Parameters: parameters || {} },
     };
 
-    let url, opts;
-    if (proxy) {
-      url = proxy + '/invoke';
-      opts = {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          target: isCompliance ? 'compliance' : 'exchange',
-          tenantId: acct.tenantId,
-          token: token,
-          cmdlet: cmdletBody,
-        }),
-      };
-    } else {
-      url = directUrl;
-      opts = {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + token,
-          'Content-Type': 'application/json;odata.metadata=minimal',
-          'X-ResponseFormat': 'json',
-        },
-        body: JSON.stringify(cmdletBody),
-      };
-    }
+    const url = proxy + '/invoke';
+    const opts = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        target: isCompliance ? 'compliance' : 'exchange',
+        tenantId: acct.tenantId,
+        cmdlet: cmdletBody,
+      }),
+    };
 
     try {
       const res = await fetch(url, opts);
@@ -703,23 +668,14 @@ const DeployEngine = (() => {
       return true;
     }
 
+    // Exchange + Compliance preflights both run a harmless read-only cmdlet
+    // through the proxy. The proxy uses app-only auth (client_credentials)
+    // so no user token is involved here.
     if (method === DEPLOY_METHOD.EXO_INVOKE) {
       if (preflightResults.exo) return true;
-      const token = await TenantAuth.getExchangeToken();
-      if (!token) {
-        showToast('No Exchange token — add Exchange.Manage permission and re-sign in');
-        return false;
-      }
-      const info = decodeTokenScopes(token);
-      console.log('[Preflight] Exchange — aud:', info.aud, '| scp:', info.scp);
-      // Test with a read-only cmdlet
       const test = await callInvokeCommand('Get-OrganizationConfig', {}, DEPLOY_METHOD.EXO_INVOKE);
       if (!test.success) {
-        if (test.needsConsent) {
-          showToast('Open Connect Tenant → Grant Admin Consent to authorize this tenant');
-        } else {
-          showToast('Exchange preflight failed: ' + test.error);
-        }
+        showToast('Exchange preflight failed: ' + describeOnboardingError(test));
         return false;
       }
       console.log('[Preflight] Exchange InvokeCommand OK');
@@ -729,20 +685,9 @@ const DeployEngine = (() => {
 
     if (method === DEPLOY_METHOD.COMPLIANCE_INVOKE) {
       if (preflightResults.compliance) return true;
-      const token = await TenantAuth.getComplianceToken();
-      if (!token) {
-        showToast('No Compliance token — add Security & Compliance permission and re-sign in');
-        return false;
-      }
-      const info = decodeTokenScopes(token);
-      console.log('[Preflight] Compliance — aud:', info.aud, '| scp:', info.scp);
       const test = await callInvokeCommand('Get-DlpCompliancePolicy', {}, DEPLOY_METHOD.COMPLIANCE_INVOKE);
       if (!test.success) {
-        if (test.needsConsent) {
-          showToast('Open Connect Tenant → Grant Admin Consent to authorize this tenant');
-        } else {
-          showToast('Compliance preflight failed: ' + test.error);
-        }
+        showToast('Compliance preflight failed: ' + describeOnboardingError(test));
         return false;
       }
       console.log('[Preflight] Compliance InvokeCommand OK');
@@ -751,6 +696,24 @@ const DeployEngine = (() => {
     }
 
     return false;
+  }
+
+  // Map proxy/MS errors to user-friendly hints pointing at the customer
+  // onboarding (admin consent + Exchange role-group assignment) when needed.
+  function describeOnboardingError(testResult) {
+    var err = (testResult && testResult.error) || '';
+    var data = (testResult && testResult.data) || {};
+    if (data.hint) return data.hint;
+    if (typeof err === 'string') {
+      if (err.indexOf('CannotResolveTenantNameException') !== -1 ||
+          err.indexOf('Could not find the organization container') !== -1) {
+        return 'This tenant has not been onboarded yet. Run the onboarding PowerShell (see Connect Tenant → Onboard tenant).';
+      }
+      if (err.indexOf('App-only token acquisition failed') !== -1) {
+        return 'Customer admin must grant consent for this tenant first (Connect Tenant → Onboard tenant).';
+      }
+    }
+    return err || 'Unknown error';
   }
 
   // ─── Deployment Execution ───

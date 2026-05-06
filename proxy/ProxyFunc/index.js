@@ -1,34 +1,82 @@
 /**
- * M365 Compliance Framework — Deployment Proxy
+ * M365 Compliance Framework — Deployment Proxy (App-Only mode)
  *
- * The Exchange Online and Security/Compliance Center REST endpoints
- * (outlook.office365.com, ps.compliance.protection.outlook.com) do not allow
- * browser CORS. This proxy forwards InvokeCommand calls server-side so the
- * SPA can deploy Defender for O365, Exchange Online, and Purview policies
- * with one click.
+ * Server-side OAuth client_credentials flow. The SPA only signs the user
+ * in for identity (user clicks Connect Tenant in the browser), but every
+ * Defender/Exchange/Purview deploy is performed by THIS proxy authenticating
+ * AS THE APP using a client secret. The user's bearer token is no longer
+ * forwarded for those workloads.
  *
  * Trust model:
- *   - The SPA acquires the user's delegated token via MSAL and sends it here.
- *   - This proxy does NOT mint tokens; it only forwards the user's bearer
- *     token to the target Microsoft endpoint. All authentication and
- *     authorisation happens at the Microsoft side.
- *   - CORS is restricted to the configured allow-list.
- *   - Set ALLOWED_ORIGIN to your SPA origin (e.g. https://yourorg.github.io).
- *
- * Deploy as Azure Functions (Node 18+), Cloudflare Worker, or any Node host.
+ *   - APP_CLIENT_SECRET is held only on the Function App (encrypted-at-rest).
+ *   - For each customer tenant, we acquire a tenant-scoped app token via
+ *     /token endpoint with grant_type=client_credentials.
+ *   - That token is sent to outlook.office365.com / ps.compliance...
+ *     /adminapi/beta/{tenantId}/InvokeCommand.
+ *   - Customer tenant must have the app SP and a role assignment
+ *     (Organization Management / Compliance Admin) — see /onboarding doc.
  *
  * Endpoints:
- *   GET  /health     → 200 OK (used by the SPA to test connectivity)
- *   POST /invoke     → forwards { target, tenantId, token, cmdlet } to MS
+ *   GET  /health     → 200 OK
+ *   GET  /diag       → upstream connectivity probe (anonymous)
+ *   POST /invoke     → forwards { target, tenantId, cmdlet } to MS using app-only auth
  */
 
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || '*';
+const APP_CLIENT_ID  = process.env.APP_CLIENT_ID  || '';
+const APP_CLIENT_SECRET = process.env.APP_CLIENT_SECRET || '';
 
 const TARGETS = {
   exchange:   'https://outlook.office365.com/adminapi/beta/',
   compliance: 'https://ps.compliance.protection.outlook.com/adminapi/beta/',
 };
+// Both Exchange and Compliance endpoints accept tokens with this audience
+// when the app has Exchange.ManageAsApp application permission.
+const TOKEN_RESOURCE_SCOPE = 'https://outlook.office365.com/.default';
 
+// ── Per-tenant app token cache ────────────────────────────────────────────
+// Tokens last ~60 min; cache for 55 min to give a safety margin.
+const tokenCache = new Map();  // key: tenantId → { token, expiresAt }
+const TOKEN_TTL_MS = 55 * 60 * 1000;
+
+async function getAppTokenForTenant(tenantId) {
+  const now = Date.now();
+  const cached = tokenCache.get(tenantId);
+  if (cached && cached.expiresAt > now) return cached.token;
+
+  if (!APP_CLIENT_ID || !APP_CLIENT_SECRET) {
+    throw new Error('Proxy not configured: APP_CLIENT_ID / APP_CLIENT_SECRET missing');
+  }
+
+  const url = 'https://login.microsoftonline.com/' + encodeURIComponent(tenantId) + '/oauth2/v2.0/token';
+  const body = new URLSearchParams({
+    client_id:     APP_CLIENT_ID,
+    client_secret: APP_CLIENT_SECRET,
+    scope:         TOKEN_RESOURCE_SCOPE,
+    grant_type:    'client_credentials',
+  });
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+  });
+  const text = await res.text();
+  let data; try { data = JSON.parse(text); } catch (_) { data = null; }
+
+  if (!res.ok || !data || !data.access_token) {
+    const err = (data && data.error_description) || (data && data.error) || text || res.statusText;
+    const e = new Error('Failed to acquire app token for tenant ' + tenantId + ': ' + err);
+    e.aadError = data || { raw: text };
+    e.status = res.status;
+    throw e;
+  }
+
+  tokenCache.set(tenantId, { token: data.access_token, expiresAt: now + TOKEN_TTL_MS });
+  return data.access_token;
+}
+
+// ── CORS / response helpers ──
 function corsHeaders() {
   return {
     'Access-Control-Allow-Origin':  ALLOWED_ORIGIN,
@@ -37,7 +85,6 @@ function corsHeaders() {
     'Access-Control-Max-Age':       '600',
   };
 }
-
 function json(status, body) {
   return {
     status,
@@ -46,35 +93,43 @@ function json(status, body) {
   };
 }
 
+// ── /invoke handler ─────────────────────────────────────────────────────
 async function handleInvoke(payload) {
-  const { target, tenantId, token, cmdlet } = payload || {};
-  if (!target || !tenantId || !token || !cmdlet || !cmdlet.CmdletInput) {
-    return json(400, { error: 'Missing required fields: target, tenantId, token, cmdlet.CmdletInput' });
+  const { target, tenantId, cmdlet } = payload || {};
+  if (!target || !tenantId || !cmdlet || !cmdlet.CmdletInput) {
+    return json(400, { error: 'Missing required fields: target, tenantId, cmdlet.CmdletInput' });
   }
   const base = TARGETS[target];
   if (!base) return json(400, { error: 'Unknown target. Use "exchange" or "compliance".' });
-
-  // Basic tenant ID sanity check.
   if (!/^[0-9a-fA-F-]{32,40}$/.test(tenantId)) {
     return json(400, { error: 'tenantId must be a GUID.' });
   }
 
-  const url = base + tenantId + '/InvokeCommand';
-  const body = JSON.stringify(cmdlet);
+  // 1) Acquire (or reuse cached) app token for this tenant.
+  let token;
+  try {
+    token = await getAppTokenForTenant(tenantId);
+  } catch (err) {
+    return json(401, {
+      error: 'App-only token acquisition failed',
+      message: err.message,
+      hint: 'Has the customer admin granted consent for Exchange.ManageAsApp and assigned the app to a role? See /api/onboarding for instructions.',
+      aadError: err.aadError || null,
+    });
+  }
 
-  // One-shot retry on transient connect-level errors. Linux Consumption can
-  // have a slow first outbound after idle (ETIMEDOUT / ECONNRESET / EAI_AGAIN);
-  // a single retry after a short pause heals it without bubbling to the user.
+  // 2) Call the InvokeCommand endpoint with the app token.
+  // Retry once on connect-level errors (cold-start outbound networking).
   const RETRYABLE_CODES = new Set(['ETIMEDOUT', 'ECONNRESET', 'EAI_AGAIN', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_SOCKET']);
-  const attempts = [0, 1500];  // immediate, then +1.5s
+  const attempts = [0, 1500];
   let lastErr = null;
+  const url = base + tenantId + '/InvokeCommand';
 
   for (let i = 0; i < attempts.length; i++) {
     if (attempts[i] > 0) await new Promise(r => setTimeout(r, attempts[i]));
 
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 30000);
-
     try {
       const res = await fetch(url, {
         method: 'POST',
@@ -83,7 +138,7 @@ async function handleInvoke(payload) {
           'Content-Type':  'application/json;odata.metadata=minimal',
           'X-ResponseFormat': 'json',
         },
-        body: body,
+        body: JSON.stringify(cmdlet),
         signal: controller.signal,
       });
       clearTimeout(timer);
@@ -98,20 +153,18 @@ async function handleInvoke(payload) {
       lastErr = err;
       const cause = err && err.cause ? err.cause : {};
       const code = cause.code || (err.name === 'AbortError' ? 'TIMEOUT' : null);
-      // Retry only on connect-level errors. Otherwise bail immediately.
       if (!RETRYABLE_CODES.has(code) && err.name !== 'AbortError') break;
     }
   }
 
-  // All attempts failed — surface the underlying cause + a hypothesis hint.
   const cause = lastErr && lastErr.cause ? lastErr.cause : {};
   const code = cause.code || (lastErr && lastErr.name === 'AbortError' ? 'TIMEOUT' : null);
   let hint = null;
   if (code === 'ETIMEDOUT' || code === 'TIMEOUT' || code === 'UND_ERR_CONNECT_TIMEOUT') {
     if (target === 'compliance') {
-      hint = 'Microsoft\'s compliance endpoint silently dropped the request. Most common cause: this tenant does not have a Microsoft Purview / Security & Compliance workload provisioned (requires M365 E5, E3+Compliance add-on, or Compliance E5).';
+      hint = 'Microsoft compliance endpoint did not respond. The most common cause now is the app SP has not been assigned a role in this tenant. See /api/onboarding.';
     } else {
-      hint = 'Microsoft\'s Exchange endpoint did not respond. Check that the signed-in user has an Exchange Online admin role assigned.';
+      hint = 'Microsoft Exchange endpoint did not respond. Check the app SP role assignment.';
     }
   }
   return json(502, {
@@ -126,20 +179,12 @@ async function handleInvoke(payload) {
   });
 }
 
-// Diagnostic — probe outbound networking to the compliance/exchange endpoints.
-// Reports DNS, TCP, TLS, and first-byte timings without needing a real token.
+// ── Diagnostic ──
 async function handleDiag() {
-  const tid = 'e4fcc63f-a000-456e-a120-3984af8367ce';
   const probes = [
     { target: 'compliance', url: 'https://ps.compliance.protection.outlook.com/' },
     { target: 'exchange',   url: 'https://outlook.office365.com/' },
     { target: 'graph',      url: 'https://graph.microsoft.com/v1.0/$metadata' },
-    { target: 'compliance-invokecommand-post', url: 'https://ps.compliance.protection.outlook.com/adminapi/beta/' + tid + '/InvokeCommand', method: 'POST',
-      body: JSON.stringify({ CmdletInput: { CmdletName: 'Get-DlpCompliancePolicy', Parameters: {} } }),
-      headers: { 'Authorization': 'Bearer fake.token.for.diag', 'Content-Type': 'application/json;odata.metadata=minimal', 'X-ResponseFormat': 'json' } },
-    { target: 'exchange-invokecommand-post', url: 'https://outlook.office365.com/adminapi/beta/' + tid + '/InvokeCommand', method: 'POST',
-      body: JSON.stringify({ CmdletInput: { CmdletName: 'Get-OrganizationConfig', Parameters: {} } }),
-      headers: { 'Authorization': 'Bearer fake.token.for.diag', 'Content-Type': 'application/json;odata.metadata=minimal', 'X-ResponseFormat': 'json' } },
   ];
   const results = [];
   for (const p of probes) {
@@ -148,32 +193,71 @@ async function handleDiag() {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 15000);
     try {
-      const res = await fetch(p.url, {
-        method: p.method || 'GET',
-        signal: controller.signal,
-        headers: p.headers,
-        body: p.body,
-      });
-      result.ok = true;
-      result.status = res.status;
-      result.elapsedMs = Date.now() - start;
+      const res = await fetch(p.url, { method: 'GET', signal: controller.signal });
+      result.ok = true; result.status = res.status; result.elapsedMs = Date.now() - start;
     } catch (err) {
       const cause = err && err.cause ? err.cause : {};
       result.error = err.message || String(err);
       result.causeCode = cause.code || null;
-      result.causeMessage = cause.message || null;
       result.elapsedMs = Date.now() - start;
     } finally {
       clearTimeout(timer);
     }
     results.push(result);
   }
-  return json(200, { service: 'm365-deploy-proxy-diag', node: process.version, region: process.env.REGION_NAME || null, results });
+  return json(200, {
+    service: 'm365-deploy-proxy-diag',
+    node: process.version,
+    region: process.env.REGION_NAME || null,
+    appConfigured: !!(APP_CLIENT_ID && APP_CLIENT_SECRET),
+    cachedTenants: tokenCache.size,
+    results,
+  });
 }
 
-// ── Azure Functions v4 (Node) entrypoint ──
-// function.json uses route "{*restOfPath}" so req.params.restOfPath captures
-// the path beyond /api/. We accept either /api/health or just /health.
+// ── Onboarding instructions ──
+function handleOnboarding() {
+  const appId = APP_CLIENT_ID || 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
+  const consentUrl = 'https://login.microsoftonline.com/common/v2.0/adminconsent' +
+    '?client_id=' + appId +
+    '&scope=' + encodeURIComponent('https://outlook.office365.com/.default') +
+    '&redirect_uri=' + encodeURIComponent('https://timothyoelkers-cloud.github.io/M365-Compliance-Framework/');
+
+  return json(200, {
+    appId: appId,
+    consentUrl: consentUrl,
+    steps: [
+      'Step 1 — Customer admin opens the consentUrl in a browser, signs in as Global Admin, accepts the permissions. This creates the app SP in the tenant.',
+      'Step 2 — Customer admin runs the PowerShell snippet below to assign roles to the app SP. Required to use Exchange.ManageAsApp at runtime.',
+      'Step 3 — Done. The deploy framework can now invoke Exchange/Compliance/Defender cmdlets in this tenant.',
+    ],
+    powershell:
+      '$appId = "' + appId + '"\n' +
+      '# Connect as Global Admin or Exchange Admin\n' +
+      'Connect-ExchangeOnline\n' +
+      'Connect-IPPSSession\n' +
+      '\n' +
+      '# Look up the AAD service principal object id\n' +
+      'Connect-MgGraph -Scopes "Application.Read.All" -NoWelcome\n' +
+      '$aadSp = Get-MgServicePrincipal -Filter "appId eq \'$appId\'"\n' +
+      'if (-not $aadSp) { throw "AAD service principal not found. Has the consent step been completed?" }\n' +
+      '\n' +
+      '# Create the Exchange Online service principal entry (if not present)\n' +
+      '$exoSp = Get-ServicePrincipal -ErrorAction SilentlyContinue | Where-Object { $_.AppId -eq $appId }\n' +
+      'if (-not $exoSp) {\n' +
+      '    $exoSp = New-ServicePrincipal -AppId $appId -ServiceId $aadSp.Id -DisplayName "M365 Compliance Framework Deploy"\n' +
+      '}\n' +
+      '\n' +
+      '# Assign the role groups required for the cmdlets the framework invokes\n' +
+      'Add-RoleGroupMember -Identity "Organization Management" -Member $exoSp.Identity\n' +
+      'Add-RoleGroupMember -Identity "Compliance Administrator" -Member $exoSp.Identity\n' +
+      '\n' +
+      '# Verify\n' +
+      'Get-RoleGroupMember "Organization Management" | Where-Object { $_.Name -eq $exoSp.Identity }\n',
+  });
+}
+
+// ── Azure Functions v4 entry ──
 module.exports = async function (context, req) {
   const path = (req.params && req.params.restOfPath) || '';
 
@@ -182,11 +266,15 @@ module.exports = async function (context, req) {
     return;
   }
   if (req.method === 'GET' && (path === 'health' || path === '')) {
-    context.res = json(200, { ok: true, service: 'm365-deploy-proxy' });
+    context.res = json(200, { ok: true, service: 'm365-deploy-proxy', mode: 'app-only', appConfigured: !!(APP_CLIENT_ID && APP_CLIENT_SECRET) });
     return;
   }
   if (req.method === 'GET' && path === 'diag') {
     context.res = await handleDiag();
+    return;
+  }
+  if (req.method === 'GET' && path === 'onboarding') {
+    context.res = handleOnboarding();
     return;
   }
   if (req.method === 'POST' && path === 'invoke') {
