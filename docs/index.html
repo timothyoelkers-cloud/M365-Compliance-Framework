@@ -475,15 +475,12 @@ async function showTenantStatusModal() {
           <strong style="font-size:.74rem;color:var(--ink2)">Admin consent required</strong>
         </div>
         <p style="margin:0 0 10px;font-size:.66rem;color:var(--ink3);line-height:1.5">
-          A Global Admin of this tenant needs to grant <code>Exchange.Manage</code> once before Defender for O365, Exchange Online, and Purview policies can deploy. SharePoint, Conditional Access, Intune, Entra and Defender for Endpoint already work.
+          A Global Admin needs to grant <code>Exchange.Manage</code> once for this tenant before Defender for O365, Exchange Online, and Purview policies can deploy. SharePoint, Conditional Access, Intune, Entra and Defender for Endpoint already work.
         </p>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <button class="btn btn-sm btn-primary" onclick="grantAdminConsent()">Grant Admin Consent ↗</button>
-          <button class="btn btn-sm" onclick="reauthAfterConsent()">Re-sign-in</button>
-        </div>
-        <p style="margin:8px 0 0;font-size:.6rem;color:var(--ink4);line-height:1.5">
-          After granting consent in the new tab, click <strong>Re-sign-in</strong> here to refresh the token.
+        <p style="margin:0 0 10px;font-size:.66rem;color:var(--ink3);line-height:1.5">
+          Clicking the button opens a small popup. On the consent screen, tick <strong>"Consent on behalf of your organization"</strong>, then <strong>Accept</strong>. The popup auto-closes — no redirect, no re-entering this site's password.
         </p>
+        <button class="btn btn-sm btn-primary" onclick="grantAdminConsent()">Grant Admin Consent</button>
       </div>`;
 
   content.innerHTML = `
@@ -814,16 +811,32 @@ function bootstrapWithWhatsNew() {
   setTimeout(maybeShowWhatsNew, 600);
 }
 
-// ── Admin-consent flow for the deployment proxy InvokeCommand path ──
-// User clicks Grant Admin Consent in the Connect Tenant modal; opens MS
-// /v2.0/adminconsent in a new tab; admin accepts; user re-signs into SPA.
-function grantAdminConsent() {
-  if (typeof DeployEngine === 'undefined' || !DeployEngine.buildAdminConsentUrl) {
-    showToast('DeployEngine not loaded yet — wait a moment and try again');
+// ── Admin-consent via popup (no full-page redirect, no gate re-prompt) ──
+// User must already be signed in; pops up a consent window with prompt=consent.
+// If the user is a Global Admin, the prompt shows a "Consent on behalf of your
+// organization" checkbox — ticking it grants admin consent in one click.
+async function grantAdminConsent() {
+  if (typeof TenantAuth === 'undefined' || !TenantAuth.isAuthenticated()) {
+    showToast('Sign in to the tenant first, then grant consent');
     return;
   }
-  var url = DeployEngine.buildAdminConsentUrl();
-  window.open(url, '_blank', 'noopener,noreferrer');
+  showToast('Opening consent popup — please complete in the new window…');
+  try {
+    await TenantAuth.consentPopup(TenantAuth.EXO_TOKEN_SCOPE);
+    showToast('Consent granted — refreshing token…');
+    // Force MSAL to re-acquire so cached old-scope tokens are evicted.
+    try { await TenantAuth.getExchangeToken(); } catch (e) { /* ignore */ }
+    try { await TenantAuth.getComplianceToken(); } catch (e) { /* ignore */ }
+    // Re-render the modal to show the new ✅ status.
+    showTenantStatusModal();
+  } catch (err) {
+    if (err && err.errorCode === 'user_cancelled') {
+      showToast('Consent cancelled');
+    } else {
+      console.error('[Consent] Failed:', err);
+      showToast('Consent failed: ' + (err.message || err.errorCode || 'unknown error'));
+    }
+  }
 }
 
 async function reauthAfterConsent() {

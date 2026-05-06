@@ -248,6 +248,35 @@ const TenantAuth = (() => {
     return getTokenForResource(COMPLIANCE_TOKEN_SCOPE);
   }
 
+  /**
+   * Force a fresh consent prompt in a popup window. Used to grant admin
+   * consent for an additional resource (e.g. Exchange.Manage) without
+   * doing a full-page redirect that would re-trigger the access gate.
+   *
+   * If the signed-in user is a Global Admin, the popup shows the consent
+   * screen with a "Consent on behalf of your organization" checkbox; ticking
+   * it grants admin consent for the entire tenant in one click.
+   *
+   * Returns the new token on success, throws on cancel/error.
+   */
+  async function consentPopup(scopes) {
+    if (!msalInstance) await init();
+    if (!currentAccount) {
+      throw new Error('Sign in first before granting consent');
+    }
+    const response = await msalInstance.acquireTokenPopup({
+      scopes: scopes,
+      account: currentAccount,
+      prompt: 'consent',  // forces consent UI, including admin-org-wide checkbox
+    });
+    if (response && response.account) {
+      currentAccount = response.account;
+      msalInstance.setActiveAccount(currentAccount);
+      updateAuthState();
+    }
+    return response.accessToken;
+  }
+
   // ─── Auth State ───
   function isAuthenticated() {
     return currentAccount !== null;
@@ -306,6 +335,7 @@ const TenantAuth = (() => {
     getAccessToken: getGraphToken, getGraphToken,
     getExchangeToken, getComplianceToken, getTokenForResource, getTokenSilent,
     getTokenForTenantResource,
+    consentPopup,
     isAuthenticated, getAccount, updateAuthState, decodeToken,
     GRAPH_SCOPES, EXO_TOKEN_SCOPE, COMPLIANCE_TOKEN_SCOPE, GRAPH_TOKEN_SCOPE,
   };
