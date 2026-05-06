@@ -527,6 +527,19 @@ const DeployEngine = (() => {
    * If a deployment proxy URL is configured, the call is routed through it
    * to bypass browser CORS on outlook.office365.com / compliance.protection.outlook.com.
    */
+  // Build the per-tenant admin-consent URL for Office 365 Exchange Online
+  // (the API that exposes Exchange.Manage). Uses the /v2.0/adminconsent
+  // endpoint — Microsoft's recommended way to bootstrap a new tenant.
+  // tenantId can be 'common' for any-tenant prompt, or a specific GUID/domain.
+  function buildAdminConsentUrl(tenantId) {
+    const tid = tenantId || (TenantAuth.getAccount() || {}).tenantId || 'common';
+    return 'https://login.microsoftonline.com/' + tid +
+      '/v2.0/adminconsent' +
+      '?client_id=c9bcd329-2658-493b-ab75-6afc6d98adc4' +
+      '&scope=' + encodeURIComponent('https://outlook.office365.com/.default') +
+      '&redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);
+  }
+
   function decodeJwtScopes(token) {
     try {
       const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
@@ -556,28 +569,13 @@ const DeployEngine = (() => {
     // this client-side so the user gets an actionable message immediately.
     const claims = decodeJwtScopes(token);
     if (!claims.scp.includes('Exchange.Manage')) {
-      const tenant = (TenantAuth.getAccount() || {}).tenantId || 'common';
-      // Use the authorize endpoint with prompt=admin_consent. This is more
-      // reliable than /v2.0/adminconsent — it forces the consent UI every
-      // time, even if AAD thinks consent already exists. After accepting,
-      // AAD redirects back with code= or admin_consent=True.
-      const consentUrl = 'https://login.microsoftonline.com/' + tenant +
-        '/oauth2/v2.0/authorize' +
-        '?client_id=c9bcd329-2658-493b-ab75-6afc6d98adc4' +
-        '&response_type=code' +
-        '&response_mode=query' +
-        '&prompt=admin_consent' +
-        '&scope=' + encodeURIComponent('https://outlook.office365.com/.default openid profile') +
-        '&redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);
       return {
         success: false,
         status: 0,
         error: 'Token missing Exchange.Manage scope (got: ' + (claims.scp.join(' ') || '<none>') +
-               '). An admin of this tenant must grant consent. Open: ' + consentUrl,
+               '). Open Connect Tenant → Grant Admin Consent to authorize this tenant.',
         needsConsent: true,
-        consentUrl: consentUrl,
         currentScopes: claims.scp,
-        tenantId: tenant,
       };
     }
 
@@ -712,7 +710,7 @@ const DeployEngine = (() => {
       const test = await callInvokeCommand('Get-OrganizationConfig', {}, DEPLOY_METHOD.EXO_INVOKE);
       if (!test.success) {
         if (test.needsConsent) {
-          showConsentNeededModal(test.consentUrl, test.currentScopes);
+          showToast('Open Connect Tenant → Grant Admin Consent to authorize this tenant');
         } else {
           showToast('Exchange preflight failed: ' + test.error);
         }
@@ -735,7 +733,7 @@ const DeployEngine = (() => {
       const test = await callInvokeCommand('Get-DlpCompliancePolicy', {}, DEPLOY_METHOD.COMPLIANCE_INVOKE);
       if (!test.success) {
         if (test.needsConsent) {
-          showConsentNeededModal(test.consentUrl, test.currentScopes);
+          showToast('Open Connect Tenant → Grant Admin Consent to authorize this tenant');
         } else {
           showToast('Compliance preflight failed: ' + test.error);
         }
@@ -1236,5 +1234,6 @@ const DeployEngine = (() => {
     DEFAULT_PROXY_URL,
     // Diagnostics
     decodeJwtScopes,
+    buildAdminConsentUrl,
   };
 })();
