@@ -386,16 +386,16 @@ async function showTenantStatusModal() {
     <div class="section-hdr" style="margin-top:18px">Deployment Proxy</div>
     <p style="font-size:.66rem;color:var(--ink4);margin:0 0 8px;line-height:1.5">
       Defender for O365, Exchange Online and Purview policies use REST endpoints that block browser CORS.
-      A hosted proxy forwards these calls server-side. Your bearer token transits the proxy but is never logged or stored.
-      Override below if you prefer to host your own proxy from <code>proxy/</code>.
+      A hosted relay forwards these calls server-side. Your bearer token transits the relay but is never logged or stored.
+      Override below if you prefer to host your own from <code>proxy/</code>.
     </p>
     <div style="display:flex;gap:6px;align-items:center">
-      <input id="proxy-url-input" type="url" placeholder="${escHtml(DeployEngine.DEFAULT_PROXY_URL)}" value="${escHtml(DeployEngine.isUsingDefaultProxy() ? '' : DeployEngine.getDeploymentProxy())}" style="flex:1;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:.7rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--ink)">
+      <input id="proxy-url-input" type="url" placeholder="https://your-proxy.example.com/api" value="${escHtml(DeployEngine.isUsingDefaultProxy() ? '' : DeployEngine.getDeploymentProxy())}" style="flex:1;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:.7rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--ink)">
       <button class="btn btn-sm btn-primary" onclick="saveDeploymentProxy()">Save</button>
       <button class="btn btn-sm" onclick="testDeploymentProxy()" title="Send a ping to the proxy">Test</button>
     </div>
     <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
-      <span style="font-size:.6rem;color:var(--ink4)">Currently using: <strong style="color:var(--ink2)">${DeployEngine.isUsingDefaultProxy() ? "Tim's hosted proxy" : 'custom override'}</strong></span>
+      <span style="font-size:.6rem;color:var(--ink4)">Currently using: <strong style="color:var(--ink2)">${DeployEngine.isUsingDefaultProxy() ? 'hosted relay' : 'custom override'}</strong></span>
       <span style="flex:1"></span>
       <button class="btn btn-sm" onclick="resetDeploymentProxy()" style="font-size:.6rem">Reset to default</button>
       <button class="btn btn-sm" onclick="disableDeploymentProxy()" title="Treat DEF/EXO/PV as PowerShell-only" style="font-size:.6rem">Disable</button>
@@ -479,7 +479,7 @@ function saveDeploymentProxy() {
 
 function resetDeploymentProxy() {
   DeployEngine.setDeploymentProxy('');
-  showToast("Reverted to Tim's hosted proxy");
+  showToast('Reverted to default deployment relay');
   refreshProxyPanel();
 }
 

@@ -4,10 +4,8 @@ A tiny stateless forwarder that lets the M365 Compliance Framework SPA deploy
 Defender for O365, Exchange Online, and Purview policies — endpoints that
 otherwise block browser CORS.
 
-> **Hosted instance:** `https://m365-deploy-proxy-inforcer.azurewebsites.net/api`
-> Hosted in Inforcer Ltd's Azure subscription, CORS-locked to
-> `https://timothyoelkers-cloud.github.io`. The SPA uses this by default —
-> you only need to deploy your own if you want to host the proxy yourself.
+> The SPA uses a hosted relay by default. You only need to deploy your own
+> instance if you want to host the proxy yourself.
 
 ## Why this exists
 

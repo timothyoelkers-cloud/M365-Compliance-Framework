@@ -98,12 +98,9 @@ The Deploy button supports four routes, picked automatically per policy:
 
 The Exchange Online and Security/Compliance REST endpoints block browser CORS,
 so a small forwarder is required to deploy Defender/Exchange/Purview policies.
-The SPA defaults to a hosted instance at
-`https://m365-deploy-proxy-inforcer.azurewebsites.net/api`
-(hosted in Inforcer Ltd's Azure subscription, CORS-locked to this site).
-Customers who prefer to host their own can deploy the reference Azure Function
-in [`proxy/`](proxy/) and override the URL in the Connect Tenant modal.
-See [`proxy/README.md`](proxy/README.md).
+The SPA uses a hosted relay by default. Customers who prefer to host their own
+can deploy the reference Azure Function in [`proxy/`](proxy/) and override the
+URL in the Connect Tenant modal. See [`proxy/README.md`](proxy/README.md).
 
 ## Licence
 

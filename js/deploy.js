@@ -501,9 +501,9 @@ const DeployEngine = (() => {
   // ── Deployment proxy ──
   // outlook.office365.com and ps.compliance.protection.outlook.com do not allow
   // browser CORS preflight, so InvokeCommand can't be called directly from the
-  // SPA. The hosted proxy in Inforcer's Azure subscription forwards calls
-  // server-side; CORS is locked to this site's origin.
-  // Customers can override with their own self-hosted proxy via setDeploymentProxy().
+  // SPA. A hosted relay forwards the calls server-side; CORS is locked to this
+  // site's origin. Customers can override with their own self-hosted proxy via
+  // setDeploymentProxy().
   const PROXY_KEY = 'm365-deployment-proxy-url';
   const DEFAULT_PROXY_URL = 'https://m365-deploy-proxy-inforcer.azurewebsites.net/api';
 
