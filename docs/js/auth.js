@@ -8,9 +8,16 @@ const TenantAuth = (() => {
 
   // ─── App Registration: Framework-Assessment-Deployment ───
   const CLIENT_ID = 'c9bcd329-2658-493b-ab75-6afc6d98adc4';
-  // Redirect URI must point to the page where MSAL.js is loaded (this page).
-  // Strip index.html if present, keep the directory path.
-  const REDIRECT_URI = window.location.origin + window.location.pathname.replace(/index\.html$/i, '');
+
+  // Redirect URI must point to the page where MSAL.js is loaded.
+  // On the production GitHub Pages host we pin to a single canonical URL so AAD
+  // only ever needs one redirect URI registered, regardless of which subpath
+  // (or trailing-slash variant, or /site/ vs root) the user happens to land on.
+  // On localhost (dev), use whatever the dev server is serving.
+  const CANONICAL_GHPAGES_URI = 'https://timothyoelkers-cloud.github.io/M365-Compliance-Framework/';
+  const REDIRECT_URI = (window.location.host === 'timothyoelkers-cloud.github.io')
+    ? CANONICAL_GHPAGES_URI
+    : window.location.origin + window.location.pathname.replace(/index\.html$/i, '');
   console.log('[Auth] Redirect URI:', REDIRECT_URI);
 
   // ─── Token Scopes (per-resource) ───
@@ -209,6 +216,23 @@ const TenantAuth = (() => {
     }
   }
 
+  /**
+   * Silent-only token probe — never shows a popup. Used by status panels.
+   * Returns the access token on success, null on failure (any reason).
+   */
+  async function getTokenSilent(scopes) {
+    if (!msalInstance || !currentAccount) return null;
+    try {
+      const response = await msalInstance.acquireTokenSilent({
+        scopes: scopes,
+        account: currentAccount,
+      });
+      return response.accessToken;
+    } catch (e) {
+      return null;
+    }
+  }
+
   /** Graph API token (graph.microsoft.com) */
   async function getGraphToken() {
     return getTokenForResource(GRAPH_TOKEN_SCOPE);
@@ -280,9 +304,9 @@ const TenantAuth = (() => {
     init, handleRedirectPromise,
     login, logout,
     getAccessToken: getGraphToken, getGraphToken,
-    getExchangeToken, getComplianceToken, getTokenForResource,
+    getExchangeToken, getComplianceToken, getTokenForResource, getTokenSilent,
     getTokenForTenantResource,
     isAuthenticated, getAccount, updateAuthState, decodeToken,
-    GRAPH_SCOPES, EXO_TOKEN_SCOPE, COMPLIANCE_TOKEN_SCOPE,
+    GRAPH_SCOPES, EXO_TOKEN_SCOPE, COMPLIANCE_TOKEN_SCOPE, GRAPH_TOKEN_SCOPE,
   };
 })();

@@ -4,14 +4,14 @@ on:
   push:
     branches: [main]
     paths:
-      - 'site/**'
+      - 'docs/**'
       - 'run-tests.js'
       - 'package.json'
       - 'package-lock.json'
   pull_request:
     branches: [main]
     paths:
-      - 'site/**'
+      - 'docs/**'
       - 'run-tests.js'
       - 'package.json'
       - 'package-lock.json'

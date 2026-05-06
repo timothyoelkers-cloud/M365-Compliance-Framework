@@ -141,7 +141,7 @@ Tests run in headless Chromium via Playwright: `npm test`
 ## Architecture
 
 ```
-site/
+docs/
 ├── index.html              # SPA shell — all pages, modals, bootstrap
 ├── manifest.json           # PWA manifest
 ├── sw.js                   # Service worker (cache v12)

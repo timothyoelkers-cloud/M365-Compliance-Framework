@@ -5,7 +5,7 @@
   "description": "M365 Compliance Framework — 47 frameworks, 140 CIS checks, 143 deployment-ready policies",
   "scripts": {
     "test": "node run-tests.js",
-    "serve": "npx serve site -l 8080"
+    "serve": "npx serve docs -l 8080"
   },
   "devDependencies": {
     "playwright": "^1.50.0"

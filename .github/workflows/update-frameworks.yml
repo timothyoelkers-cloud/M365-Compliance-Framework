@@ -44,8 +44,8 @@ jobs:
           echo "exit_code=$EXIT_CODE" >> "$GITHUB_OUTPUT"
 
           # Extract summary for PR body
-          if [ -f site/data/changelogs/*.md ]; then
-            LATEST=$(ls -t site/data/changelogs/*.md | head -1)
+          if [ -f docs/data/changelogs/*.md ]; then
+            LATEST=$(ls -t docs/data/changelogs/*.md | head -1)
             echo "changelog=$LATEST" >> "$GITHUB_OUTPUT"
           fi
 
@@ -72,7 +72,7 @@ jobs:
             The weekly version checker detected updates for one or more compliance frameworks.
 
             ### Changes
-            See the changelog in `site/data/changelogs/` for full details.
+            See the changelog in `docs/data/changelogs/` for full details.
 
             ### Dry-run output
             ```

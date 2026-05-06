@@ -105,7 +105,7 @@ npm install && npm test
 
 ## Deployment
 
-Designed for **GitHub Pages**: set source to the `site/` folder in repository settings. The `.nojekyll` file bypasses Jekyll processing.
+Designed for **GitHub Pages**: set source to the `/docs` folder in repository settings. The `.nojekyll` file bypasses Jekyll processing.
 
 ## Licence
 

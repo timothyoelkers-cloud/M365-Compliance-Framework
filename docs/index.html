@@ -335,6 +335,38 @@
 <!-- ═══ DEPLOY PROGRESS ═══ -->
 <div id="deploy-progress" class="deploy-progress" style="display:none"></div>
 
+<!-- ═══ WHAT'S NEW MODAL ═══ -->
+<div id="whatsnew-overlay" class="modal-overlay" onclick="if(event.target===this)dismissWhatsNew()">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-header">
+      <h3>What's new</h3>
+      <button class="modal-close" onclick="dismissWhatsNew()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin:0 0 12px;font-size:.78rem;color:var(--ink2);line-height:1.6">
+        <strong style="color:var(--amber)">One-click deploy is now live for Defender for O365 and Purview.</strong>
+      </p>
+      <p style="margin:0 0 12px;font-size:.72rem;color:var(--ink3);line-height:1.6">
+        Previously these policy types required generating a PowerShell script and running it manually.
+        A new server-side deployment relay forwards REST <code>InvokeCommand</code> calls
+        from your browser straight to Microsoft, with your delegated token.
+      </p>
+      <ul style="margin:0 0 12px;padding-left:18px;font-size:.72rem;color:var(--ink2);line-height:1.7">
+        <li>Click <strong>Deploy</strong> on any Defender, Exchange Online, or Purview policy.</li>
+        <li>The Deploy button works for SharePoint admin settings too — 9 SPO policies routed via Graph.</li>
+        <li>Anything still PS-only opens <strong>Deploy in Cloud Shell</strong> — script copied, shell opens in a new tab.</li>
+      </ul>
+      <p style="margin:0;font-size:.66rem;color:var(--ink4);line-height:1.5">
+        Your bearer token transits the relay but is never logged or stored. CORS is locked to this site only.
+        See <strong>Connect Tenant → Deployment Proxy</strong> to override or self-host.
+      </p>
+      <div style="display:flex;justify-content:flex-end;margin-top:18px">
+        <button class="btn btn-primary btn-sm" onclick="dismissWhatsNew()">Got it</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ TOAST ═══ -->
 <div id="toast" class="toast"></div>
 <div id="sr-announce" role="status" aria-live="polite" class="sr-only"></div>
@@ -710,11 +742,33 @@ function renderHomeFwGroups() {
 // ── Access Gate (delegated to access-gate.js) ──
 function validateGate() { if (typeof AccessGate !== 'undefined') AccessGate.validate(); }
 
+// ── What's New banner — shows once per visitor after gate unlock ──
+const WHATSNEW_KEY = 'm365-whatsnew-seen';
+const WHATSNEW_VERSION = '2026-05-defender-purview-deploy';
+
+function maybeShowWhatsNew() {
+  try {
+    if (localStorage.getItem(WHATSNEW_KEY) === WHATSNEW_VERSION) return;
+  } catch (e) { /* ignore */ }
+  const overlay = document.getElementById('whatsnew-overlay');
+  if (overlay) overlay.classList.add('open');
+}
+function dismissWhatsNew() {
+  try { localStorage.setItem(WHATSNEW_KEY, WHATSNEW_VERSION); } catch (e) { /* ignore */ }
+  const overlay = document.getElementById('whatsnew-overlay');
+  if (overlay) overlay.classList.remove('open');
+}
+
+function bootstrapWithWhatsNew() {
+  bootstrap();
+  setTimeout(maybeShowWhatsNew, 600);
+}
+
 if (typeof AccessGate !== 'undefined') {
-  AccessGate.init(bootstrap);
+  AccessGate.init(bootstrapWithWhatsNew);
 } else {
   // Fallback if access-gate.js failed to load
-  bootstrap();
+  bootstrapWithWhatsNew();
 }
 </script>
 </body>
