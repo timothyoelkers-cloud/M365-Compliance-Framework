@@ -60,44 +60,60 @@ async function handleInvoke(payload) {
   }
 
   const url = base + tenantId + '/InvokeCommand';
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 60000);
+  const body = JSON.stringify(cmdlet);
 
-  let res;
-  try {
-    res = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type':  'application/json;odata.metadata=minimal',
-        'X-ResponseFormat': 'json',
-      },
-      body: JSON.stringify(cmdlet),
-      signal: controller.signal,
-    });
-  } catch (err) {
-    // Node 18+ undici wraps the real error in err.cause. Surface it so the SPA
-    // shows a useful message instead of a bare "fetch failed".
-    const cause = err && err.cause ? err.cause : {};
-    return json(502, {
-      error: 'Upstream fetch failed',
-      target: target,
-      message: err.message || String(err),
-      causeMessage: cause.message || null,
-      causeCode: cause.code || null,
-      causeErrno: cause.errno || null,
-      url: url,
-    });
-  } finally {
-    clearTimeout(timer);
+  // One-shot retry on transient connect-level errors. Linux Consumption can
+  // have a slow first outbound after idle (ETIMEDOUT / ECONNRESET / EAI_AGAIN);
+  // a single retry after a short pause heals it without bubbling to the user.
+  const RETRYABLE_CODES = new Set(['ETIMEDOUT', 'ECONNRESET', 'EAI_AGAIN', 'UND_ERR_CONNECT_TIMEOUT', 'UND_ERR_SOCKET']);
+  const attempts = [0, 1500];  // immediate, then +1.5s
+  let lastErr = null;
+
+  for (let i = 0; i < attempts.length; i++) {
+    if (attempts[i] > 0) await new Promise(r => setTimeout(r, attempts[i]));
+
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 30000);
+
+    try {
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type':  'application/json;odata.metadata=minimal',
+          'X-ResponseFormat': 'json',
+        },
+        body: body,
+        signal: controller.signal,
+      });
+      clearTimeout(timer);
+      const text = await res.text();
+      return {
+        status: res.status,
+        headers: { 'Content-Type': 'application/json', ...corsHeaders() },
+        body: text,
+      };
+    } catch (err) {
+      clearTimeout(timer);
+      lastErr = err;
+      const cause = err && err.cause ? err.cause : {};
+      const code = cause.code || (err.name === 'AbortError' ? 'TIMEOUT' : null);
+      // Retry only on connect-level errors. Otherwise bail immediately.
+      if (!RETRYABLE_CODES.has(code) && err.name !== 'AbortError') break;
+    }
   }
 
-  const text = await res.text();
-  return {
-    status: res.status,
-    headers: { 'Content-Type': 'application/json', ...corsHeaders() },
-    body: text,
-  };
+  // All attempts failed — surface the underlying cause.
+  const cause = lastErr && lastErr.cause ? lastErr.cause : {};
+  return json(502, {
+    error: 'Upstream fetch failed after retry',
+    target: target,
+    message: lastErr ? (lastErr.message || String(lastErr)) : 'unknown',
+    causeMessage: cause.message || null,
+    causeCode: cause.code || null,
+    causeErrno: cause.errno || null,
+    url: url,
+  });
 }
 
 // ── Azure Functions v4 (Node) entrypoint ──
