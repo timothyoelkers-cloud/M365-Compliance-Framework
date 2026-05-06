@@ -527,6 +527,16 @@ const DeployEngine = (() => {
    * If a deployment proxy URL is configured, the call is routed through it
    * to bypass browser CORS on outlook.office365.com / compliance.protection.outlook.com.
    */
+  function decodeJwtScopes(token) {
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
+      const scp = String(payload.scp || '').split(' ').filter(Boolean);
+      return { scp: scp, roles: payload.roles || [], aud: payload.aud || '', tid: payload.tid || '' };
+    } catch (e) {
+      return { scp: [], roles: [], aud: '', tid: '' };
+    }
+  }
+
   async function callInvokeCommand(cmdletName, parameters, method) {
     const isCompliance = (method === DEPLOY_METHOD.COMPLIANCE_INVOKE);
 
@@ -538,6 +548,28 @@ const DeployEngine = (() => {
       return {
         success: false, status: 0,
         error: 'No ' + (isCompliance ? 'Compliance' : 'Exchange') + ' token — ensure permissions are granted and re-sign in',
+      };
+    }
+
+    // Pre-flight scope check — Microsoft silently drops connections (ETIMEDOUT)
+    // when the token lacks Exchange.Manage rather than returning 401. Detect
+    // this client-side so the user gets an actionable message immediately.
+    const claims = decodeJwtScopes(token);
+    if (!claims.scp.includes('Exchange.Manage')) {
+      const tenant = (TenantAuth.getAccount() || {}).tenantId || 'common';
+      const consentUrl = 'https://login.microsoftonline.com/' + tenant +
+        '/v2.0/adminconsent' +
+        '?client_id=c9bcd329-2658-493b-ab75-6afc6d98adc4' +
+        '&scope=' + encodeURIComponent('https://outlook.office365.com/.default') +
+        '&redirect_uri=' + encodeURIComponent(window.location.origin + window.location.pathname);
+      return {
+        success: false,
+        status: 0,
+        error: 'Token missing Exchange.Manage scope (got: ' + (claims.scp.join(' ') || '<none>') +
+               '). Add "Office 365 Exchange Online → Exchange.Manage" delegated permission to the App Registration and grant admin consent. Quick consent URL: ' + consentUrl,
+        needsConsent: true,
+        consentUrl: consentUrl,
+        currentScopes: claims.scp,
       };
     }
 
@@ -1186,5 +1218,7 @@ const DeployEngine = (() => {
     getDeploymentProxy, setDeploymentProxy, hasDeploymentProxy,
     disableDeploymentProxy, isUsingDefaultProxy,
     DEFAULT_PROXY_URL,
+    // Diagnostics
+    decodeJwtScopes,
   };
 })();
