@@ -4,7 +4,7 @@
    stale-while-revalidate for data JSON,
    network-only for auth/Graph API
 ═══════════════════════════════════════════ */
-var CACHE_NAME = 'm365-compliance-v20';
+var CACHE_NAME = 'm365-compliance-v21';
 
 var STATIC_ASSETS = [
   './',
@@ -129,8 +129,14 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  // Network-first for JS and CSS (prevents stale code issues)
-  if (url.pathname.endsWith('.js') || url.pathname.endsWith('.css')) {
+  // Network-first for JS, CSS, HTML and the SPA shell (prevents stale CSP/code).
+  // Cache is only the offline fallback.
+  var isShell = url.pathname.endsWith('.js') ||
+                url.pathname.endsWith('.css') ||
+                url.pathname.endsWith('.html') ||
+                url.pathname.endsWith('/') ||  // directory index → SPA shell
+                url.pathname.endsWith('/M365-Compliance-Framework');
+  if (isShell) {
     event.respondWith(
       fetch(event.request).then(function (response) {
         if (response.ok) {
@@ -145,7 +151,7 @@ self.addEventListener('fetch', function (event) {
     return;
   }
 
-  // Cache-first for everything else (HTML, images, fonts, manifest)
+  // Cache-first for static assets (images, fonts, manifest)
   event.respondWith(
     caches.match(event.request).then(function (cached) {
       return cached || fetch(event.request).then(function (response) {
