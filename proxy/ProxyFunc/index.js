@@ -116,6 +116,51 @@ async function handleInvoke(payload) {
   });
 }
 
+// Diagnostic — probe outbound networking to the compliance/exchange endpoints.
+// Reports DNS, TCP, TLS, and first-byte timings without needing a real token.
+async function handleDiag() {
+  const tid = 'e4fcc63f-a000-456e-a120-3984af8367ce';
+  const probes = [
+    { target: 'compliance', url: 'https://ps.compliance.protection.outlook.com/' },
+    { target: 'exchange',   url: 'https://outlook.office365.com/' },
+    { target: 'graph',      url: 'https://graph.microsoft.com/v1.0/$metadata' },
+    { target: 'compliance-invokecommand-post', url: 'https://ps.compliance.protection.outlook.com/adminapi/beta/' + tid + '/InvokeCommand', method: 'POST',
+      body: JSON.stringify({ CmdletInput: { CmdletName: 'Get-DlpCompliancePolicy', Parameters: {} } }),
+      headers: { 'Authorization': 'Bearer fake.token.for.diag', 'Content-Type': 'application/json;odata.metadata=minimal', 'X-ResponseFormat': 'json' } },
+    { target: 'exchange-invokecommand-post', url: 'https://outlook.office365.com/adminapi/beta/' + tid + '/InvokeCommand', method: 'POST',
+      body: JSON.stringify({ CmdletInput: { CmdletName: 'Get-OrganizationConfig', Parameters: {} } }),
+      headers: { 'Authorization': 'Bearer fake.token.for.diag', 'Content-Type': 'application/json;odata.metadata=minimal', 'X-ResponseFormat': 'json' } },
+  ];
+  const results = [];
+  for (const p of probes) {
+    const start = Date.now();
+    let result = { target: p.target, url: p.url, ok: false };
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    try {
+      const res = await fetch(p.url, {
+        method: p.method || 'GET',
+        signal: controller.signal,
+        headers: p.headers,
+        body: p.body,
+      });
+      result.ok = true;
+      result.status = res.status;
+      result.elapsedMs = Date.now() - start;
+    } catch (err) {
+      const cause = err && err.cause ? err.cause : {};
+      result.error = err.message || String(err);
+      result.causeCode = cause.code || null;
+      result.causeMessage = cause.message || null;
+      result.elapsedMs = Date.now() - start;
+    } finally {
+      clearTimeout(timer);
+    }
+    results.push(result);
+  }
+  return json(200, { service: 'm365-deploy-proxy-diag', node: process.version, region: process.env.REGION_NAME || null, results });
+}
+
 // ── Azure Functions v4 (Node) entrypoint ──
 // function.json uses route "{*restOfPath}" so req.params.restOfPath captures
 // the path beyond /api/. We accept either /api/health or just /health.
@@ -128,6 +173,10 @@ module.exports = async function (context, req) {
   }
   if (req.method === 'GET' && (path === 'health' || path === '')) {
     context.res = json(200, { ok: true, service: 'm365-deploy-proxy' });
+    return;
+  }
+  if (req.method === 'GET' && path === 'diag') {
+    context.res = await handleDiag();
     return;
   }
   if (req.method === 'POST' && path === 'invoke') {
