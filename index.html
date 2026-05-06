@@ -295,6 +295,38 @@
 <!-- ═══ DEPLOY PROGRESS ═══ -->
 <div id="deploy-progress" class="deploy-progress" style="display:none"></div>
 
+<!-- ═══ WHAT'S NEW MODAL ═══ -->
+<div id="whatsnew-overlay" class="modal-overlay" onclick="if(event.target===this)dismissWhatsNew()">
+  <div class="modal" style="max-width:540px">
+    <div class="modal-header">
+      <h3>What's new</h3>
+      <button class="modal-close" onclick="dismissWhatsNew()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <p style="margin:0 0 12px;font-size:.78rem;color:var(--ink2);line-height:1.6">
+        <strong style="color:var(--amber)">One-click deploy is now live for Defender for O365 and Purview.</strong>
+      </p>
+      <p style="margin:0 0 12px;font-size:.72rem;color:var(--ink3);line-height:1.6">
+        Previously these policy types required generating a PowerShell script and running it manually.
+        A new server-side deployment proxy now forwards REST <code>InvokeCommand</code> calls
+        from your browser straight to Microsoft, with your delegated token.
+      </p>
+      <ul style="margin:0 0 12px;padding-left:18px;font-size:.72rem;color:var(--ink2);line-height:1.7">
+        <li>Click <strong>Deploy</strong> on any Defender, Exchange Online, or Purview policy.</li>
+        <li>The Deploy button works for SharePoint admin settings too — 9 SPO policies routed via Graph.</li>
+        <li>Anything still PS-only opens <strong>Deploy in Cloud Shell</strong> — script copied, shell opens in a new tab.</li>
+      </ul>
+      <p style="margin:0;font-size:.66rem;color:var(--ink4);line-height:1.5">
+        Your bearer token transits the proxy but is never logged or stored. CORS is locked to this site only.
+        See <strong>Connect Tenant → Deployment Proxy</strong> to override or self-host.
+      </p>
+      <div style="display:flex;justify-content:flex-end;margin-top:18px">
+        <button class="btn btn-primary btn-sm" onclick="dismissWhatsNew()">Got it</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ═══ TOAST ═══ -->
 <div id="toast" class="toast"></div>
 
@@ -336,21 +368,152 @@ async function handleConnectTenant() {
   }
 }
 
-function showTenantStatusModal() {
+async function showTenantStatusModal() {
   const content = document.getElementById('tenant-config-content');
   const acct = TenantAuth.getAccount();
+  document.getElementById('tenant-modal-overlay').classList.add('open');
+
+  // Initial render — show identity + spinners while we probe each resource.
   content.innerHTML = `
-    <div style="text-align:center;padding:20px 0">
-      <div class="auth-dot connected" style="width:24px;height:24px;margin:0 auto 12px"></div>
+    <div style="text-align:center;padding:8px 0 16px">
+      <div class="auth-dot connected" style="width:24px;height:24px;margin:0 auto 10px"></div>
       <h4 style="margin-bottom:4px">${escHtml(acct.name)}</h4>
       <p style="font-size:.72rem;color:var(--ink3)">${escHtml(acct.email)}</p>
       <p style="font-size:.62rem;color:var(--ink4);margin-top:4px;font-family:'IBM Plex Mono',monospace">Tenant: ${escHtml(acct.tenantId)}</p>
-      <div style="display:flex;gap:8px;justify-content:center;margin-top:20px">
-        <button class="btn btn-sm" onclick="disconnectTenant()">Disconnect</button>
-        <button class="btn btn-sm" onclick="document.getElementById('tenant-modal-overlay').classList.remove('open')">Close</button>
+    </div>
+    <div class="section-hdr" style="margin-top:8px">Permissions &amp; Resources</div>
+    <div id="tenant-token-status" style="font-size:.72rem;color:var(--ink3)">Checking…</div>
+    <div class="section-hdr" style="margin-top:18px">Deployment Proxy</div>
+    <p style="font-size:.66rem;color:var(--ink4);margin:0 0 8px;line-height:1.5">
+      Defender for O365, Exchange Online and Purview policies use REST endpoints that block browser CORS.
+      A hosted proxy forwards these calls server-side. Your bearer token transits the proxy but is never logged or stored.
+      Override below if you prefer to host your own proxy from <code>proxy/</code>.
+    </p>
+    <div style="display:flex;gap:6px;align-items:center">
+      <input id="proxy-url-input" type="url" placeholder="${escHtml(DeployEngine.DEFAULT_PROXY_URL)}" value="${escHtml(DeployEngine.isUsingDefaultProxy() ? '' : DeployEngine.getDeploymentProxy())}" style="flex:1;padding:8px 10px;font-family:'IBM Plex Mono',monospace;font-size:.7rem;background:var(--surface2);border:1px solid var(--border);border-radius:6px;color:var(--ink)">
+      <button class="btn btn-sm btn-primary" onclick="saveDeploymentProxy()">Save</button>
+      <button class="btn btn-sm" onclick="testDeploymentProxy()" title="Send a ping to the proxy">Test</button>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+      <span style="font-size:.6rem;color:var(--ink4)">Currently using: <strong style="color:var(--ink2)">${DeployEngine.isUsingDefaultProxy() ? "Tim's hosted proxy" : 'custom override'}</strong></span>
+      <span style="flex:1"></span>
+      <button class="btn btn-sm" onclick="resetDeploymentProxy()" style="font-size:.6rem">Reset to default</button>
+      <button class="btn btn-sm" onclick="disableDeploymentProxy()" title="Treat DEF/EXO/PV as PowerShell-only" style="font-size:.6rem">Disable</button>
+    </div>
+    <div id="proxy-test-result" style="font-size:.62rem;color:var(--ink4);margin-top:6px;min-height:1em"></div>
+
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:22px;border-top:1px solid var(--border);padding-top:14px">
+      <button class="btn btn-sm" onclick="disconnectTenant()">Disconnect</button>
+      <button class="btn btn-sm" onclick="document.getElementById('tenant-modal-overlay').classList.remove('open')">Close</button>
+    </div>`;
+
+  // Async probe — render real status as each token check completes.
+  renderTokenStatus().catch(err => {
+    const el = document.getElementById('tenant-token-status');
+    if (el) el.innerHTML = '<span style="color:var(--red)">Status check failed: ' + escHtml(err.message) + '</span>';
+  });
+}
+
+async function renderTokenStatus() {
+  const el = document.getElementById('tenant-token-status');
+  if (!el) return;
+
+  // Probe each resource by attempting silent token acquisition. We don't surface
+  // popups here — missing scopes are flagged so the user can re-consent.
+  const probes = [
+    { key: 'graph',      label: 'Microsoft Graph',                 scopes: TenantAuth.GRAPH_TOKEN_SCOPE,
+      enables: 'Conditional Access, Intune, Entra, Defender Endpoint, SharePoint admin' },
+    { key: 'exchange',   label: 'Exchange Online (REST)',          scopes: TenantAuth.EXO_TOKEN_SCOPE,
+      enables: 'Defender for O365, Exchange Online — needs Deployment Proxy' },
+    { key: 'compliance', label: 'Security &amp; Compliance (REST)', scopes: TenantAuth.COMPLIANCE_TOKEN_SCOPE,
+      enables: 'Purview / DLP — needs Deployment Proxy' },
+  ];
+
+  // Silent-only probes — never shows a consent popup from this panel.
+  const rows = await Promise.all(probes.map(async p => {
+    const tok = await TenantAuth.getTokenSilent(p.scopes);
+    return { ...p, ok: !!tok, detail: tok ? '' : 'Token not granted (sign out and back in to consent)' };
+  }));
+
+  const proxyConfigured = DeployEngine.hasDeploymentProxy();
+
+  el.innerHTML = rows.map(r => {
+    const colour = r.ok ? 'var(--green)' : 'var(--amber)';
+    const stateText = r.ok ? 'Granted' : 'Not granted';
+    return `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--border)">
+      <span class="auth-dot ${r.ok ? 'connected' : ''}" style="background:${colour};margin-top:5px;flex-shrink:0"></span>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong style="color:var(--ink);font-size:.74rem">${r.label}</strong>
+          <span style="font-size:.62rem;color:${colour}">${stateText}</span>
+        </div>
+        <div style="font-size:.62rem;color:var(--ink4);margin-top:2px">${r.enables}</div>
+        ${!r.ok && r.detail ? `<div style="font-size:.6rem;color:var(--red);margin-top:2px">${escHtml(r.detail).substring(0, 200)}</div>` : ''}
       </div>
     </div>`;
-  document.getElementById('tenant-modal-overlay').classList.add('open');
+  }).join('') + `
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:6px 0">
+      <span class="auth-dot ${proxyConfigured ? 'connected' : ''}" style="background:${proxyConfigured ? 'var(--green)' : 'var(--ink4)'};margin-top:5px;flex-shrink:0"></span>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <strong style="color:var(--ink);font-size:.74rem">Deployment Proxy</strong>
+          <span style="font-size:.62rem;color:${proxyConfigured ? 'var(--green)' : 'var(--ink3)'}">${proxyConfigured ? 'Configured' : 'Not configured'}</span>
+        </div>
+        <div style="font-size:.62rem;color:var(--ink4);margin-top:2px">${proxyConfigured ? escHtml(DeployEngine.getDeploymentProxy()) : 'Without a proxy, Defender/Exchange/Purview deploy via Cloud Shell'}</div>
+      </div>
+    </div>`;
+}
+
+function saveDeploymentProxy() {
+  const input = document.getElementById('proxy-url-input');
+  if (!input) return;
+  const value = input.value.trim();
+  if (value && !/^https:\/\//.test(value)) {
+    showToast('Proxy URL must use https://');
+    return;
+  }
+  DeployEngine.setDeploymentProxy(value);
+  showToast(value ? 'Custom proxy saved' : 'Reverted to default proxy');
+  refreshProxyPanel();
+}
+
+function resetDeploymentProxy() {
+  DeployEngine.setDeploymentProxy('');
+  showToast("Reverted to Tim's hosted proxy");
+  refreshProxyPanel();
+}
+
+function disableDeploymentProxy() {
+  if (!confirm('Disable proxy? Defender, Exchange and Purview policies will fall back to Cloud Shell deploy.')) return;
+  DeployEngine.disableDeploymentProxy();
+  showToast('Proxy disabled — DEF/EXO/PV will use Cloud Shell');
+  refreshProxyPanel();
+}
+
+function refreshProxyPanel() {
+  // Cheapest reliable refresh: re-open the modal (it rebuilds with current state).
+  showTenantStatusModal();
+  if (AppState.get('currentPage') === 'policies' && typeof Policies !== 'undefined') Policies.render();
+}
+
+async function testDeploymentProxy() {
+  const result = document.getElementById('proxy-test-result');
+  if (!result) return;
+  const inputValue = (document.getElementById('proxy-url-input').value || '').trim().replace(/\/+$/, '');
+  // If the input is empty, test the active (default or custom) proxy.
+  const url = inputValue || DeployEngine.getDeploymentProxy();
+  if (!url) { result.innerHTML = '<span style="color:var(--amber)">No proxy configured</span>'; return; }
+  result.innerHTML = '<span style="color:var(--ink3)">Pinging ' + escHtml(url) + ' …</span>';
+  try {
+    const res = await fetch(url + '/health', { method: 'GET' });
+    if (res.ok) {
+      result.innerHTML = '<span style="color:var(--green)">Proxy is reachable (HTTP ' + res.status + ')</span>';
+    } else {
+      result.innerHTML = '<span style="color:var(--amber)">Proxy responded with HTTP ' + res.status + ' — check that /health is implemented</span>';
+    }
+  } catch (err) {
+    result.innerHTML = '<span style="color:var(--red)">Proxy unreachable: ' + escHtml(err.message) + '</span>';
+  }
 }
 
 async function disconnectTenant() {
@@ -579,6 +742,26 @@ function grantAccess() {
   const gate = document.getElementById('access-gate');
   gate.classList.add('hidden');
   bootstrap();
+  // Show the latest update note once per visitor. Bump the version to re-show
+  // for everyone after the next change.
+  setTimeout(maybeShowWhatsNew, 600);
+}
+
+const WHATSNEW_KEY = 'm365-whatsnew-seen';
+const WHATSNEW_VERSION = '2026-05-defender-purview-deploy';
+
+function maybeShowWhatsNew() {
+  try {
+    if (localStorage.getItem(WHATSNEW_KEY) === WHATSNEW_VERSION) return;
+  } catch (e) { /* ignore */ }
+  const overlay = document.getElementById('whatsnew-overlay');
+  if (overlay) overlay.classList.add('open');
+}
+
+function dismissWhatsNew() {
+  try { localStorage.setItem(WHATSNEW_KEY, WHATSNEW_VERSION); } catch (e) { /* ignore */ }
+  const overlay = document.getElementById('whatsnew-overlay');
+  if (overlay) overlay.classList.remove('open');
 }
 
 // Enter key support for gate input

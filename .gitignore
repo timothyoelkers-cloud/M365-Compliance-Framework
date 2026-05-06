@@ -1,0 +1,8 @@
+.claude/
+.DS_Store
+node_modules/
+proxy/local.settings.json
+proxy/bin/
+proxy/obj/
+*.swp
+.vscode/

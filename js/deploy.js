@@ -17,33 +17,48 @@ const DeployEngine = (() => {
   const GRAPH_TYPES = ['conditional-access', 'intune', 'entra', 'defender-endpoint'];
   const PS_TYPES = ['defender', 'exchange', 'sharepoint', 'teams', 'purview'];
 
-  // Type → default deployment method
-  // Note: InvokeCommand code is ready for DEF/EXO/PV but both endpoints
-  // (outlook.office365.com, ps.compliance.protection.outlook.com) block CORS
-  // from GitHub Pages. An Azure Function proxy would unlock 52 more policies.
+  // Type → deployment method when no proxy is configured.
+  // outlook.office365.com & ps.compliance.protection.outlook.com block browser
+  // CORS, so DEF/EXO/PV stay PS-only by default. Configuring a deployment
+  // proxy upgrades them to InvokeCommand automatically (see PROXY_TYPE_MAP).
   const TYPE_DEPLOY_MAP = {
     'conditional-access': DEPLOY_METHOD.GRAPH,
     'intune':             DEPLOY_METHOD.GRAPH,
     'entra':              DEPLOY_METHOD.GRAPH,
     'defender-endpoint':  DEPLOY_METHOD.GRAPH,
-    'defender':           DEPLOY_METHOD.PS_ONLY,    // InvokeCommand ready, CORS-blocked from SPA
-    'exchange':           DEPLOY_METHOD.PS_ONLY,    // InvokeCommand ready, CORS-blocked from SPA
-    'purview':            DEPLOY_METHOD.PS_ONLY,    // InvokeCommand ready, CORS-blocked from SPA
+    'defender':           DEPLOY_METHOD.PS_ONLY,
+    'exchange':           DEPLOY_METHOD.PS_ONLY,
+    'purview':            DEPLOY_METHOD.PS_ONLY,
     'sharepoint':         DEPLOY_METHOD.PS_ONLY,
     'teams':              DEPLOY_METHOD.PS_ONLY,
   };
 
-  // Per-policy overrides (SPO Graph subset — these 5 have Graph API support)
+  // Type → method when a deployment proxy is configured.
+  const PROXY_TYPE_MAP = {
+    'defender': DEPLOY_METHOD.EXO_INVOKE,
+    'exchange': DEPLOY_METHOD.EXO_INVOKE,
+    'purview':  DEPLOY_METHOD.COMPLIANCE_INVOKE,
+  };
+
+  // Per-policy overrides — SharePoint policies routed to /admin/sharepoint/settings (Graph)
+  // Only includes properties that exist in the Graph admin-settings schema.
   const POLICY_DEPLOY_OVERRIDE = {
+    'SPO01': DEPLOY_METHOD.SPO_GRAPH,
+    'SPO02': DEPLOY_METHOD.SPO_GRAPH,
+    'SPO03': DEPLOY_METHOD.SPO_GRAPH,
     'SPO07': DEPLOY_METHOD.SPO_GRAPH,
     'SPO09': DEPLOY_METHOD.SPO_GRAPH,
     'SPO13': DEPLOY_METHOD.SPO_GRAPH,
+    'SPO14': DEPLOY_METHOD.SPO_GRAPH,
     'SPO15': DEPLOY_METHOD.SPO_GRAPH,
     'SPO19': DEPLOY_METHOD.SPO_GRAPH,
   };
 
   function getDeployMethod(type, policyId) {
     if (policyId && POLICY_DEPLOY_OVERRIDE[policyId]) return POLICY_DEPLOY_OVERRIDE[policyId];
+    // When a deployment proxy is configured, upgrade DEF/EXO/PV from PS-only
+    // to their InvokeCommand routes — the proxy bypasses browser CORS.
+    if (hasDeploymentProxy() && PROXY_TYPE_MAP[type]) return PROXY_TYPE_MAP[type];
     return TYPE_DEPLOY_MAP[type] || DEPLOY_METHOD.PS_ONLY;
   }
 
@@ -320,7 +335,59 @@ const DeployEngine = (() => {
     return (parts[0] || 0) * 3600 + (parts[1] || 0) * 60 + (parts[2] || 0);
   }
 
+  // Map SPO PowerShell parameter values to Graph enum values where they differ.
+  function spoSharingCapability(value) {
+    var map = {
+      'Disabled':                          'disabled',
+      'ExistingExternalUserSharingOnly':   'existingExternalUserSharingOnly',
+      'ExternalUserSharingOnly':           'externalUserSharingOnly',
+      'ExternalUserAndGuestSharing':       'externalUserAndGuestSharing',
+    };
+    return map[value] || 'externalUserSharingOnly';
+  }
+
+  function spoDefaultLinkType(value) {
+    var map = {
+      'None':         'none',
+      'Direct':       'direct',
+      'Internal':     'internal',
+      'AnonymousAccess': 'anonymousAccess',
+    };
+    return map[value] || 'internal';
+  }
+
+  function spoDefaultLinkPermission(value) {
+    var map = { 'None': 'none', 'View': 'view', 'Edit': 'edit' };
+    return map[value] || 'view';
+  }
+
+  // Pull params block from either {cmdlet, parameters} or steps[0]
+  function spoParams(raw) {
+    if (raw.parameters) return raw.parameters;
+    if (raw.steps && raw.steps[0] && raw.steps[0].parameters) return raw.steps[0].parameters;
+    return {};
+  }
+
   const SPO_GRAPH_MAP = {
+    'SPO01': function (raw) {
+      var p = spoParams(raw);
+      return {
+        sharingCapability: spoSharingCapability(p.SharingCapability || 'ExistingExternalUserSharingOnly'),
+      };
+    },
+    'SPO02': function (raw) {
+      var p = spoParams(raw);
+      return {
+        defaultSharingLinkType:    spoDefaultLinkType(p.DefaultSharingLinkType || 'Internal'),
+        defaultLinkPermission:     spoDefaultLinkPermission(p.DefaultLinkPermission || 'View'),
+      };
+    },
+    'SPO03': function (raw) {
+      var p = spoParams(raw);
+      return {
+        anonymousLinkExpirationRestrictionDays: Number(p.RequireAnonymousLinksExpireInDays || 30),
+      };
+    },
     'SPO07': function () {
       return {
         sharingCapability: 'externalUserSharingOnly',
@@ -331,21 +398,25 @@ const DeployEngine = (() => {
       return { isLegacyAuthProtocolsEnabled: false };
     },
     'SPO13': function (raw) {
-      var params = (raw.steps && raw.steps[0] && raw.steps[0].parameters) || raw.parameters || {};
-      var domainStr = params.SharingAllowedDomainList || 'partner1.com partner2.com';
-      var domains = domainStr.split(/[\s,]+/).filter(Boolean);
+      var p = spoParams(raw);
+      var domainStr = p.SharingAllowedDomainList || '';
+      var domains = String(domainStr).split(/[\s,]+/).filter(Boolean);
       return {
         sharingDomainRestrictionMode: 'allowList',
         sharingAllowedDomainList: domains,
       };
     },
+    'SPO14': function () {
+      // Block apps where device enforcement is missing — restrict unmanaged sync app
+      return { isUnmanagedSyncAppForTenantRestricted: true };
+    },
     'SPO15': function (raw) {
-      var params = (raw.steps && raw.steps[0] && raw.steps[0].parameters) || raw.parameters || {};
+      var p = spoParams(raw);
       return {
         idleSessionSignOut: {
           isEnabled: true,
-          warnAfterInSeconds: parseTimeSpanToSeconds(params.WarnAfter || '00:55:00'),
-          signOutAfterInSeconds: parseTimeSpanToSeconds(params.SignOutAfter || '01:00:00'),
+          warnAfterInSeconds:    parseTimeSpanToSeconds(p.WarnAfter || '00:55:00'),
+          signOutAfterInSeconds: parseTimeSpanToSeconds(p.SignOutAfter || '01:00:00'),
         },
       };
     },
@@ -422,14 +493,64 @@ const DeployEngine = (() => {
     }
   }
 
-  // ─── InvokeCommand REST Execution (new) ───
+  // ─── InvokeCommand REST Execution ───
 
   const EXO_INVOKE_BASE = 'https://outlook.office365.com/adminapi/beta/';
   const COMPLIANCE_INVOKE_BASE = 'https://ps.compliance.protection.outlook.com/adminapi/beta/';
 
+  // ── Deployment proxy ──
+  // outlook.office365.com and ps.compliance.protection.outlook.com do not allow
+  // browser CORS preflight, so InvokeCommand can't be called directly from the
+  // SPA. The hosted proxy in Inforcer's Azure subscription forwards calls
+  // server-side; CORS is locked to this site's origin.
+  // Customers can override with their own self-hosted proxy via setDeploymentProxy().
+  const PROXY_KEY = 'm365-deployment-proxy-url';
+  const DEFAULT_PROXY_URL = 'https://m365-deploy-proxy-inforcer.azurewebsites.net/api';
+
+  function getDeploymentProxy() {
+    try {
+      const override = localStorage.getItem(PROXY_KEY);
+      if (override === '__disabled__') return '';
+      return override || DEFAULT_PROXY_URL;
+    } catch (e) {
+      return DEFAULT_PROXY_URL;
+    }
+  }
+
+  function setDeploymentProxy(url) {
+    try {
+      const normalised = String(url || '').trim().replace(/\/+$/, '');
+      if (!normalised) {
+        // Empty input → clear override and fall back to default.
+        localStorage.removeItem(PROXY_KEY);
+      } else if (normalised === DEFAULT_PROXY_URL) {
+        localStorage.removeItem(PROXY_KEY);
+      } else {
+        localStorage.setItem(PROXY_KEY, normalised);
+      }
+    } catch (e) { /* ignore */ }
+  }
+
+  function disableDeploymentProxy() {
+    try { localStorage.setItem(PROXY_KEY, '__disabled__'); } catch (e) { /* ignore */ }
+  }
+
+  function isUsingDefaultProxy() {
+    try {
+      const v = localStorage.getItem(PROXY_KEY);
+      return v === null || v === undefined;
+    } catch (e) { return true; }
+  }
+
+  function hasDeploymentProxy() {
+    return !!getDeploymentProxy();
+  }
+
   /**
    * Call the InvokeCommand REST API (Exchange or Compliance).
-   * This is the same REST backend that the EXO V3 PowerShell module uses.
+   * Same REST backend that the EXO V3 PowerShell module uses.
+   * If a deployment proxy URL is configured, the call is routed through it
+   * to bypass browser CORS on outlook.office365.com / compliance.protection.outlook.com.
    */
   async function callInvokeCommand(cmdletName, parameters, method) {
     const isCompliance = (method === DEPLOY_METHOD.COMPLIANCE_INVOKE);
@@ -451,25 +572,44 @@ const DeployEngine = (() => {
       return { success: false, status: 0, error: 'No tenant ID — please sign in' };
     }
 
-    const base = isCompliance ? COMPLIANCE_INVOKE_BASE : EXO_INVOKE_BASE;
-    const url = base + acct.tenantId + '/InvokeCommand';
+    const proxy = getDeploymentProxy();
+    const directUrl = (isCompliance ? COMPLIANCE_INVOKE_BASE : EXO_INVOKE_BASE)
+      + acct.tenantId + '/InvokeCommand';
 
-    const body = {
+    const cmdletBody = {
       CmdletInput: {
         CmdletName: cmdletName,
         Parameters: parameters || {},
       },
     };
 
-    const opts = {
-      method: 'POST',
-      headers: {
-        'Authorization': 'Bearer ' + token,
-        'Content-Type': 'application/json;odata.metadata=minimal',
-        'X-ResponseFormat': 'json',
-      },
-      body: JSON.stringify(body),
-    };
+    let url, opts;
+    if (proxy) {
+      // Proxy mode: send target URL + token + body in a single POST.
+      // Reference proxy in proxy/index.js validates and forwards.
+      url = proxy + '/invoke';
+      opts = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          target: isCompliance ? 'compliance' : 'exchange',
+          tenantId: acct.tenantId,
+          token: token,
+          cmdlet: cmdletBody,
+        }),
+      };
+    } else {
+      url = directUrl;
+      opts = {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + token,
+          'Content-Type': 'application/json;odata.metadata=minimal',
+          'X-ResponseFormat': 'json',
+        },
+        body: JSON.stringify(cmdletBody),
+      };
+    }
 
     try {
       const res = await fetch(url, opts);
@@ -516,8 +656,11 @@ const DeployEngine = (() => {
       }
     } catch (err) {
       // CORS errors surface as TypeError with no status
+      const proxyHint = getDeploymentProxy()
+        ? ' (via proxy ' + getDeploymentProxy() + ')'
+        : ' — configure a Deployment Proxy in Connect Tenant to bypass browser CORS';
       const errMsg = err.name === 'TypeError'
-        ? 'Network/CORS error — the InvokeCommand endpoint may not allow browser requests. Error: ' + err.message
+        ? 'Network/CORS error' + proxyHint + '. ' + err.message
         : 'Network error: ' + err.message;
       return { success: false, status: 0, error: errMsg };
     }
@@ -1028,5 +1171,9 @@ const DeployEngine = (() => {
     getDeploymentStatus, setDeploymentStatus, clearDeploymentStatus,
     // Info
     getRequiredPermissions, getRequiredRoles,
+    // Deployment proxy
+    getDeploymentProxy, setDeploymentProxy, hasDeploymentProxy,
+    disableDeploymentProxy, isUsingDefaultProxy,
+    DEFAULT_PROXY_URL,
   };
 })();

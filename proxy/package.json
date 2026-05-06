@@ -1,0 +1,13 @@
+{
+  "name": "m365-deploy-proxy",
+  "version": "1.0.0",
+  "description": "Stateless InvokeCommand forwarder for the M365 Compliance Framework SPA",
+  "main": "ProxyFunc/index.js",
+  "scripts": {
+    "start": "func start"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "private": true
+}

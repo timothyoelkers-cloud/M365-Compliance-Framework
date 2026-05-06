@@ -181,6 +181,23 @@ const TenantAuth = (() => {
     }
   }
 
+  /**
+   * Silent-only token probe — never shows a popup. Used by status panels.
+   * Returns the access token on success, null on failure (any reason).
+   */
+  async function getTokenSilent(scopes) {
+    if (!msalInstance || !currentAccount) return null;
+    try {
+      const response = await msalInstance.acquireTokenSilent({
+        scopes: scopes,
+        account: currentAccount,
+      });
+      return response.accessToken;
+    } catch (e) {
+      return null;
+    }
+  }
+
   /** Graph API token (graph.microsoft.com) */
   async function getGraphToken() {
     return getTokenForResource(GRAPH_TOKEN_SCOPE);
@@ -223,8 +240,8 @@ const TenantAuth = (() => {
     init, handleRedirectPromise,
     login, logout,
     getAccessToken: getGraphToken, getGraphToken,
-    getExchangeToken, getComplianceToken, getTokenForResource,
+    getExchangeToken, getComplianceToken, getTokenForResource, getTokenSilent,
     isAuthenticated, getAccount, updateAuthState, decodeToken,
-    GRAPH_SCOPES, EXO_TOKEN_SCOPE, COMPLIANCE_TOKEN_SCOPE,
+    GRAPH_SCOPES, EXO_TOKEN_SCOPE, COMPLIANCE_TOKEN_SCOPE, GRAPH_TOKEN_SCOPE,
   };
 })();

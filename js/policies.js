@@ -283,6 +283,9 @@ const Policies = (() => {
           } else {
             html += `<button class="btn btn-sm btn-deploy" onclick="handleConnectTenant()" title="Connect tenant to deploy">Deploy</button>`;
           }
+        } else if (canScript) {
+          // PS-only with no API path — offer Cloud Shell as the one-click deploy option
+          html += `<button class="btn btn-sm btn-deploy" onclick="Policies.deployViaCloudShell('${pol.id}')" title="Copy script and open Azure Cloud Shell">Deploy in Cloud Shell</button>`;
         }
         // PS1 button (always shown for types with script generation, even if also deployable)
         if (canScript) {
@@ -438,6 +441,8 @@ const Policies = (() => {
       } else {
         actionHtml += `<button class="btn" onclick="handleConnectTenant()">Connect Tenant to Deploy</button>`;
       }
+    } else if (canScript) {
+      actionHtml += `<button class="btn btn-deploy" onclick="Policies.deployViaCloudShell('${pol.id}');document.getElementById('modal-overlay').classList.remove('open')" title="Copy script and open Azure Cloud Shell">Deploy in Cloud Shell</button>`;
     }
     if (canScript) {
       actionHtml += ` <button class="btn btn-script" onclick="Policies.generateScript('${pol.id}');document.getElementById('modal-overlay').classList.remove('open')">Generate PowerShell Script</button>`;
@@ -556,6 +561,26 @@ const Policies = (() => {
     }
   }
 
+  // ── Cloud Shell deploy: copy generated PS1 to clipboard, open shell.azure.com ──
+  async function deployViaCloudShell(id) {
+    const pol = AppState.get('policies').find(p => p.id === id);
+    if (!pol) return;
+    try {
+      const rawPolicy = await DataStore.loadPolicy(pol.type, pol.file);
+      const script = DeployEngine.generateScript(rawPolicy, pol.type);
+      try {
+        await navigator.clipboard.writeText(script);
+        showToast(pol.id + ' script copied — paste into Cloud Shell');
+      } catch (e) {
+        downloadFile(script, pol.id + '.ps1', 'text/plain');
+        showToast(pol.id + '.ps1 downloaded — upload to Cloud Shell');
+      }
+      window.open('https://shell.azure.com/?shellType=powershell', '_blank', 'noopener');
+    } catch (err) {
+      showToast('Cloud Shell deploy failed: ' + err.message);
+    }
+  }
+
   async function downloadScriptBundle() {
     const sel = AppState.get('selectedPolicies');
     const policies = AppState.get('policies').filter(p =>
@@ -598,5 +623,6 @@ const Policies = (() => {
     downloadSingle, downloadBundle, viewDetail,
     deploy, deploySelected, scanTenant,
     generateScript, downloadScriptBundle,
+    deployViaCloudShell,
   };
 })();

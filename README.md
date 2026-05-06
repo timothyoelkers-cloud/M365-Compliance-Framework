@@ -83,6 +83,28 @@ This site is designed for **GitHub Pages**:
 
 The `.nojekyll` file is included to bypass Jekyll processing.
 
+## Deploying policies into a tenant
+
+The Deploy button supports four routes, picked automatically per policy:
+
+| Route | Used by | Browser-only? |
+|---|---|---|
+| Microsoft Graph | Conditional Access, Intune, Entra, Defender Endpoint | ✅ |
+| SharePoint Graph (`/admin/sharepoint/settings`) | 9 SharePoint policies | ✅ |
+| Exchange / Compliance `InvokeCommand` REST | Defender for O365, Exchange Online, Purview | Needs Deployment Proxy |
+| Azure Cloud Shell | Teams + remaining SharePoint policies | Click → script copied to clipboard, Cloud Shell opens in new tab |
+
+### Deployment Proxy
+
+The Exchange Online and Security/Compliance REST endpoints block browser CORS,
+so a small forwarder is required to deploy Defender/Exchange/Purview policies.
+The SPA defaults to a hosted instance at
+`https://m365-deploy-proxy-inforcer.azurewebsites.net/api`
+(hosted in Inforcer Ltd's Azure subscription, CORS-locked to this site).
+Customers who prefer to host their own can deploy the reference Azure Function
+in [`proxy/`](proxy/) and override the URL in the Connect Tenant modal.
+See [`proxy/README.md`](proxy/README.md).
+
 ## Licence
 
 Open source. Data based on CIS Microsoft 365 Benchmark v3.
