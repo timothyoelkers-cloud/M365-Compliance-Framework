@@ -177,31 +177,63 @@ const TenantScanner = (() => {
   }
 
   // ─── Batch API Support ───
+  // Within $batch, each sub-request URL must be RELATIVE to the batch base
+  // (no '/v1.0/' or '/beta/' prefix) — otherwise Graph parses the version
+  // segment as a path and returns "Resource not found for the segment 'v1.0'".
+  // We therefore split endpoints by version and send each subset to the
+  // matching $batch endpoint.
 
-  const BATCH_ENDPOINT = GRAPH_BASE + '/v1.0/$batch';
+  const V1_BATCH_ENDPOINT   = GRAPH_BASE + '/v1.0/$batch';
+  const BETA_BATCH_ENDPOINT = GRAPH_BASE + '/beta/$batch';
   const MAX_BATCH_SIZE = 20;
+
+  /** Returns { version: 'v1.0'|'beta'|'other', path: <url-with-prefix-stripped> }. */
+  function splitVersion(url) {
+    if (typeof url !== 'string') return { version: 'other', path: url };
+    if (url.indexOf('/v1.0/') === 0) return { version: 'v1.0', path: url.substring(5) };
+    if (url.indexOf('/beta/') === 0) return { version: 'beta', path: url.substring(5) };
+    return { version: 'other', path: url };
+  }
 
   /**
    * Execute a $batch request against the Graph API.
-   * Groups up to 20 requests per batch call.
+   * Groups by version (v1.0 vs beta) and sends each to the right endpoint.
+   * Up to 20 requests per batch call.
    */
   async function executeBatch(endpointKeys, token) {
-    var requests = [];
+    // Group keys by version
+    var byVersion = { 'v1.0': [], 'beta': [], 'other': [] };
     for (var i = 0; i < endpointKeys.length; i++) {
-      var key = endpointKeys[i];
-      var def = SCAN_ENDPOINTS[key];
-      requests.push({
-        id: key,
-        method: 'GET',
-        url: def.url,
-      });
+      var k = endpointKeys[i];
+      var def = SCAN_ENDPOINTS[k];
+      if (!def) continue;
+      var sv = splitVersion(def.url);
+      byVersion[sv.version].push({ key: k, path: sv.path });
     }
+    // Build a final result map by submitting v1.0 + beta batches in parallel.
+    var resultMap = {};
+    var batchPromises = [];
+    if (byVersion['v1.0'].length > 0) batchPromises.push(executeSingleBatch(byVersion['v1.0'], V1_BATCH_ENDPOINT, token, resultMap));
+    if (byVersion['beta'].length > 0)  batchPromises.push(executeSingleBatch(byVersion['beta'],  BETA_BATCH_ENDPOINT, token, resultMap));
+    // 'other' (anything that wasn't /v1.0/ or /beta/) cannot be batched, mark as
+    // unsupported so they fall through to the per-endpoint fetch path.
+    for (var n = 0; n < byVersion['other'].length; n++) {
+      resultMap[byVersion['other'][n].key] = { success: false, error: 'Unsupported URL prefix for $batch (use /v1.0/ or /beta/)' };
+    }
+    await Promise.all(batchPromises);
+    return resultMap;
+  }
+
+  async function executeSingleBatch(items, batchUrl, token, resultMap) {
+    var requests = items.map(function (it) {
+      return { id: it.key, method: 'GET', url: it.path };
+    });
 
     var controller = new AbortController();
     var timerId = setTimeout(function () { controller.abort(); }, REQUEST_TIMEOUT_MS * 2);
 
     try {
-      var response = await fetch(BATCH_ENDPOINT, {
+      var response = await fetch(batchUrl, {
         method: 'POST',
         headers: {
           'Authorization': 'Bearer ' + token,
@@ -212,12 +244,14 @@ const TenantScanner = (() => {
       });
 
       if (!response.ok) {
-        throw new Error('Batch HTTP ' + response.status);
+        // Mark every key in this batch as failed so the caller can see why.
+        items.forEach(function (it) {
+          resultMap[it.key] = { success: false, error: 'Batch HTTP ' + response.status };
+        });
+        return;
       }
 
       var body = await response.json();
-      var resultMap = {};
-
       var responses = body.responses || [];
       for (var j = 0; j < responses.length; j++) {
         var r = responses[j];
@@ -228,17 +262,20 @@ const TenantScanner = (() => {
           if (def2 && !def2.isList) {
             resultMap[endpointKey] = { success: true, data: r.body };
           } else {
-            var items = (r.body && Array.isArray(r.body.value)) ? r.body.value : [];
+            var bodyItems = (r.body && Array.isArray(r.body.value)) ? r.body.value : [];
             var nextLink = r.body ? r.body['@odata.nextLink'] : null;
-            resultMap[endpointKey] = { success: true, data: items, nextLink: nextLink };
+            resultMap[endpointKey] = { success: true, data: bodyItems, nextLink: nextLink };
           }
         } else {
           var errMsg = (r.body && r.body.error && r.body.error.message) || ('HTTP ' + r.status);
           resultMap[endpointKey] = { success: false, error: errMsg };
         }
       }
-
-      return resultMap;
+    } catch (err) {
+      // Any unexpected exception → mark all keys in this batch as failed.
+      items.forEach(function (it) {
+        if (!resultMap[it.key]) resultMap[it.key] = { success: false, error: err.message || String(err) };
+      });
     } finally {
       clearTimeout(timerId);
     }
