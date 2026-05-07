@@ -13,23 +13,42 @@ const TenantScanner = (() => {
   let scanning = false;
 
   // ─── Endpoints ───
+  // Each endpoint has a `category` so the inventory view can group findings by
+  // policy area (Identity, Device, Data Protection, etc).
+  // `optional: true` means a 4xx from this endpoint is silent — it just shows
+  // as "(licence not available)" in the inventory rather than a scan error.
   const SCAN_ENDPOINTS = {
-    conditionalAccess:       { url: '/v1.0/identity/conditionalAccess/policies',     isList: true  },
-    compliancePolicies:      { url: '/v1.0/deviceManagement/deviceCompliancePolicies', isList: true },
-    deviceConfigurations:    { url: '/v1.0/deviceManagement/deviceConfigurations',    isList: true  },
-    configurationPolicies:   { url: '/beta/deviceManagement/configurationPolicies',   isList: true  },
-    authorizationPolicy:     { url: '/v1.0/policies/authorizationPolicy',             isList: false },
-    adminConsentPolicy:      { url: '/v1.0/policies/adminConsentRequestPolicy',       isList: false },
-    deviceRegistrationPolicy:{ url: '/v1.0/policies/deviceRegistrationPolicy',        isList: false },
-    authMethodsPolicy:       { url: '/v1.0/policies/authenticationMethodsPolicy',     isList: false },
-    authenticatorConfig:     { url: '/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator', isList: false },
-    organization:            { url: '/v1.0/organization',                             isList: true  },
-    groupSettings:           { url: '/v1.0/groupSettings',                            isList: true  },
-    // ── Extended coverage ──
-    sharepointSettings:      { url: '/v1.0/admin/sharepoint/settings',               isList: false },
-    secureScores:            { url: '/v1.0/security/secureScores?$top=1',             isList: true  },
-    secureScoreProfiles:     { url: '/v1.0/security/secureScoreControlProfiles',      isList: true  },
-    sensitivityLabels:       { url: '/beta/security/informationProtection/sensitivityLabels', isList: true },
+    // ── Identity ──
+    conditionalAccess:       { url: '/v1.0/identity/conditionalAccess/policies',     isList: true,  category: 'Identity', label: 'Conditional Access policies' },
+    namedLocations:          { url: '/v1.0/identity/conditionalAccess/namedLocations', isList: true, category: 'Identity', label: 'Named locations' },
+    authorizationPolicy:     { url: '/v1.0/policies/authorizationPolicy',             isList: false, category: 'Identity', label: 'Authorization policy' },
+    adminConsentPolicy:      { url: '/v1.0/policies/adminConsentRequestPolicy',       isList: false, category: 'Identity', label: 'Admin consent policy' },
+    deviceRegistrationPolicy:{ url: '/v1.0/policies/deviceRegistrationPolicy',        isList: false, category: 'Identity', label: 'Device registration policy' },
+    authMethodsPolicy:       { url: '/v1.0/policies/authenticationMethodsPolicy',     isList: false, category: 'Identity', label: 'Authentication methods policy' },
+    authenticatorConfig:     { url: '/v1.0/policies/authenticationMethodsPolicy/authenticationMethodConfigurations/MicrosoftAuthenticator', isList: false, category: 'Identity', label: 'Microsoft Authenticator config' },
+    permissionGrantPolicies: { url: '/v1.0/policies/permissionGrantPolicies',         isList: true,  category: 'Identity', label: 'Permission grant policies' },
+
+    // ── Tenant ──
+    organization:            { url: '/v1.0/organization',                             isList: true,  category: 'Tenant',   label: 'Organization' },
+    groupSettings:           { url: '/v1.0/groupSettings',                            isList: true,  category: 'Tenant',   label: 'Group settings' },
+
+    // ── Device (Intune) ──
+    compliancePolicies:      { url: '/v1.0/deviceManagement/deviceCompliancePolicies', isList: true, category: 'Device',   label: 'Intune compliance policies' },
+    deviceConfigurations:    { url: '/v1.0/deviceManagement/deviceConfigurations',    isList: true,  category: 'Device',   label: 'Intune device configurations' },
+    configurationPolicies:   { url: '/beta/deviceManagement/configurationPolicies',   isList: true,  category: 'Device',   label: 'Endpoint security / settings catalog' },
+    appProtection:           { url: '/v1.0/deviceAppManagement/managedAppPolicies',   isList: true,  category: 'Device',   label: 'App protection policies', optional: true },
+
+    // ── SharePoint / OneDrive ──
+    sharepointSettings:      { url: '/v1.0/admin/sharepoint/settings',                isList: false, category: 'Collaboration', label: 'SharePoint tenant settings' },
+
+    // ── Data Protection / Purview ──
+    sensitivityLabels:       { url: '/beta/security/informationProtection/sensitivityLabels', isList: true, category: 'Data Protection', label: 'Sensitivity labels' },
+    retentionLabels:         { url: '/v1.0/security/labels/retentionLabels',          isList: true,  category: 'Data Protection', label: 'Retention labels', optional: true },
+    dlpPolicies:             { url: '/beta/dataLossPrevention/policies',              isList: true,  category: 'Data Protection', label: 'DLP policies (Graph beta)', optional: true },
+
+    // ── Security ──
+    secureScores:            { url: '/v1.0/security/secureScores?$top=1',             isList: true,  category: 'Security', label: 'Secure Score (latest)' },
+    secureScoreProfiles:     { url: '/v1.0/security/secureScoreControlProfiles',      isList: true,  category: 'Security', label: 'Secure Score control profiles' },
   };
 
   // ─── Graph Fetch Helpers ───
@@ -361,6 +380,12 @@ const TenantScanner = (() => {
               data[key] = result.data;
             } else {
               data[key] = null;
+              // Optional endpoints (those that may 404 when a workload isn't
+              // licensed in the tenant) don't surface as scan errors.
+              const def = SCAN_ENDPOINTS[key] || {};
+              const errStr = String(result.error || '');
+              const isMissing = /HTTP 404|NotFound|not available|FeatureNotEnabled/i.test(errStr);
+              if (def.optional && isMissing) continue;
               errors.push(key + ': ' + result.error);
             }
           } else {

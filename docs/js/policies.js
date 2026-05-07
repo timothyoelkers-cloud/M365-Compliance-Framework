@@ -94,8 +94,16 @@ const Policies = (() => {
         ${summary.error > 0 ? `<span class="scan-stat" style="color:var(--red)">${summary.error} errors</span>` : ''}
         <div style="flex:1"></div>
         <span style="font-size:.62rem;color:var(--ink4)">${agoText}</span>
+        <button class="btn btn-sm" onclick="Policies.toggleInventory()">View Inventory</button>
         <button class="btn btn-sm" onclick="Policies.scanTenant()" ${TenantScanner.isScanning() ? 'disabled' : ''}>Re-scan</button>
       </div>`;
+
+      // Inventory panel — renders the actual configuration found in the
+      // tenant, decoupled from our 143-policy catalogue. Hidden by default.
+      const showInventory = AppState.get('showInventory');
+      if (showInventory) {
+        html += renderInventoryPanel(scanData);
+      }
     }
 
     // ── Scan progress bar ──
@@ -661,6 +669,121 @@ const Policies = (() => {
     return html;
   }
 
+  // ─── Tenant Inventory panel ────────────────────────────────────────
+  // Renders a clean per-source inventory of the actual configuration
+  // detected in the tenant, plus JSON / CSV export buttons.
+
+  function renderInventoryPanel(scanData) {
+    if (typeof TenantInventory === 'undefined' || !TenantInventory.build) {
+      return '<div class="card" style="padding:14px;font-size:.7rem;color:var(--ink3)">Inventory module not loaded.</div>';
+    }
+    const inv = TenantInventory.build(scanData, TenantScanner.SCAN_ENDPOINTS || {});
+    if (!inv) return '';
+
+    let html = '<div class="card" style="padding:16px 18px;margin:8px 0 16px">';
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">';
+    html += '<strong style="font-size:.82rem;color:var(--ink)">Tenant Inventory</strong>';
+    html += '<span style="font-size:.66rem;color:var(--ink3)">' + inv.totals.items + ' items detected across ' + Object.keys(inv.totals.byCategory).length + ' categories</span>';
+    html += '<div style="flex:1"></div>';
+    html += '<button class="btn btn-sm" onclick="Policies.exportInventoryJson()">Export JSON</button>';
+    html += '<button class="btn btn-sm" onclick="Policies.exportInventoryCsv()">Export CSV</button>';
+    html += '<button class="btn btn-sm" onclick="Policies.toggleInventory()">Hide</button>';
+    html += '</div>';
+
+    // Category totals strip
+    const cats = Object.entries(inv.totals.byCategory).sort((a, b) => a[0].localeCompare(b[0]));
+    if (cats.length) {
+      html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;font-size:.66rem">';
+      for (const [cat, count] of cats) {
+        html += '<span class="badge badge-dark">' + escHtml(cat) + ': ' + count + '</span>';
+      }
+      html += '</div>';
+    }
+
+    // Per-source groupings
+    const byCat = {};
+    for (const g of inv.groups) {
+      (byCat[g.category] = byCat[g.category] || []).push(g);
+    }
+    for (const cat of Object.keys(byCat).sort()) {
+      html += '<div style="font-size:.7rem;font-weight:600;color:var(--ink2);margin:14px 0 6px;letter-spacing:.5px;text-transform:uppercase">' + escHtml(cat) + '</div>';
+      for (const group of byCat[cat]) {
+        const dot = group.error ? 'var(--red)' :
+                    !group.available ? 'var(--ink4)' :
+                    group.count > 0 ? 'var(--green)' : 'var(--ink3)';
+        const status = group.error ? 'error: ' + escHtml(group.error.substring(0, 80)) :
+                       !group.available ? '(not available in this tenant)' :
+                       group.count === 0 ? '(none configured)' :
+                       group.count + ' item' + (group.count > 1 ? 's' : '');
+        const expandable = group.count > 0;
+
+        html += '<details ' + (group.count <= 5 && expandable ? 'open' : '') + ' style="margin:0 0 6px;background:var(--surface2);border-radius:6px;padding:8px 10px">';
+        html += '<summary style="cursor:' + (expandable ? 'pointer' : 'default') + ';list-style:' + (expandable ? 'auto' : 'none') + ';font-size:.7rem;color:var(--ink2)">';
+        html += '<span style="display:inline-block;width:8px;height:8px;background:' + dot + ';border-radius:50%;margin-right:8px;vertical-align:middle"></span>';
+        html += '<strong>' + escHtml(group.label) + '</strong> · <span style="color:var(--ink3)">' + status + '</span>';
+        html += '</summary>';
+        if (expandable) {
+          html += '<table style="width:100%;margin-top:8px;border-collapse:collapse;font-size:.66rem">';
+          html += '<thead><tr style="text-align:left;color:var(--ink3);border-bottom:1px solid var(--border)">' +
+                  '<th style="padding:4px 6px">Name</th>' +
+                  '<th style="padding:4px 6px">Kind</th>' +
+                  '<th style="padding:4px 6px">State</th>' +
+                  '<th style="padding:4px 6px">Summary</th>' +
+                  '</tr></thead><tbody>';
+          for (const item of group.items) {
+            const stateColour = item.state === 'enabled' ? 'var(--green)' :
+                                item.state === 'reportOnly' ? 'var(--amber)' :
+                                item.state === 'disabled' ? 'var(--ink4)' : 'var(--ink3)';
+            html += '<tr style="border-bottom:1px solid var(--border)">' +
+                    '<td style="padding:4px 6px;color:var(--ink)">' + escHtml(item.name) + '</td>' +
+                    '<td style="padding:4px 6px;color:var(--ink3)">' + escHtml(item.kind) + '</td>' +
+                    '<td style="padding:4px 6px;color:' + stateColour + '">' + escHtml(item.state || '') + '</td>' +
+                    '<td style="padding:4px 6px;color:var(--ink3)">' + escHtml(item.summary || '') + '</td>' +
+                    '</tr>';
+          }
+          html += '</tbody></table>';
+        }
+        html += '</details>';
+      }
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  function toggleInventory() {
+    AppState.set('showInventory', !AppState.get('showInventory'));
+    render();
+  }
+
+  function _buildInventory() {
+    if (typeof TenantInventory === 'undefined') return null;
+    return TenantInventory.build(TenantScanner.getScanResults(), TenantScanner.SCAN_ENDPOINTS || {});
+  }
+
+  function exportInventoryJson() {
+    const inv = _buildInventory();
+    if (!inv) { showToast('No scan to export'); return; }
+    const blob = new Blob([TenantInventory.toJson(inv)], { type: 'application/json' });
+    _downloadBlob(blob, 'tenant-inventory-' + (inv.tenantId || 'unknown') + '-' + Date.now() + '.json');
+    showToast('Inventory JSON downloaded');
+  }
+
+  function exportInventoryCsv() {
+    const inv = _buildInventory();
+    if (!inv) { showToast('No scan to export'); return; }
+    const blob = new Blob([TenantInventory.toCsv(inv)], { type: 'text/csv' });
+    _downloadBlob(blob, 'tenant-inventory-' + (inv.tenantId || 'unknown') + '-' + Date.now() + '.csv');
+    showToast('Inventory CSV downloaded');
+  }
+
+  function _downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
   return {
     init, render, togglePolicy, selectAll, clearSelection,
     filterType, filterScanStatus, filterByAssessment, search,
@@ -668,5 +791,6 @@ const Policies = (() => {
     deploy, deploySelected, scanTenant,
     generateScript, downloadScriptBundle,
     deployViaCloudShell,
+    toggleInventory, exportInventoryJson, exportInventoryCsv,
   };
 })();
