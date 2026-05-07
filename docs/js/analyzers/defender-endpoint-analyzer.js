@@ -46,12 +46,28 @@
   };
 
   Findings.register('defender-endpoint', 'Defender for Endpoint', function (data) {
+    const H = Findings.helpers;
     const findings = [];
-    const policies     = data.configurationPolicies || [];
-    const oldConfigs   = data.deviceConfigurations || [];
-    const scoreSnap    = (data.secureScores && data.secureScores[0]) || null;
+
+    // Bail out cleanly if both Intune scan sources errored — don't claim "no MDE".
+    const stateConfigPol = H.sourceState(data.configurationPolicies);
+    const stateDevice    = H.sourceState(data.deviceConfigurations);
+    if (stateConfigPol === 'scanFailed' && stateDevice === 'scanFailed') {
+      return [{
+        ruleId: 'mde-scan-failed',
+        severity: 'high',
+        title: 'Defender for Endpoint config could not be scanned',
+        description: 'Both /beta/deviceManagement/configurationPolicies and /v1.0/deviceManagement/deviceConfigurations errored. Cannot tell if MDE is configured.',
+        remediation: 'Verify DeviceManagementConfiguration.Read.All admin consent and reconnect.',
+        refs: [],
+      }];
+    }
+
+    const policies      = stateConfigPol === 'scanned' ? data.configurationPolicies : [];
+    const oldConfigs    = stateDevice === 'scanned' ? data.deviceConfigurations : [];
+    const scoreSnap     = (data.secureScores && data.secureScores[0]) || null;
     const controlScores = (scoreSnap && scoreSnap.controlScores) || [];
-    const compliance   = data.compliancePolicies || [];
+    const compliance    = Array.isArray(data.compliancePolicies) ? data.compliancePolicies : [];
 
     // Group configurationPolicies by templateFamily.
     const byFamily = {};
@@ -61,9 +77,11 @@
       (byFamily[fam] = byFamily[fam] || []).push(p);
     }
 
-    // 1. No Endpoint Security policies at all
+    // 1. No Endpoint Security policies — only when we have positive evidence both sources are empty
+    const bothEmpty = stateConfigPol === 'scanned' && stateDevice === 'scanned' &&
+                      Object.keys(byFamily).length === 0 && oldConfigs.length === 0;
     const totalEndpointPolicies = Object.values(byFamily).reduce((n, arr) => n + arr.length, 0);
-    if (totalEndpointPolicies === 0 && oldConfigs.length === 0) {
+    if (bothEmpty) {
       findings.push({
         ruleId: 'no-mde-policies',
         severity: 'critical',
@@ -73,7 +91,7 @@
         refs: ['MDE01', 'MDE02', 'MDE03', 'MDE04'],
       });
       // No point evaluating individual templates if nothing exists.
-    } else {
+    } else if (stateConfigPol === 'scanned') {
       // 2-8. Per-template-family coverage
       for (const fam of Object.keys(TEMPLATE_FAMILIES)) {
         const def = TEMPLATE_FAMILIES[fam];

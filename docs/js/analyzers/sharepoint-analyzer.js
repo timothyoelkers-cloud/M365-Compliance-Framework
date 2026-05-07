@@ -5,19 +5,31 @@
   if (typeof Findings === 'undefined') return;
 
   Findings.register('sharepoint', 'SharePoint / OneDrive', function (data) {
-    const s = data.sharepointSettings;
+    const H = Findings.helpers;
     const findings = [];
-    if (!s) {
-      findings.push({
+    const state = H.sourceState(data.sharepointSettings);
+
+    if (state === 'scanFailed') {
+      return [{
+        ruleId: 'spo-scan-failed',
+        severity: 'high',
+        title: 'SharePoint admin settings could not be scanned',
+        description: 'The /v1.0/admin/sharepoint/settings request failed. Most often the App Registration is missing SharePointTenantSettings.Read.All admin consent in this tenant.',
+        remediation: 'Add SharePointTenantSettings.Read.All to the App Registration\'s Microsoft Graph permissions and grant admin consent. Reconnect Tenant.',
+        refs: [],
+      }];
+    }
+    if (state === 'notScanned' || data.sharepointSettings === undefined) {
+      return [{
         ruleId: 'no-spo-settings',
         severity: 'info',
         title: 'SharePoint admin settings not retrieved',
-        description: 'The Graph endpoint /admin/sharepoint/settings returned no data. Either the tenant lacks SharePoint or the signed-in user lacks SharePointTenantSettings.Read.All.',
+        description: 'No data returned for /admin/sharepoint/settings.',
         remediation: '',
         refs: [],
-      });
-      return findings;
+      }];
     }
+    const s = data.sharepointSettings;
 
     // 1. Anyone-with-the-link sharing
     if (s.sharingCapability === 'externalUserAndGuestSharing') {

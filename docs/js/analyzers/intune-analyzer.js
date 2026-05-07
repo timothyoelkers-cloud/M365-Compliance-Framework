@@ -5,13 +5,31 @@
   if (typeof Findings === 'undefined') return;
 
   Findings.register('intune', 'Intune / Device Management', function (data) {
-    const compliance = data.compliancePolicies || [];
-    const config = data.deviceConfigurations || [];
-    const policies = data.configurationPolicies || [];
+    const H = Findings.helpers;
     const findings = [];
 
-    // 1. No compliance policies at all
-    if (!compliance.length) {
+    // Surface scan failures explicitly — don't silently report "tenant has no Intune".
+    const stateCompliance = H.sourceState(data.compliancePolicies);
+    const stateDevice     = H.sourceState(data.deviceConfigurations);
+    const stateConfig     = H.sourceState(data.configurationPolicies);
+    const allFailed = stateCompliance === 'scanFailed' && stateDevice === 'scanFailed' && stateConfig === 'scanFailed';
+    if (allFailed) {
+      return [{
+        ruleId: 'intune-scan-failed',
+        severity: 'high',
+        title: 'Intune endpoints could not be scanned',
+        description: 'All Intune Graph endpoints (compliance, device-configuration, configuration-policies) returned errors. Likely an auth/permissions issue rather than a tenant with no Intune.',
+        remediation: 'Verify the App Registration has DeviceManagementConfiguration.Read.All and DeviceManagementManagedDevices.Read.All admin-consented. Reconnect Tenant.',
+        refs: [],
+      }];
+    }
+
+    const compliance = stateCompliance === 'scanned' ? data.compliancePolicies : [];
+    const config     = stateDevice === 'scanned' ? data.deviceConfigurations : [];
+    const policies   = stateConfig === 'scanned' ? data.configurationPolicies : [];
+
+    // 1. No compliance policies at all (only when we actually retrieved the endpoint)
+    if (stateCompliance === 'scanned' && H.isGenuinelyEmpty(data.compliancePolicies)) {
       findings.push({
         ruleId: 'no-compliance-policies',
         severity: 'critical',
@@ -20,7 +38,17 @@
         remediation: 'Create compliance policies for each device platform you support: Windows, macOS, iOS, Android. At minimum require encryption, OS minimum version, and password complexity.',
         refs: ['IN01', 'IN02', 'IN03'],
       });
-    } else {
+    } else if (stateCompliance === 'scanFailed') {
+      findings.push({
+        ruleId: 'compliance-scan-failed',
+        severity: 'high',
+        title: 'Intune compliance policies could not be scanned',
+        description: 'The /v1.0/deviceManagement/deviceCompliancePolicies endpoint errored. The tenant may have policies — we just can\'t see them.',
+        remediation: 'Verify DeviceManagementConfiguration.Read.All admin consent. Reconnect Tenant.',
+        refs: [],
+      });
+    }
+    if (compliance.length > 0) {
       // 2. Coverage gaps by platform
       const platforms = ['windows10', 'macOS', 'iOS', 'androidWorkProfile', 'android'];
       const detectedPlatforms = new Set();
@@ -44,8 +72,9 @@
       }
     }
 
-    // 3. No device configurations
-    if (!config.length && !policies.length) {
+    // 3. No device configurations — only when we actually retrieved both endpoints
+    const bothConfigsScanned = stateDevice === 'scanned' && stateConfig === 'scanned';
+    if (bothConfigsScanned && !config.length && !policies.length) {
       findings.push({
         ruleId: 'no-device-config',
         severity: 'high',

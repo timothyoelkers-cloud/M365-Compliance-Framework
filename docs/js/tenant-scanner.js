@@ -19,8 +19,11 @@ const TenantScanner = (() => {
   // as "(licence not available)" in the inventory rather than a scan error.
   const SCAN_ENDPOINTS = {
     // ── Identity ──
-    conditionalAccess:       { url: '/v1.0/identity/conditionalAccess/policies',     isList: true,  category: 'Identity', label: 'Conditional Access policies' },
-    namedLocations:          { url: '/v1.0/identity/conditionalAccess/namedLocations', isList: true, category: 'Identity', label: 'Named locations' },
+    // Beta endpoint includes preview features (time-based conditions, agents
+    // scope, secureSignInSession, etc.) that v1.0 omits. Matches the approach
+    // in jhope188/ca-policy-analyzer.
+    conditionalAccess:       { url: '/beta/identity/conditionalAccess/policies',      isList: true,  category: 'Identity', label: 'Conditional Access policies' },
+    namedLocations:          { url: '/beta/identity/conditionalAccess/namedLocations', isList: true, category: 'Identity', label: 'Named locations' },
     authorizationPolicy:     { url: '/v1.0/policies/authorizationPolicy',             isList: false, category: 'Identity', label: 'Authorization policy' },
     adminConsentPolicy:      { url: '/v1.0/policies/adminConsentRequestPolicy',       isList: false, category: 'Identity', label: 'Admin consent policy' },
     deviceRegistrationPolicy:{ url: '/v1.0/policies/deviceRegistrationPolicy',        isList: false, category: 'Identity', label: 'Device registration policy' },

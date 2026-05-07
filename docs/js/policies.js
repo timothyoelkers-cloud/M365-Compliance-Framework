@@ -704,8 +704,14 @@ const Policies = (() => {
     }
 
     // Header strip
+    const scanData = TenantScanner.getScanResults();
+    const tenantId = scanData && scanData.tenantId;
+    const scannedBy = scanData && scanData.scannedBy;
+    const scanTime = scanData && scanData.timestamp ? new Date(scanData.timestamp).toLocaleString() : '';
+    const scanErrorCount = scanData && Array.isArray(scanData.errors) ? scanData.errors.length : 0;
+
     let html = '<div class="card" style="padding:16px 18px;margin:8px 0 16px">';
-    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">';
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px;flex-wrap:wrap">';
     html += '<strong style="font-size:.82rem;color:var(--ink)">Findings</strong>';
     if (score !== null) {
       const sColour = score >= 80 ? 'var(--green)' : score >= 60 ? 'var(--amber)' : 'var(--red)';
@@ -716,6 +722,20 @@ const Policies = (() => {
     html += '<button class="btn btn-sm" onclick="Policies.exportFindingsCsv()">Export CSV</button>';
     html += '<button class="btn btn-sm" onclick="Policies.toggleFindings()">Hide</button>';
     html += '</div>';
+
+    // Provenance header — always show the tenant we scanned + scan time +
+    // error count, so the user can verify they're looking at the right tenant
+    // and that the scan actually completed.
+    if (tenantId || scanTime) {
+      html += '<div style="font-size:.62rem;color:var(--ink4);margin-bottom:14px;padding:6px 10px;background:var(--surface2);border-radius:4px;display:flex;gap:14px;flex-wrap:wrap">';
+      if (tenantId)   html += '<span><strong>Tenant:</strong> <code>' + escHtml(tenantId) + '</code></span>';
+      if (scannedBy)  html += '<span><strong>Signed in as:</strong> ' + escHtml(scannedBy) + '</span>';
+      if (scanTime)   html += '<span><strong>Scanned:</strong> ' + escHtml(scanTime) + '</span>';
+      if (scanErrorCount > 0) {
+        html += '<span style="color:var(--red)"><strong>' + scanErrorCount + ' endpoint' + (scanErrorCount > 1 ? 's' : '') + ' failed</strong></span>';
+      }
+      html += '</div>';
+    }
 
     // Severity strip
     html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;font-size:.66rem">';

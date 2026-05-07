@@ -5,12 +5,25 @@
   if (typeof Findings === 'undefined') return;
 
   Findings.register('entra', 'Entra ID', function (data) {
+    const H = Findings.helpers;
     const findings = [];
 
-    const auth = data.authorizationPolicy;
-    const consent = data.adminConsentPolicy;
-    const authMethods = data.authMethodsPolicy;
-    const orgList = data.organization || [];
+    // Surface scan failures rather than silently skipping checks.
+    if (H.sourceState(data.authorizationPolicy) === 'scanFailed') {
+      findings.push({
+        ruleId: 'authorization-policy-scan-failed',
+        severity: 'high',
+        title: 'Entra authorization policy could not be scanned',
+        description: 'The /v1.0/policies/authorizationPolicy request failed. Likely missing Policy.Read.All consent.',
+        remediation: 'Verify Policy.Read.All admin consent for the App Registration in this tenant.',
+        refs: [],
+      });
+    }
+
+    const auth = data.authorizationPolicy || null;
+    const consent = data.adminConsentPolicy || null;
+    const authMethods = data.authMethodsPolicy || null;
+    const orgList = Array.isArray(data.organization) ? data.organization : [];
     const org = orgList[0];
 
     // 1. Users can consent to apps on their own (risky)

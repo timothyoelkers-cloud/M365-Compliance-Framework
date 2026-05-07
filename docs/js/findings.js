@@ -44,6 +44,28 @@ const Findings = (() => {
       scannedAt: scanData.timestamp,
     };
 
+    // Scan-diagnostics group always comes first when there are errors —
+    // a failed scan often masquerades as "tenant has nothing configured",
+    // so we surface this prominently before any analyzer-emitted findings.
+    const scanErrors = Array.isArray(scanData.errors) ? scanData.errors : [];
+    if (scanErrors.length > 0) {
+      // Sometimes EVERY endpoint failed → almost certainly a permissions issue
+      // affecting the whole scan. Promote that to a single critical finding.
+      const everythingFailed = scanData.endpointCount && scanErrors.length >= scanData.endpointCount - 1;
+      all.push({
+        workload: '_scan',
+        workloadLabel: 'Scan diagnostics',
+        severity: everythingFailed ? 'critical' : 'high',
+        id: '_scan-failures',
+        ruleId: 'scan-failures',
+        title: scanErrors.length + ' Graph endpoint' + (scanErrors.length > 1 ? 's' : '') + ' failed during scan' +
+          (everythingFailed ? ' — entire scan may be invalid' : ''),
+        description: 'The findings below may report "no policies configured" when the real cause is a failed scan. Each failed endpoint is listed here with its error.',
+        remediation: 'Most common: missing admin consent for required Graph permissions, or signing in as a user without admin role. Verify both. Reconnect Tenant.',
+        refs: scanErrors.map(e => e.length > 200 ? e.substring(0, 200) + '…' : e),
+      });
+    }
+
     for (const a of analyzers) {
       try {
         const out = a.analyze(scanData.data, context) || [];
@@ -104,6 +126,21 @@ const Findings = (() => {
     return counts;
   }
 
+  // ── State helpers ──
+  // Distinguish three states for any scan source:
+  //   notScanned (undefined)   — endpoint not in scan map / not run
+  //   scanFailed (null)        — endpoint in scan map but request errored
+  //   scanned    (array/object)— endpoint returned data (which may be empty)
+  function sourceState(value) {
+    if (value === undefined) return 'notScanned';
+    if (value === null) return 'scanFailed';
+    return 'scanned';
+  }
+  // True only when we have positive evidence of empty (not when scan failed).
+  function isGenuinelyEmpty(value) {
+    return Array.isArray(value) && value.length === 0;
+  }
+
   // ── Helpers analyzers can use ──
   function isCAEnabled(p) { return p && p.state === 'enabled'; }
   function isCAReportOnly(p) { return p && p.state === 'enabledForReportingButNotEnforced'; }
@@ -139,6 +176,7 @@ const Findings = (() => {
       isCAEnabled, isCAReportOnly,
       targetsAllUsers, hasUserExclusions,
       grantControls, isBlockPolicy, targetsAllApps,
+      sourceState, isGenuinelyEmpty,
     },
   };
 })();

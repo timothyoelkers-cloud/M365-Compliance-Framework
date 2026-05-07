@@ -6,13 +6,35 @@
   const H = Findings.helpers;
 
   Findings.register('conditional-access', 'Conditional Access', function (data) {
-    const policies = data.conditionalAccess || [];
     const findings = [];
+    const state = H.sourceState(data.conditionalAccess);
 
-    // ── Tenant-wide gap checks ──
+    // ── Scan state checks first — never claim "no policies" when the scan errored ──
+    if (state === 'scanFailed') {
+      return [{
+        ruleId: 'ca-scan-failed',
+        severity: 'high',
+        title: 'Conditional Access could not be scanned',
+        description: 'The /v1.0/identity/conditionalAccess/policies request failed (401/403 or similar). Common causes: signed-in user lacks Policy.Read.All, or admin consent has not been granted for the app in this tenant. Check the Tenant Inventory for the exact error.',
+        remediation: 'Reconnect Tenant. Verify the signed-in user has Global Reader / Security Reader role and the App Registration has Policy.Read.All admin-consented in this tenant.',
+        refs: [],
+      }];
+    }
+    if (state === 'notScanned') {
+      return [{
+        ruleId: 'ca-not-scanned',
+        severity: 'info',
+        title: 'Conditional Access scan was not run',
+        description: 'No conditionalAccess data in the scan output.',
+        remediation: 'Run a tenant scan.',
+        refs: [],
+      }];
+    }
 
-    // 1. No CA policies at all
-    if (!policies.length) {
+    const policies = data.conditionalAccess;
+
+    // ── Genuine "no policies" only when scan succeeded with [] ──
+    if (H.isGenuinelyEmpty(policies)) {
       return [{
         ruleId: 'no-policies',
         severity: 'critical',
