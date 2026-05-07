@@ -58,6 +58,7 @@ const TenantScanPage = (() => {
     html += renderTrendSection();
     html += renderDriftSection();
     html += renderTemplatesSection(scanData);  // 🆕 template fingerprint matching
+    html += renderGitHubCompareSection();
     html += renderRecommendedActions(analysis);
     html += renderFrameworkAlignmentSection();
     html += renderCAFlowCardsSection(scanData);
@@ -335,6 +336,8 @@ const TenantScanPage = (() => {
     if (intuneBlock)  blocks.push(intuneBlock);
     const mdeBlock     = _matchMDETemplates(allPolicies, data);
     if (mdeBlock)     blocks.push(mdeBlock);
+    const entraBlock   = _matchEntraTemplates(allPolicies, data);
+    if (entraBlock)   blocks.push(entraBlock);
     const spoBlock     = _matchSPOTemplates(allPolicies, data);
     if (spoBlock)     blocks.push(spoBlock);
     if (blocks.length === 0) return '';
@@ -566,6 +569,81 @@ const TenantScanPage = (() => {
 
     return {
       workload: 'Defender for Endpoint',
+      matches,
+      summary: {
+        present: matches.filter(m => m.status === 'present').length,
+        partial: matches.filter(m => m.status === 'partial').length,
+        missing: matches.filter(m => m.status === 'missing').length,
+        total: matches.length,
+      },
+    };
+  }
+
+  // ── Entra ID settings template matching ───────────────────────────────
+  // Each ENT* template controls a specific Entra setting. We check the
+  // matching field on authorizationPolicy / adminConsentPolicy /
+  // authMethodsPolicy against the expected value.
+  function _matchEntraTemplates(allPolicies, data) {
+    const auth = data.authorizationPolicy || null;
+    const consent = data.adminConsentPolicy || null;
+    const authMethods = data.authMethodsPolicy || null;
+    const entraTemplates = allPolicies.filter(p => p.type === 'entra');
+    if (entraTemplates.length === 0) return null;
+    if (!auth && !consent && !authMethods) return null;
+
+    function getNested(obj, path) {
+      return path.split('.').reduce((acc, k) => (acc == null ? acc : acc[k]), obj);
+    }
+
+    // Per-template rule definitions. Each entry maps a template ID to the
+    // source object + setting path + expected value/check.
+    const ENT_RULES = {
+      ENT01: { source: 'auth',        path: 'defaultUserRolePermissions.allowedToCreateApps',          expected: false, mode: 'eq' },
+      ENT02: { source: 'auth',        path: 'defaultUserRolePermissions.permissionGrantPoliciesAssigned', mode: 'restrictiveConsent' },
+      ENT03: { source: 'auth',        path: 'allowInvitesFrom',                                        expected: ['adminsAndGuestInviters', 'none'], mode: 'in' },
+      ENT04: { source: 'auth',        path: 'allowedToSignUpEmailBasedSubscriptions',                  expected: false, mode: 'eq' },
+      ENT05: { source: 'consent',     path: 'isEnabled',                                               expected: true,  mode: 'eq' },
+      ENT06: { source: 'authMethods', path: 'authenticationMethodConfigurations',                      mode: 'authenticatorEnabled' },
+      ENT07: { source: 'auth',        path: 'defaultUserRolePermissions.allowedToCreateSecurityGroups', expected: false, mode: 'eq' },
+      ENT08: { source: 'auth',        path: 'defaultUserRolePermissions.allowedToCreateTenants',       expected: false, mode: 'eq' },
+      ENT09: { source: 'auth',        path: 'guestUserRoleId',                                         mode: 'truthy' },
+      ENT10: { source: 'auth',        path: 'defaultUserRolePermissions.allowedToReadOtherUsers',      expected: true,  mode: 'eq' },
+    };
+
+    const sources = { auth, consent, authMethods };
+
+    const matches = entraTemplates.map(t => {
+      const rule = ENT_RULES[t.id];
+      if (!rule) return { template: t, status: 'partial', score: 50, matchedTenantPolicy: null };
+      const src = sources[rule.source];
+      if (!src) return { template: t, status: 'partial', score: 50, matchedTenantPolicy: null };
+      const v = getNested(src, rule.path);
+
+      let ok = false;
+      if (rule.mode === 'eq')      ok = (v === rule.expected);
+      else if (rule.mode === 'in') ok = (rule.expected.indexOf(v) !== -1);
+      else if (rule.mode === 'truthy') ok = !!v;
+      else if (rule.mode === 'restrictiveConsent') {
+        // Permission-grant policies should NOT include user-default-low (the
+        // permissive "users can consent to anything" policy).
+        const list = Array.isArray(v) ? v : [];
+        ok = !list.some(p => /user-default-low/i.test(String(p)));
+      }
+      else if (rule.mode === 'authenticatorEnabled') {
+        const list = Array.isArray(v) ? v : [];
+        ok = list.some(m => m.id === 'MicrosoftAuthenticator' && m.state === 'enabled');
+      }
+      const status = ok ? 'present' : 'missing';
+      return {
+        template: t,
+        status,
+        score: ok ? 100 : 0,
+        matchedTenantPolicy: ok ? { displayName: rule.source + '.' + rule.path + ' = ' + JSON.stringify(v).substring(0, 60) } : null,
+      };
+    });
+
+    return {
+      workload: 'Entra ID',
       matches,
       summary: {
         present: matches.filter(m => m.status === 'present').length,
@@ -911,7 +989,9 @@ const TenantScanPage = (() => {
     if (time)       html += '<div><div style="font-size:.58rem;color:var(--ink4);text-transform:uppercase;letter-spacing:.5px">Last scanned</div><span style="font-size:.7rem;color:var(--ink2)">' + escHtml(time) + '</span></div>';
     if (errs > 0)   html += '<div><div style="font-size:.58rem;color:var(--ink4);text-transform:uppercase;letter-spacing:.5px">Endpoint errors</div><span style="font-size:.7rem;color:var(--red)"><strong>' + errs + '</strong> failed</span></div>';
     html += '<div style="flex:1"></div>';
-    html += '<button class="btn btn-sm" onclick="TenantScanPage.generateReport()" title="Open a printable customer report in a new tab">Generate Report</button>';
+    html += '<button class="btn btn-sm" onclick="TenantScanPage.generateReport()" title="Open a printable customer report in a new tab">Report</button>';
+    html += '<button class="btn btn-sm" onclick="TenantScanPage.openAttestation()" title="Generate a formal compliance attestation against a chosen framework">Attestation</button>';
+    html += '<button class="btn btn-sm" onclick="TenantScanPage.openCompare()" title="Side-by-side compare with another connected tenant">Compare</button>';
     html += '<button class="btn btn-sm btn-primary" onclick="TenantScanPage.scan()" ' + (isScanning ? 'disabled' : '') + '>' + (isScanning ? 'Scanning…' : 'Re-scan') + '</button>';
     html += '</div>';
     return html;
@@ -1261,10 +1341,41 @@ const TenantScanPage = (() => {
     ScanReport.generate();
   }
 
+  function openAttestation() {
+    if (typeof ComplianceAttestation === 'undefined') { showToast('Attestation module not loaded'); return; }
+    ComplianceAttestation.generate();  // no framework arg → opens the chooser
+  }
+
+  function openCompare() {
+    if (typeof TenantCompare === 'undefined') { showToast('Compare module not loaded'); return; }
+    TenantCompare.open();
+  }
+
+  // ── Custom GitHub repo compare section ──────────────────────────────
+  function renderGitHubCompareSection() {
+    let html = '<div class="card" style="padding:16px 20px;margin-bottom:14px">';
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">';
+    html += '<strong style="font-size:.82rem;color:var(--ink)">Compare against a GitHub repo</strong>';
+    html += '<span style="font-size:.62rem;color:var(--ink4)">point at any public CA-policy repository to score it against this tenant</span>';
+    html += '</div>';
+    html += '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">';
+    html += '<input id="gh-repo-input" placeholder="github.com/owner/repo or owner/repo or full URL" style="flex:1;min-width:280px;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--ink);font-family:\'JetBrains Mono\',monospace;font-size:.7rem">';
+    html += '<button class="btn btn-sm btn-primary" onclick="TenantScanPage.compareGitHub()">Compare</button>';
+    html += '</div>';
+    html += '<div id="gh-repo-result"></div>';
+    html += '</div>';
+    return html;
+  }
+
+  function compareGitHub() {
+    if (typeof GitHubTemplates === 'undefined') { showToast('GitHub module not loaded'); return; }
+    GitHubTemplates.compare();
+  }
+
   return {
     init, render, scan, filterWorkload,
     exportFindingsJson, exportFindingsCsv, exportInventoryJson, exportInventoryCsv,
-    deployFix, generateReport,
+    deployFix, generateReport, openAttestation, openCompare, compareGitHub,
     switchTenant, scheduleStart, scheduleStop,
   };
 })();

@@ -65,6 +65,7 @@ const Reports = (() => {
         <label class="rpt-toggle"><input type="checkbox" id="sec-fwdetails" onchange="Reports.preview()"> Framework Details</label>
         <label class="rpt-toggle"><input type="checkbox" id="sec-stratmaturity" onchange="Reports.preview()"> Strategy Maturity</label>
         <label class="rpt-toggle"><input type="checkbox" id="sec-deploystatus" onchange="Reports.preview()"> Deployment Status</label>
+        <label class="rpt-toggle"><input type="checkbox" id="sec-scanfindings" onchange="Reports.preview()"> Tenant Scan Findings</label>
         <label class="rpt-toggle"><input type="checkbox" id="sec-method" onchange="Reports.preview()"> Methodology</label>
       </div>
 
@@ -159,6 +160,7 @@ const Reports = (() => {
     const secFwDetails = checked('sec-fwdetails');
     const secStratMaturity = checked('sec-stratmaturity');
     const secDeployStatus = checked('sec-deploystatus');
+    const secScanFindings = checked('sec-scanfindings');
     const secMethod = checked('sec-method');
 
     const stats = AppState.getScoreStats();
@@ -275,6 +277,8 @@ const Reports = (() => {
         ${secStratMaturity ? renderStrategyMaturitySections(primary, sel) : ''}
 
         ${secDeployStatus ? renderDeployStatusSection(primary) : ''}
+
+        ${secScanFindings ? renderScanFindingsSection(primary) : ''}
 
         ${recommendations ? `
           <div class="rpt-section-head" style="color:${primary};border-bottom:2px solid ${primary}">Recommendations</div>
@@ -407,6 +411,83 @@ const Reports = (() => {
       html += '</tbody></table>';
     });
 
+    return html;
+  }
+
+  // Render Tenant Scan Findings as a section in the assessment report.
+  // Pulls from TenantScanner + Findings if a scan has been run.
+  function renderScanFindingsSection(primary) {
+    if (typeof TenantScanner === 'undefined' || typeof Findings === 'undefined') {
+      return '<div class="rpt-section-head" style="color:' + primary + ';border-bottom:2px solid ' + primary + '">Tenant Scan Findings</div>' +
+             '<div style="font-size:.78rem;color:#6b7280">No tenant scan available — connect a tenant and run a scan to populate this section.</div>';
+    }
+    var scanData = TenantScanner.getScanResults();
+    if (!scanData) {
+      return '<div class="rpt-section-head" style="color:' + primary + ';border-bottom:2px solid ' + primary + '">Tenant Scan Findings</div>' +
+             '<div style="font-size:.78rem;color:#6b7280">No tenant scan available — connect a tenant and run a scan first.</div>';
+    }
+    var analysis = Findings.analyzeAll(scanData);
+    var findings = analysis.findings || [];
+    var counts = analysis.counts || {};
+    var score = analysis.score;
+
+    var sevColour = function (sev) { return ({ critical:'#dc2626', high:'#e84393', medium:'#d97706', low:'#2563eb', info:'#6e7681' }[sev] || '#6e7681'); };
+    var html = '<div class="rpt-section-head" style="color:' + primary + ';border-bottom:2px solid ' + primary + '">Tenant Scan Findings</div>';
+
+    // Provenance + score header
+    html += '<div style="display:flex;align-items:center;gap:18px;margin-bottom:12px;font-size:.74rem;color:#374151">';
+    if (scanData.tenantId) html += '<span><strong>Tenant:</strong> <code>' + escHtml(scanData.tenantId) + '</code></span>';
+    if (scanData.timestamp) html += '<span><strong>Scanned:</strong> ' + escHtml(new Date(scanData.timestamp).toLocaleString()) + '</span>';
+    if (score != null) {
+      var sc = score >= 80 ? '#16a34a' : score >= 60 ? '#d97706' : '#dc2626';
+      html += '<span><strong>Coverage:</strong> <span style="color:' + sc + ';font-weight:600">' + score + ' / 100</span></span>';
+    }
+    html += '</div>';
+
+    // Severity strip
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">';
+    ['critical', 'high', 'medium', 'low', 'info'].forEach(function (sev) {
+      var n = counts[sev] || 0;
+      if (n === 0) return;
+      html += '<span style="background:' + sevColour(sev) + '22;color:' + sevColour(sev) + ';padding:2px 10px;border-radius:10px;font-size:.66rem;font-weight:600;text-transform:uppercase">' +
+              sev + ': ' + n + '</span>';
+    });
+    html += '</div>';
+
+    if (findings.length === 0) {
+      html += '<div style="color:#16a34a;font-size:.78rem">All analyzers ran clean against this tenant.</div>';
+      return html;
+    }
+
+    // Top recommended actions (drop info-level, dedupe, take 10)
+    var recs = findings.filter(function (f) { return f.severity !== 'info'; }).slice(0, 10);
+    if (recs.length > 0) {
+      html += '<div style="margin-bottom:12px;font-size:.74rem;color:#374151"><strong>Top recommended actions</strong></div>';
+      html += '<ol style="font-size:.74rem;color:#374151;line-height:1.6;padding-left:24px">';
+      recs.forEach(function (f) {
+        html += '<li style="margin-bottom:8px"><span style="background:' + sevColour(f.severity) + '22;color:' + sevColour(f.severity) +
+                ';padding:1px 6px;border-radius:8px;font-size:.6rem;font-weight:600;text-transform:uppercase;margin-right:6px">' + f.severity + '</span>';
+        html += '<strong>' + escHtml(f.title) + '</strong>';
+        if (f.remediation) html += '<div style="font-size:.7rem;color:#6b7280;margin-top:2px">' + escHtml(f.remediation) + '</div>';
+        html += '</li>';
+      });
+      html += '</ol>';
+    }
+
+    // By-workload summary table
+    var byWl = {};
+    findings.forEach(function (f) { (byWl[f.workloadLabel] = byWl[f.workloadLabel] || { critical:0, high:0, medium:0, low:0, info:0 })[f.severity || 'info']++; });
+    html += '<table class="rpt-table" style="margin-top:14px"><thead><tr><th style="text-align:left">Workload</th><th>Critical</th><th>High</th><th>Medium</th><th>Low</th><th>Info</th></tr></thead><tbody>';
+    Object.keys(byWl).sort().forEach(function (wl) {
+      var c = byWl[wl];
+      html += '<tr><td style="text-align:left">' + escHtml(wl) + '</td>' +
+              '<td style="color:' + sevColour('critical') + '">' + (c.critical || '') + '</td>' +
+              '<td style="color:' + sevColour('high') + '">' + (c.high || '') + '</td>' +
+              '<td style="color:' + sevColour('medium') + '">' + (c.medium || '') + '</td>' +
+              '<td style="color:' + sevColour('low') + '">' + (c.low || '') + '</td>' +
+              '<td style="color:' + sevColour('info') + '">' + (c.info || '') + '</td></tr>';
+    });
+    html += '</tbody></table>';
     return html;
   }
 
