@@ -324,13 +324,86 @@ const TenantScanPage = (() => {
   }
 
   function renderTemplatesSection(scanData) {
-    const tenantPolicies = scanData && scanData.data && scanData.data.conditionalAccess;
-    if (!Array.isArray(tenantPolicies)) return '';
-
-    // Pull our 18 CA policies from AppState — they're our templates.
     const allPolicies = AppState.get('policies') || [];
+    const data = scanData && scanData.data;
+    if (!data || allPolicies.length === 0) return '';
+
+    const blocks = [];
+    const caBlock      = _matchCATemplates(allPolicies, data);
+    if (caBlock)      blocks.push(caBlock);
+    const intuneBlock  = _matchIntuneTemplates(allPolicies, data);
+    if (intuneBlock)  blocks.push(intuneBlock);
+    const mdeBlock     = _matchMDETemplates(allPolicies, data);
+    if (mdeBlock)     blocks.push(mdeBlock);
+    const spoBlock     = _matchSPOTemplates(allPolicies, data);
+    if (spoBlock)     blocks.push(spoBlock);
+    if (blocks.length === 0) return '';
+
+    // Aggregate counts
+    let totalPresent = 0, totalPartial = 0, totalMissing = 0, totalCount = 0;
+    for (const b of blocks) {
+      totalPresent += b.summary.present;
+      totalPartial += b.summary.partial;
+      totalMissing += b.summary.missing;
+      totalCount   += b.summary.total;
+    }
+    const overall = totalCount > 0 ? Math.round((totalPresent / totalCount) * 100) : 0;
+    const colour = overall >= 70 ? 'var(--green)' : overall >= 40 ? 'var(--amber)' : 'var(--red)';
+
+    let html = '<div class="card" style="padding:16px 20px;margin-bottom:14px">';
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">';
+    html += '<strong style="font-size:.82rem;color:var(--ink)">Best-practice templates — fingerprint match</strong>';
+    html += '<span style="font-size:.66rem;color:var(--ink3)">' + totalPresent + ' present / ' + totalPartial + ' partial / ' + totalMissing + ' missing of ' + totalCount + ' templates · ' + blocks.length + ' workloads</span>';
+    html += '<div style="flex:1"></div>';
+    html += '<span style="font-size:.74rem;font-weight:600;color:' + colour + '">' + overall + '% coverage</span>';
+    html += '</div>';
+    html += '<p style="font-size:.62rem;color:var(--ink4);margin:0 0 14px;line-height:1.6">Each template fingerprint is derived from our deployment-ready catalogue. Tenant policies are scored by structure — naming conventions are ignored. Click a missing row to deploy that template.</p>';
+
+    for (const b of blocks) {
+      html += '<details ' + (b.summary.missing > 0 ? 'open' : '') + ' style="margin-bottom:10px">';
+      html += '<summary style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:6px 0;font-size:.74rem;color:var(--ink2)">';
+      html += '<strong>' + escHtml(b.workload) + '</strong>';
+      html += '<span style="font-size:.62rem;color:var(--ink3)">' + b.summary.present + ' present / ' + b.summary.partial + ' partial / ' + b.summary.missing + ' missing of ' + b.summary.total + '</span>';
+      html += '<div style="flex:1"></div>';
+      const wlScore = b.summary.total > 0 ? Math.round((b.summary.present / b.summary.total) * 100) : 0;
+      const wlColour = wlScore >= 70 ? 'var(--green)' : wlScore >= 40 ? 'var(--amber)' : 'var(--red)';
+      html += '<span style="font-size:.7rem;font-weight:600;color:' + wlColour + '">' + wlScore + '%</span>';
+      html += '</summary>';
+      html += _renderTemplateMatchTable(b.matches);
+      html += '</details>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  function _renderTemplateMatchTable(matches) {
+    let html = '<table style="width:100%;border-collapse:collapse;font-size:.66rem;margin-top:6px">';
+    html += '<thead><tr style="text-align:left;color:var(--ink3);border-bottom:1px solid var(--border)">' +
+            '<th style="padding:6px">Template</th><th style="padding:6px">Status</th><th style="padding:6px">Best match (tenant)</th><th style="padding:6px">Score</th><th style="padding:6px"></th></tr></thead><tbody>';
+    matches.sort((a, b) => {
+      const order = { missing: 0, partial: 1, present: 2 };
+      return order[a.status] - order[b.status] || a.template.id.localeCompare(b.template.id);
+    });
+    for (const m of matches) {
+      const colour = m.status === 'present' ? 'var(--green)' : m.status === 'partial' ? 'var(--amber)' : 'var(--red)';
+      html += '<tr style="border-bottom:1px solid var(--border)">';
+      html += '<td style="padding:6px;color:var(--ink)"><code style="color:var(--ink3)">' + escHtml(m.template.id) + '</code> ' + escHtml(m.template.displayName || '') + '</td>';
+      html += '<td style="padding:6px"><span style="color:' + colour + ';font-weight:600;text-transform:uppercase;font-size:.58rem">' + m.status + '</span></td>';
+      html += '<td style="padding:6px;color:var(--ink3)">' + escHtml(m.matchedTenantPolicy ? (m.matchedTenantPolicy.displayName || m.matchedTenantPolicy.name || m.matchedTenantPolicy.id || '') : '—') + '</td>';
+      html += '<td style="padding:6px;color:var(--ink4)">' + m.score + '%</td>';
+      html += '<td style="padding:6px">' + (m.status === 'missing' ? '<button class="btn btn-sm btn-deploy" onclick="TenantScanPage.deployFix(\'' + escHtml(m.template.id) + '\')">Deploy</button>' : '') + '</td>';
+      html += '</tr>';
+    }
+    html += '</tbody></table>';
+    return html;
+  }
+
+  function _matchCATemplates(allPolicies, data) {
+    const tenantPolicies = data.conditionalAccess;
+    if (!Array.isArray(tenantPolicies)) return null;
     const caTemplates = allPolicies.filter(p => p.type === 'conditional-access');
-    if (caTemplates.length === 0) return '';
+    if (caTemplates.length === 0) return null;
 
     // Each template needs the deployable JSON loaded to extract its fingerprint.
     // We'll do this lazily — for the initial render we score against in-memory
@@ -376,39 +449,184 @@ const TenantScanPage = (() => {
       return { template, status, score: bestScore, matchedTenantPolicy: bestTenant };
     });
 
-    const present = matches.filter(m => m.status === 'present').length;
-    const partial = matches.filter(m => m.status === 'partial').length;
-    const missing = matches.filter(m => m.status === 'missing').length;
-    const coverage = Math.round((present / matches.length) * 100);
+    return {
+      workload: 'Conditional Access',
+      matches: matches,
+      summary: {
+        present: matches.filter(m => m.status === 'present').length,
+        partial: matches.filter(m => m.status === 'partial').length,
+        missing: matches.filter(m => m.status === 'missing').length,
+        total:   matches.length,
+      },
+    };
+  }
 
-    let html = '<div class="card" style="padding:16px 20px;margin-bottom:14px">';
-    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">';
-    html += '<strong style="font-size:.82rem;color:var(--ink)">CA Templates — fingerprint match</strong>';
-    html += '<span style="font-size:.66rem;color:var(--ink3)">' + present + ' present / ' + partial + ' partial / ' + missing + ' missing of ' + matches.length + ' templates</span>';
-    html += '<div style="flex:1"></div>';
-    html += '<span style="font-size:.74rem;font-weight:600;color:' + (coverage >= 70 ? 'var(--green)' : coverage >= 40 ? 'var(--amber)' : 'var(--red)') + '">' + coverage + '% coverage</span>';
-    html += '</div>';
-    html += '<p style="font-size:.62rem;color:var(--ink4);margin:0 0 12px;line-height:1.6">Each template fingerprint is derived from our deployment-ready policy catalogue. We score every tenant CA policy against each fingerprint and report the best match. Naming conventions are ignored — matching is purely by policy structure.</p>';
+  // ── Intune compliance template matching ─────────────────────────────
+  // Match each IN* template against tenant compliancePolicies by platform
+  // and feature requirements (encryption, password, OS minimum version).
+  function _matchIntuneTemplates(allPolicies, data) {
+    const tenantPolicies = data.compliancePolicies;
+    if (!Array.isArray(tenantPolicies)) return null;
+    const intuneTemplates = allPolicies.filter(p => p.type === 'intune');
+    if (intuneTemplates.length === 0) return null;
 
-    html += '<table style="width:100%;border-collapse:collapse;font-size:.66rem">';
-    html += '<thead><tr style="text-align:left;color:var(--ink3);border-bottom:1px solid var(--border)">' +
-            '<th style="padding:6px">Template</th><th style="padding:6px">Status</th><th style="padding:6px">Best match (tenant)</th><th style="padding:6px">Score</th><th style="padding:6px"></th></tr></thead><tbody>';
-    matches.sort((a, b) => {
-      const order = { missing: 0, partial: 1, present: 2 };
-      return order[a.status] - order[b.status] || a.template.id.localeCompare(b.template.id);
-    });
-    for (const m of matches) {
-      const colour = m.status === 'present' ? 'var(--green)' : m.status === 'partial' ? 'var(--amber)' : 'var(--red)';
-      html += '<tr style="border-bottom:1px solid var(--border)">';
-      html += '<td style="padding:6px;color:var(--ink)"><code style="color:var(--ink3)">' + escHtml(m.template.id) + '</code> ' + escHtml(m.template.displayName || '') + '</td>';
-      html += '<td style="padding:6px"><span style="color:' + colour + ';font-weight:600;text-transform:uppercase;font-size:.58rem">' + m.status + '</span></td>';
-      html += '<td style="padding:6px;color:var(--ink3)">' + escHtml(m.matchedTenantPolicy ? (m.matchedTenantPolicy.displayName || m.matchedTenantPolicy.id) : '—') + '</td>';
-      html += '<td style="padding:6px;color:var(--ink4)">' + m.score + '%</td>';
-      html += '<td style="padding:6px">' + (m.status === 'missing' ? '<button class="btn btn-sm btn-deploy" onclick="TenantScanPage.deployFix(\'' + escHtml(m.template.id) + '\')">Deploy</button>' : '') + '</td>';
-      html += '</tr>';
+    function platformOf(odata) {
+      const t = String(odata || '').toLowerCase();
+      if (t.indexOf('windows10') !== -1 || t.indexOf('windows1011') !== -1) return 'windows';
+      if (t.indexOf('macos') !== -1) return 'macos';
+      if (t.indexOf('ios') !== -1) return 'ios';
+      if (t.indexOf('androidwork') !== -1) return 'android-work';
+      if (t.indexOf('android') !== -1) return 'android';
+      return 'unknown';
     }
-    html += '</tbody></table></div>';
-    return html;
+    function platformFromName(name) {
+      const n = (name || '').toLowerCase();
+      if (n.indexOf('windows') !== -1) return 'windows';
+      if (n.indexOf('macos') !== -1 || n.indexOf('mac os') !== -1) return 'macos';
+      if (n.indexOf('ios') !== -1 || n.indexOf('iphone') !== -1) return 'ios';
+      if (n.indexOf('android work') !== -1) return 'android-work';
+      if (n.indexOf('android') !== -1) return 'android';
+      return 'unknown';
+    }
+
+    const matches = intuneTemplates.map(t => {
+      const tPlatform = platformFromName(t.displayName);
+      let bestScore = 0, bestTenant = null;
+      for (const tp of tenantPolicies) {
+        const tpPlatform = platformOf(tp['@odata.type']);
+        let score = 0, total = 100;
+        // 50% — platform matches
+        if (tPlatform === tpPlatform && tPlatform !== 'unknown') score += 50;
+        // 25% — has password / PIN requirement
+        if (tp.passwordRequired || tp.passcodeRequired) score += 25;
+        // 25% — has encryption
+        if (tp.storageRequireEncryption || tp.deviceThreatProtectionEnabled) score += 25;
+        if (score > bestScore) { bestScore = score; bestTenant = tp; }
+      }
+      let status = 'missing';
+      if (bestScore >= 80) status = 'present';
+      else if (bestScore >= 40) status = 'partial';
+      return { template: t, status, score: bestScore, matchedTenantPolicy: bestTenant };
+    });
+
+    return {
+      workload: 'Intune / Device Management',
+      matches,
+      summary: {
+        present: matches.filter(m => m.status === 'present').length,
+        partial: matches.filter(m => m.status === 'partial').length,
+        missing: matches.filter(m => m.status === 'missing').length,
+        total: matches.length,
+      },
+    };
+  }
+
+  // ── Defender for Endpoint template-family matching ────────────────────
+  // Each MDE template is mapped to one of Microsoft's templateFamily
+  // values. A template is "present" if the tenant has at least one
+  // configurationPolicy in that family.
+  function _matchMDETemplates(allPolicies, data) {
+    const tenantPolicies = data.configurationPolicies;
+    if (!Array.isArray(tenantPolicies)) return null;
+    const mdeTemplates = allPolicies.filter(p => p.type === 'defender-endpoint');
+    if (mdeTemplates.length === 0) return null;
+
+    // Map our policy IDs/names to Microsoft templateFamily values.
+    function familyOf(template) {
+      const n = (template.displayName || '').toLowerCase();
+      if (n.indexOf('antivirus') !== -1 || n.indexOf('defender av') !== -1) return 'endpointSecurityAntivirus';
+      if (n.indexOf('attack surface') !== -1 || n.indexOf('asr') !== -1) return 'endpointSecurityAttackSurfaceReduction';
+      if (n.indexOf('edr') !== -1 || n.indexOf('endpoint detection') !== -1) return 'endpointSecurityEndpointDetectionAndResponse';
+      if (n.indexOf('firewall') !== -1) return 'endpointSecurityFirewall';
+      if (n.indexOf('disk encryption') !== -1 || n.indexOf('bitlocker') !== -1 || n.indexOf('filevault') !== -1) return 'endpointSecurityDiskEncryption';
+      if (n.indexOf('account protection') !== -1 || n.indexOf('account protect') !== -1) return 'endpointSecurityAccountProtection';
+      if (n.indexOf('privilege') !== -1) return 'endpointSecurityEndpointPrivilegeManagement';
+      return null;
+    }
+
+    // Pre-index tenant policies by family.
+    const tenantByFamily = {};
+    for (const p of tenantPolicies) {
+      const fam = p.templateReference && p.templateReference.templateFamily;
+      if (!fam) continue;
+      (tenantByFamily[fam] = tenantByFamily[fam] || []).push(p);
+    }
+
+    const matches = mdeTemplates.map(t => {
+      const fam = familyOf(t);
+      let status = 'missing', score = 0, matched = null;
+      if (fam && tenantByFamily[fam] && tenantByFamily[fam].length > 0) {
+        status = 'present'; score = 100; matched = tenantByFamily[fam][0];
+      } else if (!fam) {
+        // Couldn't map the template — show as partial so user can verify
+        status = 'partial'; score = 50;
+      }
+      return { template: t, status, score, matchedTenantPolicy: matched };
+    });
+
+    return {
+      workload: 'Defender for Endpoint',
+      matches,
+      summary: {
+        present: matches.filter(m => m.status === 'present').length,
+        partial: matches.filter(m => m.status === 'partial').length,
+        missing: matches.filter(m => m.status === 'missing').length,
+        total: matches.length,
+      },
+    };
+  }
+
+  // ── SharePoint admin settings template matching ──────────────────────
+  // Most SPO templates set a single tenant-wide property. We check the
+  // sharepointSettings response against the expected value per template.
+  function _matchSPOTemplates(allPolicies, data) {
+    const settings = data.sharepointSettings;
+    if (!settings || typeof settings !== 'object') return null;
+    const spoTemplates = allPolicies.filter(p => p.type === 'sharepoint');
+    if (spoTemplates.length === 0) return null;
+
+    // Map template ID → {prop, expected, mode}
+    // mode 'eq' = strict equality, 'ne' = not equal, 'truthy' = truthy
+    const SPO_EXPECTED = {
+      SPO01: { prop: 'sharingCapability',                       expected: ['existingExternalUserSharingOnly', 'externalUserSharingOnly', 'disabled'], mode: 'in' },
+      SPO02: { prop: 'defaultSharingLinkType',                  expected: ['internal', 'direct'], mode: 'in' },
+      SPO03: { prop: 'anonymousLinkExpirationRestrictionDays',  mode: 'gt0' },
+      SPO07: { prop: 'sharingCapability',                       expected: ['existingExternalUserSharingOnly', 'externalUserSharingOnly'], mode: 'in' },
+      SPO09: { prop: 'isLegacyAuthProtocolsEnabled',            expected: false, mode: 'eq' },
+      SPO13: { prop: 'sharingDomainRestrictionMode',            expected: ['allowList', 'blockList'], mode: 'in' },
+      SPO14: { prop: 'isUnmanagedSyncAppForTenantRestricted',   expected: true,  mode: 'eq' },
+      SPO15: { prop: 'idleSessionSignOut',                      mode: 'enabled' },
+      SPO19: { prop: 'isResharingByExternalUsersEnabled',       expected: false, mode: 'eq' },
+    };
+
+    const matches = spoTemplates.map(t => {
+      const rule = SPO_EXPECTED[t.id];
+      if (!rule) return { template: t, status: 'partial', score: 50, matchedTenantPolicy: null };
+      const v = settings[rule.prop];
+      let ok = false;
+      if (rule.mode === 'eq')      ok = (v === rule.expected);
+      else if (rule.mode === 'in') ok = (rule.expected.indexOf(v) !== -1);
+      else if (rule.mode === 'gt0') ok = (typeof v === 'number' && v > 0);
+      else if (rule.mode === 'enabled') ok = !!(v && v.isEnabled);
+      const status = ok ? 'present' : 'missing';
+      return {
+        template: t,
+        status,
+        score: ok ? 100 : 0,
+        matchedTenantPolicy: ok ? { displayName: 'Tenant setting: ' + rule.prop + ' = ' + JSON.stringify(v) } : null,
+      };
+    });
+
+    return {
+      workload: 'SharePoint / OneDrive',
+      matches,
+      summary: {
+        present: matches.filter(m => m.status === 'present').length,
+        partial: matches.filter(m => m.status === 'partial').length,
+        missing: matches.filter(m => m.status === 'missing').length,
+        total: matches.length,
+      },
+    };
   }
 
   // ── Drift section ────────────────────────────────────────────────────
