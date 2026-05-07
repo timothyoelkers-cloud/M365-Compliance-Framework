@@ -86,17 +86,38 @@ const Policies = (() => {
       const scanData = TenantScanner.getScanResults();
       const agoText = scanData ? timeSince(scanData.timestamp) : '';
 
+      // Run analyzers (cheap — no network).
+      const analysis = (typeof Findings !== 'undefined' && scanData)
+        ? Findings.analyzeAll(scanData) : null;
+
       html += `<div class="scan-summary-bar">
-        <strong style="font-size:.74rem;color:var(--ink)">Tenant Scan</strong>
-        <span class="scan-stat"><span class="dot dot-green"></span> ${summary.configured} Configured</span>
+        <strong style="font-size:.74rem;color:var(--ink)">Tenant Scan</strong>`;
+      if (analysis && analysis.score !== null) {
+        const colour = analysis.score >= 80 ? 'var(--green)' :
+                       analysis.score >= 60 ? 'var(--amber)' : 'var(--red)';
+        html += `<span class="scan-stat" style="color:${colour}"><strong>${analysis.score}</strong>/100 Coverage</span>`;
+      }
+      html += `<span class="scan-stat"><span class="dot dot-green"></span> ${summary.configured} Configured</span>
         <span class="scan-stat"><span class="dot dot-red"></span> ${summary.missing} Missing</span>
-        <span class="scan-stat"><span class="dot dot-amber"></span> ${summary.manual} Manual Check</span>
-        ${summary.error > 0 ? `<span class="scan-stat" style="color:var(--red)">${summary.error} errors</span>` : ''}
+        <span class="scan-stat"><span class="dot dot-amber"></span> ${summary.manual} Manual Check</span>`;
+      if (analysis && analysis.findings.length) {
+        const c = analysis.counts;
+        const showCount = c.critical + c.high + c.medium + c.low;
+        html += `<span class="scan-stat" style="color:var(--amber)">${showCount} Findings</span>`;
+      }
+      html += `${summary.error > 0 ? `<span class="scan-stat" style="color:var(--red)">${summary.error} errors</span>` : ''}
         <div style="flex:1"></div>
         <span style="font-size:.62rem;color:var(--ink4)">${agoText}</span>
+        <button class="btn btn-sm" onclick="Policies.toggleFindings()">View Findings</button>
         <button class="btn btn-sm" onclick="Policies.toggleInventory()">View Inventory</button>
         <button class="btn btn-sm" onclick="Policies.scanTenant()" ${TenantScanner.isScanning() ? 'disabled' : ''}>Re-scan</button>
       </div>`;
+
+      // Findings panel — severity-ranked issues from the analyzers.
+      const showFindings = AppState.get('showFindings');
+      if (showFindings && analysis) {
+        html += renderFindingsPanel(analysis);
+      }
 
       // Inventory panel — renders the actual configuration found in the
       // tenant, decoupled from our 143-policy catalogue. Hidden by default.
@@ -669,6 +690,113 @@ const Policies = (() => {
     return html;
   }
 
+  // ─── Findings panel ────────────────────────────────────────────────
+  // Severity-grouped list of analyzer findings (CA, Intune, Entra, SPO).
+
+  function renderFindingsPanel(analysis) {
+    if (!analysis) return '';
+    const findings = analysis.findings || [];
+    const counts = analysis.counts || {};
+    const score = analysis.score;
+
+    if (!findings.length) {
+      return '<div class="card" style="padding:14px;font-size:.7rem;color:var(--ink3)">No findings — every analyzer ran clean.</div>';
+    }
+
+    // Header strip
+    let html = '<div class="card" style="padding:16px 18px;margin:8px 0 16px">';
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap">';
+    html += '<strong style="font-size:.82rem;color:var(--ink)">Findings</strong>';
+    if (score !== null) {
+      const sColour = score >= 80 ? 'var(--green)' : score >= 60 ? 'var(--amber)' : 'var(--red)';
+      html += '<span style="font-size:.7rem;color:var(--ink2)">Coverage Score: <strong style="color:' + sColour + ';font-size:.82rem">' + score + '</strong>/100</span>';
+    }
+    html += '<div style="flex:1"></div>';
+    html += '<button class="btn btn-sm" onclick="Policies.exportFindingsJson()">Export JSON</button>';
+    html += '<button class="btn btn-sm" onclick="Policies.exportFindingsCsv()">Export CSV</button>';
+    html += '<button class="btn btn-sm" onclick="Policies.toggleFindings()">Hide</button>';
+    html += '</div>';
+
+    // Severity strip
+    html += '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;font-size:.66rem">';
+    ['critical', 'high', 'medium', 'low', 'info'].forEach(sev => {
+      const def = Findings.SEVERITY[sev];
+      const count = counts[sev] || 0;
+      if (count === 0) return;
+      html += '<span style="background:' + def.colour + '22;color:' + def.colour + ';padding:2px 8px;border-radius:10px;font-weight:600">' +
+              def.label + ': ' + count + '</span>';
+    });
+    html += '</div>';
+
+    // Group by workload
+    const byWorkload = {};
+    for (const f of findings) {
+      (byWorkload[f.workloadLabel] = byWorkload[f.workloadLabel] || []).push(f);
+    }
+
+    for (const wl of Object.keys(byWorkload).sort()) {
+      const list = byWorkload[wl];
+      html += '<div style="font-size:.7rem;font-weight:600;color:var(--ink2);margin:14px 0 6px;letter-spacing:.5px;text-transform:uppercase">' + escHtml(wl) + ' (' + list.length + ')</div>';
+      for (const f of list) {
+        const sevDef = Findings.SEVERITY[f.severity] || Findings.SEVERITY.info;
+        html += '<details style="margin:0 0 6px;background:var(--surface2);border-left:3px solid ' + sevDef.colour + ';border-radius:6px;padding:8px 10px">';
+        html += '<summary style="cursor:pointer;list-style:auto;font-size:.7rem;color:var(--ink)">';
+        html += '<span style="background:' + sevDef.colour + '22;color:' + sevDef.colour + ';padding:1px 6px;border-radius:8px;font-size:.58rem;font-weight:600;margin-right:8px;text-transform:uppercase">' + sevDef.label + '</span>';
+        html += '<strong>' + escHtml(f.title) + '</strong>';
+        html += '</summary>';
+        if (f.description) html += '<p style="margin:6px 0 6px;font-size:.66rem;color:var(--ink2);line-height:1.6">' + escHtml(f.description) + '</p>';
+        if (f.remediation) html += '<p style="margin:6px 0 6px;font-size:.66rem;color:var(--ink3);line-height:1.6"><strong>Remediation:</strong> ' + escHtml(f.remediation) + '</p>';
+        if (f.refs && f.refs.length) html += '<div style="font-size:.6rem;color:var(--ink4);margin-top:6px">Related: ' + f.refs.map(r => '<code>' + escHtml(r) + '</code>').join(', ') + '</div>';
+        html += '</details>';
+      }
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  function toggleFindings() {
+    AppState.set('showFindings', !AppState.get('showFindings'));
+    render();
+  }
+
+  function _buildAnalysis() {
+    if (typeof Findings === 'undefined') return null;
+    return Findings.analyzeAll(TenantScanner.getScanResults());
+  }
+
+  function exportFindingsJson() {
+    const a = _buildAnalysis();
+    if (!a || !a.findings.length) { showToast('No findings to export'); return; }
+    const blob = new Blob([JSON.stringify(a, null, 2)], { type: 'application/json' });
+    _downloadBlob(blob, 'findings-' + Date.now() + '.json');
+    showToast('Findings JSON downloaded');
+  }
+
+  function exportFindingsCsv() {
+    const a = _buildAnalysis();
+    if (!a || !a.findings.length) { showToast('No findings to export'); return; }
+    const headers = ['Severity', 'Workload', 'Title', 'Description', 'Remediation', 'Refs', 'RuleId'];
+    const rows = [headers.join(',')];
+    for (const f of a.findings) {
+      rows.push([
+        f.severity, f.workloadLabel, f.title, f.description || '', f.remediation || '',
+        (f.refs || []).join('; '), f.id || '',
+      ].map(_csvCell).join(','));
+    }
+    const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+    _downloadBlob(blob, 'findings-' + Date.now() + '.csv');
+    showToast('Findings CSV downloaded');
+  }
+
+  function _csvCell(v) {
+    var s = String(v == null ? '' : v);
+    if (s.indexOf(',') > -1 || s.indexOf('"') > -1 || s.indexOf('\n') > -1) {
+      s = '"' + s.replace(/"/g, '""') + '"';
+    }
+    return s;
+  }
+
   // ─── Tenant Inventory panel ────────────────────────────────────────
   // Renders a clean per-source inventory of the actual configuration
   // detected in the tenant, plus JSON / CSV export buttons.
@@ -792,5 +920,6 @@ const Policies = (() => {
     generateScript, downloadScriptBundle,
     deployViaCloudShell,
     toggleInventory, exportInventoryJson, exportInventoryCsv,
+    toggleFindings, exportFindingsJson, exportFindingsCsv,
   };
 })();
