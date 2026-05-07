@@ -198,6 +198,59 @@
       refs: [],
     });
 
+    // ── Break-glass account analysis ─────────────────────────────────
+    // Aggregate every excluded user / group / role across all CA policies.
+    // If the entire tenant has zero exclusions, that's a tenant-lockout risk.
+
+    const excludedUsers  = new Set();
+    const excludedGroups = new Set();
+    const excludedRoles  = new Set();
+    for (const p of policies) {
+      const u = (p.conditions && p.conditions.users) || {};
+      (u.excludeUsers  || []).forEach(x => excludedUsers.add(x));
+      (u.excludeGroups || []).forEach(x => excludedGroups.add(x));
+      (u.excludeRoles  || []).forEach(x => excludedRoles.add(x));
+    }
+    const totalExclusions = excludedUsers.size + excludedGroups.size + excludedRoles.size;
+
+    if (enabled.length > 0 && totalExclusions === 0) {
+      findings.push({
+        ruleId: 'no-break-glass',
+        severity: 'critical',
+        title: 'No break-glass / emergency-access exclusions across any CA policy',
+        description: 'Not a single Conditional Access policy in this tenant excludes any user, group, or role. A misconfigured policy (or a service outage) can lock out every administrator with no recovery path.',
+        remediation: 'Create at least two cloud-only break-glass accounts (passwordless preferred). Add them to a "Break Glass Accounts" security group. Exclude that group from every block-and-MFA policy. Document the accounts with monitored-alert sign-in detection.',
+        refs: ['CA02', 'CA03'],
+      });
+    } else if (enabled.length > 0 && totalExclusions < 2) {
+      findings.push({
+        ruleId: 'thin-break-glass',
+        severity: 'high',
+        title: 'Only ' + totalExclusions + ' exclusion across all CA policies — limited break-glass coverage',
+        description: 'Microsoft\'s recommendation is at least two break-glass accounts (one isolated from the other) excluded from all enforcing CA policies. If your single excluded principal is unavailable, the tenant locks out.',
+        remediation: 'Provision a second break-glass account in a separate naming scheme. Include both in a security group excluded from your block / MFA policies.',
+        refs: [],
+      });
+    } else if (enabled.length > 0) {
+      // Inventory: surface what we found so the customer can sanity-check.
+      const all = []
+        .concat(Array.from(excludedUsers).map(x => 'user: ' + x))
+        .concat(Array.from(excludedGroups).map(x => 'group: ' + x))
+        .concat(Array.from(excludedRoles).map(x => 'role: ' + x));
+      findings.push({
+        ruleId: 'break-glass-inventory',
+        severity: 'info',
+        title: totalExclusions + ' principal' + (totalExclusions > 1 ? 's' : '') + ' excluded across CA policies',
+        description: 'Aggregated exclusions detected: ' +
+          (excludedUsers.size  > 0 ? excludedUsers.size  + ' user' + (excludedUsers.size  > 1 ? 's' : '') + ' / ' : '') +
+          (excludedGroups.size > 0 ? excludedGroups.size + ' group' + (excludedGroups.size > 1 ? 's' : '') + ' / ' : '') +
+          (excludedRoles.size  > 0 ? excludedRoles.size  + ' role' + (excludedRoles.size  > 1 ? 's' : '') : '').replace(/ \/ $/, '') +
+          '. Verify that these include your designated break-glass accounts and that the tenant is monitored for sign-ins from them.',
+        remediation: '',
+        refs: all.slice(0, 10),
+      });
+    }
+
     return findings;
   });
 })();

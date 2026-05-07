@@ -53,11 +53,257 @@ const TenantScanPage = (() => {
     let html = '';
     html += renderProvenance(scanData);
     html += renderDashboard(scanData, analysis);
+    html += renderTrendSection();
     html += renderRecommendedActions(analysis);
+    html += renderFrameworkAlignmentSection();
+    html += renderCAFlowCardsSection(scanData);
     html += renderFindingsSection(analysis);
     html += renderInventorySection(scanData);
 
     root.innerHTML = html;
+
+    // Persist this scan into history for the trend chart (idempotent — same
+    // tenantId + same timestamp won't add a duplicate).
+    if (typeof ScanHistory !== 'undefined' && ScanHistory.saveScan && analysis) {
+      try {
+        ScanHistory.saveScan(scanData, AppState.get('tenantScanResults') || {}, analysis.counts || {}, analysis.score);
+      } catch (e) { /* non-fatal */ }
+    }
+
+    // Async-populate the trend chart from IndexedDB (non-blocking).
+    setTimeout(() => _loadTrendChart().catch(e => console.warn('[Scan] trend load failed:', e)), 50);
+  }
+
+  // ── Framework Alignment layer ────────────────────────────────────────
+
+  function renderFrameworkAlignmentSection() {
+    if (typeof FrameworkAlignment === 'undefined') return '';
+    const alignment = FrameworkAlignment.computeAlignment();
+    if (!alignment) return '';
+
+    let html = '<div class="card" style="padding:16px 20px;margin-bottom:14px">';
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">';
+    html += '<strong style="font-size:.82rem;color:var(--ink)">Framework Alignment</strong>';
+    html += '<span style="font-size:.66rem;color:var(--ink3)">' +
+      alignment.overall.configured + ' of ' + alignment.overall.total + ' CIS controls configured · overall ' + alignment.overall.score + '%</span>';
+    html += '</div>';
+    html += '<p style="font-size:.66rem;color:var(--ink3);margin:0 0 14px;line-height:1.6">A CIS control is "configured" when at least one policy mapped to it has been detected as configured in the scan. Frameworks are sorted by alignment score.</p>';
+
+    for (const f of alignment.byFramework) {
+      const colour = f.score >= 80 ? 'var(--green)' : f.score >= 50 ? 'var(--amber)' : 'var(--red)';
+      html += '<details style="margin-bottom:6px">';
+      html += '<summary style="cursor:pointer;display:flex;align-items:center;gap:10px;padding:6px 0">';
+      html += '<span style="width:200px;color:var(--ink2);font-size:.7rem;flex-shrink:0">' + escHtml(f.framework) + '</span>';
+      html += '<div style="flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;display:flex">';
+      html += '<div style="background:var(--green);width:' + (f.configured / f.total * 100) + '%" title="' + f.configured + ' configured"></div>';
+      html += '<div style="background:var(--amber);width:' + (f.manual    / f.total * 100) + '%" title="' + f.manual    + ' manual check"></div>';
+      html += '<div style="background:var(--red);width:'   + (f.missing   / f.total * 100) + '%" title="' + f.missing   + ' missing"></div>';
+      html += '</div>';
+      html += '<span style="width:60px;text-align:right;color:' + colour + ';font-weight:600;font-size:.7rem">' + f.score + '%</span>';
+      html += '<span style="width:90px;text-align:right;color:var(--ink4);font-size:.6rem">' + f.configured + ' / ' + f.total + '</span>';
+      html += '</summary>';
+      // Collapsed-detail: list controls grouped by status
+      const groups = { missing: [], manual: [], configured: [] };
+      for (const c of f.controls) {
+        if (groups[c.status]) groups[c.status].push(c);
+      }
+      html += '<div style="padding:8px 12px;background:var(--surface2);border-radius:4px;margin-top:4px">';
+      ['missing', 'manual', 'configured'].forEach(g => {
+        if (!groups[g].length) return;
+        html += '<div style="font-size:.62rem;font-weight:600;color:var(--ink3);text-transform:uppercase;margin:6px 0 2px">' + g + ' (' + groups[g].length + ')</div>';
+        html += '<div style="display:flex;flex-wrap:wrap;gap:4px">';
+        for (const c of groups[g].slice(0, 50)) {
+          html += '<span class="badge badge-dark" style="font-size:.58rem" title="' + escHtml(c.name) + '">' + escHtml(c.id) + '</span>';
+        }
+        if (groups[g].length > 50) html += '<span style="font-size:.58rem;color:var(--ink4);align-self:center">+' + (groups[g].length - 50) + ' more</span>';
+        html += '</div>';
+      });
+      html += '</div></details>';
+    }
+
+    html += '</div>';
+    return html;
+  }
+
+  // ── CA Flow Cards layer ──────────────────────────────────────────────
+  // Per-policy visual breakdown: Users → Conditions → Apps → Controls.
+
+  function renderCAFlowCardsSection(scanData) {
+    const policies = scanData && scanData.data && scanData.data.conditionalAccess;
+    if (!Array.isArray(policies) || policies.length === 0) return '';
+
+    let html = '<div class="card" style="padding:16px 20px;margin-bottom:14px">';
+    html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">';
+    html += '<strong style="font-size:.82rem;color:var(--ink)">Conditional Access — flow cards</strong>';
+    html += '<span style="font-size:.66rem;color:var(--ink3)">' + policies.length + ' policies</span>';
+    html += '</div>';
+
+    const sorted = policies.slice().sort((a, b) => {
+      const order = { enabled: 0, enabledForReportingButNotEnforced: 1, disabled: 2 };
+      return (order[a.state] || 99) - (order[b.state] || 99);
+    });
+
+    for (const p of sorted) html += renderCACard(p);
+    html += '</div>';
+    return html;
+  }
+
+  function renderCACard(p) {
+    const grant = (p.grantControls && p.grantControls.builtInControls) || [];
+    const session = p.sessionControls || {};
+    const isBlock = grant.indexOf('block') !== -1;
+    const stateColour = p.state === 'enabled'
+      ? (isBlock ? 'var(--red)' : 'var(--green)')
+      : p.state === 'enabledForReportingButNotEnforced' ? 'var(--amber)'
+      : 'var(--ink4)';
+    const stateLabel = p.state === 'enabledForReportingButNotEnforced' ? 'Report-only' :
+                       p.state === 'enabled' ? 'Enabled' : 'Disabled';
+
+    const conds = p.conditions || {};
+    const usersC = conds.users || {};
+    const appsC = conds.applications || {};
+
+    function fmtIds(arr, max) {
+      if (!Array.isArray(arr) || arr.length === 0) return '—';
+      if (max && arr.length > max) return arr.slice(0, max).join(', ') + ' (+' + (arr.length - max) + ' more)';
+      return arr.join(', ');
+    }
+    function userTargetText() {
+      const inc = usersC.includeUsers || [];
+      const incRoles = usersC.includeRoles || [];
+      const incGroups = usersC.includeGroups || [];
+      const parts = [];
+      if (inc.indexOf('All') !== -1) parts.push('All users');
+      else if (inc.length) parts.push(inc.length + ' user' + (inc.length > 1 ? 's' : ''));
+      if (incRoles.length) parts.push(incRoles.length + ' role' + (incRoles.length > 1 ? 's' : ''));
+      if (incGroups.length) parts.push(incGroups.length + ' group' + (incGroups.length > 1 ? 's' : ''));
+      return parts.length ? parts.join(' + ') : '(none)';
+    }
+    function appTargetText() {
+      const inc = appsC.includeApplications || [];
+      const actions = appsC.includeUserActions || [];
+      if (inc.indexOf('All') !== -1) return 'All apps';
+      if (actions.length) return 'User action: ' + actions.join(', ');
+      if (inc.length) return inc.length + ' app(s)';
+      return '(none)';
+    }
+    function controlsText() {
+      const out = [];
+      if (isBlock) out.push('Block');
+      if (grant.indexOf('mfa') !== -1) out.push('MFA');
+      if (grant.indexOf('compliantDevice') !== -1) out.push('Compliant device');
+      if (grant.indexOf('domainJoinedDevice') !== -1) out.push('Hybrid join');
+      if (grant.indexOf('approvedApplication') !== -1) out.push('Approved app');
+      if (grant.indexOf('compliantApplication') !== -1) out.push('App protection');
+      if (grant.indexOf('passwordChange') !== -1) out.push('Password change');
+      if (p.grantControls && p.grantControls.authenticationStrength) out.push('Auth strength: ' + p.grantControls.authenticationStrength.displayName);
+      if (session.signInFrequency) out.push('Sign-in frequency');
+      if (session.persistentBrowser) out.push('Persistent browser');
+      if (session.cloudAppSecurity) out.push('Defender for Cloud Apps');
+      return out.length ? out.join(' · ') : '(none)';
+    }
+    function condText() {
+      const out = [];
+      const cat = (conds.clientAppTypes || []).filter(x => x !== 'all');
+      if (cat.length) out.push('Client: ' + cat.join(','));
+      const sr = conds.signInRiskLevels || [];
+      if (sr.length) out.push('Sign-in risk: ' + sr.join(','));
+      const ur = conds.userRiskLevels || [];
+      if (ur.length) out.push('User risk: ' + ur.join(','));
+      const plat = conds.platforms;
+      if (plat && (plat.includePlatforms || []).length) out.push('Platforms: ' + plat.includePlatforms.join(','));
+      const loc = conds.locations;
+      if (loc && (loc.includeLocations || []).length) out.push('Locations: ' + (loc.includeLocations.length === 1 && loc.includeLocations[0] === 'All' ? 'All' : loc.includeLocations.length + ' named'));
+      return out.length ? out.join(' · ') : '(no extra conditions)';
+    }
+
+    const exclusionCount = (usersC.excludeUsers || []).length + (usersC.excludeGroups || []).length + (usersC.excludeRoles || []).length;
+
+    let html = '<div style="background:var(--surface2);border-left:3px solid ' + stateColour + ';border-radius:6px;padding:10px 14px;margin-bottom:8px">';
+    html += '<div style="display:flex;align-items:flex-start;gap:10px;margin-bottom:6px;flex-wrap:wrap">';
+    html += '<strong style="font-size:.74rem;color:var(--ink);flex:1;min-width:0">' + escHtml(p.displayName || '(unnamed)') + '</strong>';
+    html += '<span style="background:' + stateColour + '22;color:' + stateColour + ';padding:1px 7px;border-radius:8px;font-size:.56rem;font-weight:600;text-transform:uppercase">' + stateLabel + '</span>';
+    if (isBlock) html += '<span style="background:var(--red)22;color:var(--red);padding:1px 7px;border-radius:8px;font-size:.56rem;font-weight:600;text-transform:uppercase">Block</span>';
+    if (exclusionCount > 0) html += '<span style="background:var(--ink4)22;color:var(--ink3);padding:1px 7px;border-radius:8px;font-size:.56rem">' + exclusionCount + ' exclusion' + (exclusionCount > 1 ? 's' : '') + '</span>';
+    else if (isBlock) html += '<span style="background:var(--red)22;color:var(--red);padding:1px 7px;border-radius:8px;font-size:.56rem;font-weight:600">No exclusions ⚠</span>';
+    html += '</div>';
+
+    // Flow row: Users → Conditions → Apps → Controls
+    html += '<div style="display:flex;gap:8px;align-items:stretch;flex-wrap:wrap;font-size:.62rem">';
+    function box(label, value, colour) {
+      return '<div style="flex:1;min-width:140px;background:var(--surface);border:1px solid var(--border);border-radius:4px;padding:6px 8px">' +
+        '<div style="font-size:.54rem;color:' + (colour || 'var(--ink4)') + ';text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px">' + label + '</div>' +
+        '<div style="color:var(--ink2);line-height:1.5">' + escHtml(value) + '</div>' +
+        '</div>';
+    }
+    html += box('Who', userTargetText(), 'var(--blue)');
+    html += '<div style="align-self:center;color:var(--ink4)">→</div>';
+    html += box('When (conditions)', condText());
+    html += '<div style="align-self:center;color:var(--ink4)">→</div>';
+    html += box('Where (apps)', appTargetText());
+    html += '<div style="align-self:center;color:var(--ink4)">→</div>';
+    html += box('Result', controlsText(), isBlock ? 'var(--red)' : 'var(--green)');
+    html += '</div>';
+    html += '</div>';
+    return html;
+  }
+
+  // ── Trend chart layer ────────────────────────────────────────────────
+
+  function renderTrendSection() {
+    // Render placeholder; populate async (IndexedDB read)
+    return '<div class="card" id="scan-trend-card" style="padding:16px 20px;margin-bottom:14px;display:none"></div>';
+  }
+
+  async function _loadTrendChart() {
+    const card = document.getElementById('scan-trend-card');
+    if (!card) return;
+    if (typeof ScanHistory === 'undefined' || !ScanHistory.getScans) return;
+    const acct = TenantAuth.getAccount();
+    if (!acct) return;
+    const scans = await ScanHistory.getScans(acct.tenantId, 30);
+    if (!scans || scans.length < 2) return;  // need at least 2 points for a trend
+
+    // Build score-over-time data (oldest first)
+    const points = scans.slice().reverse().map(s => ({ ts: s.timestamp, score: s.score || 0 }));
+    const minScore = Math.min(...points.map(p => p.score), 0);
+    const maxScore = Math.max(...points.map(p => p.score), 100);
+    const range = Math.max(maxScore - minScore, 1);
+
+    const w = 600, h = 80, pad = 4;
+    const stepX = (w - pad * 2) / Math.max(points.length - 1, 1);
+    const path = points.map((p, i) => {
+      const x = pad + i * stepX;
+      const y = h - pad - ((p.score - minScore) / range) * (h - pad * 2);
+      return (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
+    }).join(' ');
+
+    const last = points[points.length - 1];
+    const prev = points[points.length - 2];
+    const delta = last.score - prev.score;
+    const deltaText = delta > 0 ? '+' + delta : String(delta);
+    const deltaColour = delta > 0 ? 'var(--green)' : delta < 0 ? 'var(--red)' : 'var(--ink3)';
+
+    let html = '<div style="display:flex;align-items:center;gap:14px;margin-bottom:8px;flex-wrap:wrap">';
+    html += '<strong style="font-size:.82rem;color:var(--ink)">Coverage trend</strong>';
+    html += '<span style="font-size:.66rem;color:var(--ink3)">' + scans.length + ' historical scans</span>';
+    html += '<span style="font-size:.66rem;color:' + deltaColour + ';font-weight:600">' + deltaText + ' since previous</span>';
+    html += '</div>';
+    html += '<svg viewBox="0 0 ' + w + ' ' + h + '" style="width:100%;height:80px;display:block">';
+    html += '<path d="' + path + '" stroke="var(--blue)" stroke-width="2" fill="none" />';
+    points.forEach((p, i) => {
+      const x = pad + i * stepX;
+      const y = h - pad - ((p.score - minScore) / range) * (h - pad * 2);
+      html += '<circle cx="' + x.toFixed(1) + '" cy="' + y.toFixed(1) + '" r="3" fill="var(--blue)"><title>' + new Date(p.ts).toLocaleString() + ': ' + p.score + '/100</title></circle>';
+    });
+    html += '</svg>';
+    html += '<div style="display:flex;justify-content:space-between;font-size:.58rem;color:var(--ink4);margin-top:4px">' +
+      '<span>' + new Date(points[0].ts).toLocaleDateString() + '</span>' +
+      '<span>' + new Date(last.ts).toLocaleDateString() + '</span>' +
+      '</div>';
+
+    card.innerHTML = html;
+    card.style.display = 'block';
   }
 
   // ── Provenance bar ────────────────────────────────────────────────
