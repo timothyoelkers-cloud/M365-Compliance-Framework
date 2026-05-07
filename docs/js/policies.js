@@ -86,7 +86,8 @@ const Policies = (() => {
       const scanData = TenantScanner.getScanResults();
       const agoText = scanData ? timeSince(scanData.timestamp) : '';
 
-      // Run analyzers (cheap — no network).
+      // Compact summary — full analysis (Findings/Inventory/Coverage Score)
+      // lives on the dedicated Scan tab now.
       const analysis = (typeof Findings !== 'undefined' && scanData)
         ? Findings.analyzeAll(scanData) : null;
 
@@ -108,23 +109,9 @@ const Policies = (() => {
       html += `${summary.error > 0 ? `<span class="scan-stat" style="color:var(--red)">${summary.error} errors</span>` : ''}
         <div style="flex:1"></div>
         <span style="font-size:.62rem;color:var(--ink4)">${agoText}</span>
-        <button class="btn btn-sm" onclick="Policies.toggleFindings()">View Findings</button>
-        <button class="btn btn-sm" onclick="Policies.toggleInventory()">View Inventory</button>
+        <button class="btn btn-sm btn-primary" onclick="Router.navigate('tenant-scan')">Open Scan tab</button>
         <button class="btn btn-sm" onclick="Policies.scanTenant()" ${TenantScanner.isScanning() ? 'disabled' : ''}>Re-scan</button>
       </div>`;
-
-      // Findings panel — severity-ranked issues from the analyzers.
-      const showFindings = AppState.get('showFindings');
-      if (showFindings && analysis) {
-        html += renderFindingsPanel(analysis);
-      }
-
-      // Inventory panel — renders the actual configuration found in the
-      // tenant, decoupled from our 143-policy catalogue. Hidden by default.
-      const showInventory = AppState.get('showInventory');
-      if (showInventory) {
-        html += renderInventoryPanel(scanData);
-      }
     }
 
     // ── Scan progress bar ──

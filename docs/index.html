@@ -176,6 +176,7 @@
     <a class="nav-link active" data-page="home" onclick="Router.navigate('home')">Home</a>
     <a class="nav-link" data-page="assessment" onclick="Router.navigate('assessment')">Assessment</a>
     <a class="nav-link" data-page="dashboard" onclick="Router.navigate('dashboard')">Dashboard</a>
+    <a class="nav-link" data-page="tenant-scan" onclick="Router.navigate('tenant-scan')">Scan</a>
     <a class="nav-link" data-page="policies" onclick="Router.navigate('policies')">
       Policies <span class="nav-count" id="nav-policy-count">143</span>
     </a>
@@ -270,6 +271,15 @@
         <button class="btn btn-sm" onclick="Dashboard.render()">Refresh</button>
       </div>
       <div id="dashboard-content"></div>
+    </section>
+
+    <!-- ── TENANT SCAN PAGE ──────────────── -->
+    <section id="page-tenant-scan" class="page">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+        <h2>Tenant Scan</h2>
+        <span style="font-size:.875rem;color:var(--ink2)">Live analysis of the connected M365 tenant</span>
+      </div>
+      <div id="tenant-scan-content"></div>
     </section>
 
     <!-- ── POLICIES PAGE ─────────────────── -->
@@ -398,6 +408,7 @@
 <script src="js/analyzers/sharepoint-analyzer.js"></script>
 <script src="js/analyzers/defender-endpoint-analyzer.js"></script>
 <script src="js/analyzers/purview-analyzer.js"></script>
+<script src="js/tenant-scan-page.js"></script>
 <script src="js/policy-matcher.js"></script>
 <script src="js/scan-diff.js"></script>
 <script src="js/ps-verify.js"></script>
@@ -576,6 +587,7 @@ async function bootstrap() {
     Router.register('home', () => { renderHomeSidebar(); renderHomeProfiles(); renderHomeFwGroups(); });
     Router.register('assessment', () => { Assessment.init(); });
     Router.register('dashboard', () => { Dashboard.init(); });
+    Router.register('tenant-scan', () => { TenantScanPage.init(); });
     Router.register('policies', () => { Policies.init(); });
     Router.register('reports', () => { Reports.init(); });
 
