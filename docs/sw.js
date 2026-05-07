@@ -4,7 +4,7 @@
    stale-while-revalidate for data JSON,
    network-only for auth/Graph API
 ═══════════════════════════════════════════ */
-var CACHE_NAME = 'm365-compliance-v42';
+var CACHE_NAME = 'm365-compliance-v43';
 
 var STATIC_ASSETS = [
   './',
@@ -34,6 +34,7 @@ var STATIC_ASSETS = [
   './js/analyzers/purview-analyzer.js',
   './js/analyzers/defender-o365-analyzer.js',
   './js/framework-alignment.js',
+  './js/scan-report.js',
   './js/tenant-scan-page.js',
   './js/policy-matcher.js',
   './js/scan-diff.js',

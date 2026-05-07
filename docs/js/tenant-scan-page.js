@@ -54,6 +54,7 @@ const TenantScanPage = (() => {
     html += renderProvenance(scanData);
     html += renderDashboard(scanData, analysis);
     html += renderTrendSection();
+    html += renderDriftSection();          // 🆕
     html += renderRecommendedActions(analysis);
     html += renderFrameworkAlignmentSection();
     html += renderCAFlowCardsSection(scanData);
@@ -70,8 +71,9 @@ const TenantScanPage = (() => {
       } catch (e) { /* non-fatal */ }
     }
 
-    // Async-populate the trend chart from IndexedDB (non-blocking).
+    // Async-populate trend chart + drift card from IndexedDB (non-blocking).
     setTimeout(() => _loadTrendChart().catch(e => console.warn('[Scan] trend load failed:', e)), 50);
+    setTimeout(() => _loadDriftCard().catch(e => console.warn('[Scan] drift load failed:', e)), 75);
   }
 
   // ── Framework Alignment layer ────────────────────────────────────────
@@ -248,6 +250,100 @@ const TenantScanPage = (() => {
     return html;
   }
 
+  // ── Drift section ────────────────────────────────────────────────────
+  // Compares the current scan against the previous scan stored in IndexedDB.
+  // Renders a placeholder card; populated async by _loadDriftCard().
+  function renderDriftSection() {
+    return '<div class="card" id="scan-drift-card" style="padding:16px 20px;margin-bottom:14px;display:none"></div>';
+  }
+
+  async function _loadDriftCard() {
+    const card = document.getElementById('scan-drift-card');
+    if (!card) return;
+    if (typeof ScanHistory === 'undefined' || !ScanHistory.getScans) return;
+    const acct = TenantAuth.getAccount();
+    if (!acct) return;
+    const scans = await ScanHistory.getScans(acct.tenantId, 2);
+    if (!scans || scans.length < 2) return;  // no previous scan to diff against
+
+    const current = scans[0];
+    const previous = scans[1];
+
+    // Compare per-source counts (CA policies, compliance, etc.)
+    const sources = ['conditionalAccess', 'compliancePolicies', 'deviceConfigurations', 'configurationPolicies', 'sensitivityLabels', 'retentionLabels', 'dlpPolicies', 'namedLocations'];
+    const counts = [];
+    for (const s of sources) {
+      const cur = Array.isArray(current.data && current.data[s]) ? current.data[s].length : null;
+      const prev = Array.isArray(previous.data && previous.data[s]) ? previous.data[s].length : null;
+      if (cur === null || prev === null) continue;
+      if (cur !== prev) counts.push({ source: s, prev, cur, delta: cur - prev });
+    }
+
+    // Compare CA policies specifically — show added / removed by name
+    const prevCANames = new Set((previous.data && previous.data.conditionalAccess || []).map(p => p.id));
+    const curCANames = new Set((current.data && current.data.conditionalAccess || []).map(p => p.id));
+    const addedCA   = (current.data && current.data.conditionalAccess || []).filter(p => !prevCANames.has(p.id));
+    const removedCA = (previous.data && previous.data.conditionalAccess || []).filter(p => !curCANames.has(p.id));
+
+    // Score delta + finding-count delta
+    const scoreDelta = (current.score || 0) - (previous.score || 0);
+    const prevSummary = previous.summary || {};
+    const curSummary = current.summary || {};
+    const critDelta = (curSummary.critical || 0) - (prevSummary.critical || 0);
+    const highDelta = (curSummary.high || 0) - (prevSummary.high || 0);
+
+    if (counts.length === 0 && addedCA.length === 0 && removedCA.length === 0 && scoreDelta === 0 && critDelta === 0 && highDelta === 0) {
+      // Nothing changed — show a quiet "no drift" line
+      card.innerHTML = '<div style="display:flex;align-items:center;gap:10px;font-size:.7rem;color:var(--ink3)">' +
+        '<strong style="color:var(--ink2)">No drift detected</strong> · since last scan ' + escHtml(new Date(previous.timestamp).toLocaleString()) + '</div>';
+      card.style.display = 'block';
+      return;
+    }
+
+    let html = '<div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;flex-wrap:wrap">';
+    html += '<strong style="font-size:.82rem;color:var(--ink)">What changed since last scan</strong>';
+    html += '<span style="font-size:.62rem;color:var(--ink4)">previous: ' + escHtml(new Date(previous.timestamp).toLocaleString()) + '</span>';
+    if (scoreDelta !== 0) {
+      const colour = scoreDelta > 0 ? 'var(--green)' : 'var(--red)';
+      html += '<span style="font-size:.66rem;color:' + colour + ';font-weight:600">Score: ' + (scoreDelta > 0 ? '+' : '') + scoreDelta + '</span>';
+    }
+    if (critDelta !== 0) {
+      const colour = critDelta < 0 ? 'var(--green)' : 'var(--red)';
+      html += '<span style="font-size:.66rem;color:' + colour + ';font-weight:600">Critical findings: ' + (critDelta > 0 ? '+' : '') + critDelta + '</span>';
+    }
+    if (highDelta !== 0) {
+      const colour = highDelta < 0 ? 'var(--green)' : '#e84393';
+      html += '<span style="font-size:.66rem;color:' + colour + ';font-weight:600">High findings: ' + (highDelta > 0 ? '+' : '') + highDelta + '</span>';
+    }
+    html += '</div>';
+
+    if (addedCA.length > 0) {
+      html += '<div style="margin-bottom:10px"><strong style="font-size:.66rem;color:var(--green);text-transform:uppercase;letter-spacing:.5px">+ Added CA policies</strong>';
+      html += '<ul style="margin:6px 0 0;padding-left:20px;font-size:.66rem;color:var(--ink2);line-height:1.6">';
+      addedCA.forEach(p => { html += '<li>' + escHtml(p.displayName || p.id) + ' <span style="color:var(--ink4)">— ' + escHtml(p.state || 'unknown') + '</span></li>'; });
+      html += '</ul></div>';
+    }
+    if (removedCA.length > 0) {
+      html += '<div style="margin-bottom:10px"><strong style="font-size:.66rem;color:var(--red);text-transform:uppercase;letter-spacing:.5px">− Removed CA policies</strong>';
+      html += '<ul style="margin:6px 0 0;padding-left:20px;font-size:.66rem;color:var(--ink2);line-height:1.6">';
+      removedCA.forEach(p => { html += '<li>' + escHtml(p.displayName || p.id) + '</li>'; });
+      html += '</ul></div>';
+    }
+    if (counts.length > 0) {
+      html += '<div><strong style="font-size:.66rem;color:var(--ink2);text-transform:uppercase;letter-spacing:.5px">Per-source counts</strong>';
+      html += '<table style="margin-top:6px;font-size:.66rem;border-collapse:collapse"><tbody>';
+      counts.forEach(c => {
+        const colour = c.delta > 0 ? 'var(--green)' : 'var(--red)';
+        html += '<tr><td style="padding:2px 12px 2px 0;color:var(--ink3)">' + escHtml(c.source) + '</td>' +
+                '<td style="padding:2px 12px;color:var(--ink4)">' + c.prev + ' → ' + c.cur + '</td>' +
+                '<td style="padding:2px 0;color:' + colour + ';font-weight:600">' + (c.delta > 0 ? '+' : '') + c.delta + '</td></tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+    card.innerHTML = html;
+    card.style.display = 'block';
+  }
+
   // ── Trend chart layer ────────────────────────────────────────────────
 
   function renderTrendSection() {
@@ -322,6 +418,7 @@ const TenantScanPage = (() => {
     if (time)       html += '<div><div style="font-size:.58rem;color:var(--ink4);text-transform:uppercase;letter-spacing:.5px">Last scanned</div><span style="font-size:.7rem;color:var(--ink2)">' + escHtml(time) + '</span></div>';
     if (errs > 0)   html += '<div><div style="font-size:.58rem;color:var(--ink4);text-transform:uppercase;letter-spacing:.5px">Endpoint errors</div><span style="font-size:.7rem;color:var(--red)"><strong>' + errs + '</strong> failed</span></div>';
     html += '<div style="flex:1"></div>';
+    html += '<button class="btn btn-sm" onclick="TenantScanPage.generateReport()" title="Open a printable customer report in a new tab">Generate Report</button>';
     html += '<button class="btn btn-sm btn-primary" onclick="TenantScanPage.scan()" ' + (isScanning ? 'disabled' : '') + '>' + (isScanning ? 'Scanning…' : 'Re-scan') + '</button>';
     html += '</div>';
     return html;
@@ -481,11 +578,47 @@ const TenantScanPage = (() => {
         if (f.description) html += '<p style="margin:6px 0;font-size:.64rem;color:var(--ink2);line-height:1.6">' + escHtml(f.description) + '</p>';
         if (f.remediation) html += '<p style="margin:6px 0;font-size:.64rem;color:var(--ink3);line-height:1.6"><strong>Remediation:</strong> ' + escHtml(f.remediation) + '</p>';
         if (f.refs && f.refs.length) html += '<div style="font-size:.6rem;color:var(--ink4);margin-top:6px">Related: ' + f.refs.map(r => '<code>' + escHtml(r) + '</code>').join(', ') + '</div>';
+
+        // ── One-click remediation ──
+        // For each ref that matches one of our 143 deployable policy IDs,
+        // surface a Deploy button that hands off to DeployEngine.
+        const deployableRefs = _findDeployableRefs(f.refs);
+        if (deployableRefs.length > 0) {
+          html += '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">';
+          for (const polId of deployableRefs) {
+            html += '<button class="btn btn-sm btn-deploy" onclick="TenantScanPage.deployFix(\'' + escHtml(polId) + '\')">Deploy ' + escHtml(polId) + ' to fix</button>';
+          }
+          html += '</div>';
+        }
+
         html += '</details>';
       }
     }
     html += '</div>';
     return html;
+  }
+
+  // Filter a finding's refs to only those that match one of our 143
+  // deployable policy IDs. Strings that look like CIS check numbers (1.2.3)
+  // or arbitrary text are dropped.
+  function _findDeployableRefs(refs) {
+    if (!Array.isArray(refs) || typeof AppState === 'undefined') return [];
+    const policies = AppState.get('policies') || [];
+    const policyIds = new Set(policies.map(p => p.id));
+    return refs.filter(r => policyIds.has(r));
+  }
+
+  async function deployFix(policyId) {
+    if (typeof Policies === 'undefined' || !Policies.deploy) {
+      // Fallback: navigate to policies page if Deploy module not loaded
+      Router.navigate('policies');
+      showToast('Open the Policies page and find ' + policyId + ' to deploy.');
+      return;
+    }
+    showToast('Deploying ' + policyId + '…');
+    await Policies.deploy(policyId);
+    // After deploy, re-render so the user sees updated state.
+    render();
   }
 
   // ── Inventory layer ──────────────────────────────────────────────────
@@ -627,5 +760,13 @@ const TenantScanPage = (() => {
     showToast(filename + ' downloaded');
   }
 
-  return { init, render, scan, filterWorkload, exportFindingsJson, exportFindingsCsv, exportInventoryJson, exportInventoryCsv };
+  function generateReport() {
+    if (typeof ScanReport === 'undefined' || !ScanReport.generate) {
+      showToast('Report module not loaded');
+      return;
+    }
+    ScanReport.generate();
+  }
+
+  return { init, render, scan, filterWorkload, exportFindingsJson, exportFindingsCsv, exportInventoryJson, exportInventoryCsv, deployFix, generateReport };
 })();
