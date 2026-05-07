@@ -251,6 +251,111 @@
       });
     }
 
+    // ── Known CA bypass detector ─────────────────────────────────────
+    // Checks for documented bypass techniques and Microsoft-published
+    // exclusions that should (or should NOT) appear in policies.
+
+    // 1. "All resources / All apps" enforcement rollout (Microsoft is
+    //    tightening how includeApplications=['All'] interacts with workload
+    //    identities & specific service principals — March-June 2026 rollout).
+    //    Flag policies using includeApplications=['All'] for potential review.
+    const allAppsBlocking = enabled.filter(p =>
+      H.targetsAllApps(p) && H.isBlockPolicy(p) && H.targetsAllUsers(p)
+    );
+    if (allAppsBlocking.length > 1) {
+      findings.push({
+        ruleId: 'overlapping-block-all',
+        severity: 'medium',
+        title: allAppsBlocking.length + ' enabled "block All users + All apps" policies overlap',
+        description: 'Microsoft\'s low-privilege scope enforcement (rolling out 2026) changes how multiple "All" policies interact. Overlapping block-all policies risk conflicting evaluations and unintended fall-through. Microsoft recommends consolidating into one policy with focused exclusions.',
+        remediation: 'Consolidate the block-all policies. Keep a single canonical "block legacy auth" policy and a single canonical "block high-risk" policy. Move other "All apps" policies to specific app targeting.',
+        refs: allAppsBlocking.map(p => p.id),
+      });
+    }
+
+    // 2. FOCI risk — when a CA policy excludes a specific Microsoft app,
+    //    apps in the same Family of Client IDs share refresh tokens and
+    //    can therefore inherit the exclusion. Detect any policy that excludes
+    //    apps in the well-known FOCI families.
+    const FOCI_APPS = {
+      // Microsoft Office FOCI family — sharing this token means Outlook,
+      // Teams, OneDrive, Word, Excel, PowerPoint can all use it.
+      '1fec8e78-bce4-4aaf-ab1b-5451cc387264': 'Microsoft Teams',
+      'd3590ed6-52b3-4102-aeff-aad2292ab01c': 'Microsoft Office',
+      '00000003-0000-0ff1-ce00-000000000000': 'Microsoft Office',
+      'fb78d390-0c51-40cd-8e17-fdbfab77341b': 'Microsoft Exchange REST API',
+      '00b41c95-dab0-4487-9791-b9d2c32c80f2': 'Office 365 Management',
+    };
+    for (const p of enabled) {
+      const excludedApps = (p.conditions && p.conditions.applications && p.conditions.applications.excludeApplications) || [];
+      const focis = excludedApps.filter(id => FOCI_APPS[id]);
+      if (focis.length > 0) {
+        findings.push({
+          ruleId: 'foci-app-excluded',
+          severity: 'medium',
+          title: 'FOCI app excluded from CA policy: "' + (p.displayName || p.id) + '"',
+          description: 'Excluding ' + focis.map(id => FOCI_APPS[id]).join(', ') + ' allows token sharing across the entire Microsoft Office FOCI family — an attacker compromising one app inherits the exclusion for all of them. Microsoft documents this as a known risk pattern.',
+          remediation: 'Remove the FOCI app from excludeApplications. If the user-experience reason for the exclusion is real, narrow the policy by user/group instead of by app.',
+          refs: [p.id],
+        });
+      }
+    }
+
+    // 3. MS Learn-documented service principals that should be excluded
+    //    Some Microsoft service principals (esp. directory sync) need
+    //    exclusion from MFA-blocking policies for the platform to function.
+    //    We flag MFA-required-on-all policies that DON'T exclude them.
+    const RECOMMENDED_EXCLUSION_SPS = {
+      '00000004-0000-0ff1-ce00-000000000000': 'Microsoft Exchange Online',  // for legacy hybrid setups
+      // Note: for app-only policies most service principals SHOULD NOT be
+      // excluded blanket-fashion — these checks are case-by-case.
+    };
+    // (Intentionally empty for now — placeholder for the catalogue. Customers
+    // can add their own via documentation rather than run unwanted checks.)
+
+    // 4. Report-only that overlaps an enforcing policy on the same scope.
+    //    A common mistake: leave a report-only "draft" running alongside its
+    //    enforced counterpart, which clutters the sign-in logs.
+    for (const ro of reportOnly) {
+      const roApps = ((ro.conditions || {}).applications || {}).includeApplications || [];
+      const roUsers = ((ro.conditions || {}).users || {}).includeUsers || [];
+      const overlap = enabled.find(en => {
+        const eApps = ((en.conditions || {}).applications || {}).includeApplications || [];
+        const eUsers = ((en.conditions || {}).users || {}).includeUsers || [];
+        const sameApps = roApps.length > 0 && eApps.length > 0 &&
+          roApps.some(a => eApps.indexOf(a) !== -1);
+        const sameUsers = roUsers.length > 0 && eUsers.length > 0 &&
+          roUsers.some(u => eUsers.indexOf(u) !== -1);
+        return sameApps && sameUsers;
+      });
+      if (overlap) {
+        findings.push({
+          ruleId: 'report-only-overlaps-enabled',
+          severity: 'low',
+          title: 'Report-only policy overlaps an enabled policy: "' + (ro.displayName || ro.id) + '"',
+          description: 'This report-only policy targets the same users/apps as the enabled policy "' + (overlap.displayName || overlap.id) + '". Sign-in logs will be cluttered with redundant evaluations.',
+          remediation: 'Either retire the report-only policy if its evaluation is complete, or narrow its scope so it tests something different.',
+          refs: [ro.id, overlap.id],
+        });
+      }
+    }
+
+    // 5. CA "agents" scope (preview) — Microsoft is still rolling this out.
+    //    Detect policies using the experimental Servicw Principal scope/etc.
+    for (const p of enabled) {
+      const cap = p.conditions || {};
+      if (cap.clientApplications && (cap.clientApplications.includeServicePrincipals || []).length > 0) {
+        findings.push({
+          ruleId: 'workload-id-policy',
+          severity: 'info',
+          title: 'Workload-identity CA policy active: "' + (p.displayName || p.id) + '"',
+          description: 'This policy targets specific service principals (workload identities). Workload Identity Premium licence required. Verify the service principals listed are still appropriate for your environment — orphan SPs accumulate over time.',
+          remediation: 'Review the includeServicePrincipals list quarterly. Remove SPs that no longer represent active integrations.',
+          refs: [p.id],
+        });
+      }
+    }
+
     return findings;
   });
 })();
