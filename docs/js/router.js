@@ -3,17 +3,21 @@
 ═══════════════════════════════════════════ */
 const Router = (() => {
   const routes = {
-    '':           'home',
-    'home':       'home',
-    'assessment': 'assessment',
-    'dashboard':  'dashboard',
-    'policies':   'policies',
-    'reports':    'reports',
+    '':            'home',
+    'home':        'home',
+    'assessment':  'assessment',
+    'dashboard':   'dashboard',
+    'tenant-scan': 'tenant-scan',
+    'policies':    'policies',
+    'reports':     'reports',
   };
 
   const pageInitializers = {};
 
   function register(page, initFn) {
+    // Auto-register the route so calling Router.register('foo', fn) is enough —
+    // no need to also add 'foo' to the routes table by hand.
+    if (!routes[page]) routes[page] = page;
     pageInitializers[page] = initFn;
   }
 
