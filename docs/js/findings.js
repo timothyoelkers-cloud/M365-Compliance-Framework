@@ -84,14 +84,42 @@ const Findings = (() => {
       }
     }
 
+    // Deduplicate: when two analyzers raise the same finding (e.g. CA "no
+    // policies" vs framework alignment "no CA controls satisfied"), keep
+    // the higher-severity one and drop the duplicate.
+    // Dedup key: workload + ruleId; if two findings collide and the existing
+    // one already has higher severity, drop the new one.
+    const seen = new Map();
+    const deduped = [];
+    for (const f of all) {
+      const key = (f.workload || '') + '|' + (f.ruleId || f.title || '');
+      const existing = seen.get(key);
+      const fRank = (SEVERITY[f.severity] || SEVERITY.info).rank;
+      if (existing) {
+        const eRank = (SEVERITY[existing.severity] || SEVERITY.info).rank;
+        if (fRank > eRank) {
+          // Replace existing with this higher-severity copy.
+          const idx = deduped.indexOf(existing);
+          if (idx >= 0) deduped[idx] = f;
+          seen.set(key, f);
+        }
+        continue;  // duplicate; drop
+      }
+      seen.set(key, f);
+      deduped.push(f);
+    }
+
     // Sort by severity (highest first), then by workload, then by title.
-    all.sort((a, b) => {
+    deduped.sort((a, b) => {
       const ra = (SEVERITY[a.severity] || SEVERITY.info).rank;
       const rb = (SEVERITY[b.severity] || SEVERITY.info).rank;
       if (rb !== ra) return rb - ra;
       if (a.workload !== b.workload) return a.workload.localeCompare(b.workload);
       return (a.title || '').localeCompare(b.title || '');
     });
+    // Replace `all` with the deduped list for the rest of the function.
+    all.length = 0;
+    for (const f of deduped) all.push(f);
 
     return {
       findings: all,

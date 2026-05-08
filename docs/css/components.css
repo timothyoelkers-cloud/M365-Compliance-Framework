@@ -1326,3 +1326,192 @@
   #theme-toggle-btn { display: none; }
   .slide-over { width: 100vw; }
 }
+
+/* ═══════════════════════════════════════════
+   SCAN TAB POLISH
+   - Two-column grid with sticky in-page TOC
+   - Refined Coverage Dashboard
+   - Subtle fade-in on render
+═══════════════════════════════════════════ */
+.scan-layout {
+  display: grid;
+  grid-template-columns: 1fr 220px;
+  gap: 20px;
+  align-items: flex-start;
+}
+.scan-main { min-width: 0; }
+.scan-toc {
+  position: sticky; top: 84px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r2);
+  padding: 14px 16px;
+  font-size: .68rem;
+  box-shadow: var(--shadow);
+  max-height: calc(100vh - 100px);
+  overflow-y: auto;
+}
+.scan-toc-title {
+  font-size: .6rem;
+  text-transform: uppercase;
+  letter-spacing: .8px;
+  color: var(--ink3);
+  font-weight: 700;
+  margin-bottom: 10px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+.scan-toc a {
+  display: block;
+  padding: 6px 8px;
+  color: var(--ink2);
+  text-decoration: none;
+  border-left: 2px solid transparent;
+  border-radius: 0 4px 4px 0;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+  margin-bottom: 1px;
+}
+.scan-toc a:hover {
+  background: var(--surface2);
+  color: var(--ink);
+  text-decoration: none;
+  border-left-color: var(--primary-light);
+}
+.scan-toc a.active {
+  background: var(--primary-bg);
+  color: var(--primary-dark);
+  border-left-color: var(--primary);
+  font-weight: 600;
+}
+.scan-toc .toc-count {
+  float: right;
+  color: var(--ink4);
+  font-size: .58rem;
+  font-weight: 400;
+}
+@media (max-width: 1100px) {
+  .scan-layout { grid-template-columns: 1fr; }
+  .scan-toc { position: static; max-height: none; margin-bottom: 12px; }
+  .scan-toc a { display: inline-block; margin-right: 4px; }
+}
+
+/* Refined Coverage Dashboard */
+.coverage-dash {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 28px;
+  align-items: center;
+}
+.coverage-donut {
+  position: relative; width: 180px; height: 180px;
+  border-radius: 50%;
+  display: grid; place-items: center;
+  margin: 0 auto;
+  transition: transform 300ms cubic-bezier(.4,0,.2,1);
+}
+.coverage-donut::before {
+  content: '';
+  position: absolute; inset: 8px;
+  background: var(--surface);
+  border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0,0,0,.04) inset;
+}
+.coverage-donut-inner {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  align-items: center;
+}
+.coverage-donut-num {
+  font-size: 2.4rem;
+  font-weight: 800;
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em;
+}
+.coverage-donut-suffix {
+  font-size: .58rem;
+  color: var(--ink3);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-top: 2px;
+}
+.coverage-donut-label {
+  font-size: .66rem;
+  color: var(--ink3);
+  text-align: center;
+  margin-top: 10px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+.coverage-bars { display: flex; flex-direction: column; gap: 5px; }
+.coverage-bar-row {
+  display: grid;
+  grid-template-columns: 180px 1fr 30px;
+  align-items: center; gap: 10px;
+  font-size: .66rem;
+  padding: 2px 0;
+}
+.coverage-bar-row strong { color: var(--ink2); font-weight: 500; }
+.coverage-bar {
+  height: 8px;
+  background: var(--surface2);
+  border-radius: 4px;
+  overflow: hidden;
+  display: flex;
+  position: relative;
+}
+.coverage-bar > div {
+  height: 100%;
+  transition: width 600ms cubic-bezier(.4,0,.2,1);
+}
+@media (max-width: 700px) {
+  .coverage-dash { grid-template-columns: 1fr; }
+  .coverage-bar-row { grid-template-columns: 1fr 1fr 30px; }
+}
+
+/* Sev pill consistency */
+.sev-pill {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-size: .62rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: .4px;
+}
+
+/* Card fade-in stagger when the page renders */
+@keyframes scanCardFadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.scan-main > .card,
+.scan-main > [id^="scan-section-"] {
+  animation: scanCardFadeIn 280ms cubic-bezier(.2,.8,.2,1) both;
+}
+.scan-main > *:nth-child(1) { animation-delay: 0ms; }
+.scan-main > *:nth-child(2) { animation-delay: 30ms; }
+.scan-main > *:nth-child(3) { animation-delay: 60ms; }
+.scan-main > *:nth-child(4) { animation-delay: 90ms; }
+.scan-main > *:nth-child(5) { animation-delay: 120ms; }
+.scan-main > *:nth-child(6) { animation-delay: 150ms; }
+.scan-main > *:nth-child(7) { animation-delay: 180ms; }
+
+/* Small interactive lifts */
+.tenant-overview-card {
+  transition: background 150ms ease, transform 150ms ease, border-color 150ms ease;
+}
+.tenant-overview-card:hover {
+  transform: translateY(-2px);
+  background: var(--surface);
+  border-color: var(--primary-light);
+}
+
+/* Refine flow card severity bar */
+.ca-flow-card {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.ca-flow-card:hover {
+  transform: translateX(2px);
+  box-shadow: var(--shadow);
+}

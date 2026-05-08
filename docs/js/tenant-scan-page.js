@@ -50,22 +50,39 @@ const TenantScanPage = (() => {
     // We have a scan — render all the layers.
     const analysis = (typeof Findings !== 'undefined') ? Findings.analyzeAll(scanData) : null;
 
-    let html = '';
-    html += renderTenantOverview();        // 🆕 multi-tenant strip
-    html += renderProvenance(scanData);
-    html += renderScheduleStrip();         // 🆕 scheduled scans control
-    html += renderDashboard(scanData, analysis);
-    html += renderTrendSection();
-    html += renderDriftSection();
-    html += renderTemplatesSection(scanData);  // 🆕 template fingerprint matching
-    html += renderGitHubCompareSection();
-    html += renderRecommendedActions(analysis);
-    html += renderFrameworkAlignmentSection();
-    html += renderCAFlowCardsSection(scanData);
-    html += renderFindingsSection(analysis);
-    html += renderInventorySection(scanData);
+    // Sections are wrapped in <section id="scan-section-*"> so the sticky TOC
+    // can deep-link them and highlight as the user scrolls.
+    const sections = [
+      { id: 'overview',       label: 'Overview',         html: renderTenantOverview() },
+      { id: 'provenance',     label: 'Provenance',       html: renderProvenance(scanData) },
+      { id: 'schedule',       label: 'Schedule',         html: renderScheduleStrip() },
+      { id: 'dashboard',      label: 'Coverage',         html: renderDashboard(scanData, analysis), count: analysis ? analysis.score : null, countSuffix: '/100' },
+      { id: 'trend',          label: 'Trend',            html: renderTrendSection() },
+      { id: 'drift',          label: 'Drift',            html: renderDriftSection() },
+      { id: 'templates',      label: 'Templates',        html: renderTemplatesSection(scanData) },
+      { id: 'recommended',    label: 'Recommended',      html: renderRecommendedActions(analysis), count: analysis ? Math.min(10, (analysis.findings || []).filter(f => f.severity !== 'info').length) : null },
+      { id: 'frameworks',     label: 'Frameworks',       html: renderFrameworkAlignmentSection() },
+      { id: 'flow-cards',     label: 'CA flow cards',    html: renderCAFlowCardsSection(scanData) },
+      { id: 'findings',       label: 'Findings',         html: renderFindingsSection(analysis), count: analysis ? (analysis.findings || []).length : null },
+      { id: 'inventory',      label: 'Inventory',        html: renderInventorySection(scanData) },
+      { id: 'github-compare', label: 'Compare repo',     html: renderGitHubCompareSection() },
+    ];
+
+    let mainHtml = '';
+    const tocItems = [];
+    for (const s of sections) {
+      if (!s.html) continue;
+      mainHtml += '<section id="scan-section-' + s.id + '">' + s.html + '</section>';
+      tocItems.push({ id: s.id, label: s.label, count: s.count, countSuffix: s.countSuffix });
+    }
+
+    let html = '<div class="scan-layout">';
+    html += '<div class="scan-main">' + mainHtml + '</div>';
+    html += _renderTOC(tocItems);
+    html += '</div>';
 
     root.innerHTML = html;
+    _attachScrollSpy();
 
     // Persist this scan into history for the trend chart (idempotent — same
     // tenantId + same timestamp won't add a duplicate).
@@ -427,11 +444,36 @@ const TenantScanPage = (() => {
     { id: 'JH-APP-AVD-NONTRUSTED',      displayName: 'JH | Block AVD from non-trusted locations',  fp: { includeApps: ['9cdead84-a844-4324-93f2-b2e6bb768d07'], grantControls: ['block'] } },
   ];
 
+  // Cache of per-template real-JSON fingerprints. Lazily populated by
+  // _loadRealCAFingerprints() (which reads the CA policy files via
+  // DataStore.loadPolicy and extracts the actual conditions/grantControls).
+  // Until populated, the matcher falls back to the name-derived heuristic.
+  const _caFingerprintCache = {};
+  let _caFingerprintsLoading = false;
+  async function _loadRealCAFingerprints() {
+    if (_caFingerprintsLoading) return;
+    if (typeof DataStore === 'undefined' || !DataStore.loadPolicy) return;
+    _caFingerprintsLoading = true;
+    const policies = (AppState.get('policies') || []).filter(p => p.type === 'conditional-access');
+    let any = false;
+    for (const p of policies) {
+      if (_caFingerprintCache[p.id]) continue;
+      try {
+        const raw = await DataStore.loadPolicy(p.type, p.file);
+        _caFingerprintCache[p.id] = _fingerprintFromPolicy(raw);
+        any = true;
+      } catch (e) { /* ignore — will fall back to heuristic */ }
+    }
+    if (any) render();  // re-render with the deeper fingerprints
+  }
+
   function _matchCATemplates(allPolicies, data) {
     const tenantPolicies = data.conditionalAccess;
     if (!Array.isArray(tenantPolicies)) return null;
     const caTemplates = allPolicies.filter(p => p.type === 'conditional-access');
     if (caTemplates.length === 0 && JH_CANONICAL_CA.length === 0) return null;
+    // Kick off a deeper fingerprint load (non-blocking).
+    setTimeout(() => _loadRealCAFingerprints().catch(() => {}), 0);
 
     // Each template needs the deployable JSON loaded to extract its fingerprint.
     // We'll do this lazily — for the initial render we score against in-memory
@@ -441,6 +483,11 @@ const TenantScanPage = (() => {
     // policy in our catalogue has a stable naming convention indicating its
     // intent (e.g. "CA01 | Block Legacy Authentication").
     const fingerprints = caTemplates.map(t => {
+      // Prefer the JSON-derived fingerprint loaded async by
+      // _loadRealCAFingerprints; fall back to name regex while loading.
+      if (_caFingerprintCache[t.id]) {
+        return { template: t, fp: _caFingerprintCache[t.id] };
+      }
       const name = (t.displayName || '').toLowerCase();
       const fp = {
         includeUsers: [], includeRoles: [], includeApps: [], includeUserActions: [],
@@ -1082,6 +1129,54 @@ const TenantScanPage = (() => {
     card.style.display = 'block';
   }
 
+  // ── Sticky in-page TOC ──────────────────────────────────────────────
+  function _renderTOC(items) {
+    if (!items || items.length === 0) return '';
+    let html = '<aside class="scan-toc"><div class="scan-toc-title">On this page</div>';
+    for (const it of items) {
+      const countHtml = (it.count != null && it.count !== '')
+        ? '<span class="toc-count">' + escHtml(it.count + (it.countSuffix || '')) + '</span>'
+        : '';
+      html += '<a href="#scan-section-' + it.id + '" data-toc="' + it.id + '">' + escHtml(it.label) + countHtml + '</a>';
+    }
+    html += '</aside>';
+    return html;
+  }
+
+  function _attachScrollSpy() {
+    const links = document.querySelectorAll('.scan-toc a[data-toc]');
+    if (!links.length) return;
+    const sections = Array.from(document.querySelectorAll('[id^="scan-section-"]'));
+    if (!sections.length) return;
+
+    function update() {
+      let active = sections[0].id;
+      const fromTop = window.scrollY + 110;
+      for (const s of sections) {
+        if (s.offsetTop <= fromTop) active = s.id;
+      }
+      const slug = active.replace('scan-section-', '');
+      links.forEach(a => a.classList.toggle('active', a.dataset.toc === slug));
+    }
+    update();
+    window.removeEventListener('scroll', _scanScrollHandler);
+    window.addEventListener('scroll', update, { passive: true });
+    _scanScrollHandler = update;
+
+    // Smooth scroll on click instead of instant jump.
+    links.forEach(a => {
+      a.addEventListener('click', (e) => {
+        const href = a.getAttribute('href');
+        if (!href) return;
+        const target = document.querySelector(href);
+        if (!target) return;
+        e.preventDefault();
+        window.scrollTo({ top: target.offsetTop - 80, behavior: 'smooth' });
+      });
+    });
+  }
+  let _scanScrollHandler = null;
+
   // ── Multi-tenant overview ───────────────────────────────────────────
   // When TenantManager has more than one known tenant, render a strip at
   // the top with a card per tenant. Each card shows the most recent scan
@@ -1130,7 +1225,7 @@ const TenantScanPage = (() => {
         } catch (e) { /* ignore */ }
       }
       const isCurrent = t.id === currentId;
-      html += '<div onclick="TenantScanPage.switchTenant(\'' + escHtml(t.id) + '\')" style="cursor:pointer;background:var(--surface2);border:' + (isCurrent ? '2px solid var(--blue)' : '1px solid var(--border)') + ';border-radius:8px;padding:10px 12px;transition:background .15s" onmouseover="this.style.background=\'var(--surface3)\'" onmouseout="this.style.background=\'var(--surface2)\'">';
+      html += '<div class="tenant-overview-card" onclick="TenantScanPage.switchTenant(\'' + escHtml(t.id) + '\')" style="cursor:pointer;background:var(--surface2);border:' + (isCurrent ? '2px solid var(--primary)' : '1px solid var(--border)') + ';border-radius:8px;padding:12px 14px">';
       html += '<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:4px"><strong style="flex:1;font-size:.7rem;color:var(--ink);overflow:hidden;text-overflow:ellipsis">' + escHtml(t.displayName || t.id) + '</strong>';
       if (isCurrent) html += '<span style="font-size:.52rem;color:var(--blue);text-transform:uppercase;letter-spacing:.5px">current</span>';
       html += '</div>';
@@ -1237,33 +1332,37 @@ const TenantScanPage = (() => {
     }
 
     const sColour = score >= 80 ? 'var(--green)' : score >= 60 ? 'var(--amber)' : 'var(--red)';
-    let html = '<div class="card" style="padding:18px 20px;margin-bottom:14px">';
-    html += '<div style="display:flex;align-items:flex-start;gap:24px;flex-wrap:wrap">';
+    let html = '<div class="card" style="padding:24px 26px;margin-bottom:14px">';
+    html += '<div class="coverage-dash">';
 
-    // Score donut (CSS-only)
-    html += '<div style="text-align:center;min-width:140px">';
-    html += '<div style="position:relative;width:120px;height:120px;margin:0 auto;border-radius:50%;background:conic-gradient(' + sColour + ' ' + (score * 3.6) + 'deg, var(--surface2) 0deg);display:flex;align-items:center;justify-content:center">';
-    html += '<div style="background:var(--surface);width:90px;height:90px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center">';
-    html += '<div style="font-size:1.6rem;font-weight:700;color:' + sColour + ';line-height:1">' + score + '</div>';
-    html += '<div style="font-size:.55rem;color:var(--ink3);text-transform:uppercase;letter-spacing:.5px">/ 100</div>';
-    html += '</div></div>';
-    html += '<div style="font-size:.66rem;color:var(--ink3);margin-top:8px">Coverage Score</div>';
+    // Donut (CSS classes)
+    html += '<div>';
+    html += '<div class="coverage-donut" style="background:conic-gradient(' + sColour + ' ' + (score * 3.6) + 'deg, var(--surface2) 0deg)">';
+    html += '<div class="coverage-donut-inner">';
+    html += '<div class="coverage-donut-num" style="color:' + sColour + '">' + score + '</div>';
+    html += '<div class="coverage-donut-suffix">/ 100</div>';
+    html += '</div>';
+    html += '</div>';
+    html += '<div class="coverage-donut-label">Coverage Score</div>';
     html += '</div>';
 
     // Severity strip + per-workload bars
-    html += '<div style="flex:1;min-width:280px">';
-    html += '<div style="font-size:.62rem;color:var(--ink4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">Findings by severity</div>';
-    html += '<div style="display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap">';
+    html += '<div>';
+    html += '<div style="font-size:.6rem;color:var(--ink4);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:8px">Findings by severity</div>';
+    html += '<div style="display:flex;gap:6px;margin-bottom:18px;flex-wrap:wrap">';
+    let anySev = false;
     ['critical', 'high', 'medium', 'low', 'info'].forEach(sev => {
       const def = Findings.SEVERITY[sev];
       const c = counts[sev] || 0;
       if (c === 0) return;
-      html += '<span style="background:' + def.colour + '22;color:' + def.colour + ';padding:4px 10px;border-radius:12px;font-weight:600;font-size:.66rem">' + def.label + ': ' + c + '</span>';
+      anySev = true;
+      html += '<span class="sev-pill" style="background:' + def.colour + '22;color:' + def.colour + '">' + def.label + ': ' + c + '</span>';
     });
-    if (findings.length === 0) html += '<span style="color:var(--green);font-size:.7rem;font-weight:600">No findings — every analyzer ran clean.</span>';
+    if (!anySev) html += '<span style="color:var(--green);font-size:.74rem;font-weight:600">✓ No findings — every analyzer ran clean.</span>';
     html += '</div>';
 
-    html += '<div style="font-size:.62rem;color:var(--ink4);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px">By workload</div>';
+    html += '<div style="font-size:.6rem;color:var(--ink4);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:8px">By workload</div>';
+    html += '<div class="coverage-bars">';
     const workloadKeys = Object.keys(byWorkload).sort((a, b) => {
       const pa = (byWorkload[a].critical * 4) + (byWorkload[a].high * 3) + (byWorkload[a].medium * 2) + byWorkload[a].low;
       const pb = (byWorkload[b].critical * 4) + (byWorkload[b].high * 3) + (byWorkload[b].medium * 2) + byWorkload[b].low;
@@ -1277,20 +1376,20 @@ const TenantScanPage = (() => {
         const c = byWorkload[wl];
         const total = c.critical + c.high + c.medium + c.low + c.info;
         if (total === 0) continue;
-        html += '<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;font-size:.66rem">';
-        html += '<span style="width:160px;color:var(--ink2);flex-shrink:0">' + escHtml(meta.label) + '</span>';
-        html += '<div style="flex:1;height:8px;background:var(--surface2);border-radius:4px;overflow:hidden;display:flex">';
+        html += '<div class="coverage-bar-row">';
+        html += '<strong>' + escHtml(meta.label) + '</strong>';
+        html += '<div class="coverage-bar">';
         if (c.critical) html += '<div style="background:var(--red);width:' + (c.critical / total * 100) + '%" title="' + c.critical + ' critical"></div>';
         if (c.high)     html += '<div style="background:#e84393;width:' + (c.high / total * 100) + '%" title="' + c.high + ' high"></div>';
         if (c.medium)   html += '<div style="background:var(--amber);width:' + (c.medium / total * 100) + '%" title="' + c.medium + ' medium"></div>';
         if (c.low)      html += '<div style="background:var(--blue);width:' + (c.low / total * 100) + '%" title="' + c.low + ' low"></div>';
         if (c.info)     html += '<div style="background:var(--ink4);width:' + (c.info / total * 100) + '%" title="' + c.info + ' info"></div>';
         html += '</div>';
-        html += '<span style="width:30px;text-align:right;color:var(--ink3)">' + total + '</span>';
+        html += '<span style="text-align:right;color:var(--ink3);font-variant-numeric:tabular-nums">' + total + '</span>';
         html += '</div>';
       }
     }
-    html += '</div></div></div>';
+    html += '</div></div></div></div>';
     return html;
   }
 
