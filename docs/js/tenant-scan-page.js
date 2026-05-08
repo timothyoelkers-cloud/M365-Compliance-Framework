@@ -336,6 +336,12 @@ const TenantScanPage = (() => {
     if (intuneBlock)  blocks.push(intuneBlock);
     const mdeBlock     = _matchMDETemplates(allPolicies, data);
     if (mdeBlock)     blocks.push(mdeBlock);
+    const mdoBlock     = _matchMDOTemplates(allPolicies, data);
+    if (mdoBlock)     blocks.push(mdoBlock);
+    const exoBlock     = _matchEXOTemplates(allPolicies, data);
+    if (exoBlock)     blocks.push(exoBlock);
+    const purviewBlock = _matchPurviewTemplates(allPolicies, data);
+    if (purviewBlock) blocks.push(purviewBlock);
     const entraBlock   = _matchEntraTemplates(allPolicies, data);
     if (entraBlock)   blocks.push(entraBlock);
     const spoBlock     = _matchSPOTemplates(allPolicies, data);
@@ -402,11 +408,30 @@ const TenantScanPage = (() => {
     return html;
   }
 
+  // Canonical CA fingerprints derived from JH's policy-templates.ts
+  // (https://github.com/Jhope188/ca-policy-analyzer). These complement
+  // our 18 deployable CA policies — they match by structure only; the
+  // template stub provides only id + displayName for the Templates view.
+  const JH_CANONICAL_CA = [
+    { id: 'JH-FOUND-DEVICECODE',        displayName: 'JH | Block Device Code Auth Flow',          fp: { authenticationFlows: ['deviceCodeFlow'], grantControls: ['block'], includeApps: ['All'], includeUsers: ['All'] } },
+    { id: 'JH-FOUND-COUNTRIES',         displayName: 'JH | Block Sign-In from Disallowed Countries', fp: { grantControls: ['block'], includeApps: ['All'], includeUsers: ['All'] /* requires named locations */ } },
+    { id: 'JH-FOUND-PLATFORMS',         displayName: 'JH | Block Unsupported Device Platforms',   fp: { grantControls: ['block'], includeApps: ['All'], includeUsers: ['All'] /* uses platforms.exclude */ } },
+    { id: 'JH-BASE-MFA-GUESTS',         displayName: 'JH | MFA for External / Guest Users',       fp: { grantControls: ['mfa'], includeApps: ['All'] /* targetsGuests */ } },
+    { id: 'JH-BASE-AUTHTRANSFER',       displayName: 'JH | Block Authentication Transfer',        fp: { authenticationFlows: ['authenticationTransfer'], grantControls: ['block'], includeApps: ['All'], includeUsers: ['All'] } },
+    { id: 'JH-BASE-SERVICE-ACCOUNTS',   displayName: 'JH | Block Service Accounts',               fp: { grantControls: ['block'] /* targets service-account group */ } },
+    { id: 'JH-BASE-REGSECINFO',         displayName: 'JH | MFA for Register Security Info',        fp: { includeUserActions: ['urn:user:registersecurityinfo'], grantControls: ['mfa'] } },
+    { id: 'JH-BASE-ADMIN-SESSION',      displayName: 'JH | Session: Admin Persistence (1h)',       fp: { includeRoles: ['*'], sessionSignInFreq: true, sessionPersist: true } },
+    { id: 'JH-BASE-USER-SESSION',       displayName: 'JH | Session: User Persistence (9-12h)',    fp: { includeUsers: ['All'], sessionSignInFreq: true, sessionPersist: true, includeApps: ['All'] } },
+    { id: 'JH-APP-O365-TIMEOUT',        displayName: 'JH | O365 Session Timeout',                  fp: { includeApps: ['Office365'], sessionSignInFreq: true } },
+    { id: 'JH-APP-SP-NONTRUSTED',       displayName: 'JH | Block SharePoint from non-trusted locations', fp: { includeApps: ['00000003-0000-0ff1-ce00-000000000000'], grantControls: ['block'] } },
+    { id: 'JH-APP-AVD-NONTRUSTED',      displayName: 'JH | Block AVD from non-trusted locations',  fp: { includeApps: ['9cdead84-a844-4324-93f2-b2e6bb768d07'], grantControls: ['block'] } },
+  ];
+
   function _matchCATemplates(allPolicies, data) {
     const tenantPolicies = data.conditionalAccess;
     if (!Array.isArray(tenantPolicies)) return null;
     const caTemplates = allPolicies.filter(p => p.type === 'conditional-access');
-    if (caTemplates.length === 0) return null;
+    if (caTemplates.length === 0 && JH_CANONICAL_CA.length === 0) return null;
 
     // Each template needs the deployable JSON loaded to extract its fingerprint.
     // We'll do this lazily — for the initial render we score against in-memory
@@ -436,6 +461,18 @@ const TenantScanPage = (() => {
       else { fp.grantControls = ['mfa']; fp.includeApps = ['All']; }
       return { template: t, fp: fp };
     });
+
+    // Mix in the JH canonical templates — they have explicit fingerprints
+    // already, so we just normalise to the same shape used by _scoreFingerprint.
+    for (const jh of JH_CANONICAL_CA) {
+      const fp = Object.assign({
+        includeUsers: [], includeRoles: [], includeApps: [], includeUserActions: [],
+        clientAppTypes: [], signInRiskLevels: [], userRiskLevels: [],
+        grantControls: [], hasAuthStrength: false, sessionSignInFreq: false, sessionPersist: false,
+        authenticationFlows: [],
+      }, jh.fp);
+      fingerprints.push({ template: { id: jh.id, displayName: jh.displayName }, fp });
+    }
 
     const tenantFps = tenantPolicies.map(p => ({ policy: p, fp: _fingerprintFromPolicy(p) }));
 
@@ -645,6 +682,192 @@ const TenantScanPage = (() => {
     return {
       workload: 'Entra ID',
       matches,
+      summary: {
+        present: matches.filter(m => m.status === 'present').length,
+        partial: matches.filter(m => m.status === 'partial').length,
+        missing: matches.filter(m => m.status === 'missing').length,
+        total: matches.length,
+      },
+    };
+  }
+
+  // ── Defender for O365 template matching ──────────────────────────────
+  // Each DEF template matches a Microsoft Secure Score control. We can't
+  // see the underlying Defender policies (CORS-blocked InvokeCommand) so
+  // we use Microsoft's own evaluation as the source of truth.
+  function _matchMDOTemplates(allPolicies, data) {
+    const scoreSnap = (data.secureScores && data.secureScores[0]) || null;
+    const controlScores = (scoreSnap && scoreSnap.controlScores) || [];
+    const defTemplates = allPolicies.filter(p => p.type === 'defender');
+    if (defTemplates.length === 0) return null;
+    if (controlScores.length === 0) {
+      // No Secure Score data — surface as 'partial' for every template so
+      // the user knows we couldn't evaluate (rather than false 'missing').
+      const matches = defTemplates.map(t => ({
+        template: t, status: 'partial', score: 0,
+        matchedTenantPolicy: { displayName: 'Secure Score not retrieved — manual verification required' },
+      }));
+      return _summariseBlock('Defender for O365', matches);
+    }
+
+    // Map each DEF template name → Secure Score control IDs that should be
+    // implemented for it to count as "present".
+    const NAME_TO_CONTROL = [
+      { name: /anti.?phish/i,        controls: ['AntiPhishingPolicy', 'TargetedAntiPhishing'] },
+      { name: /safe link/i,           controls: ['EnableSafeLinks', 'SafeLinksClickTracking'] },
+      { name: /safe attachment/i,     controls: ['EnableSafeAttachments', 'SafeAttachmentsForSPO'] },
+      { name: /anti.?malware/i,       controls: ['AntiMalwarePolicy'] },
+      { name: /anti.?spam.*inbound/i, controls: ['BlockListsExternalSenders', 'EnableMailboxIntelligence'] },
+      { name: /anti.?spam.*outbound/i,controls: ['OutboundSpam'] },
+      { name: /sharepoint|onedrive|teams/i, controls: ['SafeAttachmentsForSPO'] },
+      { name: /attachment.*filter|common attachment/i, controls: ['CommonAttachmentTypesFilter'] },
+    ];
+
+    function isImplemented(controlIds) {
+      for (const cs of controlScores) {
+        const id = cs.controlName || cs.id || '';
+        if (!controlIds.some(c => id.toLowerCase().indexOf(c.toLowerCase()) !== -1)) continue;
+        const score = cs.score != null ? cs.score : 0;
+        const max = cs.maxScore != null ? cs.maxScore : null;
+        if (cs.implementationStatus === 'Implemented') return { ok: true, evidence: cs };
+        if (max != null && score >= max && max > 0) return { ok: true, evidence: cs };
+      }
+      return { ok: false, evidence: null };
+    }
+
+    const matches = defTemplates.map(t => {
+      const lower = (t.displayName || '').toLowerCase();
+      const matchRule = NAME_TO_CONTROL.find(r => r.name.test(lower));
+      if (!matchRule) return { template: t, status: 'partial', score: 50, matchedTenantPolicy: null };
+      const result = isImplemented(matchRule.controls);
+      return {
+        template: t,
+        status: result.ok ? 'present' : 'missing',
+        score: result.ok ? 100 : 0,
+        matchedTenantPolicy: result.evidence ? { displayName: 'Secure Score: ' + (result.evidence.controlName || '') + ' implemented' } : null,
+      };
+    });
+
+    return _summariseBlock('Defender for O365', matches);
+  }
+
+  // ── Exchange Online template matching ────────────────────────────────
+  // Same approach as DfO — Exchange policy state is only visible via Secure
+  // Score from the browser. Map each EXO template to one or more Secure
+  // Score controls.
+  function _matchEXOTemplates(allPolicies, data) {
+    const scoreSnap = (data.secureScores && data.secureScores[0]) || null;
+    const controlScores = (scoreSnap && scoreSnap.controlScores) || [];
+    const exoTemplates = allPolicies.filter(p => p.type === 'exchange');
+    if (exoTemplates.length === 0) return null;
+    if (controlScores.length === 0) {
+      const matches = exoTemplates.map(t => ({
+        template: t, status: 'partial', score: 0,
+        matchedTenantPolicy: { displayName: 'Secure Score not retrieved — manual verification required' },
+      }));
+      return _summariseBlock('Exchange Online', matches);
+    }
+
+    const NAME_TO_CONTROL = [
+      { name: /dkim/i,                         controls: ['DKIMSigning'] },
+      { name: /dmarc/i,                        controls: ['DMARCEnforcement'] },
+      { name: /external.*forward|auto.?forward/i, controls: ['DisableAutoForwarding'] },
+      { name: /basic auth|disable basic/i,     controls: ['BlockBasicAuth'] },
+      { name: /modern auth/i,                  controls: ['EnableModernAuth'] },
+      { name: /transport.*rule|whitelist/i,    controls: ['BlockListsExternalSenders'] },
+      { name: /calendar/i,                     controls: ['CalendarSharing'] },
+      { name: /report message/i,               controls: ['ReportMessage'] },
+      { name: /public folder/i,                controls: ['PublicFolderEmail'] },
+      { name: /direct send|preventdirectmail/i, controls: ['PreventDirectMail'] },
+    ];
+
+    function isImplemented(controlIds) {
+      for (const cs of controlScores) {
+        const id = cs.controlName || cs.id || '';
+        if (!controlIds.some(c => id.toLowerCase().indexOf(c.toLowerCase()) !== -1)) continue;
+        if (cs.implementationStatus === 'Implemented') return { ok: true, evidence: cs };
+        const score = cs.score != null ? cs.score : 0;
+        const max = cs.maxScore != null ? cs.maxScore : null;
+        if (max != null && score >= max && max > 0) return { ok: true, evidence: cs };
+      }
+      return { ok: false, evidence: null };
+    }
+
+    const matches = exoTemplates.map(t => {
+      const lower = (t.displayName || '').toLowerCase();
+      const matchRule = NAME_TO_CONTROL.find(r => r.name.test(lower));
+      if (!matchRule) return { template: t, status: 'partial', score: 50, matchedTenantPolicy: null };
+      const result = isImplemented(matchRule.controls);
+      return {
+        template: t,
+        status: result.ok ? 'present' : 'missing',
+        score: result.ok ? 100 : 0,
+        matchedTenantPolicy: result.evidence ? { displayName: 'Secure Score: ' + (result.evidence.controlName || '') + ' implemented' } : null,
+      };
+    });
+
+    return _summariseBlock('Exchange Online', matches);
+  }
+
+  // ── Purview template matching ────────────────────────────────────────
+  // We can see sensitivity labels, retention labels, and DLP policies via
+  // Graph (partial coverage). Each PV template maps to a category — we
+  // count it "present" if at least one matching item exists in the tenant.
+  function _matchPurviewTemplates(allPolicies, data) {
+    const sensitivityLabels = Array.isArray(data.sensitivityLabels) ? data.sensitivityLabels : null;
+    const retentionLabels   = Array.isArray(data.retentionLabels) ? data.retentionLabels : null;
+    const dlpPolicies       = Array.isArray(data.dlpPolicies) ? data.dlpPolicies : null;
+    const pvTemplates = allPolicies.filter(p => p.type === 'purview');
+    if (pvTemplates.length === 0) return null;
+    // If none of the three sources returned data, surface partial across the board.
+    if (sensitivityLabels === null && retentionLabels === null && dlpPolicies === null) {
+      const matches = pvTemplates.map(t => ({
+        template: t, status: 'partial', score: 0,
+        matchedTenantPolicy: { displayName: 'Purview endpoints not available — verify in Purview portal' },
+      }));
+      return _summariseBlock('Purview / Data Protection', matches);
+    }
+
+    function pvCategory(name) {
+      const n = (name || '').toLowerCase();
+      if (/dlp|data loss/.test(n))                     return 'dlp';
+      if (/sensitivity|sensitive|label.*sharepoint|auto.?label|container/.test(n)) return 'sensitivity';
+      if (/retention|disposition|records|regulatory hold/.test(n)) return 'retention';
+      if (/insider risk/.test(n))                      return 'insider';
+      if (/audit/.test(n))                              return 'audit';
+      if (/communication compliance/.test(n))           return 'comms';
+      if (/information barrier/.test(n))                return 'barriers';
+      if (/ediscovery/.test(n))                         return 'ediscovery';
+      if (/adaptive protection/.test(n))                return 'adaptive';
+      return 'other';
+    }
+
+    const matches = pvTemplates.map(t => {
+      const cat = pvCategory(t.displayName);
+      let evidence = null;
+      let ok = false;
+      if (cat === 'dlp' && Array.isArray(dlpPolicies)) {
+        if (dlpPolicies.length > 0) { ok = true; evidence = dlpPolicies[0]; }
+      } else if (cat === 'sensitivity' && Array.isArray(sensitivityLabels)) {
+        if (sensitivityLabels.length > 0) { ok = true; evidence = sensitivityLabels[0]; }
+      } else if (cat === 'retention' && Array.isArray(retentionLabels)) {
+        if (retentionLabels.length > 0) { ok = true; evidence = retentionLabels[0]; }
+      }
+      const status = ok ? 'present' : (cat === 'other' || cat === 'insider' || cat === 'comms' || cat === 'barriers' || cat === 'ediscovery' || cat === 'adaptive' || cat === 'audit' ? 'partial' : 'missing');
+      return {
+        template: t,
+        status,
+        score: ok ? 100 : (status === 'partial' ? 50 : 0),
+        matchedTenantPolicy: evidence ? { displayName: cat + ' detected: ' + (evidence.displayName || evidence.name || evidence.id || '') } : null,
+      };
+    });
+
+    return _summariseBlock('Purview / Data Protection', matches);
+  }
+
+  function _summariseBlock(workload, matches) {
+    return {
+      workload, matches,
       summary: {
         present: matches.filter(m => m.status === 'present').length,
         partial: matches.filter(m => m.status === 'partial').length,
@@ -1352,12 +1575,28 @@ const TenantScanPage = (() => {
   }
 
   // ── Custom GitHub repo compare section ──────────────────────────────
+  // Preset shortcuts let users compare against well-known reference repos
+  // in one click, including this framework's own canonical CA policies.
+  const GH_REPO_PRESETS = [
+    { label: 'This framework',     url: 'github.com/timothyoelkers-cloud/M365-Compliance-Framework/tree/main/docs/data/policies/conditional-access' },
+    { label: 'JH baseline',        url: 'github.com/Jhope188/ConditionalAccessPolicies' },
+    { label: 'JH analyzer source', url: 'github.com/Jhope188/ca-policy-analyzer' },
+  ];
+
   function renderGitHubCompareSection() {
     let html = '<div class="card" style="padding:16px 20px;margin-bottom:14px">';
     html += '<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap">';
     html += '<strong style="font-size:.82rem;color:var(--ink)">Compare against a GitHub repo</strong>';
     html += '<span style="font-size:.62rem;color:var(--ink4)">point at any public CA-policy repository to score it against this tenant</span>';
     html += '</div>';
+
+    // Preset chips
+    html += '<div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">';
+    for (const p of GH_REPO_PRESETS) {
+      html += '<button class="btn btn-sm" onclick="TenantScanPage.useRepoPreset(\'' + escHtml(p.url).replace(/\\'/g, '\\\\\'') + '\')">' + escHtml(p.label) + '</button>';
+    }
+    html += '</div>';
+
     html += '<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px">';
     html += '<input id="gh-repo-input" placeholder="github.com/owner/repo or owner/repo or full URL" style="flex:1;min-width:280px;padding:6px 10px;background:var(--surface2);border:1px solid var(--border);border-radius:4px;color:var(--ink);font-family:\'JetBrains Mono\',monospace;font-size:.7rem">';
     html += '<button class="btn btn-sm btn-primary" onclick="TenantScanPage.compareGitHub()">Compare</button>';
@@ -1365,6 +1604,13 @@ const TenantScanPage = (() => {
     html += '<div id="gh-repo-result"></div>';
     html += '</div>';
     return html;
+  }
+
+  function useRepoPreset(url) {
+    const input = document.getElementById('gh-repo-input');
+    if (!input) return;
+    input.value = url;
+    compareGitHub();
   }
 
   function compareGitHub() {
@@ -1375,7 +1621,7 @@ const TenantScanPage = (() => {
   return {
     init, render, scan, filterWorkload,
     exportFindingsJson, exportFindingsCsv, exportInventoryJson, exportInventoryCsv,
-    deployFix, generateReport, openAttestation, openCompare, compareGitHub,
+    deployFix, generateReport, openAttestation, openCompare, compareGitHub, useRepoPreset,
     switchTenant, scheduleStart, scheduleStop,
   };
 })();
